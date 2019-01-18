@@ -10,7 +10,7 @@ Discuss contributions to Mesosphere USI using GitHub [issues](https://github.com
 
 ### Bugs / Feature Requests
 Think you’ve found a bug? Want to see a new feature? Please open a case in our issue management tool, JIRA:
-* Login to the [DC/OS USI Public JIRA](https://jira.mesosphere.com/projects/DCOS_OSS_USI/issues).  You will need a Github or Google account to use this service.
+* Login to the [DC/OS USI Public JIRA](https://jira.mesosphere.com/projects/DCOS_OSS/issues).  You will need a Github or Google account to use this service.
 * Navigate to the **DC/OS OSS USI project**.
 * Click **Create Issue** - Please provide as much information as possible about the issue type and how to reproduce it.
 * Github Issues for this project have been disabled.
