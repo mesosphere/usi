@@ -1,0 +1,5 @@
+rootProject.name = 'usi'
+
+include 'interface'
+include 'core'
+include 'hello-world'
