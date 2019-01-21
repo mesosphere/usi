@@ -1,0 +1,15 @@
+plugins {
+    // Apply the scala plugin to add support for Scala
+    id 'scala'
+    id 'application'
+}
+
+
+application {
+    mainClassName = "com.mesosphere.usi.example.Main"
+}
+
+dependencies {
+    compile project(':core')
+    compile project(':interface')
+}

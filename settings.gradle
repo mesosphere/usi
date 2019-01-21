@@ -8,3 +8,7 @@
  */
 
 rootProject.name = 'usi'
+
+include 'interface'
+include 'core'
+include 'example-orchestrator'

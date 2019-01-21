@@ -9,14 +9,18 @@
 plugins {
     // Apply the scala plugin to add support for Scala
     id 'scala'
-    id 'application'
 }
 
-repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+allprojects {
+    repositories {
+        // Use jcenter for resolving your dependencies.
+        // You can declare any Maven/Ivy/file repository here.
+        jcenter()
+    }
+
+
 }
+
 
 dependencies {
     // Use Scala 2.12 in our library project
@@ -31,6 +35,18 @@ dependencies {
 }
 
 
-application {
-    mainClassName = "com.mesosphere.usi.Main"
+subprojects {
+    version = '1.0'
+    apply plugin: "scala"
+    dependencies {
+        // Use Scala 2.12 in our library project
+        implementation 'org.scala-lang:scala-library:2.12.7'
+
+        // Use Scalatest for testing our library
+        testImplementation 'junit:junit:4.12'
+        testImplementation 'org.scalatest:scalatest_2.12:3.0.5'
+
+        // Need scala-xml at test runtime
+        testRuntimeOnly 'org.scala-lang.modules:scala-xml_2.12:1.1.1'
+    }
 }

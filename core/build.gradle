@@ -1,0 +1,8 @@
+plugins {
+    // Apply the scala plugin to add support for Scala
+    id 'scala'
+}
+
+dependencies {
+    compile project(':interface')
+}
