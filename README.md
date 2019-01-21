@@ -8,7 +8,7 @@ This repository is currently a work-in-progress.
 How to run:
 
 ```
-$ gradle :example:run
+$ gradle :hello-world:run
 ```
 
 

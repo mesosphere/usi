@@ -3,7 +3,7 @@ plugins {
 }
 
 application {
-    mainClassName = "com.mesosphere.usi.example.Main"
+    mainClassName = "com.mesosphere.usi.helloworld.Main"
 }
 
 dependencies {

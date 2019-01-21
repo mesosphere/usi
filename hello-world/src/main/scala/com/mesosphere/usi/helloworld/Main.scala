@@ -1,5 +1,4 @@
-package com.mesosphere.usi.example
-
+package com.mesosphere.usi.helloworld
 
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.interface.PodSpec

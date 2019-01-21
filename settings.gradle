@@ -2,4 +2,4 @@ rootProject.name = 'usi'
 
 include 'interface'
 include 'core'
-include 'example-orchestrator'
+include 'hello-world'
