@@ -1,6 +1,6 @@
 package com.mesosphere.usi.interface
 
-import com.mesosphere.usi.interface.DummySchedulerInterface._
+import com.mesosphere.usi.interface.DummySchedulerInterface.DeploymentId
 
 import scala.concurrent.Future
 
