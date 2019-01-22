@@ -6,7 +6,7 @@ Contributors Guide
 [__Contributing__](CONTRIBUTING.md) |
 [__Slack__](http://chat.dcos.io)
 
-Discuss contributions to Mesosphere USI using GitHub [issues](https://github.com/mesosphere/usi/issues) and make contributions with GitHub [pull requests](https://github.com/mesosphere/usi/pulls).
+Make contributions with GitHub [pull requests](https://github.com/mesosphere/usi/pulls).
 
 ### Bugs / Feature Requests
 Think you’ve found a bug? Want to see a new feature? Please open a case in our issue management tool, JIRA:
