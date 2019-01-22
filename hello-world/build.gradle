@@ -8,5 +8,5 @@ application {
 
 dependencies {
     compile project(':core')
-    compile project(':interface')
+    compile project(':interfaces')
 }
