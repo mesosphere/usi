@@ -1,3 +1,4 @@
 dependencies {
     compile project(':interfaces')
+    compile 'com.typesafe.akka:akka-stream_2.12:2.5.19'
 }

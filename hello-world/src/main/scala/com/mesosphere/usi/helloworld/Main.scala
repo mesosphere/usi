@@ -1,7 +1,6 @@
 package com.mesosphere.usi.helloworld
 
-import com.mesosphere.usi.core.Scheduler
-import com.mesosphere.usi.interface.PodSpec
+import com.mesosphere.usi.core.{PodSpec, Scheduler}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

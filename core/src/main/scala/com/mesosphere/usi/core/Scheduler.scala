@@ -1,14 +1,13 @@
 package com.mesosphere.usi.core
 
-import scala.concurrent.Future
-import com.mesosphere.usi.interface.DummySchedulerInterface
-import com.mesosphere.usi.interface.DummySchedulerInterface.DeploymentId
-import com.mesosphere.usi.interface.PodSpec
+import akka.NotUsed
 
-class Scheduler extends DummySchedulerInterface {
+import akka.stream.scaladsl.{Flow, Source}
 
-  override def schedule(podSpec: PodSpec): Future[DeploymentId] = {
-    println(s"scheduling pod ${podSpec.id} with goal ${podSpec.goal}")
-    Future.successful("deploymentId")
-  }
+object Scheduler {
+  type SpecState = (SpecSnapshot, Source[SpecUpdate, NotUsed])
+  type StatusState = (StatusSnapshot, Source[StatusUpdate, NotUsed])
+
+  // Materialized value should probably be a Future containing Mesos master connection info etc.
+  val usi: Flow[SpecState, StatusState, NotUsed] = ???
 }
