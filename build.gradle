@@ -19,6 +19,16 @@ subprojects {
         // Need scala-xml at test runtime
         testRuntimeOnly 'org.scala-lang.modules:scala-xml_2.12:1.1.1'
     }
+
+    test {
+        reports.html.enabled = false
+    }
+}
+
+task testReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/allTests")
+    // Include the results from the `test` task in all subprojects
+    reportOn subprojects*.test
 }
 
 task githubReport(type: GithubStatus) {
