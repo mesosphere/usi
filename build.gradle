@@ -1,10 +1,10 @@
+import mesosphere.gradle.github.GithubStatus
+
 subprojects {
     version = '1.0'
     apply plugin: "scala"
 
     repositories {
-        // Use jcenter for resolving your dependencies.
-        // You can declare any Maven/Ivy/file repository here.
         jcenter()
     }
     
@@ -20,3 +20,5 @@ subprojects {
         testRuntimeOnly 'org.scala-lang.modules:scala-xml_2.12:1.1.1'
     }
 }
+
+task githubReport(type: GithubStatus)
