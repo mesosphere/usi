@@ -17,12 +17,19 @@ class GithubStatus extends DefaultTask {
 
   @Input
   @BeanProperty
+  var repoSlug = ""
+
+  @Input
+  @BeanProperty
+  var commit: String = ""
+
+  @Input
+  @BeanProperty
   var context: String = ""
 
   @TaskAction
   def run(): Unit = {
-    val commit = sys.env.getOrElse("TRAVIS_COMMIT", throw new IllegalArgumentException("TRAVIS_COMMIT not set. Probably not running on Travis CI."))
-    val path = s"repos/mesosphere/usi/status/$commit"
+    val path = s"repos/$repoSlug/statuses/$commit"
     val body =
       s"""
         |{
@@ -32,7 +39,7 @@ class GithubStatus extends DefaultTask {
         |  "context": "$context"
         |}
       """.stripMargin
-    //execute(path, body)
+    execute(path, body)
   }
 
 
