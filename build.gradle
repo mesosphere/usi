@@ -1,3 +1,4 @@
+import mesosphere.gradle.aws.S3Upload
 import mesosphere.gradle.github.GithubStatus
 
 subprojects {
@@ -29,6 +30,12 @@ task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/allTests")
     // Include the results from the `test` task in all subprojects
     reportOn subprojects*.test
+}
+
+task syncContents(type: S3Upload, dependsOn: testReport) {
+    bucket = "usi-builds"
+    prefix = "mesosphere/usi/karsten/github-report/7" // TODO(karsten): Construct from env vars
+    source = file("build/reports/allTests")  // TODO(karsten): Use output from testReport
 }
 
 task githubReport(type: GithubStatus) {
