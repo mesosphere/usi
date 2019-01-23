@@ -9,19 +9,25 @@ package object core {
   type PodId = String
   type ReservationId = String
 
-  case class PodSpec(id: PodId, goal: String, runSpec: String)
+  sealed trait Goal
+  object Goal {
+    case object Running extends Goal
+    case object Terminal extends Goal
+  }
 
+  case class PodSpec(id: PodId, goal: Goal, runSpec: String)
   case class ReservationSpec(id: String)
 
-  case class SpecSnapshot(podSpecs: Seq[PodSpec], reservationSpecs: Seq[ReservationSpec])
-
-
-  case class StatusSnapshot(podStatuses: Seq[PodStatus], reservationStatuses: Seq[ReservationStatus])
-
+  sealed trait StatusMessage
+  case class StatusSnapshot(podStatuses: Seq[PodStatus], reservationStatuses: Seq[ReservationStatus]) extends StatusMessage
+  sealed trait StatusChange extends StatusMessage
+  case class PodStatusChange(id: PodId, newStatus: Option[PodStatus]) extends StatusChange
+  case class ReservationStatusChange(id: ReservationId, newStatus: Option[ReservationStatus]) extends StatusChange
 
   sealed trait MesosTaskStatus
   object MesosTaskStatus {
     case object TASK_RUNNING extends MesosTaskStatus
+    case object TASK_KILLED extends MesosTaskStatus
   }
 
   /**
@@ -40,14 +46,11 @@ package object core {
 
   case class ReservationStatus(id: ReservationId, reservationState: ReservationState /* TODO make enum */)
 
-  // Status is a bad name
-  sealed trait StatusUpdate
-  case class PodStatusUpdate(id: PodId, newStatus: Option[PodStatus]) extends StatusUpdate
-  case class ReservationStatusUpdate(id: ReservationId, newStatus: Option[ReservationStatus]) extends StatusUpdate
+  sealed trait SpecMessage
+  case class SpecsSnapshot(podSpecs: Seq[PodSpec], reservationSpecs: Seq[ReservationSpec]) extends SpecMessage
 
-  sealed trait SpecUpdate
-  case class PodSpecUpdate(id: PodId, newState: Option[PodSpec]) extends SpecUpdate
-  case class ReservationSpecUpdate(id: ReservationId, newState: Option[ReservationSpec]) extends SpecUpdate
-
+  sealed trait SpecChange extends SpecMessage
+  case class PodSpecChange(id: PodId, newState: Option[PodSpec]) extends SpecChange
+  case class ReservationSpecChange(id: ReservationId, newState: Option[ReservationSpec]) extends SpecChange
 }
 
