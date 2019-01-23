@@ -1,25 +1,38 @@
 package mesosphere.gradle.github
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.{Input, TaskAction}
 import scalaj.http._
 
+import scala.beans.BeanProperty
+
 class GithubStatus extends DefaultTask {
+  @Input
+  @BeanProperty
+  var targetUrl: String = ""
+
+  @Input
+  @BeanProperty
+  var statusDescription: String = ""
+
+  @Input
+  @BeanProperty
+  var context: String = ""
 
   @TaskAction
   def run(): Unit = {
     val commit = sys.env.getOrElse("TRAVIS_COMMIT", throw new IllegalArgumentException("TRAVIS_COMMIT not set. Probably not running on Travis CI."))
     val path = s"repos/mesosphere/usi/status/$commit"
     val body =
-      """
+      s"""
         |{
         |  "state": "success",
-        |  "target_url": "https://examplebucket.s3-website-us-west-2.amazonaws.com/docs/doc1.html",
-        |  "description": "The build succeeded!",
-        |  "context": "mesosphere/tests"
+        |  "target_url": "$targetUrl",
+        |  "description": "$statusDescription",
+        |  "context": "$context"
         |}
       """.stripMargin
-    execute(path, body)
+    //execute(path, body)
   }
 
 

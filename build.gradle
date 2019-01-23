@@ -21,4 +21,8 @@ subprojects {
     }
 }
 
-task githubReport(type: GithubStatus)
+task githubReport(type: GithubStatus) {
+    targetUrl = "https://examplebucket.s3-website-us-west-2.amazonaws.com/docs/doc1.html"
+    context = "mesosphere/tests"
+    statusDescription = "Test results"
+}
