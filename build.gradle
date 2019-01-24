@@ -1,6 +1,10 @@
 import mesosphere.gradle.aws.S3Upload
 import mesosphere.gradle.github.GithubStatus
 
+plugins {
+    id 'org.ajoberstar.git-publish' version '2.0.0'
+}
+
 subprojects {
     version = '1.0'
     apply plugin: "scala"
@@ -56,3 +60,21 @@ task githubReport(type: GithubStatus, dependsOn: uploadTestReports) {
     statusDescription = "Test results"
     targetUrl = "https://s3-us-west-2.amazonaws.com/${uploadTestReports.bucket}/${uploadTestReports.prefix}/index.html"
 }
+
+gitPublish {
+    repoUri = 'git@github.com:mesosphere/usi.git'
+    branch = 'gh-pages'
+
+    contents {
+        subprojects.each { subproject ->
+            subproject.tasks.withType(ScalaDoc).each { sdoc ->
+               from sdoc.destinationDir into subproject.name
+            }
+        }
+    }
+
+    preserve {
+        include 'index.html'
+    }
+}
+gitPublishCopy.dependsOn(subprojects*.scaladoc)
