@@ -27,21 +27,32 @@ subprojects {
 }
 
 task testReport(type: TestReport) {
+    description = "Aggregate all test results from subprojects into one test report."
+    
     destinationDir = file("$buildDir/reports/allTests")
     // Include the results from the `test` task in all subprojects
     reportOn subprojects*.test
 }
 
-task syncContents(type: S3Upload, dependsOn: testReport) {
+task uploadTestReports(type: S3Upload, dependsOn: testReport) {
+    description = "Upload Gradle test reports to S3."
+    
+    String repoSlug = System.getenv().get("TRAVIS_REPO_SLUG")
+    String branch = System.getenv().get("TRAVIS_PULL_REQUEST_BRANCH") ?: System.getenv().get("TRAVIS_BRANCH")
+    String buildNumber = System.getenv().get("TRAVIS_BUILD_NUMBER")
+    
+    region = "us-west-2"
     bucket = "usi-builds"
-    prefix = "mesosphere/usi/karsten/github-report/7" // TODO(karsten): Construct from env vars
-    source = file("build/reports/allTests")  // TODO(karsten): Use output from testReport
+    prefix = "$repoSlug/$branch/$buildNumber"
+    source = testReport.destinationDir
 }
 
-task githubReport(type: GithubStatus) {
-    repoSlug = "mesosphere/usi"
+task githubReport(type: GithubStatus, dependsOn: uploadTestReports) {
+    description = "Report test results to Github as commit status."
+    
+    repoSlug = System.getenv().get("TRAVIS_REPO_SLUG")
     commit = System.getenv().get("TRAVIS_COMMIT")
     context = "mesosphere/tests"
     statusDescription = "Test results"
-    targetUrl = "https://examplebucket.s3-website-us-west-2.amazonaws.com/docs/doc1.html"
+    targetUrl = "https://s3-us-west-2.amazonaws.com/${uploadTestReports.bucket}/${uploadTestReports.prefix}/index.html"
 }

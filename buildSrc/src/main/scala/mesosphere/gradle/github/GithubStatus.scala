@@ -1,31 +1,33 @@
 package mesosphere.gradle.github
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.{Input, TaskAction}
+import org.gradle.api.tasks.TaskAction
 import scalaj.http._
 
 import scala.beans.BeanProperty
 
+object GithubStatus {
+  sealed trait State {
+    def value: String = toString.toLowerCase
+  }
+  case object Error extends State
+  case object Failure extends State
+  case object Pending extends State
+  case object Success extends State
+}
+
 class GithubStatus extends DefaultTask {
-  @Input
-  @BeanProperty
-  var targetUrl: String = ""
+  @BeanProperty var targetUrl: String = ""
 
-  @Input
-  @BeanProperty
-  var statusDescription: String = ""
+  @BeanProperty var statusDescription: String = ""
 
-  @Input
-  @BeanProperty
-  var repoSlug = ""
+  @BeanProperty var repoSlug = ""
 
-  @Input
-  @BeanProperty
-  var commit: String = ""
+  @BeanProperty var commit: String = ""
 
-  @Input
-  @BeanProperty
-  var context: String = ""
+  @BeanProperty var context: String = ""
+
+  @BeanProperty var commitState: GithubStatus.State = GithubStatus.Success
 
   @TaskAction
   def run(): Unit = {
@@ -33,7 +35,7 @@ class GithubStatus extends DefaultTask {
     val body =
       s"""
         |{
-        |  "state": "success",
+        |  "state": "${commitState.value}",
         |  "target_url": "$targetUrl",
         |  "description": "$statusDescription",
         |  "context": "$context"
