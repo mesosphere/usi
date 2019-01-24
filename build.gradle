@@ -1,6 +1,8 @@
 import mesosphere.gradle.aws.S3Upload
 import mesosphere.gradle.github.GithubStatus
 
+import java.nio.file.Paths
+
 plugins {
     id 'org.ajoberstar.git-publish' version '2.0.0'
 }
@@ -28,6 +30,14 @@ subprojects {
     test {
         reports.html.enabled = false
     }
+
+    scaladoc {
+        destinationDir file(Paths.get(rootProject.buildDir.toString(), "gitPublish", project.name))
+    }
+}
+
+task aggregateScalaDoc(type: ScalaDoc) {
+    source += subprojects*.sourceSets.main.allScala
 }
 
 task testReport(type: TestReport) {
@@ -64,14 +74,6 @@ task githubReport(type: GithubStatus, dependsOn: uploadTestReports) {
 gitPublish {
     repoUri = 'git@github.com:mesosphere/usi.git'
     branch = 'gh-pages'
-
-    contents {
-        subprojects.each { subproject ->
-            subproject.tasks.withType(ScalaDoc).each { sdoc ->
-               from sdoc.destinationDir into subproject.name
-            }
-        }
-    }
 
     preserve {
         include 'index.html'
