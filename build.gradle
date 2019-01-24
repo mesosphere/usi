@@ -30,14 +30,20 @@ subprojects {
     test {
         reports.html.enabled = false
     }
-
-    scaladoc {
-        destinationDir file(Paths.get(rootProject.buildDir.toString(), "gitPublish", project.name))
-    }
 }
 
-task aggregateScalaDoc(type: ScalaDoc) {
-    source += subprojects*.sourceSets.main.allScala
+task scaladoc(type: ScalaDoc) {
+    description = "Builds all Scala docs into the gh-pages checkout for publishing."
+    destinationDir file(Paths.get(rootProject.buildDir.toString(), "gitPublish", "api"))
+
+    source = files(subprojects.collect{it.sourceSets.main.allScala + it.sourceSets.main.allJava})
+    classpath = files(subprojects.collect {it.sourceSets.main.compileClasspath})
+    scalaClasspath = subprojects.first().scaladoc.scalaClasspath
+
+    subprojects.each {
+        excludes += it.scaladoc.excludes
+        includes += it.scaladoc.includes
+    }
 }
 
 task testReport(type: TestReport) {
@@ -75,8 +81,14 @@ gitPublish {
     repoUri = 'git@github.com:mesosphere/usi.git'
     branch = 'gh-pages'
 
+    contents {
+        from "docs"
+    }
+
     preserve {
-        include 'index.html'
+        // Preserve all files from /docs on master.
+        include '_config.yml'
+        include '**/*.md'
     }
 }
-gitPublishCopy.dependsOn(subprojects*.scaladoc)
+gitPublishCopy.dependsOn(scaladoc)
