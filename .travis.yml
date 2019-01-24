@@ -5,7 +5,7 @@ before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 after_script:
-  - 'if [[ -z "${GIT_PASSWORD}" ]]; then ./gradlew githubReport; fi'
+  - 'if [[ ! -z "$GIT_PASSWORD" ]]; then ./gradlew githubReport; fi'
 cache:
   directories:
     - $HOME/.gradle/caches/
