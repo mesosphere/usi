@@ -2,4 +2,4 @@ rootProject.name = 'usi'
 
 include 'interfaces'
 include 'core'
-include 'examples/hello-world'
+include 'examples:hello-world'
