@@ -1,10 +1,11 @@
+import mesosphere.gradle.aws.S3Upload
+import mesosphere.gradle.github.GithubStatus
+
 subprojects {
     version = '1.0'
     apply plugin: "scala"
 
     repositories {
-        // Use jcenter for resolving your dependencies.
-        // You can declare any Maven/Ivy/file repository here.
         jcenter()
     }
     
@@ -19,4 +20,39 @@ subprojects {
         // Need scala-xml at test runtime
         testRuntimeOnly 'org.scala-lang.modules:scala-xml_2.12:1.1.1'
     }
+
+    test {
+        reports.html.enabled = false
+    }
+}
+
+task testReport(type: TestReport) {
+    description = "Aggregate all test results from subprojects into one test report."
+    
+    destinationDir = file("$buildDir/reports/allTests")
+    // Include the results from the `test` task in all subprojects
+    reportOn subprojects*.test
+}
+
+task uploadTestReports(type: S3Upload, dependsOn: testReport) {
+    description = "Upload Gradle test reports to S3."
+    
+    String repoSlug = System.getenv().get("TRAVIS_REPO_SLUG")
+    String branch = System.getenv().get("TRAVIS_PULL_REQUEST_BRANCH") ?: System.getenv().get("TRAVIS_BRANCH")
+    String buildNumber = System.getenv().get("TRAVIS_BUILD_NUMBER")
+    
+    region = "us-west-2"
+    bucket = "usi-builds"
+    prefix = "$repoSlug/$branch/$buildNumber"
+    source = testReport.destinationDir
+}
+
+task githubReport(type: GithubStatus, dependsOn: uploadTestReports) {
+    description = "Report test results to Github as commit status."
+    
+    repoSlug = System.getenv().get("TRAVIS_REPO_SLUG")
+    commit = System.getenv().get("TRAVIS_COMMIT")
+    context = "mesosphere/tests"
+    statusDescription = "Test results"
+    targetUrl = "https://s3-us-west-2.amazonaws.com/${uploadTestReports.bucket}/${uploadTestReports.prefix}/index.html"
 }
