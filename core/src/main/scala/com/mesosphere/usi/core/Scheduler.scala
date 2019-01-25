@@ -1,14 +1,12 @@
 package com.mesosphere.usi.core
 
 import scala.concurrent.Future
-import com.mesosphere.usi.interface.DummySchedulerInterface
-import com.mesosphere.usi.interface.DummySchedulerInterface.DeploymentId
-import com.mesosphere.usi.interface.PodSpec
+import com.mesosphere.usi.core.models.{DeploymentId, PodSpec}
 
-class Scheduler extends DummySchedulerInterface {
+class Scheduler {
 
-  override def schedule(podSpec: PodSpec): Future[DeploymentId] = {
-    println(s"scheduling pod ${podSpec.id} with goal ${podSpec.goal}")
-    Future.successful("deploymentId")
+  def schedule(podSpec: PodSpec): Future[DeploymentId] = {
+    println(s"scheduling pod ${podSpec.id}")
+    Future.successful(DeploymentId("deploymentId"))
   }
 }
