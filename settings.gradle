@@ -2,4 +2,6 @@ rootProject.name = 'usi'
 
 include 'interfaces'
 include 'core'
+include 'core-models'
 include 'examples:hello-world'
+include 'persistence'
