@@ -2,4 +2,7 @@ rootProject.name = 'usi'
 
 include 'interfaces'
 include 'core'
-include 'examples:hello-world'
+
+/* example projects*/
+include 'hello-world'
+project(':hello-world').projectDir = new File('examples/hello-world')
