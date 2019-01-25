@@ -1,6 +1,8 @@
 package com.mesosphere.usi
 
-package object core {
+import java.time.{Instant, ZonedDateTime}
+
+package object models {
   /*
    * TODO - we'll want to model these better; Future frameworks migrating to USI are unlikely to have a specific way to
    * format taskIds, so we'll effectively need to accept any mesos-valid taskId. (String)
@@ -16,6 +18,7 @@ package object core {
   }
 
   case class PodSpec(id: PodId, goal: Goal, runSpec: String)
+  case class PodRecord(id: PodId, launchedAt: Instant)
   case class ReservationSpec(id: String)
 
   sealed trait StatusMessage
@@ -53,4 +56,3 @@ package object core {
   case class PodSpecChange(id: PodId, newState: Option[PodSpec]) extends SpecChange
   case class ReservationSpecChange(id: ReservationId, newState: Option[ReservationSpec]) extends SpecChange
 }
-
