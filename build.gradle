@@ -1,20 +1,26 @@
 import mesosphere.gradle.aws.S3Upload
 import mesosphere.gradle.github.GithubStatus
-
 import java.nio.file.Paths
 
 plugins {
+    id 'idea'
     id 'org.ajoberstar.git-publish' version '2.0.0'
 }
 
-subprojects {
-    version = '1.0'
+allprojects {
+
+    version = '0.1'
     apply plugin: "scala"
+
+    targetCompatibility = 1.8
+    compileScala.targetCompatibility = 1.8
+
+    archivesBaseName = "usi-${it.name}"
 
     repositories {
         jcenter()
     }
-    
+
     dependencies {
         // Use Scala 2.12 in our library project
         implementation 'org.scala-lang:scala-library:2.12.7'
@@ -32,7 +38,7 @@ subprojects {
     }
 }
 
-task scaladoc(type: ScalaDoc) {
+scaladoc {
     description = "Builds all Scala docs into the gh-pages checkout for publishing."
     destinationDir file(Paths.get(rootProject.buildDir.toString(), "gitPublish", "api"))
 
@@ -46,9 +52,17 @@ task scaladoc(type: ScalaDoc) {
     }
 }
 
+idea {
+  project {
+    jdkName = '1.8'
+    languageLevel = '1.8'
+    vcs = 'Git'
+  }
+}
+
 task testReport(type: TestReport) {
     description = "Aggregate all test results from subprojects into one test report."
-    
+
     destinationDir = file("$buildDir/reports/allTests")
     // Include the results from the `test` task in all subprojects
     reportOn subprojects*.test
@@ -56,11 +70,11 @@ task testReport(type: TestReport) {
 
 task uploadTestReports(type: S3Upload, dependsOn: testReport) {
     description = "Upload Gradle test reports to S3."
-    
+
     String repoSlug = System.getenv().get("TRAVIS_REPO_SLUG")
     String branch = System.getenv().get("TRAVIS_PULL_REQUEST_BRANCH") ?: System.getenv().get("TRAVIS_BRANCH")
     String buildNumber = System.getenv().get("TRAVIS_BUILD_NUMBER")
-    
+
     region = "us-west-2"
     bucket = "usi-builds"
     prefix = "$repoSlug/$branch/$buildNumber"
@@ -69,7 +83,7 @@ task uploadTestReports(type: S3Upload, dependsOn: testReport) {
 
 task githubReport(type: GithubStatus, dependsOn: uploadTestReports) {
     description = "Report test results to Github as commit status."
-    
+
     repoSlug = System.getenv().get("TRAVIS_REPO_SLUG")
     commit = System.getenv().get("TRAVIS_COMMIT")
     context = "mesosphere/tests"
