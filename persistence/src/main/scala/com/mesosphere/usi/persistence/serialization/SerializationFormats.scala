@@ -1,4 +1,4 @@
-package com.mesosphere.usi.persistence
+package com.mesosphere.usi.persistence.serialization
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
 

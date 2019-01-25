@@ -3,11 +3,16 @@ package com.mesosphere.usi.persistence
 import akka.{Done, NotUsed}
 import akka.stream.scaladsl.Source
 import com.mesosphere.usi.core.models.{PodRecord, ReservationRecord}
-import com.mesosphere.usi.persistence.storage.{KVStorage, Serialization}
-import SerializationFormats.{javaSerializationPodRecord, javaSerializationReservationRecord}
+import com.mesosphere.usi.persistence.storage.KVStorage
+import com.mesosphere.usi.persistence.serialization.SerializationFormats.{javaSerializationPodRecord, javaSerializationReservationRecord}
+import com.mesosphere.usi.persistence.serialization.Serialization
 
 import scala.concurrent.Future
 
+/**
+  * Implementation of the repository that uses an underlying key-value storage for storing records.
+  * @param storage
+  */
 class KVRepositoryImpl(storage: KVStorage) extends Repository {
 
   private def podRecordSeqNr2Bytes(seqNr: Long): Array[Byte] = {

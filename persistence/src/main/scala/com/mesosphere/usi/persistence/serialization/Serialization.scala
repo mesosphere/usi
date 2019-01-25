@@ -1,6 +1,4 @@
-package com.mesosphere.usi.persistence.storage
-
-import com.mesosphere.usi.persistence.SerializationFormat
+package com.mesosphere.usi.persistence.serialization
 
 object Serialization {
 
@@ -15,4 +13,3 @@ object Serialization {
   }
 
 }
-

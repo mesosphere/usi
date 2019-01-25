@@ -7,6 +7,10 @@ import com.mesosphere.usi.core.models.{PodRecord, ReservationRecord}
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.Future
 
+/**
+  * In-memory implementation of the repository which doesn't use any persistent storage
+  * and can be used for development/test purpose.
+  */
 class InMemoryRepositoryImpl extends Repository {
 
   private val podMap = TrieMap.empty[Long, PodRecord]

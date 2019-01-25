@@ -9,7 +9,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink}
 import com.mesosphere.usi.core.models._
-import com.mesosphere.usi.persistence.storage.InMemoryStorage
+import com.mesosphere.usi.persistence.storageimpl.InMemoryStorageImpl
 import org.junit.runner.RunWith
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
@@ -46,7 +46,7 @@ class KVRepositorySuite extends WordSpec with ScalaFutures with BeforeAndAfterAl
 
 
 class Fixture {
-  val storage = new InMemoryStorage
+  val storage = new InMemoryStorageImpl
 
   val repository = new KVRepositoryImpl(storage)
 
