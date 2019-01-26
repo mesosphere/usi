@@ -2,6 +2,10 @@ rootProject.name = 'usi'
 
 include 'interfaces'
 include 'core'
+include 'metrics'
+findProject(':metrics')?.name = 'usi-metrics'
+include 'metrics-dropwizard'
+findProject(':metrics-dropwizard')?.name = 'usi-metrics-dropwizard'
 
 /* example projects*/
 include 'hello-world'

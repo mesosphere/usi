@@ -1,0 +1,12 @@
+plugins {
+    id 'scala'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'com.typesafe.akka', name: 'akka-stream_2.12', version: '2.5.19'
+}
+
