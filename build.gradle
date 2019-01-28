@@ -19,6 +19,11 @@ allprojects {
         jcenter()
     }
 
+    // compiler warnings + unused imports are reported as errors
+    tasks.withType(ScalaCompile) {
+        scalaCompileOptions.additionalParameters = ["-Xlint", "-Xfatal-warnings"]
+    }
+
     dependencies {
         // Use Scala 2.12 in our library project
         implementation 'org.scala-lang:scala-library:2.12.7'
