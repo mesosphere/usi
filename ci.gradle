@@ -1,0 +1,63 @@
+import mesosphere.gradle.aws.S3Upload
+import mesosphere.gradle.github.GithubStatus
+import mesosphere.gradle.travis.TravisEnvironment
+
+
+task testReport(type: TestReport) {
+    description = "Aggregate all test results from subprojects into one test report."
+
+    destinationDir = file("$buildDir/reports/allTests")
+    // Include the results from the `test` task in all subprojects
+    reportOn subprojects*.test
+    dependsOn(subprojects.check)
+}
+
+task uploadTestReports(type: S3Upload, dependsOn: testReport) {
+    description = "Upload Gradle test reports to S3."
+    dependsOn testReport
+
+    String repoSlug = TravisEnvironment.repoSlug()
+    String branch = TravisEnvironment.branch()
+    String buildNumber = TravisEnvironment.buildNumber()
+
+    region = "us-west-2"
+    bucket = "usi-builds"
+    prefix = "$repoSlug/$branch/$buildNumber"
+    source = testReport.destinationDir
+}
+
+task githubReport(type: GithubStatus, dependsOn: uploadTestReports) {
+    description = "Report test results to Github as commit status."
+    dependsOn uploadTestReports
+
+    repoSlug = TravisEnvironment.repoSlug()
+    commit = TravisEnvironment.commit()
+    context = "mesosphere/tests"
+    statusDescription = "Test results"
+    targetUrl = "https://s3-us-west-2.amazonaws.com/${uploadTestReports.bucket}/${uploadTestReports.prefix}/index.html"
+}
+
+gitPublish {
+    repoUri = 'git@github.com:mesosphere/usi.git'
+    branch = 'gh-pages'
+
+    contents {
+        from "docs"
+    }
+
+    preserve {
+        // Preserve all files from /docs on master.
+        include '_config.yml'
+        include '**/*.md'
+    }
+}
+gitPublishCopy.dependsOn(scaladoc)
+
+task ci {
+    description = "The main target for CI builds."
+    if (TravisEnvironment.isMasterBuild()) {
+        dependsOn githubReport, gitPublishPush
+    } else if (TravisEnvironment.isSecureBuild())  {
+        dependsOn githubReport
+    }
+}
