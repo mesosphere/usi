@@ -26,15 +26,25 @@ allprojects {
     }
 
     dependencies {
+        // Scala version for all scala dependencies
+        def scalaVersion = '2.12'
+
         // Use Scala 2.12 in our library project
         implementation 'org.scala-lang:scala-library:2.12.7'
 
         // Use Scalatest for testing our library
-        testImplementation 'junit:junit:4.12'
-        testImplementation 'org.scalatest:scalatest_2.12:3.0.5'
+        testImplementation "junit:junit:4.12"
+        testImplementation "org.scalatest:scalatest_$scalaVersion:3.0.5"
 
         // Need scala-xml at test runtime
-        testRuntimeOnly 'org.scala-lang.modules:scala-xml_2.12:1.1.1'
+        testRuntimeOnly "org.scala-lang.modules:scala-xml_$scalaVersion:1.1.1"
+
+        // Logging
+        compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+        compile group: 'com.typesafe.scala-logging', name: "scala-logging_$scalaVersion", version: '3.9.2'
+
+        // Akka
+        compile group: 'com.typesafe.akka', name: "akka-http_$scalaVersion", version: '10.0.11'
     }
 
     test {
