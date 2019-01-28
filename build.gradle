@@ -1,5 +1,6 @@
 import mesosphere.gradle.aws.S3Upload
 import mesosphere.gradle.github.GithubStatus
+import mesosphere.gradle.travis.TravisEnvironment
 
 import java.nio.file.Paths
 
@@ -30,6 +31,7 @@ subprojects {
     test {
         reports.html.enabled = false
     }
+    check {}
 }
 
 task scaladoc(type: ScalaDoc) {
@@ -52,14 +54,16 @@ task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/allTests")
     // Include the results from the `test` task in all subprojects
     reportOn subprojects*.test
+    dependsOn(subprojects.check)
 }
 
 task uploadTestReports(type: S3Upload, dependsOn: testReport) {
     description = "Upload Gradle test reports to S3."
+    dependsOn testReport
     
-    String repoSlug = System.getenv().get("TRAVIS_REPO_SLUG")
-    String branch = System.getenv().get("TRAVIS_PULL_REQUEST_BRANCH") ?: System.getenv().get("TRAVIS_BRANCH")
-    String buildNumber = System.getenv().get("TRAVIS_BUILD_NUMBER")
+    String repoSlug = TravisEnvironment.repoSlug()
+    String branch = TravisEnvironment.branch()
+    String buildNumber = TravisEnvironment.buildNumber()
     
     region = "us-west-2"
     bucket = "usi-builds"
@@ -69,9 +73,10 @@ task uploadTestReports(type: S3Upload, dependsOn: testReport) {
 
 task githubReport(type: GithubStatus, dependsOn: uploadTestReports) {
     description = "Report test results to Github as commit status."
+    dependsOn uploadTestReports
     
-    repoSlug = System.getenv().get("TRAVIS_REPO_SLUG")
-    commit = System.getenv().get("TRAVIS_COMMIT")
+    repoSlug = TravisEnvironment.repoSlug()
+    commit = TravisEnvironment.commit()
     context = "mesosphere/tests"
     statusDescription = "Test results"
     targetUrl = "https://s3-us-west-2.amazonaws.com/${uploadTestReports.bucket}/${uploadTestReports.prefix}/index.html"
@@ -92,3 +97,12 @@ gitPublish {
     }
 }
 gitPublishCopy.dependsOn(scaladoc)
+
+task ci {
+    description = "The main traget for CI builds."
+    if (TravisEnvironment.isMasterBuild()) {
+        dependsOn githubReport, gitPublishPush
+    } else if (TravisEnvironment.isSecureBuild())  {
+        dependsOn githubReport
+    }
+}
