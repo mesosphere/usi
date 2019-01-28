@@ -1,8 +1,11 @@
+sudo: required
+dist: xenial
+
 language: scala
 scala:
    - 2.12.2
 script:
-  - ./gradlew ci
+  - sudo ./gradlew ci
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
