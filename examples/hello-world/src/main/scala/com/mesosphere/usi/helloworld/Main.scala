@@ -6,6 +6,9 @@ import com.mesosphere.usi.interface.PodSpec
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
+/**
+  * A demonstration of USI features.
+  */
 object Main extends App {
 
   val scheduler =  new Scheduler
