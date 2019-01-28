@@ -5,4 +5,5 @@ include 'core'
 include 'mesos-client'
 
 /* example projects*/
+include 'hello-world'
 project(':hello-world').projectDir = new File('examples/hello-world')
