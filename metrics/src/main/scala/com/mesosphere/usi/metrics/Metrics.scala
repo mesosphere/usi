@@ -10,7 +10,8 @@ import scala.concurrent.Future
 trait Metric
 
 /**
-  * A gauge is an instantaneous measurement of a value e.g. number of offer processed.
+  * A gauge is an instantaneous measurement of a value e.g. number of offer processed. You can increment and
+  * decrement it's value.
   */
 trait Gauge extends Metric {
   def value(): Long
@@ -19,8 +20,8 @@ trait Gauge extends Metric {
 }
 
 /**
-  * A counter is just a gauge for an [[java.util.concurrent.atomic.AtomicLong]] instance. You can increment or decrement
-  * its value.
+  * A counter is just a gauge for an [[java.util.concurrent.atomic.AtomicLong]] instance. Note that you can only
+  * increment it's value.
   */
 trait Counter extends Metric {
   def increment(): Unit
@@ -34,11 +35,14 @@ trait SettableGauge extends Gauge {
   def setValue(value: Long): Unit
 }
 
+/**
+  * A closer gauge is a special sort of gauge where a lambda can be passed which will be called,
+  * each time, the gauges value is fetched.
+  */
 trait ClosureGauge extends Metric
 
 /**
-  * A meter metric which measures mean throughput and one-, five-, and fifteen-minute exponentially-weighted moving
-  * average throughput.
+  * A meter measures the rate at which a set of events occur.
   */
 trait Meter extends Metric {
   def mark(): Unit
@@ -57,7 +61,7 @@ trait Timer extends TimerAdapter {
   def blocking[T](f: => T): T
 
   // value is in nanoseconds
-  def update(value: Long): Unit
+  override def update(value: Long): Unit
 }
 
 trait Metrics {

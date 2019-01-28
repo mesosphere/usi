@@ -40,7 +40,6 @@ allprojects {
         testRuntimeOnly "org.scala-lang.modules:scala-xml_$scalaVersion:1.1.1"
 
         // Logging
-        compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
         compile group: 'com.typesafe.scala-logging', name: "scala-logging_$scalaVersion", version: '3.9.2'
 
         // Akka

@@ -3,7 +3,7 @@ package metrics
 
 import akka.stream.scaladsl.{Flow, Source}
 import akka.stream.stage._
-import akka.stream.{Attributes, FlowShape, Inlet, Outlet, javadsl}
+import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import java.time.{Clock, Duration, Instant}
 
 import com.mesosphere.usi.async.ExecutionContexts
@@ -56,7 +56,7 @@ class TimedStage[T](timer: TimerAdapter, clock: Clock) extends GraphStage[FlowSh
 
 case class HistogramTimer(timer: TimerAdapter) extends Timer {
 
-  def apply[T](f: => Future[T]): Future[T] = {
+  override def apply[T](f: => Future[T]): Future[T] = {
     val start = System.nanoTime()
     val future = try {
       f
@@ -69,14 +69,14 @@ case class HistogramTimer(timer: TimerAdapter) extends Timer {
     future
   }
 
-  def forSource[T, M](f: => Source[T, M])(implicit clock: Clock = Clock.systemUTC): Source[T, M] = {
+  override def forSource[T, M](f: => Source[T, M])(implicit clock: Clock = Clock.systemUTC): Source[T, M] = {
     val src = f
     val flow = Flow.fromGraph(new TimedStage[T](timer, clock))
     val transformed = src.via(flow)
     transformed
   }
 
-  def blocking[T](f: => T): T = {
+  override def blocking[T](f: => T): T = {
     val start = System.nanoTime()
     try {
       f
@@ -85,5 +85,5 @@ case class HistogramTimer(timer: TimerAdapter) extends Timer {
     }
   }
 
-  def update(value: Long): Unit = timer.update(value)
+  override def update(value: Long): Unit = timer.update(value)
 }
