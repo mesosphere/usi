@@ -5,17 +5,24 @@ import mesosphere.gradle.travis.TravisEnvironment
 import java.nio.file.Paths
 
 plugins {
+    id 'idea'
     id 'org.ajoberstar.git-publish' version '2.0.0'
 }
 
-subprojects {
-    version = '1.0'
+allprojects {
+
+    version = '0.1'
     apply plugin: "scala"
+
+    targetCompatibility = 1.8
+    compileScala.targetCompatibility = 1.8
+
+    archivesBaseName = "usi-${it.name}"
 
     repositories {
         jcenter()
     }
-    
+
     dependencies {
         // Use Scala 2.12 in our library project
         implementation 'org.scala-lang:scala-library:2.12.7'
@@ -34,7 +41,7 @@ subprojects {
     check {}
 }
 
-task scaladoc(type: ScalaDoc) {
+scaladoc {
     description = "Builds all Scala docs into the gh-pages checkout for publishing."
     destinationDir file(Paths.get(rootProject.buildDir.toString(), "gitPublish", "api"))
 
@@ -48,9 +55,17 @@ task scaladoc(type: ScalaDoc) {
     }
 }
 
+idea {
+  project {
+    jdkName = '1.8'
+    languageLevel = '1.8'
+    vcs = 'Git'
+  }
+}
+
 task testReport(type: TestReport) {
     description = "Aggregate all test results from subprojects into one test report."
-    
+
     destinationDir = file("$buildDir/reports/allTests")
     // Include the results from the `test` task in all subprojects
     reportOn subprojects*.test
