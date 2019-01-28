@@ -1,7 +1,7 @@
 # Metrics
 
 This module defines a set of metrics interfaces. For a concrete implementation 
-see [metrics-dropwizar](http://github.com/mesosphere/use/metrics-dropwizard) 
+see [metrics-dropwizard](http://github.com/mesosphere/usi/metrics-dropwizard) 
 module. 
 
 ## Metric types

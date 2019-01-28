@@ -11,6 +11,7 @@ allprojects {
     version = '0.1'
     apply plugin: "scala"
 
+    sourceCompatibility = 1.8
     targetCompatibility = 1.8
     compileScala.targetCompatibility = 1.8
 

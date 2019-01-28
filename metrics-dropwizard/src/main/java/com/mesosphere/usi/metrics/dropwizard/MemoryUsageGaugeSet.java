@@ -9,7 +9,13 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -17,7 +23,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 /**
  * A set of gauges for JVM memory usage, including stats on heap vs. non-heap memory, plus
  * GC-specific memory pools.
- *
+ * <p>
  * This is a copy of MemoryUsageGaugeSet from Dropwizard metrics, slightly adjusted to support USI metric name
  * conventions.
  */
