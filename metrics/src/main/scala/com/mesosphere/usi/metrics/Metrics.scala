@@ -4,32 +4,42 @@ import java.time.Clock
 import akka.stream.scaladsl.Source
 import scala.concurrent.Future
 
+/**
+  * Basic trait for all metric types
+  */
 trait Metric
 
-trait Counter extends Metric {
-  def increment(): Unit
-  def increment(times: Long): Unit
-}
-
+/**
+  * A gauge is an instantaneous measurement of a value e.g. number of offer processed.
+  */
 trait Gauge extends Metric {
   def value(): Long
   def increment(by: Long = 1): Unit
   def decrement(by: Long = 1): Unit
 }
 
+/**
+  * A counter is just a gauge for an [[java.util.concurrent.atomic.AtomicLong]] instance. You can increment or decrement
+  * its value.
+  */
+trait Counter extends Metric {
+  def increment(): Unit
+  def increment(times: Long): Unit
+}
+
+/**
+  * A settable gauge is like the usual [[Gauge]] but you can also set it's value directly.
+  */
 trait SettableGauge extends Gauge {
   def setValue(value: Long): Unit
 }
 
 trait ClosureGauge extends Metric
 
-trait MinMaxCounter extends Metric {
-  def increment(): Unit
-  def increment(times: Long): Unit
-  def decrement(): Unit
-  def decrement(times: Long): Unit
-}
-
+/**
+  * A meter metric which measures mean throughput and one-, five-, and fifteen-minute exponentially-weighted moving
+  * average throughput.
+  */
 trait Meter extends Metric {
   def mark(): Unit
 }
@@ -38,6 +48,9 @@ trait TimerAdapter extends Metric {
   def update(value: Long): Unit
 }
 
+/**
+  * A timer measures both the rate that a particular piece of code is called and the distribution of its duration.
+  */
 trait Timer extends TimerAdapter {
   def apply[T](f: => Future[T]): Future[T]
   def forSource[T, M](f: => Source[T, M])(implicit clock: Clock = Clock.systemUTC): Source[T, M]

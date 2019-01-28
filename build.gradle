@@ -33,7 +33,7 @@ allprojects {
         implementation 'org.scala-lang:scala-library:2.12.7'
 
         // Use Scalatest for testing our library
-        testImplementation "junit:junit:4.12"
+        testImplementation 'junit:junit:4.12'
         testImplementation "org.scalatest:scalatest_$scalaVersion:3.0.5"
 
         // Need scala-xml at test runtime
