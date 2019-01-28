@@ -5,6 +5,7 @@ import mesosphere.gradle.travis.TravisEnvironment
 
 task testReport(type: TestReport) {
     description = "Aggregate all test results from subprojects into one test report."
+    group = "CI"
 
     destinationDir = file("$buildDir/reports/allTests")
     // Include the results from the `test` task in all subprojects
@@ -12,8 +13,9 @@ task testReport(type: TestReport) {
     dependsOn(subprojects.check)
 }
 
-task uploadTestReports(type: S3Upload, dependsOn: testReport) {
+task uploadTestReports(type: S3Upload) {
     description = "Upload Gradle test reports to S3."
+    group = "CI"
     dependsOn testReport
 
     String repoSlug = TravisEnvironment.repoSlug()
@@ -26,8 +28,9 @@ task uploadTestReports(type: S3Upload, dependsOn: testReport) {
     source = testReport.destinationDir
 }
 
-task githubReport(type: GithubStatus, dependsOn: uploadTestReports) {
+task githubReport(type: GithubStatus) {
     description = "Report test results to Github as commit status."
+    group = "CI"
     dependsOn uploadTestReports
 
     repoSlug = TravisEnvironment.repoSlug()
@@ -55,6 +58,7 @@ gitPublishCopy.dependsOn(scaladoc)
 
 task ci {
     description = "The main target for CI builds."
+    group = "CI"
     if (TravisEnvironment.isMasterBuild()) {
         dependsOn githubReport, gitPublishPush
     } else if (TravisEnvironment.isSecureBuild())  {
