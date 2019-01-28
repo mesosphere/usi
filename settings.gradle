@@ -2,5 +2,7 @@ rootProject.name = 'usi'
 
 include 'interfaces'
 include 'core'
-include 'hello-world'
 include 'mesos-client'
+
+/* example projects*/
+project(':hello-world').projectDir = new File('examples/hello-world')
