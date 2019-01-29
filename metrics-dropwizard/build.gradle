@@ -1,0 +1,8 @@
+dependencies {
+    implementation project(':metrics')
+    compile group: 'com.github.vladimir-bukhtoyarov', name: 'rolling-metrics', version:  '2.0.4'
+    compile group: 'com.iheart', name: 'ficus_2.12', version: '1.4.4'
+    compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.0.5'
+    compile group: 'io.dropwizard.metrics', name: 'metrics-jvm', version: '4.0.5'
+    compile group: 'org.hdrhistogram', name: 'HdrHistogram', version:  '2.1.11'
+}
