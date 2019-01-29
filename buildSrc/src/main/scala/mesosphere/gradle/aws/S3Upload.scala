@@ -3,7 +3,7 @@ package mesosphere.gradle.aws
 import java.io.File
 
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.amazonaws.services.s3.transfer.Transfer.TransferState
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import com.typesafe.scalalogging.StrictLogging
@@ -40,14 +40,13 @@ class S3Upload extends DefaultTask with StrictLogging {
     tx.shutdownNow(true)
     assert(upload.getState() == TransferState.Completed, s"Upload finished with ${upload.getState()}")
 
-    tx.shutdownNow(true)
     logger.info("Done.")
   }
 
   /**
     *  Returns AWS S3 client.
     */
-  def createS3Client() = {
+  def createS3Client(): AmazonS3 = {
     AmazonS3ClientBuilder.standard().withCredentials(credentialProviderChain).withRegion(region).build()
   }
 
