@@ -2,14 +2,13 @@ package mesosphere.mesos.client
 
 import java.net.URI
 
-import akka.stream.{Materializer, OverflowStrategy}
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.MediaType.Compressible
 import akka.http.scaladsl.model._
-import akka.stream._
 import akka.stream.alpakka.recordio.scaladsl.RecordIOFraming
 import akka.stream.scaladsl._
+import akka.stream.{Materializer, OverflowStrategy, _}
 import akka.util.ByteString
 import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.StrictLogging
@@ -17,7 +16,7 @@ import mesosphere.mesos.conf.MesosClientConf
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait MesosClient {
   /**
@@ -145,13 +144,10 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       .build()
   }
 
-  private val dataBytesExtractor: Flow[HttpResponse, ByteString, NotUsed] =
-    Flow[HttpResponse].flatMapConcat(resp => resp.entity.dataBytes)
-
   private val eventDeserializer: Flow[ByteString, Event, NotUsed] =
     Flow[ByteString].map(bytes => Event.parseFrom(bytes.toArray))
 
-  private def connectionSource(frameworkInfo: FrameworkInfo, url: URI)(implicit mat: Materializer, as: ActorSystem) = {
+  private def connectionSource(frameworkInfo: FrameworkInfo, url: URI)(implicit as: ActorSystem) = {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
     val request = HttpRequest(
@@ -289,7 +285,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     */
   def apply(conf: MesosClientConf, frameworkInfo: FrameworkInfo)(
     implicit
-    system: ActorSystem, materializer: ActorMaterializer, executionContext: ExecutionContext): Source[MesosClient, NotUsed] = {
+    system: ActorSystem, materializer: ActorMaterializer): Source[MesosClient, NotUsed] = {
 
     val initialUrl = new java.net.URI(s"http://${conf.master}")
 

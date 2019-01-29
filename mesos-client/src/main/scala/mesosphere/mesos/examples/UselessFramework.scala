@@ -6,16 +6,15 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import com.typesafe.config.ConfigFactory
-import com.typesafe.scalalogging.StrictLogging
 import mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
 import mesosphere.mesos.conf.MesosClientConf
 import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.Event
 
+import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
-import collection.JavaConverters._
 
 /**
   * Run Foo framework that:
