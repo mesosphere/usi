@@ -59,7 +59,7 @@ gitPublishCopy.dependsOn(scaladoc)
 task ci {
     description = "The main target for CI builds."
     group = "CI"
-     if (TravisEnvironment.isMasterBuild()) {
+    if (TravisEnvironment.isMasterBuild()) {
         dependsOn githubReport, gitPublishPush
     } else if (TravisEnvironment.isSecureBuild())  {
         dependsOn githubReport
