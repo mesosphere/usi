@@ -27,17 +27,50 @@ package object models {
   case class PodStatusChange(id: PodId, newStatus: Option[PodStatus]) extends StatusChange
   case class ReservationStatusChange(id: ReservationId, newStatus: Option[ReservationStatus]) extends StatusChange
 
-  sealed trait MesosTaskStatus
-  object MesosTaskStatus {
-    case object TASK_RUNNING extends MesosTaskStatus
-    case object TASK_KILLED extends MesosTaskStatus
+  /**
+    * Mock Mesos calls / state
+    */
+  object Mesos {
+    sealed trait Call
+
+    object Call {
+      case object Revive extends Call
+      case object Suppress extends Call
+      case class Accept(offerId: String, operations: Seq[Operation]) extends Call
+      case class Kill(taskId: String) extends Call
+    }
+
+
+    // stub class that just launches as
+    case class Operation(launch: Launch)
+
+    case class Launch(taskInfo: TaskInfo)
+
+    case class TaskInfo(taskId: String)
+
+    case class TaskState(taskId: String, status: TaskStatus)
+    sealed trait TaskStatus
+    object TaskStatus {
+      case object TASK_RUNNING extends TaskStatus
+      case object TASK_KILLED extends TaskStatus
+    }
+
+
+    sealed trait Event
+
+    object Event {
+      case class Offer(offerId: String) extends Event
+      case class Update(status: TaskState) extends Event
+
+    }
   }
+
 
   /**
     * Describes the status of some pod
     */
   case class PodStatus(id: String,
-                       taskStatuses: Map[String, MesosTaskStatus] /* TODO: use Mesos task state */ )
+                       taskStatuses: Map[String, Mesos.TaskStatus] /* TODO: use Mesos task state */ )
 
 
   sealed trait ReservationState
