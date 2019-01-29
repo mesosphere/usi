@@ -2,7 +2,7 @@ package mesosphere.mesos.client
 
 import java.net.URI
 
-import mesosphere.mesos.conf.MesosClientConf
+import mesosphere.mesos.conf.MesosClientSettings
 import org.apache.mesos.v1.Protos.FrameworkID
 
 case class MesosConnectionContext(
@@ -14,7 +14,7 @@ case class MesosConnectionContext(
 }
 
 object MesosConnectionContext {
-  def apply(conf: MesosClientConf): MesosConnectionContext = MesosConnectionContext(
+  def apply(conf: MesosClientSettings): MesosConnectionContext = MesosConnectionContext(
     new java.net.URI(s"http://${conf.master}"),
     None,
     None)

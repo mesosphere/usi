@@ -12,7 +12,7 @@ import akka.stream.{Materializer, OverflowStrategy, _}
 import akka.util.ByteString
 import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.StrictLogging
-import mesosphere.mesos.conf.MesosClientConf
+import mesosphere.mesos.conf.MesosClientSettings
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 
@@ -283,7 +283,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     *    available via the materializable-once source, `.mesosSource`, which DOES NOT include the earlier-consumed
     *    SUBSCRIBED event.
     */
-  def apply(conf: MesosClientConf, frameworkInfo: FrameworkInfo)(
+  def apply(conf: MesosClientSettings, frameworkInfo: FrameworkInfo)(
     implicit
     system: ActorSystem, materializer: ActorMaterializer): Source[MesosClient, NotUsed] = {
 
