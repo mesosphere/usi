@@ -10,7 +10,6 @@ import com.codahale.metrics.MetricRegistry
 import com.github.rollingmetrics.histogram.{HdrBuilder, OverflowResolver}
 import com.mesosphere.usi.metrics.dropwizard.conf.MetricsSettings
 import com.mesosphere.usi.metrics.{ClosureGauge, Counter, Gauge, Meter, Metrics, SettableGauge, Timer, TimerAdapter, UnitOfMeasurement}
-import mesosphere.marathon.metrics.HistogramTimer
 
 import scala.util.matching.Regex
 
