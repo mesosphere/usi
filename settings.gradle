@@ -3,6 +3,8 @@ rootProject.name = 'usi'
 include 'interfaces'
 include 'core'
 include 'mesos-client'
+include 'metrics'
+include 'metrics-dropwizard'
 
 /* example projects*/
 include 'hello-world'

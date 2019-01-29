@@ -1,8 +1,9 @@
-import mesosphere.gradle.aws.S3Upload
-import mesosphere.gradle.github.GithubStatus
+
+import java.nio.file.Paths
 
 plugins {
     id 'idea'
+    id 'org.ajoberstar.git-publish' version '2.0.0'
 }
 
 allprojects {
@@ -10,6 +11,7 @@ allprojects {
     version = '0.1'
     apply plugin: "scala"
 
+    sourceCompatibility = 1.8
     targetCompatibility = 1.8
     compileScala.targetCompatibility = 1.8
 
@@ -19,21 +21,52 @@ allprojects {
         jcenter()
     }
 
+    // compiler warnings + unused imports are reported as errors
+    tasks.withType(ScalaCompile) {
+        scalaCompileOptions.additionalParameters = ["-Xlint", "-Xfatal-warnings"]
+    }
+
     dependencies {
+        // Scala version for all scala dependencies
+        def scalaVersion = '2.12'
+
         // Use Scala 2.12 in our library project
         implementation 'org.scala-lang:scala-library:2.12.7'
         implementation 'com.typesafe.scala-logging:scala-logging_2.12:3.9.2'
 
         // Use Scalatest for testing our library
         testImplementation 'junit:junit:4.12'
-        testImplementation 'org.scalatest:scalatest_2.12:3.0.5'
+        testImplementation "org.scalatest:scalatest_$scalaVersion:3.0.5"
 
         // Need scala-xml at test runtime
-        testRuntimeOnly 'org.scala-lang.modules:scala-xml_2.12:1.1.1'
+        testRuntimeOnly "org.scala-lang.modules:scala-xml_$scalaVersion:1.1.1"
+
+        // Logging
+        compile group: 'com.typesafe.scala-logging', name: "scala-logging_$scalaVersion", version: '3.9.2'
+
+        // Akka
+        compile group: 'com.typesafe.akka', name: "akka-http_$scalaVersion", version: '10.0.11'
     }
 
     test {
         reports.html.enabled = false
+    }
+    check {}
+}
+
+apply from: 'ci.gradle'
+
+scaladoc {
+    description = "Builds all Scala docs into the gh-pages checkout for publishing."
+    destinationDir file(Paths.get(rootProject.buildDir.toString(), "gitPublish", "api"))
+
+    source = files(subprojects.collect{it.sourceSets.main.allScala + it.sourceSets.main.allJava})
+    classpath = files(subprojects.collect {it.sourceSets.main.compileClasspath})
+    scalaClasspath = subprojects.first().scaladoc.scalaClasspath
+
+    subprojects.each {
+        excludes += it.scaladoc.excludes
+        includes += it.scaladoc.includes
     }
 }
 
@@ -43,35 +76,4 @@ idea {
     languageLevel = '1.8'
     vcs = 'Git'
   }
-}
-
-task testReport(type: TestReport) {
-    description = "Aggregate all test results from subprojects into one test report."
-
-    destinationDir = file("$buildDir/reports/allTests")
-    // Include the results from the `test` task in all subprojects
-    reportOn subprojects*.test
-}
-
-task uploadTestReports(type: S3Upload, dependsOn: testReport) {
-    description = "Upload Gradle test reports to S3."
-
-    String repoSlug = System.getenv().get("TRAVIS_REPO_SLUG")
-    String branch = System.getenv().get("TRAVIS_PULL_REQUEST_BRANCH") ?: System.getenv().get("TRAVIS_BRANCH")
-    String buildNumber = System.getenv().get("TRAVIS_BUILD_NUMBER")
-
-    region = "us-west-2"
-    bucket = "usi-builds"
-    prefix = "$repoSlug/$branch/$buildNumber"
-    source = testReport.destinationDir
-}
-
-task githubReport(type: GithubStatus, dependsOn: uploadTestReports) {
-    description = "Report test results to Github as commit status."
-
-    repoSlug = System.getenv().get("TRAVIS_REPO_SLUG")
-    commit = System.getenv().get("TRAVIS_COMMIT")
-    context = "mesosphere/tests"
-    statusDescription = "Test results"
-    targetUrl = "https://s3-us-west-2.amazonaws.com/${uploadTestReports.bucket}/${uploadTestReports.prefix}/index.html"
 }

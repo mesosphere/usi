@@ -12,6 +12,9 @@ object DummySchedulerInterface {
   type DeploymentId = String
 }
 
+/**
+  * The pod sec describes a Mesos task group that should be launched.
+  */
 trait PodSpec {
   def id: String
   def goal: String
