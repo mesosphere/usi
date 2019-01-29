@@ -1,6 +1,6 @@
 package com.mesosphere.usi.repository
 
-import com.mesosphere.usi.core.models.{PodRecord, ReservationId, ReservationRecord}
+import com.mesosphere.usi.core.models.{ReservationId, ReservationRecord}
 
 import scala.concurrent.Future
 
