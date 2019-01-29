@@ -199,12 +199,20 @@
                         <a href="GarbageCollectorMetricSet.html" title="A set of gauges for the counts and elapsed times of garbage collections.">GarbageCollectorMetricSet</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
+                        <a class="class" href="HistogramTimer.html" title=""></a>
+                        <a href="HistogramTimer.html" title="">HistogramTimer</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
                         <a class="class" href="MemoryUsageGaugeSet.html" title="A set of gauges for JVM memory usage, including stats on heap vs."></a>
                         <a href="MemoryUsageGaugeSet.html" title="A set of gauges for JVM memory usage, including stats on heap vs.">MemoryUsageGaugeSet</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="class" href="ThreadStatesGaugeSet.html" title="A set of gauges for the number of threads in their various states and deadlock detection."></a>
                         <a href="ThreadStatesGaugeSet.html" title="A set of gauges for the number of threads in their various states and deadlock detection.">ThreadStatesGaugeSet</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="class" href="TimedStage.html" title="Akka Graph Stage that measures the time from the start of the stream until the end of it, where start is defined as the instant the stream is materialized"></a>
+                        <a href="TimedStage.html" title="Akka Graph Stage that measures the time from the start of the stream until the end of it, where start is defined as the instant the stream is materialized">TimedStage</a>
                       </li>
               </ul>
             </div>
@@ -336,6 +344,22 @@ conventions.
       <p class="shortcomment cmt">A set of gauges for the counts and elapsed times of garbage collections.</p><div class="fullcomment"><div class="comment cmt"><p>A set of gauges for the counts and elapsed times of garbage collections.</p><p>This is a copy of GarbageCollectorMetricSet from Dropwizard metrics, slightly adjusted to support USI metric name
 conventions.
 </p></div></div>
+    </li><li name="com.mesosphere.usi.metrics.dropwizard.HistogramTimer" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="HistogramTimerextendsTimerwithProductwithSerializable"></a><a id="HistogramTimer:HistogramTimer"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/metrics/dropwizard/index.html#HistogramTimerextendsTimerwithProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="HistogramTimer.html"><span class="name">HistogramTimer</span></a><span class="params">(<span name="timer">timer: <a href="../TimerAdapter.html" class="extype" name="com.mesosphere.usi.metrics.TimerAdapter">TimerAdapter</a></span>)</span><span class="result"> extends <a href="../Timer.html" class="extype" name="com.mesosphere.usi.metrics.Timer">Timer</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
     </li><li name="com.mesosphere.usi.metrics.dropwizard.MemoryUsageGaugeSet" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="MemoryUsageGaugeSetextendsMetricSet"></a><a id="MemoryUsageGaugeSet:MemoryUsageGaugeSet"></a>
       <span class="permalink">
@@ -373,6 +397,24 @@ conventions.
       <p class="shortcomment cmt">A set of gauges for the number of threads in their various states and deadlock detection.</p><div class="fullcomment"><div class="comment cmt"><p>A set of gauges for the number of threads in their various states and deadlock detection.</p><p>This is a copy of ThreadStatesGaugeSet from Dropwizard metrics, slightly adjusted to support USI metric name
 conventions.
 </p></div></div>
+    </li><li name="com.mesosphere.usi.metrics.dropwizard.TimedStage" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TimedStage[T]extendsGraphStage[akka.stream.FlowShape[T,T]]"></a><a id="TimedStage[T]:TimedStage[T]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/metrics/dropwizard/index.html#TimedStage[T]extendsGraphStage[akka.stream.FlowShape[T,T]]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="Akka Graph Stage that measures the time from the start of the stream until the end of it, where start is defined as the instant the stream is materialized" href="TimedStage.html"><span class="name">TimedStage</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="akka.stream.stage.GraphStage">GraphStage</span>[<span class="extype" name="akka.stream.FlowShape">FlowShape</span>[<span class="extype" name="com.mesosphere.usi.metrics.dropwizard.TimedStage.T">T</span>, <span class="extype" name="com.mesosphere.usi.metrics.dropwizard.TimedStage.T">T</span>]]</span>
+      </span>
+      
+      <p class="shortcomment cmt">Akka Graph Stage that measures the time from the start of the stream until the end of it, where start is defined as
+the instant the stream is materialized
+</p>
     </li></ol>
             </div>
 
