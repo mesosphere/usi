@@ -41,7 +41,7 @@ task githubReport(type: GithubStatus) {
 }
 
 gitPublish {
-    repoUri = 'git@github.com:mesosphere/usi.git'
+    repoUri = 'https://github.com/mesosphere/usi.git'
     branch = 'gh-pages'
 
     contents {
