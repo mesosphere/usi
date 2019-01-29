@@ -1,4 +1,4 @@
-package mesosphere.mesos.client
+package com.mesosphere.mesos.client
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow

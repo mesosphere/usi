@@ -1,4 +1,4 @@
-package mesosphere.mesos.client
+package com.mesosphere.mesos.client
 
 import java.net.URI
 
@@ -12,7 +12,7 @@ import akka.stream.{Materializer, OverflowStrategy, _}
 import akka.util.ByteString
 import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.StrictLogging
-import mesosphere.mesos.conf.MesosClientSettings
+import com.mesosphere.mesos.conf.MesosClientSettings
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 

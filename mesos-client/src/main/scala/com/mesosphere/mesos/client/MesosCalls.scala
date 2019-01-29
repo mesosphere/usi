@@ -1,4 +1,4 @@
-package mesosphere.mesos.client
+package com.mesosphere.mesos.client
 
 import akka.util.ByteString
 import com.google.protobuf

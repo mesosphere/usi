@@ -1,8 +1,8 @@
-package mesosphere.mesos.conf
+package com.mesosphere.mesos.conf
 
 import com.typesafe.config.Config
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.{Duration, FiniteDuration}
 
 case class MesosClientSettings(conf: Config) {
   val master: String = conf.getString("connection.masterUrl")
