@@ -17,3 +17,12 @@ How to test:
 ```
 $ gradle test
 ```
+
+## Versioning
+
+USI uses [semantic versioning](https://semver.org/). That means 
+we are committed to keep our documented API compatible across releases 
+unless we change the MAJOR version (the first number in the version tuple).
+
+For example version 0.1.0 and 1.0.0 will not have a compatible API, but 
+0.2.0 and 0.1.0 should be backwards compatible. 
