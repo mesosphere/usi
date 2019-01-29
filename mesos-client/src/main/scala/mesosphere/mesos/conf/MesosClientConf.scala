@@ -1,5 +1,7 @@
 package mesosphere.mesos.conf
 
+import com.typesafe.config.Config
+
 import scala.concurrent.duration._
 
 /**
@@ -11,8 +13,11 @@ import scala.concurrent.duration._
   * @param idleTimeout Time in seconds between two processed elements exceeds the provided timeout then the connection to mesos
   *                    is interrupted. Is usually set to approx. 5 hear beats.
   */
-case class MesosClientConf(
-    master: String,
-    sourceBufferSize: Int = 10,
-    redirectRetries: Int = 3,
-    idleTimeout: FiniteDuration = 75.seconds)
+case class MesosClientConf(conf: Config) {
+  val master: String = conf.getString("connection.masterUrl")
+  val redirectRetries: Int = conf.getInt("connection.redirectRetries")
+  // we want FiniteDuration, the conversion is needed to achieve that
+  val idleTimeout: FiniteDuration = Duration.fromNanos(conf.getDuration("connection.idleTimeout").toNanos)
+
+  val sourceBufferSize: Int = conf.getInt("backPressure.sourceBufferSize")
+}

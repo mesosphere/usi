@@ -5,6 +5,7 @@ import java.util.UUID
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.StrictLogging
 import mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
 import mesosphere.mesos.conf.MesosClientConf
@@ -37,7 +38,7 @@ object UselessFramework extends App with StrictLoggingFlow {
       .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .build()
 
-  val conf = MesosClientConf(master = s"127.0.0.1:5050")
+  val conf = MesosClientConf(ConfigFactory.load())
   val client = Await.result(MesosClient(conf, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   client.mesosSource.runWith(Sink.foreach { event =>
