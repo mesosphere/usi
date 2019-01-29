@@ -32,6 +32,7 @@ allprojects {
 
         // Use Scala 2.12 in our library project
         implementation 'org.scala-lang:scala-library:2.12.7'
+        implementation 'com.typesafe.scala-logging:scala-logging_2.12:3.9.2'
 
         // Use Scalatest for testing our library
         testImplementation 'junit:junit:4.12'
