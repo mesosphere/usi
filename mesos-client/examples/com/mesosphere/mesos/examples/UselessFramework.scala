@@ -1,16 +1,19 @@
 package mesosphere.mesos.examples
 
+import java.util.UUID
+
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
-import com.typesafe.scalalogging.StrictLogging
-import mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
-import mesosphere.mesos.conf.MesosClientConf
-import org.apache.mesos.v1.mesos.{Filters, FrameworkInfo}
-import org.apache.mesos.v1.scheduler.scheduler.Event
+import com.typesafe.config.ConfigFactory
+import com.mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
+import com.mesosphere.mesos.conf.MesosClientSettings
+import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
+import org.apache.mesos.v1.scheduler.Protos.Event
+
+import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
 import scala.util.{Failure, Success}
 
 /**
@@ -26,30 +29,31 @@ object UselessFramework extends App with StrictLoggingFlow {
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  val frameworkInfo = FrameworkInfo(
-    user = "foo",
-    name = "Example FOO Framework",
-    roles = Seq("test"),
-    capabilities = Seq(FrameworkInfo.Capability(`type` = Some(FrameworkInfo.Capability.Type.MULTI_ROLE)))
-  )
+  val frameworkInfo = FrameworkInfo.newBuilder()
+    .setUser("foo")
+    .setName("Example FOO Framework")
+    .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
+    .addRoles("test")
+    .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
+    .build()
 
-  val conf = new MesosClientConf(master = s"127.0.0.1:5050")
+  val conf = MesosClientSettings(ConfigFactory.load())
   val client = Await.result(MesosClient(conf, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   client.mesosSource.runWith(Sink.foreach { event =>
 
-    if (event.`type`.get == Event.Type.SUBSCRIBED) {
+    if (event.getType == Event.Type.SUBSCRIBED) {
       logger.info("Successfully subscribed to mesos")
-    } else if (event.`type`.get == Event.Type.OFFERS) {
+    } else if (event.getType == Event.Type.OFFERS) {
 
-      val offerIds = event.offers.get.offers.map(_.id).toList
+      val offerIds = event.getOffers.getOffersList.asScala.map(_.getId).toList
 
       Source(offerIds)
         .via(log(s"Declining offer with id = ")) // Decline all offers
         .map(oId => client.calls.newDecline(
-          offerIds = Seq(oId),
-          filters = Some(Filters(Some(5.0f)))
-        ))
+        offerIds = Seq(oId),
+        filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build())
+      ))
         .runWith(client.mesosSink)
     }
 
