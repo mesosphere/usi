@@ -1,5 +1,4 @@
-package mesosphere.marathon
-package metrics
+package com.mesosphere.usi.metrics.dropwizard
 
 import akka.stream.scaladsl.{Flow, Source}
 import akka.stream.stage._
