@@ -2,7 +2,7 @@ language: scala
 scala:
    - 2.12.2
 script:
-  - ./gradlew ci --info
+  - ./gradlew ci --stacktrace
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
