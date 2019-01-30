@@ -2,23 +2,9 @@ package com.mesosphere.mesos.client
 
 import akka.util.ByteString
 import com.google.protobuf
-import org.apache.mesos.v1.Protos.{
-  AgentID,
-  ExecutorID,
-  Filters,
-  FrameworkID,
-  KillPolicy,
-  OfferID,
-  Request,
-  TaskID
-}
+import org.apache.mesos.v1.Protos.{AgentID, ExecutorID, Filters, FrameworkID, KillPolicy, OfferID, Request, TaskID}
 import org.apache.mesos.v1.scheduler.Protos.Call
-import org.apache.mesos.v1.scheduler.Protos.Call.{
-  Accept,
-  Decline,
-  Reconcile,
-  Revive
-}
+import org.apache.mesos.v1.scheduler.Protos.Call.{Accept, Decline, Reconcile, Revive}
 
 class MesosCalls(frameworkId: FrameworkID) {
 
@@ -73,8 +59,7 @@ class MesosCalls(frameworkId: FrameworkID) {
     *
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#decline
     */
-  def newDecline(offerIds: Seq[OfferID],
-                 filters: Option[Filters] = None): Call = {
+  def newDecline(offerIds: Seq[OfferID], filters: Option[Filters] = None): Call = {
     val declineBuilder = Decline.newBuilder()
     offerIds.foreach(declineBuilder.addOfferIds)
     filters.foreach(declineBuilder.setFilters)
@@ -139,9 +124,7 @@ class MesosCalls(frameworkId: FrameworkID) {
     *
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#kill
     */
-  def newKill(taskId: TaskID,
-              agentId: Option[AgentID] = None,
-              killPolicy: Option[KillPolicy]): Call = {
+  def newKill(taskId: TaskID, agentId: Option[AgentID] = None, killPolicy: Option[KillPolicy]): Call = {
     val killBuilder = Call.Kill
       .newBuilder()
       .setTaskId(taskId)
@@ -188,9 +171,7 @@ class MesosCalls(frameworkId: FrameworkID) {
     *
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#acknowledge
     */
-  def newAcknowledge(agentId: AgentID,
-                     taskId: TaskID,
-                     uuid: protobuf.ByteString): Call = {
+  def newAcknowledge(agentId: AgentID, taskId: TaskID, uuid: protobuf.ByteString): Call = {
     Call
       .newBuilder()
       .setType(Call.Type.ACKNOWLEDGE)
@@ -234,9 +215,7 @@ class MesosCalls(frameworkId: FrameworkID) {
     *
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#message
     */
-  def newMessage(agentId: AgentID,
-                 executorId: ExecutorID,
-                 message: ByteString): Call = {
+  def newMessage(agentId: AgentID, executorId: ExecutorID, message: ByteString): Call = {
     Call
       .newBuilder()
       .setType(Call.Type.MESSAGE)
@@ -279,8 +258,7 @@ class MesosCalls(frameworkId: FrameworkID) {
     *
     * https://mesosphere.com/blog/mesos-inverse-offers/
     */
-  def newAcceptInverseOffers(offers: Seq[OfferID],
-                             filters: Option[Filters] = None): Call = {
+  def newAcceptInverseOffers(offers: Seq[OfferID], filters: Option[Filters] = None): Call = {
     val acceptInverseBuilder = Call.AcceptInverseOffers.newBuilder()
     offers.foreach(acceptInverseBuilder.addInverseOfferIds)
     filters.foreach(acceptInverseBuilder.setFilters)
@@ -302,8 +280,7 @@ class MesosCalls(frameworkId: FrameworkID) {
     *
     * https://mesosphere.com/blog/mesos-inverse-offers/
     */
-  def newDeclineInverseOffers(offers: Seq[OfferID],
-                              filters: Option[Filters] = None): Call = {
+  def newDeclineInverseOffers(offers: Seq[OfferID], filters: Option[Filters] = None): Call = {
     val declineInverseBuilder = Call.DeclineInverseOffers.newBuilder()
     offers.foreach(declineInverseBuilder.addInverseOfferIds)
     filters.foreach(declineInverseBuilder.setFilters)

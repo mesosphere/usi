@@ -15,8 +15,7 @@ import scala.util.control.NonFatal
   * Akka Graph Stage that measures the time from the start of the stream until the end of it, where start is defined as
   * the instant the stream is materialized
   */
-class TimedStage[T](timer: TimerAdapter, clock: Clock)
-    extends GraphStage[FlowShape[T, T]] {
+class TimedStage[T](timer: TimerAdapter, clock: Clock) extends GraphStage[FlowShape[T, T]] {
   val in = Inlet[T]("timer.in")
   val out = Outlet[T]("timer.out")
 
@@ -68,13 +67,11 @@ case class HistogramTimer(timer: TimerAdapter) extends Timer {
         timer.update(System.nanoTime() - start)
         throw e
     }
-    future.onComplete(_ => timer.update(System.nanoTime() - start))(
-      ExecutionContexts.callerThread)
+    future.onComplete(_ => timer.update(System.nanoTime() - start))(ExecutionContexts.callerThread)
     future
   }
 
-  override def forSource[T, M](f: => Source[T, M])(
-      implicit clock: Clock = Clock.systemUTC): Source[T, M] = {
+  override def forSource[T, M](f: => Source[T, M])(implicit clock: Clock = Clock.systemUTC): Source[T, M] = {
     val src = f
     val flow = Flow.fromGraph(new TimedStage[T](timer, clock))
     val transformed = src.via(flow)

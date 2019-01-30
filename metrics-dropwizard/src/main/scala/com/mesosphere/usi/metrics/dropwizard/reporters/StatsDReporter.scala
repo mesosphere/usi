@@ -7,22 +7,12 @@ import java.util.concurrent.TimeUnit
 import akka.actor.{Actor, ActorRef, Props}
 import akka.io.{IO, Udp}
 import akka.util.ByteString
-import com.codahale.metrics.{
-  Counter,
-  Gauge,
-  Histogram,
-  Meter,
-  Metered,
-  MetricRegistry,
-  Snapshot,
-  Timer
-}
+import com.codahale.metrics.{Counter, Gauge, Histogram, Meter, Metered, MetricRegistry, Snapshot, Timer}
 import com.mesosphere.usi.metrics.dropwizard.conf.StatsdReporterSettings
 
 import scala.collection.JavaConverters._
 
-class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
-    extends Actor {
+class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry) extends Actor {
   private val remote: InetSocketAddress = {
     val host = settings.host
     val port = settings.port
@@ -51,12 +41,7 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
   }
 
   private def report(socket: ActorRef): Unit = {
-    report(socket,
-           registry.getGauges,
-           registry.getCounters,
-           registry.getHistograms,
-           registry.getMeters,
-           registry.getTimers)
+    report(socket, registry.getGauges, registry.getCounters, registry.getHistograms, registry.getMeters, registry.getTimers)
   }
 
   private def report(socket: ActorRef,
@@ -88,9 +73,7 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
   private val rateFactor = TimeUnit.SECONDS.toSeconds(1)
   private val durationFactor = 1.0 / TimeUnit.SECONDS.toNanos(1)
 
-  private def reportGauge(socket: ActorRef,
-                          name: String,
-                          gauge: Gauge[_]): Unit = {
+  private def reportGauge(socket: ActorRef, name: String, gauge: Gauge[_]): Unit = {
     val value: Number = gauge.getValue match {
       case v: Double => if (v.isNaN) 0.0 else v
       case v: Float  => if (v.isNaN) 0.0 else v.toDouble
@@ -100,26 +83,12 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
     maybeSendAndAppend(socket, s"$name:$value|g\n")
   }
 
-  private def reportCounter(socket: ActorRef,
-                            name: String,
-                            counter: Counter): Unit =
+  private def reportCounter(socket: ActorRef, name: String, counter: Counter): Unit =
     maybeSendAndAppend(socket, s"$name:${counter.getCount}|g\n")
 
   private val histogramSnapshotSuffixes =
-    Seq("min",
-        "mean",
-        "p50",
-        "p75",
-        "p95",
-        "p98",
-        "p99",
-        "p999",
-        "max",
-        "stddev")
-  private def reportSnapshot(socket: ActorRef,
-                             name: String,
-                             snapshot: Snapshot,
-                             scaleMetrics: Boolean): Unit = {
+    Seq("min", "mean", "p50", "p75", "p95", "p98", "p99", "p999", "max", "stddev")
+  private def reportSnapshot(socket: ActorRef, name: String, snapshot: Snapshot, scaleMetrics: Boolean): Unit = {
     val values = Seq(
       snapshot.getMin.toDouble,
       snapshot.getMean,
@@ -141,9 +110,7 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
     }
   }
 
-  private def reportHistogram(socket: ActorRef,
-                              name: String,
-                              histogram: Histogram): Unit = {
+  private def reportHistogram(socket: ActorRef, name: String, histogram: Histogram): Unit = {
     val count = histogram.getCount.toDouble
     maybeSendAndAppend(socket, s"$name.count:$count|g\n")
     reportSnapshot(socket, name, histogram.getSnapshot, false)
@@ -151,9 +118,7 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
 
   private val meteredSuffixes =
     Seq("count", "mean_rate", "m1_rate", "m5_rate", "m15_rate")
-  private def reportMetered(socket: ActorRef,
-                            name: String,
-                            meter: Metered): Unit = {
+  private def reportMetered(socket: ActorRef, name: String, meter: Metered): Unit = {
     val values = Seq(
       meter.getCount.toDouble,
       meter.getMeanRate * rateFactor,
@@ -167,9 +132,7 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
     }
   }
 
-  private def reportTimer(socket: ActorRef,
-                          name: String,
-                          timer: Timer): Unit = {
+  private def reportTimer(socket: ActorRef, name: String, timer: Timer): Unit = {
     val count = timer.getCount.toDouble
     maybeSendAndAppend(socket, s"$name.count:$count|g\n")
     val snapshot = timer.getSnapshot
@@ -180,10 +143,8 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
   val maxPayloadSize = 508 // the maximum safe UDP payload size
   val buffer = new StringBuilder
 
-  private def maybeSendAndAppend(socket: ActorRef,
-                                 measurement: String): Unit = {
-    require(measurement.length <= maxPayloadSize,
-            "measurement length is too large")
+  private def maybeSendAndAppend(socket: ActorRef, measurement: String): Unit = {
+    require(measurement.length <= maxPayloadSize, "measurement length is too large")
 
     if (buffer.length + measurement.length > maxPayloadSize)
       flush(socket)
@@ -199,8 +160,7 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
 }
 
 object StatsDReporter {
-  def props(settings: StatsdReporterSettings,
-            registry: MetricRegistry): Props = {
+  def props(settings: StatsdReporterSettings, registry: MetricRegistry): Props = {
     Props(new StatsDReporter(settings, registry))
   }
 

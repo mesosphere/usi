@@ -8,12 +8,7 @@ import org.scalatest.{GivenWhenThen, Inside, Matchers, OptionValues, WordSpec}
 import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
-class MetricsSettingsTest
-    extends WordSpec
-    with Matchers
-    with GivenWhenThen
-    with Inside
-    with OptionValues {
+class MetricsSettingsTest extends WordSpec with Matchers with GivenWhenThen with Inside with OptionValues {
 
   "MetricsSettings" should {
     "parse reference.conf correctly" in {
