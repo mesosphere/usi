@@ -1,4 +1,4 @@
-package mesosphere.mesos.examples
+package com.mesosphere.mesos.examples
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
