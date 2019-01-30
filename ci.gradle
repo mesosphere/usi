@@ -2,7 +2,6 @@ import mesosphere.gradle.aws.S3Upload
 import mesosphere.gradle.github.GithubStatus
 import mesosphere.gradle.travis.TravisEnvironment
 
-
 task testReport(type: TestReport) {
     description = "Aggregate all test results from subprojects into one test report."
     group = "CI"

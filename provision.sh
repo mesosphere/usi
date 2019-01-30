@@ -10,9 +10,6 @@ apt-get -y update
 
 apt-get -y install mesos=1.4.0-2.0.1 zookeeperd
 
-service mesos-master stop
-service mesos-slave stop
-
 if ! command -v mesos >/dev/null 2>&1; then
 	echo "Mesos installation failed."
 	exit 1
