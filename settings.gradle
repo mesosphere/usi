@@ -1,5 +1,11 @@
 rootProject.name = 'usi'
 
-include 'interfaces'
 include 'core'
+include 'core-models'
+include 'mesos-client'
+include 'metrics'
+include 'metrics-dropwizard'
+
+/* example projects*/
 include 'hello-world'
+project(':hello-world').projectDir = new File('examples/hello-world')

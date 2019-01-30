@@ -1,0 +1,11 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClassName = "com.mesosphere.usi.helloworld.Main"
+}
+
+dependencies {
+    compile project(':core')
+}

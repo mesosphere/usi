@@ -35,6 +35,10 @@ dcos-registry-*
 
 .gradle
 /build/
+*/build/
+examples/*/build/
+*/out
+examples/*/out/
 
 # Ignore Gradle GUI config
 gradle-app.setting

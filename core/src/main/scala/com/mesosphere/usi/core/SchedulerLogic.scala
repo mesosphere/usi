@@ -3,6 +3,8 @@ package com.mesosphere.usi.core
 import akka.stream._
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.mesosphere.usi.models._
+import com.mesosphere.usi._
+import com.mesosphere.usi.core.models.{Goal, PodId, PodRecord, PodSpec, ReservationId}
 
 import scala.collection.mutable
 
@@ -46,8 +48,7 @@ class SchedulerLogicGraph extends GraphStage[BidiShape[SpecMessage, StatusMessag
 
       setHandler(mesosCalls, new OutHandler {
         override def onPull(): Unit = {
-          if (pendingMesosCalls.nonEmpty)
-            push(mesosCalls, pendingMesosCalls.dequeue())
+          pushQueuedMesosCall()
         }
       })
 
@@ -74,6 +75,7 @@ class SchedulerLogicGraph extends GraphStage[BidiShape[SpecMessage, StatusMessag
           pendingStatusMessages.enqueue(status)
         }
         maybePush()
+        maybePull()
       }
 
       def maybePush(): Unit = {
@@ -151,10 +153,10 @@ class SchedulerLogic {
 
   def taskIdsFor(pod: PodSpec): Seq[TaskId] = {
     // ignoring momentarily that these might be different
-    Seq(pod.id)
+    Seq("taskId")
   }
 
-  def podIdFor(taskId: TaskId): PodId = taskId
+  def podIdFor(taskId: TaskId): PodId = PodId("podId")
 
   private def assertValidTransition(oldSpec: PodSpec, newSpec: PodSpec): Unit = {
     if ((oldSpec.goal == Goal.Terminal) && (newSpec.goal == Goal.Running))
