@@ -65,7 +65,7 @@ task provision(type: Exec) {
               |echo "deb http://repos.mesosphere.io/\${DISTRO} \${CODENAME} main" | sudo tee /etc/apt/sources.list.d/mesosphere.list
               |apt-get -y update
               |
-              |apt-get -y install mesos=1.4.0-2.0.1 zookeeperd
+              |apt-get -y install mesos=$mesosVersion-2.0.3 zookeeperd
               |""".stripMargin()
     doFirst {
         File provisionScript = new File('provision.sh')
