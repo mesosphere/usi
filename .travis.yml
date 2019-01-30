@@ -3,7 +3,7 @@ language: scala
 scala:
    - 2.12.2
 before_install:
-  - sudo ./provision.sh
+  - sudo ./gradlew provision --info
 script:
   - ./gradlew ci --info
 before_cache:
