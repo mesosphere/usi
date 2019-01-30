@@ -76,8 +76,8 @@ case class MesosCluster(
 
   lazy val agents = 0.until(numSlaves).map { i =>
     // We can add additional resources constraints for our test clusters here.
-    // IMPORTANT: we give each cluster's agent it's own port range! Otherwise every mesos will offer the same port range
-    // to it's marathon, leading to multiple tasks (from different IT suits) trying to use the same port!
+    // IMPORTANT: we give each cluster's agent it's own port range! Otherwise every Mesos will offer the same port range
+    // to it's frameworks, leading to multiple tasks (from different test suits) trying to use the same port!
     // First-come-first-served task will bind successfully where the others will fail leading to a lot inconsistency and
     // flakiness in tests.
 
@@ -380,9 +380,9 @@ object IP {
   lazy val routableIPv4: String =
     sys.env.getOrElse("MESOSTEST_IP_ADDRESS", inferRoutableIP)
 
-  private def detectIpScript = {
+  private def detectIpScript: String = {
     val resource = getClass.getClassLoader.getResource("detect-routable-ip.sh")
-    Option(resource).flatMap { f => Option(f.getFile) }.getOrElse {
+    Option(resource).flatMap { r => Option(r.getPath) }.getOrElse {
       throw new RuntimeException(
         s"Couldn't find file for detect-routable-ip.sh resource; is ${resource}. Are you running from a JAR?")
     }
