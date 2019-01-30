@@ -1,4 +1,4 @@
-package com.mesosphere.mesos.examples
+package mesosphere.mesos.examples
 
 import java.util.UUID
 
