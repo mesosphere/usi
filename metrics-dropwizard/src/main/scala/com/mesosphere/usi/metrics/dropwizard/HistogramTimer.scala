@@ -15,7 +15,8 @@ import scala.util.control.NonFatal
   * Akka Graph Stage that measures the time from the start of the stream until the end of it, where start is defined as
   * the instant the stream is materialized
   */
-class TimedStage[T](timer: TimerAdapter, clock: Clock) extends GraphStage[FlowShape[T, T]] {
+class TimedStage[T](timer: TimerAdapter, clock: Clock)
+    extends GraphStage[FlowShape[T, T]] {
   val in = Inlet[T]("timer.in")
   val out = Outlet[T]("timer.out")
 
@@ -25,22 +26,25 @@ class TimedStage[T](timer: TimerAdapter, clock: Clock) extends GraphStage[FlowSh
     val logic = new GraphStageLogic(shape) {
       private val start: Instant = clock.instant
 
-      setHandler(in, new InHandler {
-        @scala.throws[Exception](classOf[Exception])
-        override def onPush(): Unit = push(out, grab(in))
+      setHandler(
+        in,
+        new InHandler {
+          @scala.throws[Exception](classOf[Exception])
+          override def onPush(): Unit = push(out, grab(in))
 
-        @scala.throws[Exception](classOf[Exception])
-        override def onUpstreamFinish(): Unit = {
-          timer.update(Duration.between(start, clock.instant).toNanos)
-          super.onUpstreamFinish()
-        }
+          @scala.throws[Exception](classOf[Exception])
+          override def onUpstreamFinish(): Unit = {
+            timer.update(Duration.between(start, clock.instant).toNanos)
+            super.onUpstreamFinish()
+          }
 
-        @scala.throws[Exception](classOf[Exception])
-        override def onUpstreamFailure(ex: Throwable): Unit = {
-          timer.update(Duration.between(start, clock.instant).toNanos)
-          super.onUpstreamFailure(ex)
+          @scala.throws[Exception](classOf[Exception])
+          override def onUpstreamFailure(ex: Throwable): Unit = {
+            timer.update(Duration.between(start, clock.instant).toNanos)
+            super.onUpstreamFailure(ex)
+          }
         }
-      })
+      )
 
       setHandler(out, new OutHandler {
         @scala.throws[Exception](classOf[Exception])
@@ -64,11 +68,13 @@ case class HistogramTimer(timer: TimerAdapter) extends Timer {
         timer.update(System.nanoTime() - start)
         throw e
     }
-    future.onComplete(_ => timer.update(System.nanoTime() - start))(ExecutionContexts.callerThread)
+    future.onComplete(_ => timer.update(System.nanoTime() - start))(
+      ExecutionContexts.callerThread)
     future
   }
 
-  override def forSource[T, M](f: => Source[T, M])(implicit clock: Clock = Clock.systemUTC): Source[T, M] = {
+  override def forSource[T, M](f: => Source[T, M])(
+      implicit clock: Clock = Clock.systemUTC): Source[T, M] = {
     val src = f
     val flow = Flow.fromGraph(new TimedStage[T](timer, clock))
     val transformed = src.via(flow)

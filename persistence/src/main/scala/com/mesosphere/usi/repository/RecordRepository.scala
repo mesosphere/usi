@@ -42,5 +42,7 @@ trait RecordRepository {
   def delete(record: Record): Future[RecordId]
 }
 
-class RecordAlreadyExistsException(id: String) extends RuntimeException(s"record with id $id already exists.")
-class RecordNotFoundException(id: String) extends RuntimeException(s"record with id $id doesn't exist.")
+class RecordAlreadyExistsException(id: String)
+    extends RuntimeException(s"record with id $id already exists.")
+class RecordNotFoundException(id: String)
+    extends RuntimeException(s"record with id $id doesn't exist.")

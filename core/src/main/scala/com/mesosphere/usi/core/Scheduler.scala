@@ -4,8 +4,7 @@ import com.mesosphere.usi.core.models.PodSpec
 
 import scala.concurrent.Future
 
-
-class Scheduler  {
+class Scheduler {
 
   def schedule(podSpec: PodSpec): Future[String] = {
     println(s"scheduling pod ${podSpec.id}")

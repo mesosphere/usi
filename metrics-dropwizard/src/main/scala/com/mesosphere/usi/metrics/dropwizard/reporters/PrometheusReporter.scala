@@ -3,40 +3,64 @@ package com.mesosphere.usi.metrics.dropwizard.reporters
 import java.util
 import java.util.concurrent.TimeUnit
 
-import com.codahale.metrics.{Counter, Gauge, Histogram, Meter, Metered, MetricRegistry, Timer}
+import com.codahale.metrics.{
+  Counter,
+  Gauge,
+  Histogram,
+  Meter,
+  Metered,
+  MetricRegistry,
+  Timer
+}
 
 import scala.collection.JavaConverters._
 
 object PrometheusReporter {
   def report(registry: MetricRegistry): String = {
-    report(registry.getGauges, registry.getCounters, registry.getHistograms, registry.getMeters, registry.getTimers)
+    report(registry.getGauges,
+           registry.getCounters,
+           registry.getHistograms,
+           registry.getMeters,
+           registry.getTimers)
   }
 
-  private def report(
-    gauges: util.SortedMap[String, Gauge[_]],
-    counters: util.SortedMap[String, Counter],
-    histograms: util.SortedMap[String, Histogram],
-    meters: util.SortedMap[String, Meter],
-    timers: util.SortedMap[String, Timer]): String = {
+  private def report(gauges: util.SortedMap[String, Gauge[_]],
+                     counters: util.SortedMap[String, Counter],
+                     histograms: util.SortedMap[String, Histogram],
+                     meters: util.SortedMap[String, Meter],
+                     timers: util.SortedMap[String, Timer]): String = {
 
     val buffer = new StringBuilder
 
-    gauges.asScala.foreach { case (name, value) => reportGauge(buffer, sanitizeName(name), value) }
-    counters.asScala.foreach { case (name, value) => reportCounter(buffer, sanitizeName(name), value) }
-    histograms.asScala.foreach { case (name, value) => reportHistogram(buffer, sanitizeName(name), value) }
-    meters.asScala.foreach { case (name, value) => reportMetered(buffer, sanitizeName(name), value) }
-    timers.asScala.foreach { case (name, value) => reportTimer(buffer, sanitizeName(name), value) }
+    gauges.asScala.foreach {
+      case (name, value) => reportGauge(buffer, sanitizeName(name), value)
+    }
+    counters.asScala.foreach {
+      case (name, value) => reportCounter(buffer, sanitizeName(name), value)
+    }
+    histograms.asScala.foreach {
+      case (name, value) => reportHistogram(buffer, sanitizeName(name), value)
+    }
+    meters.asScala.foreach {
+      case (name, value) => reportMetered(buffer, sanitizeName(name), value)
+    }
+    timers.asScala.foreach {
+      case (name, value) => reportTimer(buffer, sanitizeName(name), value)
+    }
 
     buffer.toString()
   }
 
   private val forbiddenCharsRe = "[^a-zA-Z0-9_]".r
-  private def sanitizeName(name: String): String = forbiddenCharsRe.replaceAllIn(name, "_")
+  private def sanitizeName(name: String): String =
+    forbiddenCharsRe.replaceAllIn(name, "_")
 
-  private def reportGauge(buffer: StringBuilder, name: String, gauge: Gauge[_]): Unit = {
+  private def reportGauge(buffer: StringBuilder,
+                          name: String,
+                          gauge: Gauge[_]): Unit = {
     val value: Number = gauge.getValue match {
       case v: Double => if (v.isNaN) 0.0 else v
-      case v: Float => if (v.isNaN) 0.0 else v.toDouble
+      case v: Float  => if (v.isNaN) 0.0 else v.toDouble
       case v: Number => v
     }
     appendMetricType(buffer, name, "gauge")
@@ -44,7 +68,9 @@ object PrometheusReporter {
     appendEmptyLine(buffer)
   }
 
-  private def reportCounter(buffer: StringBuilder, name: String, counter: Counter): Unit = {
+  private def reportCounter(buffer: StringBuilder,
+                            name: String,
+                            counter: Counter): Unit = {
     appendMetricType(buffer, name, "counter")
     appendLine(buffer, s"$name ${counter.getCount}")
     appendEmptyLine(buffer)
@@ -53,7 +79,9 @@ object PrometheusReporter {
   private val rateFactor = TimeUnit.SECONDS.toSeconds(1)
   private val durationFactor = 1.0 / TimeUnit.SECONDS.toNanos(1)
 
-  private def reportHistogram(buffer: StringBuilder, name: String, histogram: Histogram): Unit = {
+  private def reportHistogram(buffer: StringBuilder,
+                              name: String,
+                              histogram: Histogram): Unit = {
     val count = histogram.getCount
     val snapshot = histogram.getSnapshot
 
@@ -89,7 +117,9 @@ object PrometheusReporter {
     appendEmptyLine(buffer)
   }
 
-  private def reportRates(buffer: StringBuilder, name: String, metered: Metered): Unit = {
+  private def reportRates(buffer: StringBuilder,
+                          name: String,
+                          metered: Metered): Unit = {
     val meanRate = metered.getMeanRate * rateFactor
     val m1Rate = metered.getOneMinuteRate * rateFactor
     val m5Rate = metered.getFiveMinuteRate * rateFactor
@@ -105,7 +135,9 @@ object PrometheusReporter {
     appendLine(buffer, s"${name}_m15_rate $m15Rate")
   }
 
-  private def reportMetered(buffer: StringBuilder, name: String, meter: Metered): Unit = {
+  private def reportMetered(buffer: StringBuilder,
+                            name: String,
+                            meter: Metered): Unit = {
     val count = meter.getCount
 
     appendMetricType(buffer, name + "_count", "gauge")
@@ -114,7 +146,9 @@ object PrometheusReporter {
     appendEmptyLine(buffer)
   }
 
-  private def reportTimer(buffer: StringBuilder, name: String, timer: Timer): Unit = {
+  private def reportTimer(buffer: StringBuilder,
+                          name: String,
+                          timer: Timer): Unit = {
     val count = timer.getCount
     val snapshot = timer.getSnapshot
 
@@ -152,7 +186,9 @@ object PrometheusReporter {
     appendEmptyLine(buffer)
   }
 
-  private def appendMetricType(buffer: StringBuilder, name: String, metricType: String): Unit = {
+  private def appendMetricType(buffer: StringBuilder,
+                               name: String,
+                               metricType: String): Unit = {
     appendLine(buffer, s"# TYPE $name $metricType")
   }
 

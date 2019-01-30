@@ -29,37 +29,44 @@ object UselessFramework extends App with StrictLoggingFlow {
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  val frameworkInfo = FrameworkInfo.newBuilder()
+  val frameworkInfo = FrameworkInfo
+    .newBuilder()
     .setUser("foo")
     .setName("Example FOO Framework")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
     .addRoles("test")
-    .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
+    .addCapabilities(FrameworkInfo.Capability
+      .newBuilder()
+      .setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .build()
 
   val conf = MesosClientSettings(ConfigFactory.load())
-  val client = Await.result(MesosClient(conf, frameworkInfo).runWith(Sink.head), 10.seconds)
+  val client = Await.result(MesosClient(conf, frameworkInfo).runWith(Sink.head),
+                            10.seconds)
 
-  client.mesosSource.runWith(Sink.foreach { event =>
+  client.mesosSource
+    .runWith(Sink.foreach { event =>
+      if (event.getType == Event.Type.SUBSCRIBED) {
+        logger.info("Successfully subscribed to mesos")
+      } else if (event.getType == Event.Type.OFFERS) {
 
-    if (event.getType == Event.Type.SUBSCRIBED) {
-      logger.info("Successfully subscribed to mesos")
-    } else if (event.getType == Event.Type.OFFERS) {
+        val offerIds = event.getOffers.getOffersList.asScala.map(_.getId).toList
 
-      val offerIds = event.getOffers.getOffersList.asScala.map(_.getId).toList
+        Source(offerIds)
+          .via(log(s"Declining offer with id = ")) // Decline all offers
+          .map(oId =>
+            client.calls.newDecline(
+              offerIds = Seq(oId),
+              filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build())
+          ))
+          .runWith(client.mesosSink)
+      }
 
-      Source(offerIds)
-        .via(log(s"Declining offer with id = ")) // Decline all offers
-        .map(oId => client.calls.newDecline(
-        offerIds = Seq(oId),
-        filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build())
-      ))
-        .runWith(client.mesosSink)
+    })
+    .onComplete {
+      case Success(res) =>
+        logger.info(s"Stream completed: $res"); system.terminate()
+      case Failure(e) =>
+        logger.error(s"Error in stream: $e"); system.terminate()
     }
-
-  }).onComplete{
-    case Success(res) =>
-      logger.info(s"Stream completed: $res"); system.terminate()
-    case Failure(e) => logger.error(s"Error in stream: $e"); system.terminate()
-  }
 }
