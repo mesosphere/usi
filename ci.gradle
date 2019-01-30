@@ -67,8 +67,10 @@ task provision(type: Exec) {
               |
               |apt-get -y install mesos=1.4.0-2.0.1 zookeeperd
               |""".stripMargin()
-    File provisionScript = new File('provision.sh')
-    provisionScript.write(script)
+    doFirst {
+        File provisionScript = new File('provision.sh')
+        provisionScript.write(script)
+    }
     
     commandLine '/usr/bin/env', 'bash', 'provision.sh'
 }
