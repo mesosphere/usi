@@ -31,19 +31,19 @@ object UselessFramework extends App with StrictLoggingFlow {
 
   val frameworkInfo = FrameworkInfo.newBuilder()
     .setUser("foo")
-    .setName("Example FOO Framework")
+    .setName("Useless Framework")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
     .addRoles("test")
     .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .build()
 
-  val conf = MesosClientSettings(ConfigFactory.load())
+  val conf = MesosClientSettings(ConfigFactory.load().getConfig("mesos-client"))
   val client = Await.result(MesosClient(conf, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   client.mesosSource.runWith(Sink.foreach { event =>
 
     if (event.getType == Event.Type.SUBSCRIBED) {
-      logger.info("Successfully subscribed to mesos")
+      logger.info("Successfully subscribed to Mesos")
     } else if (event.getType == Event.Type.OFFERS) {
 
       val offerIds = event.getOffers.getOffersList.asScala.map(_.getId).toList
