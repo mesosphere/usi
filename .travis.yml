@@ -1,6 +1,9 @@
+sudo: required
 language: scala
 scala:
    - 2.12.2
+before_install:
+  - sudo ./provision.sh
 script:
   - ./gradlew ci --info
 before_cache:
