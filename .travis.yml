@@ -2,9 +2,8 @@ sudo: required
 language: scala
 scala:
    - 2.12.2
-before_install:
-  - sudo ./gradlew provision --info
 script:
+  - sudo ./gradlew provision
   - ./gradlew ci --info
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
