@@ -5,6 +5,7 @@ include 'core-models'
 include 'mesos-client'
 include 'metrics'
 include 'metrics-dropwizard'
+include 'persistence'
 
 /* example projects*/
 include 'hello-world'
