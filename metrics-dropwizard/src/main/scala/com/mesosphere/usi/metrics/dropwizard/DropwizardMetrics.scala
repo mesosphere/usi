@@ -28,16 +28,11 @@ class DropwizardMetrics(metricsSettings: MetricsSettings, registry: MetricRegist
 
   private val namePrefix = metricsSettings.namePrefix
   private val histrogramSettings = metricsSettings.historgramSettings
-  private val histogramReservoirHighestTrackableValue =
-    histrogramSettings.reservoirHighestTrackableValue
-  private val histogramReservoirSignificantDigits =
-    histrogramSettings.reservoirSignificantDigits
-  private val histogramReservoirResetPeriodically =
-    histrogramSettings.reservoirResetPeriodically
-  private val histogramReservoirResettingInterval =
-    Duration.ofNanos(histrogramSettings.reservoirResettingInterval.toNanos)
-  private val histogramReservoirResettingChunks =
-    histrogramSettings.reservoirResettingChunks
+  private val histogramReservoirHighestTrackableValue = histrogramSettings.reservoirHighestTrackableValue
+  private val histogramReservoirSignificantDigits = histrogramSettings.reservoirSignificantDigits
+  private val histogramReservoirResetPeriodically = histrogramSettings.reservoirResetPeriodically
+  private val histogramReservoirResettingInterval = Duration.ofNanos(histrogramSettings.reservoirResettingInterval.toNanos)
+  private val histogramReservoirResettingChunks = histrogramSettings.reservoirResettingChunks
 
   implicit class DropwizardCounter(val counter: codahale.metrics.Counter) extends Counter {
     override def increment(): Unit = increment(1L)
