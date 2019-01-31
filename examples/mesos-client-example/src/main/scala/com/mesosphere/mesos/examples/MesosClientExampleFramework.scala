@@ -1,37 +1,38 @@
-package mesosphere.mesos.examples
+package com.mesosphere.mesos.examples
 
 import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
-import com.typesafe.config.ConfigFactory
 import com.mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
+import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.Event
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
+import scala.collection.JavaConverters._
 
 /**
-  * Run Foo framework that:
-  *  - successfully subscribes
-  *  - declines all offers.
+  * Run a mesos-client example framework that:
+  *  - uses only the raw mesos-client
+  *  - successfully subscribes to Mesos master
+  *  - declines all offers
   *
-  *  Not much, but shows the basic idea. Good to test against local mesos.
+  *  Not much, but shows the basic idea. Good to test against local Mesos.
   *
   */
-object UselessFramework extends App with StrictLoggingFlow {
+object MesosClientExampleFramework extends App with StrictLoggingFlow {
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
   val frameworkInfo = FrameworkInfo.newBuilder()
-    .setUser("foo")
-    .setName("Useless Framework")
+    .setUser("mesos-client")
+    .setName("MesosClientExample")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
     .addRoles("test")
     .addCapabilities(FrameworkInfo.Capability
@@ -39,8 +40,8 @@ object UselessFramework extends App with StrictLoggingFlow {
       .setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .build()
 
-  val conf = MesosClientSettings(ConfigFactory.load().getConfig("mesos-client"))
-  val client = Await.result(MesosClient(conf, frameworkInfo).runWith(Sink.head), 10.seconds)
+  val settings = MesosClientSettings(ConfigFactory.load().getConfig("mesos-client"))
+  val client = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   client.mesosSource
     .runWith(Sink.foreach { event =>
