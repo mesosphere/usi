@@ -34,7 +34,7 @@ class S3Upload extends DefaultTask with StrictLogging {
       if (!fileDetails.isDirectory) {
         val file = fileDetails.getRelativePath()
         val key = s"$prefix/$file"
-        val request = PutObjectRequest.builder().bucket(bucket).key(key).contentType("test/plain").build()
+        val request = PutObjectRequest.builder().bucket(bucket).key(key).contentType("test/html").build()
         val body = AsyncRequestBody.fromFile(fileDetails.getFile)
         pendingUploads = pendingUploads :+ s3.putObject(request, body)
       }
