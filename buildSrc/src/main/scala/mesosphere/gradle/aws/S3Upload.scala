@@ -2,6 +2,7 @@ package mesosphere.gradle.aws
 
 import java.util.concurrent.CompletableFuture
 
+import org.apache.commons.io.FilenameUtils
 import com.typesafe.scalalogging.StrictLogging
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileTree
@@ -9,7 +10,7 @@ import org.gradle.api.tasks.TaskAction
 import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3AsyncClient
-import software.amazon.awssdk.services.s3.model.{PutObjectResponse, PutObjectRequest}
+import software.amazon.awssdk.services.s3.model.{PutObjectRequest, PutObjectResponse}
 
 import scala.beans.BeanProperty
 
@@ -34,7 +35,11 @@ class S3Upload extends DefaultTask with StrictLogging {
       if (!fileDetails.isDirectory) {
         val file = fileDetails.getRelativePath()
         val key = s"$prefix/$file"
-        val request = PutObjectRequest.builder().bucket(bucket).key(key).contentType("test/html").build()
+        val request = PutObjectRequest.builder()
+          .bucket(bucket)
+          .key(key)
+          .contentType(ContentType.of(fileDetails.getName))
+          .build()
         val body = AsyncRequestBody.fromFile(fileDetails.getFile)
         pendingUploads = pendingUploads :+ s3.putObject(request, body)
       }
@@ -47,4 +52,15 @@ class S3Upload extends DefaultTask with StrictLogging {
     logger.info("Done.")
   }
 
+}
+
+object ContentType {
+  val contentTypeMap = Map(
+    "html" -> "text/html",
+    "css" -> "text/css",
+    "js" -> "application/x-javascript",
+    "xml" -> "text/xml"
+  )
+
+  def of(fileName: String): String = contentTypeMap.getOrElse(FilenameUtils.getExtension(fileName), "text/plain")
 }
