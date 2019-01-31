@@ -116,10 +116,11 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
         "max",
         "stddev")
   private def reportSnapshot(buffer: StringBuilder,
-                             name: String,
-                             snapshot: Snapshot,
-                             timestamp: Long,
-                             scaleMetrics: Boolean): Unit = {
+   name: String,
+   snapshot: Snapshot,
+   timestamp: Long,
+   scaleMetrics: Boolean): Unit = {
+
     val values = Seq(
       snapshot.getMin.toDouble,
       snapshot.getMean,
