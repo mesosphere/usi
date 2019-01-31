@@ -140,8 +140,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#subscribe-1
     */
   private def newSubscribeCall(frameworkInfo: FrameworkInfo): Call = {
-    Call
-      .newBuilder()
+    Call.newBuilder()
       .setType(Call.Type.SUBSCRIBE)
       .setFrameworkId(frameworkInfo.getId)
       .setSubscribe(Call.Subscribe.newBuilder().setFrameworkInfo(frameworkInfo))
@@ -161,8 +160,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
 
     val httpConnection = Http().outgoingConnection(url.getHost, url.getPort)
 
-    Source
-      .single(request)
+    Source.single(request)
       .via(log(s"Connecting to the new leader: $url"))
       .via(httpConnection)
       .via(log("HttpResponse: "))
