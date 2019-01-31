@@ -43,7 +43,7 @@ case class ZookeeperServer(
   private var running = autoStart
   private val testingServer = new TestingServer(config, autoStart)
 
-  def connectUri = testingServer.getConnectString
+  def connectUrl = testingServer.getConnectString
   /**
     * Starts or restarts the server. If the server is currently running it will be stopped
     * and restarted. If it's not currently running then it will be started. If
@@ -93,7 +93,7 @@ trait ZookeeperServerTest extends BeforeAndAfterAll with StrictLogging { this: S
 
   def zkClient(retryPolicy: RetryPolicy = NoRetryPolicy, namespace: Option[String] = None): CuratorFramework = {
     zkserver.start()
-    val client: CuratorFramework = CuratorFrameworkFactory.newClient(zkserver.connectUri, retryPolicy)
+    val client: CuratorFramework = CuratorFrameworkFactory.newClient(zkserver.connectUrl, retryPolicy)
     client.start()
 
     if (!client.blockUntilConnected(client.getZookeeperClient.getConnectionTimeoutMs, java.util.concurrent.TimeUnit.MILLISECONDS)) {
