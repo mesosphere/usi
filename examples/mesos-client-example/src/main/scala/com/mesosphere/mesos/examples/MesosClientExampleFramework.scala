@@ -35,8 +35,7 @@ object MesosClientExampleFramework extends App with StrictLoggingFlow {
     .setName("MesosClientExample")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
     .addRoles("test")
-    .addCapabilities(FrameworkInfo.Capability
-      .newBuilder()
+    .addCapabilities(FrameworkInfo.Capability.newBuilder()
       .setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .build()
 
