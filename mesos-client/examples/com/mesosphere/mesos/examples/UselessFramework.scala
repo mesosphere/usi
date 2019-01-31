@@ -29,10 +29,9 @@ object UselessFramework extends App with StrictLoggingFlow {
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  val frameworkInfo = FrameworkInfo
-    .newBuilder()
+  val frameworkInfo = FrameworkInfo.newBuilder()
     .setUser("foo")
-    .setName("Example FOO Framework")
+    .setName("Useless Framework")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
     .addRoles("test")
     .addCapabilities(FrameworkInfo.Capability
@@ -40,7 +39,7 @@ object UselessFramework extends App with StrictLoggingFlow {
       .setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .build()
 
-  val conf = MesosClientSettings(ConfigFactory.load())
+  val conf = MesosClientSettings(ConfigFactory.load().getConfig("mesos-client"))
   val client = Await.result(MesosClient(conf, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   client.mesosSource

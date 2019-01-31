@@ -7,6 +7,13 @@ plugins {
     id 'cz.alenkacz.gradle.scalafmt' version '1.7.0'
 }
 
+ext {
+    // Scala version for all scala dependencies
+    scalaVersion = '2.12'
+
+    mesosVersion = '1.7.0'
+}
+
 allprojects {
 
     version = '0.1'
@@ -31,8 +38,6 @@ allprojects {
     compileScala.dependsOn scalafmtAll
 
     dependencies {
-        // Scala version for all scala dependencies
-        def scalaVersion = '2.12'
 
         // Use Scala 2.12 in our library project
         implementation 'org.scala-lang:scala-library:2.12.7'
