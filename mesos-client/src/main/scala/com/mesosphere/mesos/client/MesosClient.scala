@@ -289,9 +289,10 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     *    available via the materializable-once source, `.mesosSource`, which DOES NOT include the earlier-consumed
     *    SUBSCRIBED event.
     */
-  def apply(conf: MesosClientSettings, frameworkInfo: FrameworkInfo)(implicit
-                                                                     system: ActorSystem,
-                                                                     materializer: ActorMaterializer): Source[MesosClient, NotUsed] = {
+  def apply(conf: MesosClientSettings, frameworkInfo: FrameworkInfo)(
+      implicit
+      system: ActorSystem,
+      materializer: ActorMaterializer): Source[MesosClient, NotUsed] = {
 
     val initialUrl = new java.net.URI(s"http://${conf.master}")
 

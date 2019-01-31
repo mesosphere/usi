@@ -41,7 +41,12 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
   }
 
   private def report(socket: ActorRef): Unit = {
-    report(socket, registry.getGauges, registry.getCounters, registry.getHistograms, registry.getMeters, registry.getTimers)
+    report(socket,
+           registry.getGauges,
+           registry.getCounters,
+           registry.getHistograms,
+           registry.getMeters,
+           registry.getTimers)
   }
 
   private def report(socket: ActorRef,
@@ -91,7 +96,16 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
     maybeSendAndAppend(socket, s"$name:${counter.getCount}|g\n")
 
   private val histogramSnapshotSuffixes =
-    Seq("min", "average", "median", "75percentile", "95percentile", "98percentile", "99percentile", "999percentile", "max", "stddev")
+    Seq("min",
+        "average",
+        "median",
+        "75percentile",
+        "95percentile",
+        "98percentile",
+        "99percentile",
+        "999percentile",
+        "max",
+        "stddev")
   private def reportSnapshot(socket: ActorRef, name: String, snapshot: Snapshot, scaleMetrics: Boolean): Unit = {
     val values = Seq(
       snapshot.getMin.toDouble,

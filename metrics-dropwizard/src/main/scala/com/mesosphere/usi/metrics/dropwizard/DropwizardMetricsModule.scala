@@ -6,7 +6,11 @@ import akka.Done
 import akka.actor.ActorRefFactory
 import com.codahale.metrics.MetricRegistry
 import com.mesosphere.usi.metrics.Metrics
-import com.mesosphere.usi.metrics.dropwizard.conf.{DataDogApiReporterSettings, DataDogUdpReporterSettings, MetricsSettings}
+import com.mesosphere.usi.metrics.dropwizard.conf.{
+  DataDogApiReporterSettings,
+  DataDogUdpReporterSettings,
+  MetricsSettings
+}
 import com.mesosphere.usi.metrics.dropwizard.reporters.{DataDogAPIReporter, DataDogUDPReporter, StatsDReporter}
 import com.typesafe.config.Config
 
@@ -28,7 +32,8 @@ class DropwizardMetricsModule(config: Config) {
   def snapshot(): MetricRegistry = registry
 
   def start(actorRefFactory: ActorRefFactory): Done = {
-    metricsSettings.statsdReporterSettings.foreach(statsdSettings => actorRefFactory.actorOf(StatsDReporter.props(statsdSettings, registry), "StatsDReporter"))
+    metricsSettings.statsdReporterSettings.foreach(statsdSettings =>
+      actorRefFactory.actorOf(StatsDReporter.props(statsdSettings, registry), "StatsDReporter"))
 
     metricsSettings.dataDogReporterSettings.foreach {
       case s: DataDogUdpReporterSettings =>

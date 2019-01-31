@@ -16,7 +16,9 @@ import com.typesafe.scalalogging.StrictLogging
 
 import scala.collection.JavaConverters._
 
-class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricRegistry) extends Actor with StrictLogging {
+class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricRegistry)
+    extends Actor
+    with StrictLogging {
   private val apiKey = settings.apiKey
   private val apiUrl =
     s"https://app.datadoghq.com/api/v1/series?api_key=$apiKey"
@@ -105,8 +107,21 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
     reportMetric(buffer, name, counter.getCount.toString, timestamp, "gauge")
 
   private val histogramSnapshotSuffixes =
-    Seq("min", "average", "median", "75percentile", "95percentile", "98percentile", "99percentile", "999percentile", "max", "stddev")
-  private def reportSnapshot(buffer: StringBuilder, name: String, snapshot: Snapshot, timestamp: Long, scaleMetrics: Boolean): Unit = {
+    Seq("min",
+        "average",
+        "median",
+        "75percentile",
+        "95percentile",
+        "98percentile",
+        "99percentile",
+        "999percentile",
+        "max",
+        "stddev")
+  private def reportSnapshot(buffer: StringBuilder,
+                             name: String,
+                             snapshot: Snapshot,
+                             timestamp: Long,
+                             scaleMetrics: Boolean): Unit = {
     val values = Seq(
       snapshot.getMin.toDouble,
       snapshot.getMean,
@@ -158,9 +173,14 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
     reportMetered(buffer, name, timer, timestamp)
   }
 
-  private def reportMetric(buffer: StringBuilder, name: String, value: String, timestamp: Long, metricType: String): Unit = {
+  private def reportMetric(buffer: StringBuilder,
+                           name: String,
+                           value: String,
+                           timestamp: Long,
+                           metricType: String): Unit = {
     if (buffer.length() > 0) buffer.append(',')
-    buffer.append(s"""{"metric":"$name","interval":$transmissionInterval,"points":[[$timestamp,$value]],"type":"$metricType",host:"$host"}""")
+    buffer.append(
+      s"""{"metric":"$name","interval":$transmissionInterval,"points":[[$timestamp,$value]],"type":"$metricType",host:"$host"}""")
   }
 }
 

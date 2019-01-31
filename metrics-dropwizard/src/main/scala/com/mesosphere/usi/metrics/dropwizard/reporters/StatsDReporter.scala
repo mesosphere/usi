@@ -41,7 +41,12 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
   }
 
   private def report(socket: ActorRef): Unit = {
-    report(socket, registry.getGauges, registry.getCounters, registry.getHistograms, registry.getMeters, registry.getTimers)
+    report(socket,
+           registry.getGauges,
+           registry.getCounters,
+           registry.getHistograms,
+           registry.getMeters,
+           registry.getTimers)
   }
 
   private def report(socket: ActorRef,
