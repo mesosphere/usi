@@ -120,8 +120,7 @@ class MesosCalls(frameworkId: FrameworkID) {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#kill
     */
   def newKill(taskId: TaskID, agentId: Option[AgentID] = None, killPolicy: Option[KillPolicy]): Call = {
-    val killBuilder = Call.Kill
-      .newBuilder()
+    val killBuilder = Call.Kill.newBuilder()
       .setTaskId(taskId)
     agentId.foreach(killBuilder.setAgentId)
     killPolicy.foreach(killBuilder.setKillPolicy)
@@ -146,8 +145,7 @@ class MesosCalls(frameworkId: FrameworkID) {
       .setType(Call.Type.SHUTDOWN)
       .setFrameworkId(frameworkId)
       .setShutdown(
-        Call.Shutdown
-          .newBuilder()
+        Call.Shutdown.newBuilder()
           .setExecutorId(executorId)
           .setAgentId(agentId)
           .build())
@@ -169,8 +167,7 @@ class MesosCalls(frameworkId: FrameworkID) {
       .setType(Call.Type.ACKNOWLEDGE)
       .setFrameworkId(frameworkId)
       .setAcknowledge(
-        Call.Acknowledge
-          .newBuilder()
+        Call.Acknowledge.newBuilder()
           .setAgentId(agentId)
           .setTaskId(taskId)
           .setUuid(uuid)
@@ -211,8 +208,7 @@ class MesosCalls(frameworkId: FrameworkID) {
       .setType(Call.Type.MESSAGE)
       .setFrameworkId(frameworkId)
       .setMessage(
-        Call.Message
-          .newBuilder()
+        Call.Message.newBuilder()
           .setAgentId(agentId)
           .setExecutorId(executorId)
           .setData(protobuf.ByteString.copyFrom(message.toArray))
