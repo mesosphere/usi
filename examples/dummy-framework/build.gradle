@@ -1,5 +1,4 @@
 dependencies {
-    compile project(':mesos-client')
-    implementation "org.apache.mesos:mesos:$mesosVersion"
+    implementation project(':mesos-client')
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
 }
