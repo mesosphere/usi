@@ -81,7 +81,7 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
   private def reportGauge(socket: ActorRef, name: String, gauge: Gauge[_]): Unit = {
     val value: Number = gauge.getValue match {
       case v: Double => if (v.isNaN) 0.0 else v
-      case v: Float  => if (v.isNaN) 0.0 else v.toDouble
+      case v: Float => if (v.isNaN) 0.0 else v.toDouble
       case v: Number => v
     }
 

@@ -106,15 +106,15 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
 
   private val histogramSnapshotSuffixes =
     Seq("min",
-        "average",
-        "median",
-        "75percentile",
-        "95percentile",
-        "98percentile",
-        "99percentile",
-        "999percentile",
-        "max",
-        "stddev")
+      "average",
+      "median",
+      "75percentile",
+      "95percentile",
+      "98percentile",
+      "99percentile",
+      "999percentile",
+      "max",
+      "stddev")
   private def reportSnapshot(buffer: StringBuilder,
    name: String,
    snapshot: Snapshot,
