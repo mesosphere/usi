@@ -11,7 +11,6 @@ import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
-import org.scalatest.concurrent.Eventually
 import org.apache.mesos.v1.scheduler.Protos.Event
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -20,12 +19,9 @@ import scala.annotation.tailrec
 import scala.concurrent.Future
 
 @RunWith(classOf[JUnitRunner])
-class MesosClientIntegrationTest extends AkkaUnitTest
-  with MesosClusterTest
-  with Eventually {
+class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
 
   "Mesos client should successfully subscribe to mesos without framework Id" in withFixture() { f =>
-    When("a framework subscribes")
     Then("a framework successfully subscribes without a framework Id")
     f.client.frameworkId.getValue shouldNot be(empty)
 
@@ -102,23 +98,25 @@ class MesosClientIntegrationTest extends AkkaUnitTest
     implicit val materializer: ActorMaterializer = ActorMaterializer()
 
     val frameworkInfo = FrameworkInfo.newBuilder()
-      .setUser("foo")
-      .setName("Example FOO Framework")
+      .setUser("test")
+      .setName("Mesos Client Integration Tests")
       .setId(existingFrameworkId.getOrElse(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString)))
       .addRoles("foo")
       .setFailoverTimeout(0.0f)
       .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
       .build()
 
-    val mesosUrl = new java.net.URI(mesos.url)
+    val mesosUrl = new java.net.URI(mesosFacade.url)
     val mesosHost = mesosUrl.getHost
     val mesosPort = mesosUrl.getPort
 
     val config = ConfigFactory.parseString(
       s"""
-         |connection.masterUrl="${mesosUrl.getHost}:${mesosUrl.getPort}"
+         |mesos-client.master-url="${mesosUrl.getHost}:${mesosUrl.getPort}"
     """.stripMargin).withFallback(ConfigFactory.load())
-    val settings = MesosClientSettings(config)
+
+    val settings = MesosClientSettings(config.getConfig("mesos-client"))
+
     val client = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
 
     val queue = client.mesosSource.

@@ -40,7 +40,7 @@ allprojects {
 
         // Use Scalatest for testing our library
         testImplementation 'junit:junit:4.12'
-        compile "org.scalatest:scalatest_$scalaVersion:3.0.5"
+        testImplementation "org.scalatest:scalatest_$scalaVersion:3.0.5"
 
         // Need scala-xml at test runtime
         testRuntimeOnly "org.scala-lang.modules:scala-xml_$scalaVersion:1.1.1"

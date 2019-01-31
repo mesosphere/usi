@@ -84,10 +84,9 @@ object MesosFacade {
   case class ITask(id: String, status: Option[String])
 
   case class ITFramework(id: String, name: String, tasks: Seq[ITask])
-  case class ITFrameworks(
-                           frameworks: Seq[ITFramework],
-                           completed_frameworks: Seq[ITFramework],
-                           unregistered_frameworks: Seq[ITFramework])
+  case class ITFrameworks(frameworks: Seq[ITFramework],
+                          completed_frameworks: Seq[ITFramework],
+                          unregistered_frameworks: Seq[ITFramework])
 }
 
 class MesosFacade(val url: String, val waitTime: FiniteDuration = 30.seconds)(implicit val system: ActorSystem, materializer: Materializer)
@@ -101,7 +100,6 @@ class MesosFacade(val url: String, val waitTime: FiniteDuration = 30.seconds)(im
   // `waitTime` is passed implicitly to the `request` and `requestFor` methods
   implicit val requestTimeout = waitTime
   def state: RestResult[ITMesosState] = {
-    logger.info(s"fetching state from $url")
     result(requestFor[ITMesosState](Get(s"$url/state.json")), waitTime)
   }
 
@@ -119,6 +117,10 @@ class MesosFacade(val url: String, val waitTime: FiniteDuration = 30.seconds)(im
 
   def teardown(frameworkId: String): HttpResponse = {
     result(request(Post(s"$url/teardown", HttpEntity(s"frameworkId=$frameworkId"))), waitTime).value
+  }
+
+  def redirect(leader: String = url): HttpResponse = {
+    result(request(Get(s"$leader/redirect")), waitTime).value
   }
 }
 

@@ -4,21 +4,16 @@ import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.{Files, Paths}
 
-import akka.Done
 import akka.actor.{ActorSystem, Scheduler}
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.client.RequestBuilding.Get
 import akka.stream.Materializer
-import com.mesosphere.utils.retry.Retry
 import com.mesosphere.utils.zookeeper.ZookeeperServerTest
 import com.mesosphere.utils.{PortAllocator, ProcessOutputToLogStream}
 import org.apache.commons.io.FileUtils
 import org.scalatest.Suite
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 
-import scala.async.Async._
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.sys.process.{Process, ProcessBuilder}
 import scala.util.Try
 
@@ -39,11 +34,7 @@ case class MesosCluster(
                          waitForMesosTimeout: FiniteDuration = 5.minutes,
                          mastersFaultDomains: Seq[Option[FaultDomain]],
                          agentsFaultDomains: Seq[Option[FaultDomain]],
-                         agentsGpus: Option[Int] = None)(implicit
-                                                         system: ActorSystem,
-                                                         mat: Materializer,
-                                                         ctx: ExecutionContext,
-                                                         scheduler: Scheduler) extends AutoCloseable with Eventually {
+                         agentsGpus: Option[Int] = None)(implicit system: ActorSystem, mat: Materializer) extends AutoCloseable with Eventually {
   require(quorumSize > 0 && quorumSize <= numMasters)
   require(agentsFaultDomains.isEmpty || agentsFaultDomains.size == numSlaves)
 
@@ -75,12 +66,6 @@ case class MesosCluster(
   }
 
   lazy val agents = 0.until(numSlaves).map { i =>
-    // We can add additional resources constraints for our test clusters here.
-    // IMPORTANT: we give each cluster's agent it's own port range! Otherwise every Mesos will offer the same port range
-    // to it's frameworks, leading to multiple tasks (from different test suits) trying to use the same port!
-    // First-come-first-served task will bind successfully where the others will fail leading to a lot inconsistency and
-    // flakiness in tests.
-
     val (faultDomainAgentAttributes: Map[String, Option[String]], mesosFaultDomainAgentCmdOption) = if (agentsFaultDomains.nonEmpty && agentsFaultDomains(i).nonEmpty) {
       val faultDomain = agentsFaultDomains(i).get
       val mesosFaultDomainCmdOption = s"""
@@ -105,11 +90,16 @@ case class MesosCluster(
       (nodeAttributes, Some(mesosFaultDomainCmdOption))
     } else Map.empty -> None
 
-    // uniquely identify each agent node, useful for constraint matching
+    // Uniquely identify each agent node, useful for constraint matching
     val attributes: Map[String, Option[String]] = Map("node" -> Some(i.toString)) ++ faultDomainAgentAttributes
 
     val renderedAttributes: String = attributes.map { case (key, maybeVal) => s"$key${maybeVal.map(v => s":$v").getOrElse("")}" }.mkString(";")
 
+    // We can add additional resources constraints for our test clusters here.
+    // IMPORTANT: we give each cluster's agent it's own port range! Otherwise every Mesos will offer the same port range
+    // to it's frameworks, leading to multiple tasks (from different test suits) trying to use the same port!
+    // First-come-first-served task will bind successfully where the others will fail leading to a lot inconsistency and
+    // flakiness in tests.
     Agent(resources = new Resources(ports = PortAllocator.portsRange(), gpus = agentsGpus), extraArgs = Seq(
       s"--attributes=$renderedAttributes"
     ) ++ mesosFaultDomainAgentCmdOption.map(fd => s"--domain=$fd"))
@@ -119,47 +109,28 @@ case class MesosCluster(
     start()
   }
 
-  def start(): Future[String] = async {
+  def start(): String = {
     masters.foreach(_.start())
     agents.foreach(_.start())
-    val masterUri = await(waitForLeader())
-    await(waitForAgents(masterUri))
-    masterUri
+    val masterUrl = waitForLeader()
+    waitForAgents(masterUrl)
+    masterUrl
   }
 
-  def waitForLeader(): Future[String] = async {
+  def waitForLeader(): String = {
     val firstMaster = s"http://${masters.head.ip}:${masters.head.port}"
-    val result = Retry("wait for leader", maxAttempts = Int.MaxValue, maxDuration = waitForMesosTimeout) {
-      Http().singleRequest(Get(firstMaster + "/redirect")).map { result =>
-        result.discardEntityBytes() // forget about the body
-        if (result.status.isFailure()) {
-          throw new Exception(s"Couldn't determine leader: $result")
-        }
-        result
-      }
-    }
+    val mesosFacade = new MesosFacade(firstMaster)
 
-    def maybeFixURI(uri: String): String = {
-      // some versions of mesos issue redirects with broken Location headers; fix them here
-      if (uri.indexOf("//") == 0) {
-        "http:" + uri
-      } else {
-        uri
-      }
+    val leader = eventually(timeout(waitForMesosTimeout), interval(1.seconds)){
+      mesosFacade.redirect().headers.find(_.lowercaseName() == "location").map(_.value()).get
     }
-
-    val location = await(result).headers.find(_.lowercaseName() == "location").map(_.value()).getOrElse(firstMaster)
-    maybeFixURI(location)
+    s"http:$leader"
   }
 
-  def waitForAgents(masterUri: String): Future[Done] = {
-    val mesosFacade = new MesosFacade(masterUri)
-    Retry.blocking("wait for agents", maxAttempts = Int.MaxValue, maxDuration = waitForMesosTimeout) {
-      val numAgents = mesosFacade.state.value.agents.size
-      if (numAgents != agents.size) {
-        throw new Exception(s"Agents are not ready. Found $numAgents but expected ${agents.size}")
-      }
-      Done
+  def waitForAgents(masterUrl: String): Unit = {
+    val mesosFacade = new MesosFacade(masterUrl)
+    eventually(timeout(waitForMesosTimeout), interval(1.seconds)){
+      mesosFacade.state.value.agents.size == agents.size
     }
   }
 
@@ -261,11 +232,39 @@ case class MesosCluster(
         val projectDir = sys.props.getOrElse("user.dir", ".")
         FileUtils.copyDirectory(workDir, Paths.get(projectDir, "sandboxes", suiteName).toFile)
       }
-      // Copy all sandbox files (useful for debugging) into current directory for Jenkins to archive it:
+      // Copy all sandbox files (useful for debugging) into current directory for build job to archive it:
       Try(copySandboxFiles())
       stop()
       Try(FileUtils.deleteDirectory(workDir))
     }
+  }
+
+  def teardown(): Unit = {
+    val facade = new MesosFacade(waitForLeader(), waitForMesosTimeout)
+    val frameworkIds = facade.frameworkIds().value
+
+    // Call mesos/teardown for all framework Ids in the cluster and wait for the teardown to complete
+    frameworkIds.foreach { fId =>
+      facade.teardown(fId)
+      eventually(timeout(1.minutes), interval(2.seconds)) { facade.completedFrameworkIds().value.contains(fId) }
+    }
+  }
+
+  override def close(): Unit = {
+    Try(teardown())
+    agents.foreach(_.close())
+    masters.foreach(_.close())
+  }
+
+  // Get a random port from a random agent from the port range that was given to the agent during initialisation
+  // This is useful for integration tests that need to bind to an accessible port. It still can happen that the
+  // requested port is already bound but the chances should be slim. If not - blame @kjeschkies. Integration test
+  // suites should not use the same port twice in their tests.
+  def randomAgentPort(): Int = {
+    import scala.util.Random
+    val (min, max) = Random.shuffle(agents).head.resources.ports
+    val range = min to max
+    range(Random.nextInt(range.length))
   }
 
   // format: OFF
@@ -302,41 +301,10 @@ case class MesosCluster(
     override val processName = "Agent"
   }
   // format: ON
-
-  def state = new MesosFacade(Await.result(waitForLeader(), waitForMesosTimeout)).state
-
-  def teardown(): Unit = {
-    val facade = new MesosFacade(Await.result(waitForLeader(), waitForMesosTimeout))
-    val frameworkIds = facade.frameworkIds().value
-
-    // Call mesos/teardown for all framework Ids in the cluster and wait for the teardown to complete
-    frameworkIds.foreach { fId =>
-      facade.teardown(fId)
-      eventually(timeout(1.minutes), interval(2.seconds)) { facade.completedFrameworkIds().value.contains(fId) }
-    }
-  }
-
-  override def close(): Unit = {
-    Try(teardown())
-    agents.foreach(_.close())
-    masters.foreach(_.close())
-  }
-
-  // Get a random port from a random agent from the port range that was given to the agent during initialisation
-  // This is useful for integration tests that need to bind to an accessible port. It still can happen that the
-  // requested port is already bound but the chances should be slim. If not - blame @kjeschkies. Integration test
-  // suites should not use the same port twice in their tests.
-  def randomAgentPort(): Int = {
-    import scala.util.Random
-    val (min, max) = Random.shuffle(agents).head.resources.ports
-    val range = min to max
-    range(Random.nextInt(range.length))
-  }
 }
-// format: ON
 
 trait MesosTest {
-  def mesos: MesosFacade
+  def mesosFacade: MesosFacade
   val mesosMasterUrl: String
 }
 
@@ -352,7 +320,6 @@ trait MesosClusterTest extends Suite with ZookeeperServerTest with MesosTest wit
 
   def agentsGpus: Option[Int] = None
 
-  private val localMesosUrl = sys.env.get("USE_LOCAL_MESOS")
   lazy val mesosMasterUrl = s"zk://${zkserver.connectUri}/mesos"
   lazy val mesosNumMasters = 1
   lazy val mesosNumSlaves = 1
@@ -361,15 +328,15 @@ trait MesosClusterTest extends Suite with ZookeeperServerTest with MesosTest wit
   lazy val mesosLeaderTimeout: FiniteDuration = patienceConfig.timeout.toMillis.milliseconds
   lazy val mesosCluster = MesosCluster(suiteName, mesosNumMasters, mesosNumSlaves, mesosMasterUrl, mesosQuorumSize,
     autoStart = false, config = mesosConfig, mesosLeaderTimeout, mastersFaultDomains, agentsFaultDomains, agentsGpus = agentsGpus)
-  lazy val mesos = new MesosFacade(localMesosUrl.getOrElse(mesosCluster.waitForLeader().futureValue))
+  lazy val mesosFacade = new MesosFacade(mesosCluster.waitForLeader())
 
   abstract override def beforeAll(): Unit = {
     super.beforeAll()
-    localMesosUrl.fold(mesosCluster.start().futureValue)(identity)
+    mesosCluster.start()
   }
 
   abstract override def afterAll(): Unit = {
-    localMesosUrl.fold(mesosCluster.close())(_ => ())
+    mesosCluster.close()
     super.afterAll()
   }
 }
