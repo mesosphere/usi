@@ -5,7 +5,7 @@
 </p>
 <p align="center">
   <a href="https://travis-ci.org/mesosphere/usi"><img alt="undefined" src="https://img.shields.io/travis/mesosphere/usi/master.svg?style=flat"></a>
-  <img alt="undefined" src="https://img.shields.io/github/license/mesosphere/usi.svg?style=flat">
+  <a href="https://github.com/mesosphere/usi/blob/master/LICENSE"><img alt="undefined" src="https://img.shields.io/github/license/mesosphere/usi.svg?style=flat"></a>
 </p>
 
 This repository is currently a work-in-progress.
