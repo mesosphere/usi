@@ -1,6 +1,8 @@
 # Unified Scheduler Interface
 Deploy and manage containers (including Docker) on top of Apache Mesos at scale.
 
+[![Build Status](https://img.shields.io/travis/mesosphere/usi/master.svg?style=flat)](https://travis-ci.org/mesosphere/usi) ![](https://img.shields.io/github/license/mesosphere/usi.svg?style=flat)
+
 This repository is currently a work-in-progress.
 
 [Design principles behind USI](https://github.com/mesosphere/marathon-design/blob/master/unified-scheduler/index.md)
