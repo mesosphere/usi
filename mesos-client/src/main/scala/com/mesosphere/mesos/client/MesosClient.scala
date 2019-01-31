@@ -171,29 +171,27 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
   private def mesosHttpConnection(frameworkInfo: FrameworkInfo, url: URI, redirectRetries: Int)(
       implicit mat: Materializer,
       as: ActorSystem): Source[(HttpResponse, ConnectionInfo), NotUsed] =
-    connectionSource(frameworkInfo, url)
-      .map { response =>
-        response.status match {
-          case StatusCodes.OK =>
-            logger.info(s"Connected successfully to $url");
-            val streamId = response.headers
-              .find(h => h.is(MesosStreamIdHeaderName.toLowerCase))
-              .getOrElse(throw new IllegalStateException(s"Missing MesosStreamId header in ${response.headers}"))
+    connectionSource(frameworkInfo, url).map { response =>
+      response.status match {
+        case StatusCodes.OK =>
+          logger.info(s"Connected successfully to $url");
+          val streamId = response.headers
+            .find(h => h.is(MesosStreamIdHeaderName.toLowerCase))
+            .getOrElse(throw new IllegalStateException(s"Missing MesosStreamId header in ${response.headers}"))
 
-            (response, ConnectionInfo(url, streamId.value()))
-          case StatusCodes.TemporaryRedirect =>
-            val leader = new URI(response.header[headers.Location].get.value())
-            logger.warn(s"New mesos leader available at $leader")
-            // Update the context with the new leader's host and port and throw an exception that is handled in the
-            // next `recoverWith` stage.
-            response.discardEntityBytes()
-            throw MesosRedirectException(leader)
-          case _ =>
-            response.discardEntityBytes()
-            throw new IllegalArgumentException(s"Mesos server error: $response")
-        }
+          (response, ConnectionInfo(url, streamId.value()))
+        case StatusCodes.TemporaryRedirect =>
+          val leader = new URI(response.header[headers.Location].get.value())
+          logger.warn(s"New mesos leader available at $leader")
+          // Update the context with the new leader's host and port and throw an exception that is handled in the
+          // next `recoverWith` stage.
+          response.discardEntityBytes()
+          throw MesosRedirectException(leader)
+        case _ =>
+          response.discardEntityBytes()
+          throw new IllegalArgumentException(s"Mesos server error: $response")
       }
-      .recoverWithRetries(redirectRetries, {
+    }.recoverWithRetries(redirectRetries, {
         case MesosRedirectException(leader) =>
           mesosHttpConnection(frameworkInfo, leader, redirectRetries)
       })
