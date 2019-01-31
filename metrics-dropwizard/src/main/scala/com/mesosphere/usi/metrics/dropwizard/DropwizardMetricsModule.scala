@@ -6,11 +6,7 @@ import akka.Done
 import akka.actor.ActorRefFactory
 import com.codahale.metrics.MetricRegistry
 import com.mesosphere.usi.metrics.Metrics
-import com.mesosphere.usi.metrics.dropwizard.conf.{
-  DataDogApiReporterSettings,
-  DataDogUdpReporterSettings,
-  MetricsSettings
-}
+import com.mesosphere.usi.metrics.dropwizard.conf.{DataDogApiReporterSettings, DataDogUdpReporterSettings, MetricsSettings} //format:OFF
 import com.mesosphere.usi.metrics.dropwizard.reporters.{DataDogAPIReporter, DataDogUDPReporter, StatsDReporter}
 import com.typesafe.config.Config
 

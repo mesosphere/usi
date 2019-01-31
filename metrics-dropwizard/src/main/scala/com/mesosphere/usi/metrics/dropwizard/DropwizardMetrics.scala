@@ -9,40 +9,30 @@ import com.codahale.metrics
 import com.codahale.metrics.MetricRegistry
 import com.github.rollingmetrics.histogram.{HdrBuilder, OverflowResolver}
 import com.mesosphere.usi.metrics.dropwizard.conf.MetricsSettings
-import com.mesosphere.usi.metrics.{
-  ClosureGauge,
-  Counter,
-  Gauge,
-  Meter,
-  Metrics,
-  SettableGauge,
-  Timer,
-  TimerAdapter,
-  UnitOfMeasurement
-}
+import com.mesosphere.usi.metrics.{ClosureGauge, Counter, Gauge, Meter, Metrics, SettableGauge, Timer, TimerAdapter, UnitOfMeasurement} //format:OFF
 
-import scala.util.matching.Regex
+  import scala.util.matching.Regex
 
-class DropwizardMetrics(metricsSettings: MetricsSettings, registry: MetricRegistry) extends Metrics {
-  import DropwizardMetrics.constructName
+  class DropwizardMetrics(metricsSettings: MetricsSettings, registry: MetricRegistry) extends Metrics {
+    import DropwizardMetrics.constructName
 
-  private val namePrefix = metricsSettings.namePrefix
-  private val histrogramSettings = metricsSettings.historgramSettings
-  private val histogramReservoirHighestTrackableValue = histrogramSettings.reservoirHighestTrackableValue
-  private val histogramReservoirSignificantDigits = histrogramSettings.reservoirSignificantDigits
-  private val histogramReservoirResetPeriodically = histrogramSettings.reservoirResetPeriodically
-  private val histogramReservoirResettingInterval = Duration.ofNanos(histrogramSettings.reservoirResettingInterval.toNanos)
-  private val histogramReservoirResettingChunks = histrogramSettings.reservoirResettingChunks
+    private val namePrefix = metricsSettings.namePrefix
+    private val histrogramSettings = metricsSettings.historgramSettings
+    private val histogramReservoirHighestTrackableValue = histrogramSettings.reservoirHighestTrackableValue
+    private val histogramReservoirSignificantDigits = histrogramSettings.reservoirSignificantDigits
+    private val histogramReservoirResetPeriodically = histrogramSettings.reservoirResetPeriodically
+    private val histogramReservoirResettingInterval = Duration.ofNanos(histrogramSettings.reservoirResettingInterval.toNanos)
+    private val histogramReservoirResettingChunks = histrogramSettings.reservoirResettingChunks
 
-  implicit class DropwizardCounter(val counter: codahale.metrics.Counter) extends Counter {
-    override def increment(): Unit = increment(1L)
-    override def increment(times: Long): Unit = counter.inc(times)
-  }
-  override def counter(name: String, unit: UnitOfMeasurement = UnitOfMeasurement.None): Counter = {
-    registry.counter(constructName(namePrefix, name, "counter", unit))
-  }
+    implicit class DropwizardCounter(val counter: codahale.metrics.Counter) extends Counter {
+      override def increment(): Unit = increment(1L)
+      override def increment(times: Long): Unit = counter.inc(times)
+    }
+    override def counter(name: String, unit: UnitOfMeasurement = UnitOfMeasurement.None): Counter = {
+      registry.counter(constructName(namePrefix, name, "counter", unit))
+    }
 
-  override def closureGauge[N](name: String,
+    override def closureGauge[N](name: String,
                                fn: () => N,
                                unit: UnitOfMeasurement = UnitOfMeasurement.None): ClosureGauge = {
     class DropwizardClosureGauge(val name: String) extends ClosureGauge {
