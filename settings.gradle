@@ -10,7 +10,5 @@ include 'persistence'
 /* example projects*/
 include 'hello-world'
 project(':hello-world').projectDir = new File('examples/hello-world')
-include 'dummy-framework'
-project(':dummy-framework').projectDir = new File('examples/dummy-framework')
-
-
+include 'mesos-client-example'
+project(':mesos-client-example').projectDir = new File('examples/mesos-client-example')

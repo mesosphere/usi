@@ -17,22 +17,22 @@ import scala.util.{Failure, Success}
 import scala.collection.JavaConverters._
 
 /**
-  * Run a dummy framework that:
+  * Run a mesos-client example framework that:
   *  - uses only the raw mesos-client
   *  - successfully subscribes to Mesos master
-  *  - declines all offers since its well, pretty dummy
+  *  - declines all offers
   *
   *  Not much, but shows the basic idea. Good to test against local Mesos.
   *
   */
-object DummyFramework extends App with StrictLoggingFlow {
+object MesosClientExampleFramework extends App with StrictLoggingFlow {
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
   val frameworkInfo = FrameworkInfo.newBuilder()
-    .setUser("dummy")
-    .setName("Dummy Framework")
+    .setUser("mesos-client")
+    .setName("MesosClientExample")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
     .addRoles("test")
     .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
