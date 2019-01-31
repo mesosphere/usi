@@ -1,20 +1,21 @@
 package mesosphere.gradle.aws
 
-import java.io.File
+import java.util.concurrent.CompletableFuture
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
-import com.amazonaws.services.s3.transfer.Transfer.TransferState
-import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 import com.typesafe.scalalogging.StrictLogging
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskAction
+import software.amazon.awssdk.core.async.AsyncRequestBody
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3AsyncClient
+import software.amazon.awssdk.services.s3.model.{PutObjectResponse, PutObjectRequest}
 
 import scala.beans.BeanProperty
 
 class S3Upload extends DefaultTask with StrictLogging {
 
-  val credentialProviderChain = new DefaultAWSCredentialsProviderChain()
+  lazy val s3: S3AsyncClient = S3AsyncClient.builder().region(Region.of(region)).build()
 
   @BeanProperty var region: String = "us-west-2"
 
@@ -22,32 +23,28 @@ class S3Upload extends DefaultTask with StrictLogging {
 
   @BeanProperty var prefix: String = ""
 
-  @BeanProperty var source: File = null
+  @BeanProperty var source: FileTree = null
 
   @TaskAction
   def run(): Unit = {
-    logger.info(s"Uploading files from $source to $bucket with prefix $prefix")
+    logger.info(s"Uploading files to $bucket with prefix $prefix")
 
-    val tx = TransferManagerBuilder.standard().withS3Client(createS3Client()).build()
-    val upload = tx.uploadDirectory(bucket, prefix, source, true)
-
-    while(!upload.isDone()) {
-      val progress = upload.getProgress()
-      logger.info(s"${progress.getPercentTransferred()} % ${upload.getState()}")
-      Thread.sleep(2000)
+    var pendingUploads = Vector.empty[CompletableFuture[PutObjectResponse]]
+    source.visit { fileDetails =>
+      if (!fileDetails.isDirectory) {
+        val file = fileDetails.getRelativePath()
+        val key = s"$prefix/$file"
+        val request = PutObjectRequest.builder().bucket(bucket).key(key).build()
+        val body = AsyncRequestBody.fromFile(fileDetails.getFile)
+        pendingUploads = pendingUploads :+ s3.putObject(request, body)
+      }
     }
 
-    tx.shutdownNow(true)
-    assert(upload.getState() == TransferState.Completed, s"Upload finished with ${upload.getState()}")
+    logger.info(s"Waiting for all ${pendingUploads.size} to finish.")
+    // Any exception is propagated.
+    pendingUploads.foreach(_.join())
 
     logger.info("Done.")
-  }
-
-  /**
-    *  Returns AWS S3 client.
-    */
-  def createS3Client(): AmazonS3 = {
-    AmazonS3ClientBuilder.standard().withCredentials(credentialProviderChain).withRegion(region).build()
   }
 
 }

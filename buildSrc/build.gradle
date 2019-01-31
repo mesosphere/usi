@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.amazonaws:aws-java-sdk-s3:1.11.129'
+    implementation 'software.amazon.awssdk:s3:2.3.9'
     implementation 'com.typesafe.scala-logging:scala-logging_2.12:3.9.2'
     implementation 'org.scala-lang:scala-library:2.12.7'
     implementation 'org.scalaj:scalaj-http_2.12:2.4.1'
