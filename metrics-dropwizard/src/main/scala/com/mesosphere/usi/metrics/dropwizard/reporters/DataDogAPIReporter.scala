@@ -81,9 +81,7 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
       .toString
 
     val body = HttpEntity(MediaTypes.`application/json`, data)
-    http
-      .singleRequest(HttpRequest(method = HttpMethods.POST, uri = apiUrl, entity = body))
-      .pipeTo(self)
+    http.singleRequest(HttpRequest(method = HttpMethods.POST, uri = apiUrl, entity = body)).pipeTo(self)
   }
 
   private val forbiddenCharsRe = "[^a-zA-Z0-9_.]".r

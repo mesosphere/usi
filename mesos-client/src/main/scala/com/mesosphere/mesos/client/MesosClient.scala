@@ -154,9 +154,9 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
     val request = HttpRequest(HttpMethods.POST,
-                              uri = Uri("/api/v1/scheduler"),
-                              entity = HttpEntity(ProtobufMediaType, body),
-                              headers = List(headers.Accept(ProtobufMediaType)))
+      uri = Uri("/api/v1/scheduler"),
+      entity = HttpEntity(ProtobufMediaType, body),
+      headers = List(headers.Accept(ProtobufMediaType)))
 
     val httpConnection = Http().outgoingConnection(url.getHost, url.getPort)
 
@@ -325,14 +325,12 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
   *
   */
 class MesosClientImpl(sharedKillSwitch: SharedKillSwitch,
-                      val subscribed: Event.Subscribed,
-                      val connectionInfo: MesosClient.ConnectionInfo,
-                      /**
-                        * Events from Mesos scheduler, sans initial Subscribed event.
-                        */
-                      val mesosSource: Source[Event, NotUsed])(implicit
-                                                               as: ActorSystem,
-                                                               m: Materializer)
+  val subscribed: Event.Subscribed,
+  val connectionInfo: MesosClient.ConnectionInfo,
+  /**
+    * Events from Mesos scheduler, sans initial Subscribed event.
+    */
+  val mesosSource: Source[Event, NotUsed])(implicit as: ActorSystem, m: Materializer)
     extends MesosClient
     with StrictLoggingFlow {
 
