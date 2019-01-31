@@ -10,3 +10,7 @@ include 'persistence'
 /* example projects*/
 include 'hello-world'
 project(':hello-world').projectDir = new File('examples/hello-world')
+include 'dummy-framework'
+project(':dummy-framework').projectDir = new File('examples/dummy-framework')
+
+

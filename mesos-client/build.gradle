@@ -1,11 +1,3 @@
-sourceSets {
-    main {
-        scala {
-            srcDirs = ['src/main/scala', 'examples']
-        }
-    }
-}
-
 dependencies {
     implementation "org.apache.mesos:mesos:$mesosVersion"
     implementation 'com.lightbend.akka:akka-stream-alpakka-simple-codecs_2.12:0.20'
