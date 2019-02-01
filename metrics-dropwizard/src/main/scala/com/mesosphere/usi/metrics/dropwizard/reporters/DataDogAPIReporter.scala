@@ -94,7 +94,7 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
   private def reportGauge(buffer: StringBuilder, name: String, gauge: Gauge[_], timestamp: Long): Unit = {
     val value: Number = gauge.getValue match {
       case v: Double => if (v.isNaN) 0.0 else v
-      case v: Float  => if (v.isNaN) 0.0 else v.toDouble
+      case v: Float => if (v.isNaN) 0.0 else v.toDouble
       case v: Number => v
     }
 
@@ -105,7 +105,8 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
     reportMetric(buffer, name, counter.getCount.toString, timestamp, "gauge")
 
   private val histogramSnapshotSuffixes =
-    Seq("min",
+    Seq(
+      "min",
       "average",
       "median",
       "75percentile",
@@ -115,11 +116,12 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
       "999percentile",
       "max",
       "stddev")
-  private def reportSnapshot(buffer: StringBuilder,
-   name: String,
-   snapshot: Snapshot,
-   timestamp: Long,
-   scaleMetrics: Boolean): Unit = {
+  private def reportSnapshot(
+      buffer: StringBuilder,
+      name: String,
+      snapshot: Snapshot,
+      timestamp: Long,
+      scaleMetrics: Boolean): Unit = {
 
     val values = Seq(
       snapshot.getMin.toDouble,
@@ -172,11 +174,12 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
     reportMetered(buffer, name, timer, timestamp)
   }
 
-  private def reportMetric(buffer: StringBuilder,
-                           name: String,
-                           value: String,
-                           timestamp: Long,
-                           metricType: String): Unit = {
+  private def reportMetric(
+      buffer: StringBuilder,
+      name: String,
+      value: String,
+      timestamp: Long,
+      metricType: String): Unit = {
     if (buffer.length() > 0) buffer.append(',')
     buffer.append(
       s"""{"metric":"$name","interval":$transmissionInterval,"points":[[$timestamp,$value]],"type":"$metricType",host:"$host"}""")
