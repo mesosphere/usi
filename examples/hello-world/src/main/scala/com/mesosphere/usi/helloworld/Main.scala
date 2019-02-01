@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
   */
 object Main extends App {
 
-  val scheduler =  new Scheduler
+  val scheduler = new Scheduler
 
   println("Starting orchestrator")
 

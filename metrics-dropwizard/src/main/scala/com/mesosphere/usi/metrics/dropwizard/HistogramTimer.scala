@@ -25,22 +25,25 @@ class TimedStage[T](timer: TimerAdapter, clock: Clock) extends GraphStage[FlowSh
     val logic = new GraphStageLogic(shape) {
       private val start: Instant = clock.instant
 
-      setHandler(in, new InHandler {
-        @scala.throws[Exception](classOf[Exception])
-        override def onPush(): Unit = push(out, grab(in))
+      setHandler(
+        in,
+        new InHandler {
+          @scala.throws[Exception](classOf[Exception])
+          override def onPush(): Unit = push(out, grab(in))
 
-        @scala.throws[Exception](classOf[Exception])
-        override def onUpstreamFinish(): Unit = {
-          timer.update(Duration.between(start, clock.instant).toNanos)
-          super.onUpstreamFinish()
-        }
+          @scala.throws[Exception](classOf[Exception])
+          override def onUpstreamFinish(): Unit = {
+            timer.update(Duration.between(start, clock.instant).toNanos)
+            super.onUpstreamFinish()
+          }
 
-        @scala.throws[Exception](classOf[Exception])
-        override def onUpstreamFailure(ex: Throwable): Unit = {
-          timer.update(Duration.between(start, clock.instant).toNanos)
-          super.onUpstreamFailure(ex)
+          @scala.throws[Exception](classOf[Exception])
+          override def onUpstreamFailure(ex: Throwable): Unit = {
+            timer.update(Duration.between(start, clock.instant).toNanos)
+            super.onUpstreamFailure(ex)
+          }
         }
-      })
+      )
 
       setHandler(out, new OutHandler {
         @scala.throws[Exception](classOf[Exception])
