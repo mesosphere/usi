@@ -140,7 +140,8 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#subscribe-1
     */
   private def newSubscribeCall(frameworkInfo: FrameworkInfo): Call = {
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.SUBSCRIBE)
       .setFrameworkId(frameworkInfo.getId)
       .setSubscribe(Call.Subscribe.newBuilder().setFrameworkInfo(frameworkInfo))
@@ -153,14 +154,16 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
   private def connectionSource(frameworkInfo: FrameworkInfo, url: URI)(implicit as: ActorSystem) = {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
-    val request = HttpRequest(HttpMethods.POST,
+    val request = HttpRequest(
+      HttpMethods.POST,
       uri = Uri("/api/v1/scheduler"),
       entity = HttpEntity(ProtobufMediaType, body),
       headers = List(headers.Accept(ProtobufMediaType)))
 
     val httpConnection = Http().outgoingConnection(url.getHost, url.getPort)
 
-    Source.single(request)
+    Source
+      .single(request)
       .via(log(s"Connecting to the new leader: $url"))
       .via(httpConnection)
       .via(log("HttpResponse: "))
@@ -190,9 +193,9 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           throw new IllegalArgumentException(s"Mesos server error: $response")
       }
     }.recoverWithRetries(redirectRetries, {
-        case MesosRedirectException(leader) =>
-          mesosHttpConnection(frameworkInfo, leader, redirectRetries)
-      })
+      case MesosRedirectException(leader) =>
+        mesosHttpConnection(frameworkInfo, leader, redirectRetries)
+    })
 
   /**
     * Input events (Call) are sent to the scheduler, serially, with backpressure. Events received from Mesos are
@@ -324,13 +327,14 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
 /**
   *
   */
-class MesosClientImpl(sharedKillSwitch: SharedKillSwitch,
-  val subscribed: Event.Subscribed,
-  val connectionInfo: MesosClient.ConnectionInfo,
-  /**
-    * Events from Mesos scheduler, sans initial Subscribed event.
-    */
-  val mesosSource: Source[Event, NotUsed])(implicit as: ActorSystem, m: Materializer)
+class MesosClientImpl(
+    sharedKillSwitch: SharedKillSwitch,
+    val subscribed: Event.Subscribed,
+    val connectionInfo: MesosClient.ConnectionInfo,
+    /**
+      * Events from Mesos scheduler, sans initial Subscribed event.
+      */
+    val mesosSource: Source[Event, NotUsed])(implicit as: ActorSystem, m: Materializer)
     extends MesosClient
     with StrictLoggingFlow {
 

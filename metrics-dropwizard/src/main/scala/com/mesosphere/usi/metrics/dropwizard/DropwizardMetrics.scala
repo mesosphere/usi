@@ -9,7 +9,17 @@ import com.codahale.metrics
 import com.codahale.metrics.MetricRegistry
 import com.github.rollingmetrics.histogram.{HdrBuilder, OverflowResolver}
 import com.mesosphere.usi.metrics.dropwizard.conf.MetricsSettings
-import com.mesosphere.usi.metrics.{ClosureGauge, Counter, Gauge, Meter, Metrics, SettableGauge, Timer, TimerAdapter, UnitOfMeasurement} //format:OFF
+import com.mesosphere.usi.metrics.{
+  ClosureGauge,
+  Counter,
+  Gauge,
+  Meter,
+  Metrics,
+  SettableGauge,
+  Timer,
+  TimerAdapter,
+  UnitOfMeasurement
+}
 
 import scala.util.matching.Regex
 
@@ -21,7 +31,8 @@ class DropwizardMetrics(metricsSettings: MetricsSettings, registry: MetricRegist
   private val histogramReservoirHighestTrackableValue = histrogramSettings.reservoirHighestTrackableValue
   private val histogramReservoirSignificantDigits = histrogramSettings.reservoirSignificantDigits
   private val histogramReservoirResetPeriodically = histrogramSettings.reservoirResetPeriodically
-  private val histogramReservoirResettingInterval = Duration.ofNanos(histrogramSettings.reservoirResettingInterval.toNanos)
+  private val histogramReservoirResettingInterval =
+    Duration.ofNanos(histrogramSettings.reservoirResettingInterval.toNanos)
   private val histogramReservoirResettingChunks = histrogramSettings.reservoirResettingChunks
 
   implicit class DropwizardCounter(val counter: codahale.metrics.Counter) extends Counter {
@@ -32,9 +43,10 @@ class DropwizardMetrics(metricsSettings: MetricsSettings, registry: MetricRegist
     registry.counter(constructName(namePrefix, name, "counter", unit))
   }
 
-  override def closureGauge[N](name: String,
-                               fn: () => N,
-                               unit: UnitOfMeasurement = UnitOfMeasurement.None): ClosureGauge = {
+  override def closureGauge[N](
+      name: String,
+      fn: () => N,
+      unit: UnitOfMeasurement = UnitOfMeasurement.None): ClosureGauge = {
     class DropwizardClosureGauge(val name: String) extends ClosureGauge {
       registry.gauge(name, () => () => fn())
     }
@@ -77,14 +89,16 @@ class DropwizardMetrics(metricsSettings: MetricsSettings, registry: MetricRegist
       val reservoirBuilder = new HdrBuilder()
         .withSignificantDigits(histogramReservoirSignificantDigits)
         .withLowestDiscernibleValue(1)
-        .withHighestTrackableValue(histogramReservoirHighestTrackableValue,
-                                   OverflowResolver.REDUCE_TO_HIGHEST_TRACKABLE)
+        .withHighestTrackableValue(
+          histogramReservoirHighestTrackableValue,
+          OverflowResolver.REDUCE_TO_HIGHEST_TRACKABLE)
       if (histogramReservoirResetPeriodically) {
         if (histogramReservoirResettingChunks == 0)
           reservoirBuilder.resetReservoirPeriodically(histogramReservoirResettingInterval)
         else
-          reservoirBuilder.resetReservoirPeriodicallyByChunks(histogramReservoirResettingInterval,
-                                                              histogramReservoirResettingChunks)
+          reservoirBuilder.resetReservoirPeriodicallyByChunks(
+            histogramReservoirResettingInterval,
+            histogramReservoirResettingChunks)
       }
       val reservoir = reservoirBuilder.buildReservoir()
       new metrics.Timer(reservoir)
@@ -99,8 +113,8 @@ object DropwizardMetrics {
 
   def constructName(prefix: String, name: String, `type`: String, unit: UnitOfMeasurement): String = {
     val unitSuffix = unit match {
-      case UnitOfMeasurement.None   => ""
-      case UnitOfMeasurement.Time   => ".seconds"
+      case UnitOfMeasurement.None => ""
+      case UnitOfMeasurement.Time => ".seconds"
       case UnitOfMeasurement.Memory => ".bytes"
     }
     val constructedName = s"$prefix.$name.${`type`}$unitSuffix"

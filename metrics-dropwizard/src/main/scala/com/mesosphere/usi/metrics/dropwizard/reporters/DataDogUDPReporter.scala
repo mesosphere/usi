@@ -41,15 +41,22 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
   }
 
   private def report(socket: ActorRef): Unit = {
-    report(socket, registry.getGauges, registry.getCounters, registry.getHistograms, registry.getMeters, registry.getTimers)
+    report(
+      socket,
+      registry.getGauges,
+      registry.getCounters,
+      registry.getHistograms,
+      registry.getMeters,
+      registry.getTimers)
   }
 
-  private def report(socket: ActorRef,
-   gauges: util.SortedMap[String, Gauge[_]],
-   counters: util.SortedMap[String, Counter],
-   histograms: util.SortedMap[String, Histogram],
-   meters: util.SortedMap[String, Meter],
-   timers: util.SortedMap[String, Timer]): Unit = {
+  private def report(
+      socket: ActorRef,
+      gauges: util.SortedMap[String, Gauge[_]],
+      counters: util.SortedMap[String, Counter],
+      histograms: util.SortedMap[String, Histogram],
+      meters: util.SortedMap[String, Meter],
+      timers: util.SortedMap[String, Timer]): Unit = {
 
     gauges.asScala.foreach {
       case (name, value) => reportGauge(socket, sanitizeName(name), value)
@@ -80,7 +87,7 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
   private def reportGauge(socket: ActorRef, name: String, gauge: Gauge[_]): Unit = {
     val value: Number = gauge.getValue match {
       case v: Double => if (v.isNaN) 0.0 else v
-      case v: Float  => if (v.isNaN) 0.0 else v.toDouble
+      case v: Float => if (v.isNaN) 0.0 else v.toDouble
       case v: Number => v
     }
 
@@ -91,16 +98,17 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
     maybeSendAndAppend(socket, s"$name:${counter.getCount}|g\n")
 
   private val histogramSnapshotSuffixes =
-    Seq("min",
-        "average",
-        "median",
-        "75percentile",
-        "95percentile",
-        "98percentile",
-        "99percentile",
-        "999percentile",
-        "max",
-        "stddev")
+    Seq(
+      "min",
+      "average",
+      "median",
+      "75percentile",
+      "95percentile",
+      "98percentile",
+      "99percentile",
+      "999percentile",
+      "max",
+      "stddev")
   private def reportSnapshot(socket: ActorRef, name: String, snapshot: Snapshot, scaleMetrics: Boolean): Unit = {
     val values = Seq(
       snapshot.getMin.toDouble,
