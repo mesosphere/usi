@@ -12,11 +12,12 @@ object PrometheusReporter {
     report(registry.getGauges, registry.getCounters, registry.getHistograms, registry.getMeters, registry.getTimers)
   }
 
-  private def report(gauges: util.SortedMap[String, Gauge[_]],
-                     counters: util.SortedMap[String, Counter],
-                     histograms: util.SortedMap[String, Histogram],
-                     meters: util.SortedMap[String, Meter],
-                     timers: util.SortedMap[String, Timer]): String = {
+  private def report(
+      gauges: util.SortedMap[String, Gauge[_]],
+      counters: util.SortedMap[String, Counter],
+      histograms: util.SortedMap[String, Histogram],
+      meters: util.SortedMap[String, Meter],
+      timers: util.SortedMap[String, Timer]): String = {
 
     val buffer = new StringBuilder
 
@@ -46,7 +47,7 @@ object PrometheusReporter {
   private def reportGauge(buffer: StringBuilder, name: String, gauge: Gauge[_]): Unit = {
     val value: Number = gauge.getValue match {
       case v: Double => if (v.isNaN) 0.0 else v
-      case v: Float  => if (v.isNaN) 0.0 else v.toDouble
+      case v: Float => if (v.isNaN) 0.0 else v.toDouble
       case v: Number => v
     }
     appendMetricType(buffer, name, "gauge")

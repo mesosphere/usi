@@ -30,12 +30,14 @@ object MesosClientExampleFramework extends App with StrictLoggingFlow {
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  val frameworkInfo = FrameworkInfo.newBuilder()
+  val frameworkInfo = FrameworkInfo
+    .newBuilder()
     .setUser("mesos-client")
     .setName("MesosClientExample")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
     .addRoles("test")
-    .addCapabilities(FrameworkInfo.Capability.newBuilder()
+    .addCapabilities(FrameworkInfo.Capability
+      .newBuilder()
       .setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .build()
 

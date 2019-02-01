@@ -6,17 +6,20 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
 import net.ceedubs.ficus.Ficus.{finiteDurationReader, toFicusConfig}
 
-case class HistorgramSettings(reservoirHighestTrackableValue: Long = 3600000000000L,
-                              reservoirSignificantDigits: Int = 3,
-                              reservoirResetPeriodically: Boolean = true,
-                              reservoirResettingInterval: FiniteDuration = 5.seconds,
-                              reservoirResettingChunks: Int = 0) {
+case class HistorgramSettings(
+    reservoirHighestTrackableValue: Long = 3600000000000L,
+    reservoirSignificantDigits: Int = 3,
+    reservoirResetPeriodically: Boolean = true,
+    reservoirResettingInterval: FiniteDuration = 5.seconds,
+    reservoirResettingChunks: Int = 0) {
   require(reservoirHighestTrackableValue > 1L, "reservoir-highest-trackable-value: should be > 1")
-  require(reservoirSignificantDigits >= 0 && reservoirSignificantDigits <= 5,
-          "reservoir-significant-digits should be >= 0 and <= 5")
+  require(
+    reservoirSignificantDigits >= 0 && reservoirSignificantDigits <= 5,
+    "reservoir-significant-digits should be >= 0 and <= 5")
   require(reservoirResettingInterval > Duration.Zero, "reservoir-resetting-interval should be > 0")
-  require(reservoirResettingChunks == 0 || reservoirResettingChunks >= 2,
-          "reservoir-resetting-chunks should be == 0 or >= 2")
+  require(
+    reservoirResettingChunks == 0 || reservoirResettingChunks >= 2,
+    "reservoir-resetting-chunks should be == 0 or >= 2")
 }
 
 object HistorgramSettings {
@@ -77,10 +80,11 @@ object DataDogReporterSettings {
   }
 }
 
-case class MetricsSettings(namePrefix: String,
-                           historgramSettings: HistorgramSettings,
-                           statsdReporterSettings: Option[StatsdReporterSettings],
-                           dataDogReporterSettings: Option[DataDogReporterSettings]) {
+case class MetricsSettings(
+    namePrefix: String,
+    historgramSettings: HistorgramSettings,
+    statsdReporterSettings: Option[StatsdReporterSettings],
+    dataDogReporterSettings: Option[DataDogReporterSettings]) {
   require(namePrefix.nonEmpty, "name-prefix should not be empty")
 }
 
