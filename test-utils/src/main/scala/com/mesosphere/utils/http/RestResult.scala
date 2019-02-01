@@ -9,7 +9,9 @@ import scala.reflect.ClassTag
 /**
   * Result of an REST call.
   */
-case class RestResult[+T](valueGetter: () => T, originalResponse: HttpResponse, entityString: String)(implicit ct: ClassTag[T]) extends StrictLogging {
+case class RestResult[+T](valueGetter: () => T, originalResponse: HttpResponse, entityString: String)(
+    implicit ct: ClassTag[T])
+    extends StrictLogging {
   def code: Int = originalResponse.status.intValue
   def success: Boolean = code >= 200 && code < 300
   lazy val value: T = try {
@@ -47,4 +49,3 @@ object RestResult {
     new RestResult[HttpResponse](() => response, response, entityString)
   }
 }
-

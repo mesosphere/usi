@@ -17,21 +17,21 @@ object MesosFacade {
     * Corresponds to parts of `state.json`.
     */
   case class ITMesosState(
-                           version: String,
-                           gitTag: Option[String],
-                           agents: Seq[ITAgent],
-                           frameworks: Seq[ITFramework],
-                           completed_frameworks: Seq[ITFramework],
-                           unregistered_framework_ids: Seq[String])
+      version: String,
+      gitTag: Option[String],
+      agents: Seq[ITAgent],
+      frameworks: Seq[ITFramework],
+      completed_frameworks: Seq[ITFramework],
+      unregistered_framework_ids: Seq[String])
 
   case class ITAgent(
-                      id: String,
-                      attributes: ITAttributes,
-                      resources: ITResources,
-                      usedResources: ITResources,
-                      offeredResources: ITResources,
-                      reservedResourcesByRole: Map[String, ITResources],
-                      unreservedResources: ITResources)
+      id: String,
+      attributes: ITAttributes,
+      resources: ITResources,
+      usedResources: ITResources,
+      offeredResources: ITResources,
+      reservedResourcesByRole: Map[String, ITResources],
+      unreservedResources: ITResources)
 
   case class ITAttributes(attributes: Map[String, ITResourceValue])
 
@@ -52,9 +52,12 @@ object MesosFacade {
     def nonEmpty: Boolean = !isEmpty
 
     override def toString: String = {
-      "{" + resources.toSeq.sortBy(_._1).map {
-        case (k, v) => s"$k: $v"
-      }.mkString(", ") + " }"
+      "{" + resources.toSeq
+        .sortBy(_._1)
+        .map {
+          case (k, v) => s"$k: $v"
+        }
+        .mkString(", ") + " }"
     }
   }
   object ITResources {
@@ -63,7 +66,8 @@ object MesosFacade {
       val resources: Map[String, ITResourceValue] = vals.map {
         case (id, value: Double) => id -> ITResourceScalarValue(value)
         case (id, value: String) => id -> ITResourceStringValue(value)
-        case (id, value) => throw new IllegalStateException(s"Unsupported ITResource type: ${value.getClass}; expected: Double | String")
+        case (id, value) =>
+          throw new IllegalStateException(s"Unsupported ITResource type: ${value.getClass}; expected: Double | String")
       }(collection.breakOut)
       ITResources(resources)
     }
@@ -84,13 +88,17 @@ object MesosFacade {
   case class ITask(id: String, status: Option[String])
 
   case class ITFramework(id: String, name: String, tasks: Seq[ITask])
-  case class ITFrameworks(frameworks: Seq[ITFramework],
-                          completed_frameworks: Seq[ITFramework],
-                          unregistered_frameworks: Seq[ITFramework])
+  case class ITFrameworks(
+      frameworks: Seq[ITFramework],
+      completed_frameworks: Seq[ITFramework],
+      unregistered_frameworks: Seq[ITFramework])
 }
 
-class MesosFacade(val url: String, val waitTime: FiniteDuration = 30.seconds)(implicit val system: ActorSystem, materializer: Materializer)
-  extends PlayJsonSupport with StrictLogging {
+class MesosFacade(val url: String, val waitTime: FiniteDuration = 30.seconds)(
+    implicit val system: ActorSystem,
+    materializer: Materializer)
+    extends PlayJsonSupport
+    with StrictLogging {
 
   import com.mesosphere.utils.http.AkkaHttpResponse._
   import MesosFacade._
@@ -123,4 +131,3 @@ class MesosFacade(val url: String, val waitTime: FiniteDuration = 30.seconds)(im
     result(request(Get(s"$leader/redirect")), waitTime).value
   }
 }
-

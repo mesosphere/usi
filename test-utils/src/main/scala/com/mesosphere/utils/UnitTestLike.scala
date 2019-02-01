@@ -7,7 +7,21 @@ import com.typesafe.scalalogging.StrictLogging
 import org.scalactic.source.Position
 import org.scalatest.concurrent.{Eventually, JavaFutures, ScalaFutures, TimeLimitedTests}
 import org.scalatest.time.{Minute, Seconds, Span}
-import org.scalatest.{AppendedClues, Args, BeforeAndAfter, BeforeAndAfterAll, BeforeAndAfterEach, GivenWhenThen, Informer, Matchers, OptionValues, Status, TryValues, WordSpec, WordSpecLike}
+import org.scalatest.{
+  AppendedClues,
+  Args,
+  BeforeAndAfter,
+  BeforeAndAfterAll,
+  BeforeAndAfterEach,
+  GivenWhenThen,
+  Informer,
+  Matchers,
+  OptionValues,
+  Status,
+  TryValues,
+  WordSpec,
+  WordSpecLike
+}
 
 import scala.concurrent.ExecutionContextExecutor
 
@@ -15,20 +29,21 @@ import scala.concurrent.ExecutionContextExecutor
   * Base trait for all unit tests in WordSpec style with common matching/before/after and Option/Try/Future
   * helpers all mixed in.
   */
-trait UnitTestLike extends WordSpecLike
-  with GivenWhenThen
-  with ScalaFutures
-  with JavaFutures
-  with Matchers
-  with BeforeAndAfter
-  with BeforeAndAfterEach
-  with OptionValues
-  with TryValues
-  with AppendedClues
-  with StrictLogging
-  with BeforeAndAfterAll
-  with Eventually
-  with TimeLimitedTests {
+trait UnitTestLike
+    extends WordSpecLike
+    with GivenWhenThen
+    with ScalaFutures
+    with JavaFutures
+    with Matchers
+    with BeforeAndAfter
+    with BeforeAndAfterEach
+    with OptionValues
+    with TryValues
+    with AppendedClues
+    with StrictLogging
+    with BeforeAndAfterAll
+    with Eventually
+    with TimeLimitedTests {
 
   private class LoggingInformer(info: Informer) extends Informer {
     def apply(message: String, payload: Option[Any] = None)(implicit pos: Position): Unit = {
@@ -57,8 +72,7 @@ trait UnitTestLike extends WordSpecLike
 abstract class UnitTest extends WordSpec with UnitTestLike
 
 trait AkkaUnitTestLike extends UnitTestLike {
-  protected lazy val akkaConfig: Config = ConfigFactory.parseString(
-    s"""
+  protected lazy val akkaConfig: Config = ConfigFactory.parseString(s"""
        |akka.test.default-timeout=${patienceConfig.timeout.millisPart}
     """.stripMargin).withFallback(ConfigFactory.load())
 
@@ -69,7 +83,7 @@ trait AkkaUnitTestLike extends UnitTestLike {
 
   abstract override def afterAll(): Unit = {
     super.afterAll()
-    system.terminate().futureValue  // intentionally shutdown the actor system last.
+    system.terminate().futureValue // intentionally shutdown the actor system last.
   }
 }
 

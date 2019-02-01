@@ -49,7 +49,7 @@ object MesosFormats {
       (__ \ "offered_resources").formatNullable[ITResources].withDefault(ITResources.empty) ~
       (__ \ "reserved_resources").formatNullable[Map[String, ITResources]].withDefault(Map.empty) ~
       (__ \ "unreserved_resources").formatNullable[ITResources].withDefault(ITResources.empty)
-    )(ITAgent.apply, unlift(ITAgent.unapply))
+  )(ITAgent.apply, unlift(ITAgent.unapply))
 
   implicit lazy val ITStatusFormat: Format[ITMesosState] = (
     (__ \ "version").format[String] ~
@@ -58,7 +58,7 @@ object MesosFormats {
       (__ \ "frameworks").format[Seq[ITFramework]] ~
       (__ \ "completed_frameworks").format[Seq[ITFramework]] ~
       (__ \ "unregistered_frameworks").format[Seq[String]]
-    )(ITMesosState.apply, unlift(ITMesosState.unapply))
+  )(ITMesosState.apply, unlift(ITMesosState.unapply))
 
   implicit lazy val ITaskFormat: Format[ITask] = Json.format[ITask]
 

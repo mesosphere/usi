@@ -65,9 +65,8 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
     val offerId = offer.getOffers.getOffers(0).getId
 
     And("and an offer is declined")
-    val decline = f.client.calls.newDecline(
-      offerIds = Seq(offerId),
-      filters = Some(Filters.newBuilder.setRefuseSeconds(0.0).build()))
+    val decline = f.client.calls
+      .newDecline(offerIds = Seq(offerId), filters = Some(Filters.newBuilder.setRefuseSeconds(0.0).build()))
 
     Source.single(decline).runWith(f.client.mesosSink)
 
@@ -88,7 +87,8 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
 
   def withFixture(frameworkId: Option[FrameworkID.Builder] = None)(fn: Fixture => Unit): Unit = {
     val f = new Fixture(frameworkId)
-    try fn(f) finally {
+    try fn(f)
+    finally {
       f.client.killSwitch.shutdown()
     }
   }
@@ -97,7 +97,8 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
     implicit val system: ActorSystem = ActorSystem()
     implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-    val frameworkInfo = FrameworkInfo.newBuilder()
+    val frameworkInfo = FrameworkInfo
+      .newBuilder()
       .setUser("test")
       .setName("Mesos Client Integration Tests")
       .setId(existingFrameworkId.getOrElse(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString)))
@@ -110,8 +111,7 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
     val mesosHost = mesosUrl.getHost
     val mesosPort = mesosUrl.getPort
 
-    val config = ConfigFactory.parseString(
-      s"""
+    val config = ConfigFactory.parseString(s"""
          |mesos-client.master-url="${mesosUrl.getHost}:${mesosUrl.getPort}"
     """.stripMargin).withFallback(ConfigFactory.load())
 
@@ -119,8 +119,7 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
 
     val client = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
 
-    val queue = client.mesosSource.
-      runWith(Sink.queue())
+    val queue = client.mesosSource.runWith(Sink.queue())
 
     /**
       * Pull (and drop) elements from the queue until the predicate returns true. Does not cancel the upstream.

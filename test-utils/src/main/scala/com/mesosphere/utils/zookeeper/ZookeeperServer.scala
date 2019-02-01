@@ -23,9 +23,9 @@ import scala.collection.JavaConverters._
   * @param autoStart Start zookeeper in the background
   * @param port The port to run ZK on
   */
-case class ZookeeperServer(
-    autoStart: Boolean = true,
-    val port: Int = PortAllocator.ephemeralPort()) extends AutoCloseable with StrictLogging {
+case class ZookeeperServer(autoStart: Boolean = true, val port: Int = PortAllocator.ephemeralPort())
+    extends AutoCloseable
+    with StrictLogging {
 
   private val maxClientConnections = 20
   private val config = {
@@ -44,6 +44,7 @@ case class ZookeeperServer(
   private val testingServer = new TestingServer(config, autoStart)
 
   def connectUrl = testingServer.getConnectString
+
   /**
     * Starts or restarts the server. If the server is currently running it will be stopped
     * and restarted. If it's not currently running then it will be started. If
@@ -96,7 +97,9 @@ trait ZookeeperServerTest extends BeforeAndAfterAll with StrictLogging { this: S
     val client: CuratorFramework = CuratorFrameworkFactory.newClient(zkserver.connectUrl, retryPolicy)
     client.start()
 
-    if (!client.blockUntilConnected(client.getZookeeperClient.getConnectionTimeoutMs, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+    if (!client.blockUntilConnected(
+        client.getZookeeperClient.getConnectionTimeoutMs,
+        java.util.concurrent.TimeUnit.MILLISECONDS)) {
       throw new IllegalStateException("Failed to connect to Zookeeper. Will exit now.")
     }
     val namespaced = namespace.map(client.usingNamespace(_)).getOrElse(client)
