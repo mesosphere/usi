@@ -14,16 +14,38 @@ import software.amazon.awssdk.services.s3.model.{PutObjectRequest, PutObjectResp
 
 import scala.beans.BeanProperty
 
+/**
+  * The S3Upload task defines a basic uploader for AWS S3.
+  */
 class S3Upload extends DefaultTask with StrictLogging {
 
   lazy val s3: S3AsyncClient = S3AsyncClient.builder().region(Region.of(region)).build()
 
+  /**
+    * Defines the AWS region. Defaults to us-west-2.
+    */
   @BeanProperty var region: String = "us-west-2"
 
+  /**
+    * The bucket name for all uploaded objects.
+    */
   @BeanProperty var bucket: String = ""
 
+  /**
+    * The prefix used for all files to create the key. The S3 object key will be "$prefix/$filePath"
+    *
+    * Example:
+    *
+    * Given the prefix is "foo/bar"
+    * And we have a file "build/tests/failed.xml"
+    * And source points to "build/"
+    * Then the object key for "failed.xml" will be "foo/bar/tests/failed.xml"
+    */
   @BeanProperty var prefix: String = ""
 
+  /**
+    * Defines the root with filters for all files that should be uploaded to [[bucket]].
+    */
   @BeanProperty var source: FileTree = null
 
   @TaskAction
@@ -54,6 +76,9 @@ class S3Upload extends DefaultTask with StrictLogging {
 
 }
 
+/**
+  * Defines a mapping from file extensions to MIME types, ie Content-type metadata.
+  */
 object ContentType {
   val contentTypeMap = Map(
     "html" -> "text/html",
