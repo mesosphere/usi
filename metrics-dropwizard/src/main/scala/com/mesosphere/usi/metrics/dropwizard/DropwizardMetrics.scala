@@ -9,7 +9,7 @@ import com.codahale.metrics
 import com.codahale.metrics.MetricRegistry
 import com.github.rollingmetrics.histogram.{HdrBuilder, OverflowResolver}
 import com.mesosphere.usi.metrics.dropwizard.conf.MetricsSettings
-import com.mesosphere.usi.metrics.{ClosureGauge, Counter, Gauge, Meter, Metrics, SettableGauge, Timer, TimerAdapter, UnitOfMeasurement}
+import com.mesosphere.usi.metrics.{ClosureGauge, Counter, Gauge, Meter, Metrics, SettableGauge, Timer, TimerAdapter, UnitOfMeasurement} //format:OFF
 
 import scala.util.matching.Regex
 
@@ -32,8 +32,9 @@ class DropwizardMetrics(metricsSettings: MetricsSettings, registry: MetricRegist
     registry.counter(constructName(namePrefix, name, "counter", unit))
   }
 
-  override def closureGauge[N](name: String, fn: () => N,
-    unit: UnitOfMeasurement = UnitOfMeasurement.None): ClosureGauge = {
+  override def closureGauge[N](name: String,
+                               fn: () => N,
+                               unit: UnitOfMeasurement = UnitOfMeasurement.None): ClosureGauge = {
     class DropwizardClosureGauge(val name: String) extends ClosureGauge {
       registry.gauge(name, () => () => fn())
     }
@@ -52,9 +53,7 @@ class DropwizardMetrics(metricsSettings: MetricsSettings, registry: MetricRegist
   override def gauge(name: String, unit: UnitOfMeasurement = UnitOfMeasurement.None): Gauge = {
     new DropwizardSettableGauge(constructName(namePrefix, name, "gauge", unit))
   }
-  override def settableGauge(
-    name: String,
-    unit: UnitOfMeasurement = UnitOfMeasurement.None): SettableGauge = {
+  override def settableGauge(name: String, unit: UnitOfMeasurement = UnitOfMeasurement.None): SettableGauge = {
     new DropwizardSettableGauge(constructName(namePrefix, name, "gauge", unit))
   }
 
@@ -66,22 +65,26 @@ class DropwizardMetrics(metricsSettings: MetricsSettings, registry: MetricRegist
   }
 
   implicit class DropwizardTimerAdapter(val timer: metrics.Timer) extends TimerAdapter {
-    override def update(value: Long): Unit = timer.update(value, TimeUnit.NANOSECONDS)
+    override def update(value: Long): Unit =
+      timer.update(value, TimeUnit.NANOSECONDS)
   }
 
   override def timer(name: String): Timer = {
-    val effectiveName = constructName(namePrefix, name, "timer", UnitOfMeasurement.Time)
+    val effectiveName =
+      constructName(namePrefix, name, "timer", UnitOfMeasurement.Time)
 
     def makeTimer(): metrics.Timer = {
       val reservoirBuilder = new HdrBuilder()
         .withSignificantDigits(histogramReservoirSignificantDigits)
         .withLowestDiscernibleValue(1)
-        .withHighestTrackableValue(histogramReservoirHighestTrackableValue, OverflowResolver.REDUCE_TO_HIGHEST_TRACKABLE)
+        .withHighestTrackableValue(histogramReservoirHighestTrackableValue,
+                                   OverflowResolver.REDUCE_TO_HIGHEST_TRACKABLE)
       if (histogramReservoirResetPeriodically) {
         if (histogramReservoirResettingChunks == 0)
           reservoirBuilder.resetReservoirPeriodically(histogramReservoirResettingInterval)
         else
-          reservoirBuilder.resetReservoirPeriodicallyByChunks(histogramReservoirResettingInterval, histogramReservoirResettingChunks)
+          reservoirBuilder.resetReservoirPeriodicallyByChunks(histogramReservoirResettingInterval,
+                                                              histogramReservoirResettingChunks)
       }
       val reservoir = reservoirBuilder.buildReservoir()
       new metrics.Timer(reservoir)
@@ -96,14 +99,15 @@ object DropwizardMetrics {
 
   def constructName(prefix: String, name: String, `type`: String, unit: UnitOfMeasurement): String = {
     val unitSuffix = unit match {
-      case UnitOfMeasurement.None => ""
-      case UnitOfMeasurement.Time => ".seconds"
+      case UnitOfMeasurement.None   => ""
+      case UnitOfMeasurement.Time   => ".seconds"
       case UnitOfMeasurement.Memory => ".bytes"
     }
     val constructedName = s"$prefix.$name.${`type`}$unitSuffix"
     constructedName match {
       case validNameRegex() =>
-      case _ => throw new IllegalArgumentException(s"$name is not a valid metric name")
+      case _ =>
+        throw new IllegalArgumentException(s"$name is not a valid metric name")
     }
     constructedName
   }

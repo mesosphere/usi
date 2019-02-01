@@ -6,7 +6,7 @@ import akka.Done
 import akka.actor.ActorRefFactory
 import com.codahale.metrics.MetricRegistry
 import com.mesosphere.usi.metrics.Metrics
-import com.mesosphere.usi.metrics.dropwizard.conf.{DataDogApiReporterSettings, DataDogUdpReporterSettings, MetricsSettings}
+import com.mesosphere.usi.metrics.dropwizard.conf.{DataDogApiReporterSettings, DataDogUdpReporterSettings, MetricsSettings} //format:OFF
 import com.mesosphere.usi.metrics.dropwizard.reporters.{DataDogAPIReporter, DataDogUDPReporter, StatsDReporter}
 import com.typesafe.config.Config
 
@@ -32,9 +32,12 @@ class DropwizardMetricsModule(config: Config) {
       actorRefFactory.actorOf(StatsDReporter.props(statsdSettings, registry), "StatsDReporter"))
 
     metricsSettings.dataDogReporterSettings.foreach {
-      case s: DataDogUdpReporterSettings => actorRefFactory.actorOf(DataDogUDPReporter.props(s, registry), name = "DataDogUDPReporter")
-      case s: DataDogApiReporterSettings => actorRefFactory.actorOf(DataDogAPIReporter.props(s, registry), name = "DataDogAPIReporter")
-      case s => throw new IllegalArgumentException(s"Unsupported DataDog reporter typ: $s")
+      case s: DataDogUdpReporterSettings =>
+        actorRefFactory.actorOf(DataDogUDPReporter.props(s, registry), name = "DataDogUDPReporter")
+      case s: DataDogApiReporterSettings =>
+        actorRefFactory.actorOf(DataDogAPIReporter.props(s, registry), name = "DataDogAPIReporter")
+      case s =>
+        throw new IllegalArgumentException(s"Unsupported DataDog reporter typ: $s")
     }
     Done
   }

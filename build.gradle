@@ -4,6 +4,7 @@ import java.nio.file.Paths
 plugins {
     id 'idea'
     id 'org.ajoberstar.git-publish' version '2.0.0'
+    id 'cz.alenkacz.gradle.scalafmt' version '1.7.0'
 }
 
 ext {
@@ -16,6 +17,7 @@ ext {
 allprojects {
 
     version = '0.1'
+
     apply plugin: "scala"
 
     sourceCompatibility = 1.8
@@ -32,6 +34,8 @@ allprojects {
     tasks.withType(ScalaCompile) {
         scalaCompileOptions.additionalParameters = ["-Xlint", "-Xfatal-warnings"]
     }
+
+    compileScala.dependsOn scalafmtAll
 
     dependencies {
         // Use Scala 2.12 in our library project

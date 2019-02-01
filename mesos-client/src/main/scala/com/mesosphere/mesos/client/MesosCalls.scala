@@ -7,6 +7,7 @@ import org.apache.mesos.v1.scheduler.Protos.Call
 import org.apache.mesos.v1.scheduler.Protos.Call.{Accept, Decline, Reconcile, Revive}
 
 class MesosCalls(frameworkId: FrameworkID) {
+
   /**
     * ***************************************************************************
     * Helper methods to create mesos `Call`s
@@ -14,7 +15,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#calls
     * ***************************************************************************
     */
-
   /**
     * Factory method to construct a TEARDOWN Mesos Call event. Calling this method has no side effects.
     *
@@ -121,7 +121,7 @@ class MesosCalls(frameworkId: FrameworkID) {
     */
   def newKill(taskId: TaskID, agentId: Option[AgentID] = None, killPolicy: Option[KillPolicy]): Call = {
     val killBuilder = Call.Kill.newBuilder()
-        .setTaskId(taskId)
+      .setTaskId(taskId)
     agentId.foreach(killBuilder.setAgentId)
     killPolicy.foreach(killBuilder.setKillPolicy)
 
@@ -144,7 +144,11 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call.newBuilder()
       .setType(Call.Type.SHUTDOWN)
       .setFrameworkId(frameworkId)
-      .setShutdown(Call.Shutdown.newBuilder().setExecutorId(executorId).setAgentId(agentId).build())
+      .setShutdown(
+        Call.Shutdown.newBuilder()
+          .setExecutorId(executorId)
+          .setAgentId(agentId)
+          .build())
       .build()
   }
 
@@ -162,7 +166,12 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call.newBuilder()
       .setType(Call.Type.ACKNOWLEDGE)
       .setFrameworkId(frameworkId)
-      .setAcknowledge(Call.Acknowledge.newBuilder().setAgentId(agentId).setTaskId(taskId).setUuid(uuid).build())
+      .setAcknowledge(
+        Call.Acknowledge.newBuilder()
+          .setAgentId(agentId)
+          .setTaskId(taskId)
+          .setUuid(uuid)
+          .build())
       .build()
   }
 
@@ -198,7 +207,12 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call.newBuilder()
       .setType(Call.Type.MESSAGE)
       .setFrameworkId(frameworkId)
-      .setMessage(Call.Message.newBuilder().setAgentId(agentId).setExecutorId(executorId).setData( protobuf.ByteString.copyFrom(message.toArray)).build())
+      .setMessage(
+        Call.Message.newBuilder()
+          .setAgentId(agentId)
+          .setExecutorId(executorId)
+          .setData(protobuf.ByteString.copyFrom(message.toArray))
+          .build())
       .build()
   }
 

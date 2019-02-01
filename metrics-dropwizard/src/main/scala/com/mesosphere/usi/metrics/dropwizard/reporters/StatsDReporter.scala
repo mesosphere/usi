@@ -18,7 +18,7 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
     val port = settings.port
     new InetSocketAddress(host, port)
   }
-  private val transmissionInterval= settings.transmissionInterval
+  private val transmissionInterval = settings.transmissionInterval
 
   private case object Tick
 
@@ -41,24 +41,36 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
   }
 
   private def report(socket: ActorRef): Unit = {
-    report(
-      socket,
-      registry.getGauges, registry.getCounters, registry.getHistograms, registry.getMeters, registry.getTimers)
+    report(socket,
+     registry.getGauges,
+     registry.getCounters,
+     registry.getHistograms,
+     registry.getMeters,
+     registry.getTimers)
   }
 
-  private def report(
-    socket: ActorRef,
-    gauges: util.SortedMap[String, Gauge[_]],
-    counters: util.SortedMap[String, Counter],
-    histograms: util.SortedMap[String, Histogram],
-    meters: util.SortedMap[String, Meter],
-    timers: util.SortedMap[String, Timer]): Unit = {
+  private def report(socket: ActorRef,
+   gauges: util.SortedMap[String, Gauge[_]],
+   counters: util.SortedMap[String, Counter],
+   histograms: util.SortedMap[String, Histogram],
+   meters: util.SortedMap[String, Meter],
+   timers: util.SortedMap[String, Timer]): Unit = {
 
-    gauges.asScala.foreach { case (name, value) => reportGauge(socket, name, value) }
-    counters.asScala.foreach { case (name, value) => reportCounter(socket, name, value) }
-    histograms.asScala.foreach { case (name, value) => reportHistogram(socket, name, value) }
-    meters.asScala.foreach { case (name, value) => reportMetered(socket, name, value) }
-    timers.asScala.foreach { case (name, value) => reportTimer(socket, name, value) }
+    gauges.asScala.foreach {
+      case (name, value) => reportGauge(socket, name, value)
+    }
+    counters.asScala.foreach {
+      case (name, value) => reportCounter(socket, name, value)
+    }
+    histograms.asScala.foreach {
+      case (name, value) => reportHistogram(socket, name, value)
+    }
+    meters.asScala.foreach {
+      case (name, value) => reportMetered(socket, name, value)
+    }
+    timers.asScala.foreach {
+      case (name, value) => reportTimer(socket, name, value)
+    }
 
     flush(socket)
   }
@@ -81,8 +93,7 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
 
   private val histogramSnapshotSuffixes =
     Seq("min", "mean", "p50", "p75", "p95", "p98", "p99", "p999", "max", "stddev")
-  private def reportSnapshot(socket: ActorRef, name: String, snapshot: Snapshot,
-    scaleMetrics: Boolean): Unit = {
+  private def reportSnapshot(socket: ActorRef, name: String, snapshot: Snapshot, scaleMetrics: Boolean): Unit = {
     val values = Seq(
       snapshot.getMin.toDouble,
       snapshot.getMean,
@@ -93,11 +104,14 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
       snapshot.get99thPercentile(),
       snapshot.get999thPercentile(),
       snapshot.getMax.toDouble,
-      snapshot.getStdDev)
-    val scaledValues = if (scaleMetrics) values.map(_ * durationFactor) else values
+      snapshot.getStdDev
+    )
+    val scaledValues =
+      if (scaleMetrics) values.map(_ * durationFactor) else values
 
     histogramSnapshotSuffixes.zip(scaledValues).foreach {
-      case (suffix, value) => maybeSendAndAppend(socket, s"$name.$suffix:$value|g\n")
+      case (suffix, value) =>
+        maybeSendAndAppend(socket, s"$name.$suffix:$value|g\n")
     }
   }
 
@@ -107,16 +121,19 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
     reportSnapshot(socket, name, histogram.getSnapshot, false)
   }
 
-  private val meteredSuffixes = Seq("count", "mean_rate", "m1_rate", "m5_rate", "m15_rate")
+  private val meteredSuffixes =
+    Seq("count", "mean_rate", "m1_rate", "m5_rate", "m15_rate")
   private def reportMetered(socket: ActorRef, name: String, meter: Metered): Unit = {
     val values = Seq(
       meter.getCount.toDouble,
       meter.getMeanRate * rateFactor,
       meter.getOneMinuteRate * rateFactor,
       meter.getFiveMinuteRate * rateFactor,
-      meter.getFifteenMinuteRate * rateFactor)
+      meter.getFifteenMinuteRate * rateFactor
+    )
     meteredSuffixes.zip(values).foreach {
-      case (suffix, value) => maybeSendAndAppend(socket, s"$name.$suffix:$value|g\n")
+      case (suffix, value) =>
+        maybeSendAndAppend(socket, s"$name.$suffix:$value|g\n")
     }
   }
 

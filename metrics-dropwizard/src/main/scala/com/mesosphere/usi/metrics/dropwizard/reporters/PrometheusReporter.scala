@@ -12,31 +12,41 @@ object PrometheusReporter {
     report(registry.getGauges, registry.getCounters, registry.getHistograms, registry.getMeters, registry.getTimers)
   }
 
-  private def report(
-    gauges: util.SortedMap[String, Gauge[_]],
-    counters: util.SortedMap[String, Counter],
-    histograms: util.SortedMap[String, Histogram],
-    meters: util.SortedMap[String, Meter],
-    timers: util.SortedMap[String, Timer]): String = {
+  private def report(gauges: util.SortedMap[String, Gauge[_]],
+                     counters: util.SortedMap[String, Counter],
+                     histograms: util.SortedMap[String, Histogram],
+                     meters: util.SortedMap[String, Meter],
+                     timers: util.SortedMap[String, Timer]): String = {
 
     val buffer = new StringBuilder
 
-    gauges.asScala.foreach { case (name, value) => reportGauge(buffer, sanitizeName(name), value) }
-    counters.asScala.foreach { case (name, value) => reportCounter(buffer, sanitizeName(name), value) }
-    histograms.asScala.foreach { case (name, value) => reportHistogram(buffer, sanitizeName(name), value) }
-    meters.asScala.foreach { case (name, value) => reportMetered(buffer, sanitizeName(name), value) }
-    timers.asScala.foreach { case (name, value) => reportTimer(buffer, sanitizeName(name), value) }
+    gauges.asScala.foreach {
+      case (name, value) => reportGauge(buffer, sanitizeName(name), value)
+    }
+    counters.asScala.foreach {
+      case (name, value) => reportCounter(buffer, sanitizeName(name), value)
+    }
+    histograms.asScala.foreach {
+      case (name, value) => reportHistogram(buffer, sanitizeName(name), value)
+    }
+    meters.asScala.foreach {
+      case (name, value) => reportMetered(buffer, sanitizeName(name), value)
+    }
+    timers.asScala.foreach {
+      case (name, value) => reportTimer(buffer, sanitizeName(name), value)
+    }
 
     buffer.toString()
   }
 
   private val forbiddenCharsRe = "[^a-zA-Z0-9_]".r
-  private def sanitizeName(name: String): String = forbiddenCharsRe.replaceAllIn(name, "_")
+  private def sanitizeName(name: String): String =
+    forbiddenCharsRe.replaceAllIn(name, "_")
 
   private def reportGauge(buffer: StringBuilder, name: String, gauge: Gauge[_]): Unit = {
     val value: Number = gauge.getValue match {
       case v: Double => if (v.isNaN) 0.0 else v
-      case v: Float => if (v.isNaN) 0.0 else v.toDouble
+      case v: Float  => if (v.isNaN) 0.0 else v.toDouble
       case v: Number => v
     }
     appendMetricType(buffer, name, "gauge")
