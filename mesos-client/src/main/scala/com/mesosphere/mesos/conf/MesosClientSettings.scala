@@ -9,7 +9,7 @@ case class MesosClientSettings(conf: Config) {
   val redirectRetries: Int = conf.getInt("redirect-retries")
   // we want FiniteDuration, the conversion is needed to achieve that
   val idleTimeout: FiniteDuration =
-    Duration.fromNanos(conf.getDuration("MesosClientSettings").toNanos)
+    Duration.fromNanos(conf.getDuration("idle-timeout").toNanos)
 
   val sourceBufferSize: Int = conf.getInt("back-pressure.source-buffer-size")
 }

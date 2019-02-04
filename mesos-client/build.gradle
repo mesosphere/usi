@@ -1,6 +1,5 @@
 dependencies {
+    testCompile project(':test-utils')
     compile "org.apache.mesos:mesos:$mesosVersion"
-    implementation 'com.lightbend.akka:akka-stream-alpakka-simple-codecs_2.12:0.20'
-    implementation 'com.typesafe.akka:akka-http_2.12:10.1.7'
-    implementation 'com.typesafe.akka:akka-stream_2.12:2.5.19'
+    implementation 'com.lightbend.akka:akka-stream-alpakka-simple-codecs_2.12:1.0-M2'
 }
