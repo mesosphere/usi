@@ -1,6 +1,7 @@
 package com.mesosphere.utils.mesos
 
 import java.io.File
+import java.net.{InetAddress, NetworkInterface}
 import java.nio.charset.Charset
 import java.nio.file.{Files, Paths}
 
@@ -8,10 +9,12 @@ import akka.actor.{ActorSystem, Scheduler}
 import akka.stream.Materializer
 import com.mesosphere.utils.zookeeper.ZookeeperServerTest
 import com.mesosphere.utils.{PortAllocator, ProcessOutputToLogStream}
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.io.FileUtils
 import org.scalatest.Suite
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 
+import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.sys.process.{Process, ProcessBuilder}
@@ -388,23 +391,44 @@ trait MesosClusterTest extends Suite with ZookeeperServerTest with MesosTest wit
   }
 }
 
-object IP {
-  import sys.process._
+object IP extends StrictLogging {
 
-  lazy val routableIPv4: String =
-    sys.env.getOrElse("MESOSTEST_IP_ADDRESS", inferRoutableIP)
-
-  private def detectIpScript: String = {
-    val resource = getClass.getClassLoader.getResource("detect-routable-ip.sh")
-    Option(resource).flatMap { r =>
-      Option(r.getPath)
-    }.getOrElse {
-      throw new RuntimeException(
-        s"Couldn't find file for detect-routable-ip.sh resource; is ${resource}. Are you running from a JAR?")
-    }
-  }
+  lazy val routableIPv4: String = sys.env.getOrElse("MESOSTEST_IP_ADDRESS", inferRoutableIP)
 
   private def inferRoutableIP: String = {
-    Seq("bash", detectIpScript).!!.trim
+    logger.info(s"=== Scanning InetAddresses ===")
+    val nets: Iterator[NetworkInterface] = NetworkInterface.getNetworkInterfaces.asScala
+
+    // Get all available InetAdresses from all network interfaces on the machine
+    val addresses: Iterator[InetAddress] = nets.map { net =>
+     net.getInetAddresses.asScala.map { addr =>
+       logger.info(s"""|Display name: ${net.getDisplayName}
+                       |Name: ${net.getName}
+                       |InetAddress: ${addr}
+                       |Loopback: ${addr.isLoopbackAddress}
+                       |Site-local: ${addr.isSiteLocalAddress}
+                       |Link-local: ${addr.isLinkLocalAddress}
+                       |Multicast: ${addr.isMulticastAddress}
+       """.stripMargin)
+       addr
+     }
+    }.flatten
+
+    // We filter out loopback addresses (not what we want) and afterwards the list of priorities is:
+    // 1. A site-local InetAddress (isSiteLocalAddress == true)
+    // 2. InetAddress.getLocalHost as a fallback is the above didn't work
+    //
+    // There is also a possibility to get a link-local InetAddress before falling back to the getLocalHost method
+    // but I'm not sure if that's actually needed.
+    //
+    // [Site-local and link-local addresses](https://4sysops.com/archives/ipv6-tutorial-part-6-site-local-addresses-and-link-local-addresses/)
+    // [Useful Stackoverflow](https://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java/38342964#38342964)
+    val siteLocal: Option[InetAddress] = addresses
+      .filter(addr => !addr.isLoopbackAddress)
+      .find(addr => addr.isSiteLocalAddress)
+
+    siteLocal
+      .getOrElse(InetAddress.getLocalHost)
+      .getHostAddress
   }
 }
