@@ -393,50 +393,48 @@ client.mesosSource.runWith(Sink.ignore).onComplete{
   case Failure(e) =&gt; logger.error(s&quot;Error in stream: $e&quot;)
 }
 <code><code><code></code></code></code></code></code></code></p><p>No attempt is made to handle any reconnection logic after the Mesos Master connection is established. The client
-is expected to handle disconnects and re-instantiate the Mesos Client as needed.</p><p>The basic flow for connecting to Mesos and reading events looks some like this:</p><p>+------------+</p><table class="doctbl">
+is expected to handle disconnects and re-instantiate the Mesos Client as needed.</p><p>The basic flow for connecting to Mesos and reading events looks some like this:</p><p>+------------+</p><p>| Http       | (1)</p><table class="doctbl">
       <thead>
-        <tr><th class="doctbl-right"><p> Http       </p></th><th class="doctbl-right"><p> (1)</p></th></tr>
+        <tr><th class="doctbl-left"><p> Connection </p></th></tr>
       </thead>
       
-    </table><table class="doctbl">
-      <thead>
-        <tr><th class="doctbl-right"><p>
+    </table><p>+------------+</p><p>|
 v
-+---------------+</p></th></tr>
-      </thead>
-      <tbody><tr><td class="doctbl-right"><p> Bytes         </p></td></tr>
-          </tbody>
-    </table><table class="doctbl">
++---------------+</p><p>| Http Response | (2)</p><table class="doctbl">
       <thead>
-        <tr><th class="doctbl-right"><p>
-v
-+------------+</p></th></tr>
+        <tr><th class="doctbl-left"><p> Bytes         </p></th></tr>
       </thead>
-      <tbody><tr><td class="doctbl-right"><p> Scanner    </p></td></tr>
-          </tbody>
-    </table><table class="doctbl">
+      
+    </table><p>+---------------+</p><p>|
+v
++------------+</p><p>| RecordIO   | (3)</p><table class="doctbl">
       <thead>
-        <tr><th class="doctbl-right"><p>
-v
-+--------------+</p></th></tr>
+        <tr><th class="doctbl-left"><p> Scanner    </p></th></tr>
       </thead>
-      <tbody><tr><td class="doctbl-right"><p> Deserializer </p></td></tr>
-          </tbody>
-    </table><table class="doctbl">
+      
+    </table><p>+------------+</p><p>|
+v
++--------------+</p><p>| Event        | (4)</p><table class="doctbl">
       <thead>
-        <tr><th class="doctbl-right"><p>
-v
-+------------+</p></th></tr>
+        <tr><th class="doctbl-left"><p> Deserializer </p></th></tr>
       </thead>
-      <tbody><tr><td class="doctbl-right"><p> Consumer   </p></td></tr>
-          </tbody>
-    </table><p>v
+      
+    </table><p>+--------------+</p><p>|
+v
++------------+</p><p>| Subscribed | (5)</p><table class="doctbl">
+      <thead>
+        <tr><th class="doctbl-left"><p> Consumer   </p></th></tr>
+      </thead>
+      
+    </table><p>+------------+
+v
 +---------------+</p><table class="doctbl">
       <thead>
-        <tr><th class="doctbl-right"><p> MesosClient   </p></th></tr>
+        <tr><th class="doctbl-left"><p> MesosClient   </p></th></tr>
       </thead>
       
-    </table><p>1. Http Connection: mesos-v1-client uses the Akka-http low-level <code>Http.outgoingConnection()</code> to <code>POST</code> a
+    </table><p>| (with events) | (6)
++---------------+</p><p>1. Http Connection: mesos-v1-client uses the Akka-http low-level <code>Http.outgoingConnection()</code> to <code>POST</code> a
    [SUBSCRIBE](http://mesos.apache.org/documentation/latest/scheduler-http-api/#subscribe-1) request to Mesos
    <code>api/v1/scheduler</code> endpoint, providing framework info as requested. The HTTP response is a stream in RecordIO
    format which is handled by the later stages.</p><p>   If we connect to a non-leader Mesos master, we automatically follow the redirect up to <code>conf.redirectRetries</code>.</p><p>   When we receive the HTTP response headers from the master connection, we set aside the <code>Mesos-Stream-Id</code>(see
@@ -497,6 +495,22 @@ v
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#debug" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="debug[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="debug[T](String):Flow[T,T,NotUsed]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/MesosClient$.html#debug[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">debug</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.debug.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.debug.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="StrictLoggingFlow.html" class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow">StrictLoggingFlow</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -529,6 +543,22 @@ v
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#error" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="error[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="error[T](String):Flow[T,T,NotUsed]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/MesosClient$.html#error[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">error</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.error.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.error.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="StrictLoggingFlow.html" class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow">StrictLoggingFlow</a></dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
@@ -589,6 +619,22 @@ v
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#info" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="info[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="info[T](String):Flow[T,T,NotUsed]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/MesosClient$.html#info[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">info</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.info.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.info.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="StrictLoggingFlow.html" class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow">StrictLoggingFlow</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
@@ -605,22 +651,6 @@ v
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#log" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="log[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="log[T](String):Flow[T,T,NotUsed]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/MesosClient$.html#log[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">log</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.log.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.log.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="StrictLoggingFlow.html" class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow">StrictLoggingFlow</a></dd></dl></div>
     </li><li name="com.typesafe.scalalogging.StrictLogging#logger" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="logger:com.typesafe.scalalogging.Logger"></a><a id="logger:Logger"></a>
       <span class="permalink">
@@ -791,6 +821,22 @@ v
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#warn" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="warn[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="warn[T](String):Flow[T,T,NotUsed]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/MesosClient$.html#warn[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">warn</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.warn.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.warn.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="StrictLoggingFlow.html" class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow">StrictLoggingFlow</a></dd></dl></div>
     </li>
               </ol>
             </div>

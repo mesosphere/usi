@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1 API  - com.mesosphere.mesos.client.StrictLoggingFlow</title>
-          <meta name="description" content="usi 0.1 API - com.mesosphere.mesos.client.StrictLoggingFlow" />
-          <meta name="keywords" content="usi 0.1 API com.mesosphere.mesos.client.StrictLoggingFlow" />
+          <title>usi 0.1 API  - com.mesosphere.utils.mesos.MesosCluster.Agent</title>
+          <meta name="description" content="usi 0.1 API - com.mesosphere.utils.mesos.MesosCluster.Agent" />
+          <meta name="keywords" content="usi 0.1 API com.mesosphere.utils.mesos.MesosCluster.Agent" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -101,10 +101,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../../index.html" class="extype" name="com">com</a></dd></dl></div>
-    </li><li name="com.mesosphere.mesos" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="mesos"></a><a id="mesos:mesos"></a>
+    </li><li name="com.mesosphere.utils" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="utils"></a><a id="utils:utils"></a>
       <span class="permalink">
-      <a href="../../com/mesosphere/index.html#mesos" title="Permalink">
+      <a href="../../com/mesosphere/index.html#utils" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -113,14 +113,14 @@
         <span class="kind">package</span>
       </span>
       <span class="symbol">
-        <a title="" href="../index.html"><span class="name">mesos</span></a>
+        <a title="" href="../index.html"><span class="name">utils</span></a>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../index.html" class="extype" name="com.mesosphere">mesosphere</a></dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="client"></a><a id="client:client"></a>
+    </li><li name="com.mesosphere.utils.mesos" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="mesos"></a><a id="mesos:mesos"></a>
       <span class="permalink">
-      <a href="../../../com/mesosphere/mesos/index.html#client" title="Permalink">
+      <a href="../../../com/mesosphere/utils/index.html#mesos" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -129,41 +129,60 @@
         <span class="kind">package</span>
       </span>
       <span class="symbol">
-        <a title="" href="index.html"><span class="name">client</span></a>
+        <a title="" href="index.html"><span class="name">mesos</span></a>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.mesos">mesos</a></dd></dl></div>
-    </li><li class="current-entities indented4">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.utils">utils</a></dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster" visbl="pub" class="indented5 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MesosClusterextendsAutoCloseablewithEventuallywithProductwithSerializable"></a><a id="MesosCluster:MesosCluster"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/index.html#MesosClusterextendsAutoCloseablewithEventuallywithProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable number of masters/agents." href="MesosCluster.html"><span class="name">MesosCluster</span></a><span class="params">(<span name="suiteName">suiteName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="numMasters">numMasters: <span class="extype" name="scala.Int">Int</span></span>, <span name="numSlaves">numSlaves: <span class="extype" name="scala.Int">Int</span></span>, <span name="masterUrl">masterUrl: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="quorumSize">quorumSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="autoStart">autoStart: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="agentsConfig">agentsConfig: <a href="MesosAgentConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosAgentConfig">MesosAgentConfig</a> = <span class="symbol">MesosAgentConfig()</span></span>, <span name="waitForMesosTimeout">waitForMesosTimeout: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span> = <span class="symbol">5.minutes</span></span>, <span name="mastersFaultDomains">mastersFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsFaultDomains">agentsFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsGpus">agentsGpus: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>] = <span class="symbol">None</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result"> extends <span class="extype" name="java.lang.AutoCloseable">AutoCloseable</span> with <span class="extype" name="org.scalatest.concurrent.Eventually">Eventually</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable
+number of masters/agents.</p><div class="fullcomment"><div class="comment cmt"><p>Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable
+number of masters/agents.
+</p></div><dl class="paramcmts block"><dt class="param">suiteName</dt><dd class="cmt"><p>suite name that uses the cluster. will be included into logging messages</p></dd><dt class="param">numMasters</dt><dd class="cmt"><p>number of Mesos master</p></dd><dt class="param">numSlaves</dt><dd class="cmt"><p>number of Mesos slaves</p></dd><dt class="param">masterUrl</dt><dd class="cmt"><p>Mesos master ZK url in the form of zk://zk-1/mesos</p></dd><dt class="param">quorumSize</dt><dd class="cmt"><p>Mesos master quorum size</p></dd><dt class="param">autoStart</dt><dd class="cmt"><p>if true, the cluster will be started automatically</p></dd><dt class="param">agentsConfig</dt><dd class="cmt"><p>Mesos agent configuration</p></dd><dt class="param">waitForMesosTimeout</dt><dd class="cmt"><p>time to wait for Mesos master/agent to start</p></dd><dt class="param">mastersFaultDomains</dt><dd class="cmt"><p>Mesos master fault domain configuration</p></dd><dt class="param">agentsFaultDomains</dt><dd class="cmt"><p>Mesos agents fault domain configuration</p></dd><dt class="param">agentsGpus</dt><dd class="cmt"><p>number of GPUs per agent</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.mesosphere.utils.mesos">mesos</a></dd></dl></div>
+    </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="MesosCalls.html" title=""></a>
-                        <a href="MesosCalls.html" title="">MesosCalls</a>
-                      </li><li class="current-entities indented4">
-                        <a class="object" href="MesosClient$.html" title=""></a>
-                        <a class="trait" href="MesosClient.html" title=""></a>
-                        <a href="MesosClient.html" title="">MesosClient</a>
-                      </li><li class="current-entities indented4">
+                        <a class="class" href="" title=""></a>
+                        <a href="" title="">Agent</a>
+                      </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="MesosClientImpl.html" title=""></a>
-                        <a href="MesosClientImpl.html" title="">MesosClientImpl</a>
-                      </li><li class="current-entities indented4">
-                        <a class="object" href="MesosConnectionContext$.html" title=""></a>
-                        <a class="class" href="MesosConnectionContext.html" title=""></a>
-                        <a href="MesosConnectionContext.html" title="">MesosConnectionContext</a>
-                      </li><li class="current-entities indented4">
+                        <a class="class" href="MesosCluster$Master.html" title=""></a>
+                        <a href="MesosCluster$Master.html" title="">Master</a>
+                      </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="trait" href="" title=""></a>
-                        <a href="" title="">StrictLoggingFlow</a>
+                        <a class="trait" href="MesosCluster$Mesos.html" title="Basic trait representing Mesos Master/Agent."></a>
+                        <a href="MesosCluster$Mesos.html" title="Basic trait representing Mesos Master/Agent.">Mesos</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="class" href="MesosCluster$PatienceConfig.html" title=""></a>
+                        <a href="MesosCluster$PatienceConfig.html" title="">PatienceConfig</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="class" href="MesosCluster$Resources.html" title=""></a>
+                        <a href="MesosCluster$Resources.html" title="">Resources</a>
                       </li>
               </ul>
             </div>
           </div>
           <div id="content">
-            <body class="trait type">
+            <body class="class type">
       <div id="definition">
-        <div class="big-circle trait">t</div>
-        <p id="owner"><a href="../../../index.html" class="extype" name="com">com</a>.<a href="../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../index.html" class="extype" name="com.mesosphere.mesos">mesos</a>.<a href="index.html" class="extype" name="com.mesosphere.mesos.client">client</a></p>
-        <h1>StrictLoggingFlow<span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html" title="Permalink">
+        <div class="big-circle class">c</div>
+        <p id="owner"><a href="../../../index.html" class="extype" name="com">com</a>.<a href="../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../index.html" class="extype" name="com.mesosphere.utils">utils</a>.<a href="index.html" class="extype" name="com.mesosphere.utils.mesos">mesos</a>.<a href="MesosCluster.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster">MesosCluster</a></p>
+        <h1>Agent<span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -173,10 +192,10 @@
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">trait</span>
+        <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">StrictLoggingFlow</span><span class="result"> extends <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></span>
+        <span class="name">Agent</span><span class="params">(<span name="resources">resources: <a href="MesosCluster$Resources.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Resources">Resources</a></span>, <span name="extraArgs">extraArgs: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -185,13 +204,8 @@
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
-        </div><div class="toggleContainer block">
-            <span class="toggle">
-              Known Subclasses
-            </span>
-            <div class="subClasses hiddenContent"><a href="MesosClient$.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a>, <a href="MesosClientImpl.html" class="extype" name="com.mesosphere.mesos.client.MesosClientImpl">MesosClientImpl</a>, <a href="../examples/MesosClientExampleFramework$.html" class="extype" name="com.mesosphere.mesos.examples.MesosClientExampleFramework">MesosClientExampleFramework</a></div>
-          </div></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a>, <span class="extype" name="java.lang.AutoCloseable">AutoCloseable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
         
 
       <div id="mbrsel">
@@ -216,7 +230,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.mesos.client.StrictLoggingFlow"><span>StrictLoggingFlow</span></li><li class="in" name="com.typesafe.scalalogging.StrictLogging"><span>StrictLogging</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.utils.mesos.MesosCluster.Agent"><span>Agent</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="com.mesosphere.utils.mesos.MesosCluster.Mesos"><span>Mesos</span></li><li class="in" name="java.lang.AutoCloseable"><span>AutoCloseable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -234,7 +248,26 @@
 
       <div id="template">
         <div id="allMembers">
-        
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="com.mesosphere.utils.mesos.MesosCluster.Agent#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(resources:MesosCluster.this.Resources,extraArgs:Seq[String]):MesosCluster.this.Agent"></a><a id="&lt;init&gt;:Agent"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#&lt;init&gt;(resources:MesosCluster.this.Resources,extraArgs:Seq[String]):MesosCluster.this.Agent" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Agent</span><span class="params">(<span name="resources">resources: <a href="MesosCluster$Resources.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Resources">Resources</a></span>, <span name="extraArgs">extraArgs: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
+      </span>
+      
+      
+    </li></ol>
+            </div>
 
         
 
@@ -246,7 +279,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -262,7 +295,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html###():Int" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -278,7 +311,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -294,7 +327,7 @@
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -310,7 +343,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#clone():Object" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -331,10 +364,10 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#debug" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="debug[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="debug[T](String):Flow[T,T,NotUsed]"></a>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster.Mesos#close" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="close():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#debug[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#close():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -343,14 +376,14 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">debug</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.debug.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.debug.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">close</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a> → AutoCloseable</dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -363,42 +396,26 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster.Agent#extraArgs" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="extraArgs:Seq[String]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#extraArgs:Seq[String]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="name">extraArgs</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#error" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="error[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="error[T](String):Flow[T,T,NotUsed]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#error[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">error</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.error.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.error.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Agent">Agent</a> → <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a></dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#finalize():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -420,7 +437,7 @@
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -436,45 +453,26 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="hashCode():Int"></a>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster.Mesos#ip" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ip:String"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#hashCode():Int" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#ip:String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+        <span class="name">ip</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd><dt>Annotations</dt><dd>
-                <span class="name">@native</span><span class="args">()</span>
-              
-        </dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#info" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="info[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="info[T](String):Flow[T,T,NotUsed]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#info[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">info</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.info.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.info.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -487,26 +485,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.typesafe.scalalogging.StrictLogging#logger" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="logger:com.typesafe.scalalogging.Logger"></a><a id="logger:Logger"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#logger:com.typesafe.scalalogging.Logger" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">logger</span><span class="result">: <span class="extype" name="com.typesafe.scalalogging.Logger">Logger</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>StrictLogging</dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -522,7 +504,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#notify():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -541,7 +523,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -557,10 +539,106 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster.Mesos#port" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="port:Int"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#port:Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">port</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a></dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster.Agent#processBuilder" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="processBuilder:scala.sys.process.ProcessBuilder"></a><a id="processBuilder:ProcessBuilder"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#processBuilder:scala.sys.process.ProcessBuilder" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">processBuilder</span><span class="result">: <span class="extype" name="scala.sys.process.ProcessBuilder">ProcessBuilder</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Agent">Agent</a> → <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a></dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster.Agent#processName" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="processName:String"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#processName:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">processName</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Agent">Agent</a> → <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a></dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster.Agent#resources" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="resources:MesosCluster.this.Resources"></a><a id="resources:Resources"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#resources:MesosCluster.this.Resources" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">resources</span><span class="result">: <a href="MesosCluster$Resources.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Resources">Resources</a></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster.Mesos#start" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="start():Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#start():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">start</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a></dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster.Mesos#stop" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="stop():Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#stop():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -573,26 +651,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="toString():String"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#toString():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#wait():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -614,7 +676,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -636,7 +698,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -657,22 +719,22 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#warn" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="warn[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="warn[T](String):Flow[T,T,NotUsed]"></a>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster.Agent#workDir" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="workDir:java.io.File"></a><a id="workDir:File"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#warn[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#workDir:java.io.File" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">warn</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.warn.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.warn.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">workDir</span><span class="result">: <span class="extype" name="java.io.File">File</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Agent">Agent</a> → <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a></dd></dl></div>
     </li>
               </ol>
             </div>
@@ -683,8 +745,18 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.typesafe.scalalogging.StrictLogging">
-              <h3>Inherited from <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></h3>
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.Product">
+              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
+            </div><div class="parent" name="scala.Equals">
+              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+            </div><div class="parent" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">
+              <h3>Inherited from <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a></h3>
+            </div><div class="parent" name="java.lang.AutoCloseable">
+              <h3>Inherited from <span class="extype" name="java.lang.AutoCloseable">AutoCloseable</span></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
