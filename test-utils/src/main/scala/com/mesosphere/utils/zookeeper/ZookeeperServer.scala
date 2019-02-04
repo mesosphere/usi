@@ -27,7 +27,6 @@ case class ZookeeperServer(autoStart: Boolean = true, val port: Int = PortAlloca
     extends AutoCloseable
     with StrictLogging {
 
-  private val maxClientConnections = 20
   private val config = {
     new InstanceSpec(
       null, // auto-create workdir
@@ -37,7 +36,7 @@ case class ZookeeperServer(autoStart: Boolean = true, val port: Int = PortAlloca
       true, // deleteDataDirectoryOnClose = true
       -1, // default serverId
       -1, // default tickTime
-      maxClientConnections
+      -1
     )
   }
   private var running = autoStart
