@@ -164,9 +164,9 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
 
     Source
       .single(request)
-      .via(log(s"Connecting to the new leader: $url"))
+      .via(info(s"Connecting to the new leader: $url"))
       .via(httpConnection)
-      .via(log("HttpResponse: "))
+      .via(info("HttpResponse: "))
   }
 
   private def mesosHttpConnection(frameworkInfo: FrameworkInfo, url: URI, redirectRetries: Int)(
@@ -301,7 +301,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     val eventReader = Flow[ByteString]
       .via(RecordIOFraming.scanner())
       .via(eventDeserializer)
-      .via(log("Received mesos Event: "))
+      .via(debug("Received mesos Event: "))
       .idleTimeout(conf.idleTimeout)
       .buffer(conf.sourceBufferSize, OverflowStrategy.backpressure)
 
@@ -377,7 +377,7 @@ class MesosClientImpl(
   override val mesosSink: Sink[Call, Future[Done]] =
     Flow[Call]
       .via(sharedKillSwitch.flow[Call])
-      .via(log("Sending "))
+      .via(debug("Sending "))
       .via(eventSerializer)
       .via(requestBuilder)
       .via(httpConnection)

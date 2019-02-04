@@ -32,13 +32,14 @@ object MesosClientExampleFramework extends App with StrictLoggingFlow {
 
   val frameworkInfo = FrameworkInfo
     .newBuilder()
-    .setUser("mesos-client")
+    .setUser("example")
     .setName("MesosClientExample")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
     .addRoles("test")
     .addCapabilities(FrameworkInfo.Capability
       .newBuilder()
       .setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
+    .setFailoverTimeout(0d)
     .build()
 
   val settings = MesosClientSettings(ConfigFactory.load().getConfig("mesos-client"))
@@ -53,7 +54,7 @@ object MesosClientExampleFramework extends App with StrictLoggingFlow {
         val offerIds = event.getOffers.getOffersList.asScala.map(_.getId).toList
 
         Source(offerIds)
-          .via(log(s"Declining offer with id = ")) // Decline all offers
+          .via(info(s"Declining offer with id = ")) // Decline all offers
           .map(
             oId =>
               client.calls.newDecline(

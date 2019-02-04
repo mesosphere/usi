@@ -91,7 +91,7 @@ case class MesosCluster(
     } else None
 
     Master(
-      extraArgs = Seq("--slave_ping_timeout=1secs", "--max_slave_ping_timeouts=4", s"--quorum=$quorumSize") ++ faultDomainJson
+      extraArgs = Seq("--agent_ping_timeout=1secs", "--max_agent_ping_timeouts=4", s"--quorum=$quorumSize") ++ faultDomainJson
         .map(fd => s"--domain=$fd"))
   }
 

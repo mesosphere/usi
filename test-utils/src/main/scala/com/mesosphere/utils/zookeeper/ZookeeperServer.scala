@@ -1,5 +1,6 @@
 package com.mesosphere.utils.zookeeper
 
+import java.util
 import java.util.concurrent.CopyOnWriteArrayList
 
 import com.mesosphere.utils.PortAllocator
@@ -36,7 +37,12 @@ case class ZookeeperServer(autoStart: Boolean = true, val port: Int = PortAlloca
       true, // deleteDataDirectoryOnClose = true
       -1, // default serverId
       -1, // default tickTime
-      -1
+      -1,
+      new util.HashMap[String, Object]() { // custom properties
+        {
+          put("admin.enableServer", Boolean.box(false)); // disable the admin server
+        }
+      }
     )
   }
   private var running = autoStart
