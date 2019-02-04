@@ -401,8 +401,8 @@ object IP extends StrictLogging {
 
     // Get all available InetAdresses from all network interfaces on the machine
     val addresses: Iterator[InetAddress] = nets.map { net =>
-     net.getInetAddresses.asScala.map { addr =>
-       logger.info(s"""|Display name: ${net.getDisplayName}
+      net.getInetAddresses.asScala.map { addr =>
+        logger.info(s"""|Display name: ${net.getDisplayName}
                        |Name: ${net.getName}
                        |InetAddress: ${addr}
                        |Loopback: ${addr.isLoopbackAddress}
@@ -410,8 +410,8 @@ object IP extends StrictLogging {
                        |Link-local: ${addr.isLinkLocalAddress}
                        |Multicast: ${addr.isMulticastAddress}
        """.stripMargin)
-       addr
-     }
+        addr
+      }
     }.flatten
 
     // We filter out loopback addresses (not what we want) and afterwards the list of priorities is:
