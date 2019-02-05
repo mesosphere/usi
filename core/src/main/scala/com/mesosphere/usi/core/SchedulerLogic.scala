@@ -5,19 +5,77 @@ import java.time.Instant
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.models._
 
+/**
+  * Container class responsible for keeping track of the frame and cache.
+  *
+  * As a general rule, business logic does not manipulate the USI state directly, but rather does so by returning
+  * effects.
+  */
+private[core] class SchedulerLogic {
+  private var frame: Frame = Frame(Map.empty, Map.empty, Map.empty)
+  private var cachedPendingLaunch = CachedPendingLaunch(Set.empty)
+
+  def processSpecEvent(msg: SpecEvent): FrameEffects = {
+    val (frameWithPodSpecChanges, changedPodIds) = frame.applySpecEvent(msg)
+    frame = frameWithPodSpecChanges
+    val frameEffects = SchedulerLogic.computeNextStateForPods(frameWithPodSpecChanges)(changedPodIds)
+    applyAndUpdateCaches(frameEffects, changedPodIds)
+  }
+
+  /**
+    * Given a frame effects, apply the usi state change effects of the frame effects. Then, update the cache and perform
+    * other housekeeping items for pods that are dirty, such as:
+    *
+    * - Prune terminal / unreachable podStatuses for which no podSpec is defined
+    * - Update the pending launch set index
+    * - (WIP) issue any revive calls (this should be done elsewhere)
+    *
+    * Any usiState changes (such as pruning terminal / unreachable podStatuses) are added to the frameEffects.
+    *
+    * @param eventFrameEffects The effects from the incoming SpecEvent
+    * @param dirtyPodIds The podSpecs whose cache should be updated or checked for pruning
+    * @return The frame effects with additional housekeeping effects applied
+    */
+  private def applyAndUpdateCaches(eventFrameEffects: FrameEffects, dirtyPodIds: Set[PodId]): FrameEffects = {
+    frame = frame.applyStateEffects(eventFrameEffects)
+    this.cachedPendingLaunch = this.cachedPendingLaunch.update(frame, dirtyPodIds)
+
+    val pruneEffects = SchedulerLogic.pruneTaskStatuses(frame)(dirtyPodIds)
+    frame = frame.applyStateEffects(pruneEffects)
+
+    val reviveEffects =
+      if (cachedPendingLaunch.pendingLaunch.nonEmpty)
+        FrameEffects.empty.withMesosCall(Mesos.Call.Revive)
+      else
+        FrameEffects.empty
+
+    eventFrameEffects ++ pruneEffects ++ reviveEffects
+  }
+
+  /**
+    * Process a Mesos event and update internal state.
+    *
+    * @param event
+    * @return The events describing state changes as Mesos call intents
+    */
+  def processMesosEvent(event: Mesos.Event): FrameEffects = {
+    val result = SchedulerLogic.handleMesosEvent(frame, cachedPendingLaunch.pendingLaunch)(event)
+
+    applyAndUpdateCaches(result.frameEffects, result.dirtyPodIds)
+  }
+}
+
+/**
+  * The current home for USI business logic
+  */
 private[core] object SchedulerLogic {
   private def terminalOrUnreachable(status: PodStatus): Boolean = {
-    // Cheesy method
+    // TODO - temporary stub implementation
     status.taskStatuses.values.forall(status => status == Mesos.TaskStatus.TASK_RUNNING)
   }
 
-  private def assertValidTransition(oldSpec: PodSpec, newSpec: PodSpec): Unit = {
-    if ((oldSpec.goal == Goal.Terminal) && (newSpec.goal == Goal.Running))
-      throw new IllegalStateException(s"Illegal state transition Terminal to Running for podId ${oldSpec.id}")
-  }
-
   private def taskIdsFor(pod: PodSpec): Seq[TaskId] = {
-    // ignoring momentarily that these might be different
+    // TODO - temporary stub implementation
     Seq(pod.id.value)
   }
 
@@ -29,136 +87,88 @@ private[core] object SchedulerLogic {
     *   - Prune a terminal / unknown task status.
     * - If a podSpec is marked as terminal, then issue a kill.
     *
-    * @param podSpecs      The podSpecs state for this frame
-    * @param podRecords    The current
-    * @param podId
-    * @param newState      The new state for this pod; optional. None for deleted.
-    * @param resultBuilder The frameResult builder. Effects are appended on to this and returned.
-    * @return The given responseBuilder plus all effects as a result of the application of this podSpecUpdate
+    * @return The effects of launching this offer
     */
-  def handlePodSpecUpdate(podSpecs: Map[PodId, PodSpec], podRecords: Map[PodId, PodRecord], podStatuses: Map[PodId, PodStatus])
-                                 (podId: PodId, newState: Option[PodSpec], resultBuilder: FrameResultBuilder): FrameResultBuilder = {
-    var b = resultBuilder
+  private def matchOffer(offer: Mesos.Event.Offer, pendingLaunchPodSpecs: Seq[PodSpec]): FrameEffects = {
+    var effects = FrameEffects.empty
 
-    newState match {
-      case None =>
-        // TODO - this should be spurious if the podStatus is non-terminal
-        if (podStatuses.get(podId).exists { status => terminalOrUnreachable(status) }) {
-          b = b.withChangeMessage(PodStatusUpdated(podId, None))
-        }
-
-        if (podRecords.contains(podId)) {
-          b = b.withChangeMessage(PodRecordUpdated(podId, None))
-        }
-
-      case Some(podSpec) =>
-
-        podSpecs.get(podId).foreach(assertValidTransition(_, podSpec))
-
-        if (podSpec.goal == Goal.Terminal) {
-          taskIdsFor(podSpec).foreach { taskId =>
-            b = b.withMesosCall(Mesos.Call.Kill(taskId))
-          }
-        }
-    }
-    b
-  }
-
-
-  private def matchOffer(podSpecs: Map[PodId, PodSpec])(offer: Mesos.Event.Offer, pendingLaunch: Set[PodId]): FrameResultBuilder = {
-    var b = FrameResultBuilder.empty
-
-    val operations = pendingLaunch
-      .iterator
-      .flatMap { podId =>
-        taskIdsFor(podSpecs(podId)).iterator.map { taskId =>
-          Mesos.Operation(Mesos.Launch(Mesos.TaskInfo(taskId)))
-        }
+    val operations = pendingLaunchPodSpecs.iterator.flatMap { pod =>
+      taskIdsFor(pod).iterator.map { taskId =>
+        Mesos.Operation(Mesos.Launch(Mesos.TaskInfo(taskId)))
       }
-      .to[Seq]
+    }.to[Seq]
 
-    pendingLaunch.foreach { podId =>
-      b = b.withChangeMessage(PodRecordUpdated(podId, Some(PodRecord(podId, Instant.now(), offer.agentId))))
+    pendingLaunchPodSpecs.foreach { pod =>
+      effects = effects.withPodRecord(pod.id, Some(PodRecord(pod.id, Instant.now(), offer.agentId)))
     }
-    b = b.withMesosCall(Mesos.Call.Accept(offer.offerId, operations = operations))
+    effects = effects.withMesosCall(Mesos.Call.Accept(offer.offerId, operations = operations))
 
-    b
+    effects
   }
 
-  private[core] def pendingLaunch(podId: PodId, goal: Goal, podRecord: Option[PodRecord]): Boolean = {
+  private[core] def pendingLaunch(goal: Goal, podRecord: Option[PodRecord]): Boolean = {
     (goal == Goal.Running) && podRecord.isEmpty
   }
 
-  private[core] case class HandleSpecEventResult(newPodSpecs: Map[PodId, PodSpec], dirtyPodIds: Set[PodId], frameResult: FrameResultBuilder)
+  private[core] def computeNextStateForPods(frame: Frame)(changedPodIds: Set[PodId]): FrameEffects = {
+    changedPodIds.foldLeft(FrameEffects.empty) { (initialEffects, podId) =>
+      var effects = initialEffects
 
-  private[core] def handleSpecEvent(podRecords: Map[PodId, PodRecord], podStatuses: Map[PodId, PodStatus])(podSpecs: Map[PodId, PodSpec], msg: SpecEvent): HandleSpecEventResult = {
-    msg match {
-      case SpecsSnapshot(podSpecSnapshot, reservationSpecSnapshot) =>
-        if (reservationSpecSnapshot.nonEmpty) {
-          throw new NotImplementedError("ReservationSpec support not yet implemented")
-        }
-        val newPodsSpecs: Map[PodId, PodSpec] = podSpecSnapshot.map { pod => pod.id -> pod }(collection.breakOut)
+      frame.podSpecs.get(podId) match {
+        case None =>
+          // TODO - this should be spurious if the podStatus is non-terminal
+          if (frame.podStatuses.get(podId).exists { status =>
+              terminalOrUnreachable(status)
+            }) {
+            effects = effects.withPodStatus(podId, None)
+          }
 
-        val changedPodIds = podSpecs.keySet ++ newPodsSpecs.keySet
+          if (frame.podRecords.contains(podId)) {
+            // delete podRecord
+            effects = effects.withPodRecord(podId, None)
+          }
 
-        val responseFromUpdate = changedPodIds.foldLeft(FrameResultBuilder.empty) { (response, podId) =>
-          SchedulerLogic.handlePodSpecUpdate(podSpecs, podRecords, podStatuses)(podId, newPodsSpecs.get(podId), response)
-        }
-
-        HandleSpecEventResult(
-          newPodsSpecs,
-          changedPodIds,
-          responseFromUpdate)
-
-      case PodSpecUpdated(id, newState) =>
-        val newPodSpecs = newState match {
-          case Some(podSpec) =>
-            podSpecs.updated(id, podSpec)
-          case None =>
-            podSpecs - id
-        }
-        val responseFromUpdate = SchedulerLogic.handlePodSpecUpdate(podSpecs, podRecords, podStatuses)(id, newState, FrameResultBuilder.empty)
-
-        HandleSpecEventResult(
-          newPodSpecs,
-          Set(id),
-          responseFromUpdate)
-
-      case ReservationSpecUpdated(id, _) =>
-        throw new NotImplementedError("ReservationSpec support not yet implemented")
+        case Some(podSpec) =>
+          if (podSpec.goal == Goal.Terminal) {
+            taskIdsFor(podSpec).foreach { taskId =>
+              effects = effects.withMesosCall(Mesos.Call.Kill(taskId))
+            }
+          }
+      }
+      effects
     }
   }
 
-  case class HandleMesosEventResult(frameResult: FrameResultBuilder, dirtyPodIds: Set[PodId])
+  case class HandleMesosEventResult(frameEffects: FrameEffects, dirtyPodIds: Set[PodId])
 
   object HandleMesosEventResult {
-    val empty = HandleMesosEventResult(FrameResultBuilder.empty, Set.empty)
+    val empty = HandleMesosEventResult(FrameEffects.empty, Set.empty)
   }
 
-  def handleMesosEvent(podStatuses: Map[PodId, PodStatus], podSpecs: Map[PodId, PodSpec], cachedPendingLaunch: Set[PodId])
-                      (event: Mesos.Event): HandleMesosEventResult = {
+  def handleMesosEvent(frame: Frame, pendingLaunch: Set[PodId])(event: Mesos.Event): HandleMesosEventResult = {
     event match {
       case offer: Mesos.Event.Offer =>
-        val changedPodIds = cachedPendingLaunch
-        val response = matchOffer(podSpecs)(offer, cachedPendingLaunch)
-        HandleMesosEventResult(response, changedPodIds)
+        val changedPodIds = pendingLaunch
+        val effects = matchOffer(offer, pendingLaunch.flatMap { podId =>
+          frame.podSpecs.get(podId)
+        }(collection.breakOut))
+        HandleMesosEventResult(effects, changedPodIds)
 
       case Mesos.Event.StatusUpdate(taskId, taskStatus) =>
-
         val podId = podIdFor(taskId)
 
-        if (podSpecs.contains(podId)) {
-          val newState = podStatuses.get(podId) match {
+        if (frame.podSpecs.contains(podId)) {
+          val newState = frame.podStatuses.get(podId) match {
             case Some(status) =>
               status.copy(taskStatuses = status.taskStatuses.updated(taskId, taskStatus))
             case None =>
               PodStatus(podId, Map(taskId -> taskStatus))
           }
 
-          val response = FrameResultBuilder.empty.withChangeMessage(PodStatusUpdated(podId, Some(newState)))
-          HandleMesosEventResult(
-            response,
-            Set(podId))
+          val effects = FrameEffects.empty
+            .withPodStatus(podId, Some(newState))
+
+          HandleMesosEventResult(effects, Set(podId))
         } else {
           HandleMesosEventResult.empty
         }
@@ -173,124 +183,19 @@ private[core] object SchedulerLogic {
     * @param podIds podIds changed during the last frame
     * @return
     */
-  private[core] def pruneTaskStatuses(podStatuses: Map[PodId, PodStatus], podSpecs: Map[PodId, PodSpec])
-                                     (podIds: Set[PodId]): FrameResultBuilder = {
-    var b = FrameResultBuilder.empty
+  def pruneTaskStatuses(frame: Frame)(podIds: Set[PodId]): FrameEffects = {
+    var effects = FrameEffects.empty
     podIds.foreach { podId =>
-      if (podStatuses.contains(podId)) {
-        val podSpecDefined = !podSpecs.contains(podId)
+      if (frame.podStatuses.contains(podId)) {
+        val podSpecDefined = !frame.podSpecs.contains(podId)
         // prune terminal statuses for which there's no defined podSpec
-        if (!podSpecDefined && terminalOrUnreachable(podStatuses(podId))) {
-          b = b.withChangeMessage(PodStatusUpdated(podId, None))
+        if (!podSpecDefined && terminalOrUnreachable(frame.podStatuses(podId))) {
+          effects = effects.withPodStatus(podId, None)
         }
       }
     }
-    b
+    effects
   }
 
   private def podIdFor(taskId: TaskId): PodId = PodId(taskId)
-}
-
-/**
-  * Container class responsible for keeping track of the USI state and podSpecs.
-  *
-  * As a general rule, business logic does not manipulate the USI state directly, but rather does so by returning intents.
-  */
-private[core] class SchedulerLogic {
-  private var podSpecs: Map[PodId, PodSpec] = Map.empty
-  private var podRecords: Map[PodId, PodRecord] = Map.empty
-  private var podStatuses: Map[PodId, PodStatus] = Map.empty
-  private var cachedPendingLaunch: Set[PodId] = Set.empty
-
-  private def applyUSIStateChanges(response: FrameResult): Unit = {
-    response.usiStateEvents.foreach {
-      case recordChange: PodRecordUpdated =>
-        recordChange.newRecord match {
-          case Some(newRecord) =>
-            podRecords = podRecords.updated(recordChange.id, newRecord)
-            // podRecord presence means we've launched
-            cachedPendingLaunch -= recordChange.id
-          case None =>
-            podRecords -= recordChange.id
-        }
-      case statusChange: PodStatusUpdated =>
-        statusChange.newStatus match {
-          case Some(newStatus) =>
-            podStatuses = podStatuses.updated(statusChange.id, newStatus)
-          case None =>
-            podStatuses -= statusChange.id
-        }
-      case agentRecordChange: AgentRecordUpdated => // TODO
-      case reservationStatusChange: ReservationStatusUpdated => // TODO
-      case statusSnapshot: USIStateSnapshot => // TODO
-    }
-  }
-
-  /**
-    * Maintains the internal cache of pods pending launch, so a full scan isn't required on every offer
-    *
-    * Must be called after podSpecs are updated, and response effects are applied.
-    *
-    * @param podIds
-    */
-  private def updatePendingLaunch(podIds: Set[PodId]): Unit = {
-    podIds.foreach { podId =>
-      val shouldBeLaunched = podSpecs.get(podId).exists { podSpec =>
-        SchedulerLogic.pendingLaunch(podId, podSpec.goal, podRecords.get(podId))
-      }
-      if (shouldBeLaunched)
-        cachedPendingLaunch += podId
-      else
-        cachedPendingLaunch -= podId
-    }
-  }
-
-  def processSpecEvent(msg: SpecEvent): FrameResult = {
-    val handleResult = SchedulerLogic.handleSpecEvent(this.podRecords, this.podStatuses)(this.podSpecs, msg)
-    this.podSpecs = handleResult.newPodSpecs
-
-    applyAndUpdateCaches(handleResult.frameResult, handleResult.dirtyPodIds)
-  }
-
-  /**
-    * Given a frameResult, apply the effects of the frame result. Then, update the cache and perform other housekeeping
-    * items for pods that are dirty, such as:
-    *
-    * - Prune terminal / unreachable podStatuses for which no podSpec is defined
-    * - Update the pending launch set index
-    * - (WIP) issue any revive calls (this should be done elsewhere)
-    *
-    * Any usiState changes (such as pruning terminal / unreachable podStatuses) are added to the frameResult.
-    *
-    * @param frameResult   The result from the incoming SpecEvent or
-    * @param changedPodIds The
-    * @return The frameResult with additional housekeeping effects applied
-    */
-  private def applyAndUpdateCaches(frameResult: FrameResultBuilder, changedPodIds: Set[PodId]): FrameResult = {
-    applyUSIStateChanges(frameResult)
-
-    val pruneResponse = SchedulerLogic.pruneTaskStatuses(this.podStatuses, this.podSpecs)(changedPodIds)
-    applyUSIStateChanges(pruneResponse)
-
-    updatePendingLaunch(changedPodIds)
-
-    val reviveIfNonEmpty = if (cachedPendingLaunch.nonEmpty)
-      FrameResultBuilder.empty.withMesosCall(Mesos.Call.Revive)
-    else
-      FrameResultBuilder.empty
-
-    frameResult ++ pruneResponse ++ reviveIfNonEmpty
-  }
-
-  /**
-    * Process a Mesos event and update internal state.
-    *
-    * @param event
-    * @return The events describing state changes as Mesos call intents
-    */
-  def processMesosEvent(event: Mesos.Event): FrameResult = {
-    val result = SchedulerLogic.handleMesosEvent(podStatuses, podSpecs, cachedPendingLaunch)(event)
-
-    applyAndUpdateCaches(result.frameResult, result.dirtyPodIds)
-  }
 }

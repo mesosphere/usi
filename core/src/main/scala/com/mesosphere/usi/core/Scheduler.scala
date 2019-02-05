@@ -25,7 +25,7 @@ import com.mesosphere.usi.models.{Mesos, SpecEvent, USIStateEvent}
  *                    |  +------------------+          +-------------+         USIStateEvents  |
  *        SpecEvents  |  |                  |          |             |      /------------------>----> (framework)
  * (framework) >------>-->                  |          |             |     /                   |
- *                    |  |                  | Response |             |    /                    |
+ *                    |  |                  | Effects  |             |    /                    |
  *                    |  |  SchedulerLogic  o----------> Persistence o---+                     |
  *                    |  |                  |          |             |    \                    |
  *       MesosEvents  |  |                  |          |             |     \   MesosCalls      |
@@ -50,14 +50,14 @@ object Scheduler {
         (schedulerLogic) => {
           import GraphDSL.Implicits._
 
-          val broadcast = builder.add(Broadcast[FrameResult](2))
+          val broadcast = builder.add(Broadcast[FrameEffects](2))
 
           schedulerLogic.out ~> broadcast.in
 
-          val mesosCalls = broadcast.out(0).mapConcat { response => response.mesosCalls }
-          val statuses = broadcast.out(1).mapConcat { response => response.usiStateEvents }
+          val mesosCalls = broadcast.out(0).mapConcat { effects => effects.mesosCalls }
+          val stateEvents = broadcast.out(1).mapConcat { effects => effects.stateEvents }
 
-          BidiShape.apply(schedulerLogic.in0, statuses.outlet, schedulerLogic.in1, mesosCalls.outlet)
+          BidiShape.apply(schedulerLogic.in0, stateEvents.outlet, schedulerLogic.in1, mesosCalls.outlet)
         }
       }
     }

@@ -37,25 +37,25 @@ object SchedulerLogicGraph {
   * logic would've been needed.
   *
   * It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
-  * likely need timers, other callbacks, and perhaps other output ports.
+  * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
-class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event, FrameResult]] {
+class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event, FrameEffects]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
   val mesosEvents = Inlet[Mesos.Event]("mesos-events")
   val specEvents = Inlet[SpecEvent]("specs")
-  val responses = Outlet[FrameResult]("response")
+  val responses = Outlet[FrameEffects]("response")
   // Define the (sole) output port of this stage
   val out: Outlet[Int] = Outlet("NumbersSource")
   // Define the shape of this stage, which is SourceShape with the port we defined above
-  override val shape: FanInShape2[SpecEvent, Mesos.Event, FrameResult] = new FanInShape2(specEvents, mesosEvents, responses)
+  override val shape: FanInShape2[SpecEvent, Mesos.Event, FrameEffects] = new FanInShape2(specEvents, mesosEvents, responses)
 
   // This is where the actual (possibly stateful) logic will live
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     val schedulerLogic = new SchedulerLogic
 
     new GraphStageLogic(shape) {
-      val pendingResponses: mutable.Queue[FrameResult] = mutable.Queue.empty
+      val pendingResponses: mutable.Queue[FrameEffects] = mutable.Queue.empty
 
       setHandler(mesosEvents, new InHandler {
         override def onPush(): Unit = {
@@ -86,7 +86,7 @@ class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event,
         pull(mesosEvents)
       }
 
-      def handleResponse(response: FrameResult): Unit = {
+      def handleResponse(response: FrameEffects): Unit = {
         if (isAvailable(responses)) {
           if (pendingResponses.nonEmpty) {
             throw new IllegalStateException("We should always immediately push on pull if responses are queued")
