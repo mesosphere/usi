@@ -19,8 +19,8 @@ allprojects {
     apply plugin: "scala"
 
     sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-    compileScala.targetCompatibility = 1.8
+    targetCompatibility = 1.11
+    compileScala.targetCompatibility = 1.11
 
     archivesBaseName = "usi-${it.name}"
 
