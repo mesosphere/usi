@@ -8,7 +8,7 @@ plugins {
 
 ext {
     // Scala version for all scala dependencies
-    scalaVersion = '2.12.7'
+    scalaVersion = '2.12'
 
     mesosVersion = '1.7.0'
 }
@@ -77,7 +77,7 @@ scaladoc {
 
 idea {
   project {
-    jdkName = '1.8'
+    jdkName = '1.11'
     languageLevel = '1.8'
     vcs = 'Git'
   }
