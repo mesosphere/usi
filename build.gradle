@@ -8,7 +8,7 @@ plugins {
 
 ext {
     // Scala version for all scala dependencies
-    scalaVersion = '2.12'
+    scalaVersion = '2.12.7'
 
     mesosVersion = '1.7.0'
 }

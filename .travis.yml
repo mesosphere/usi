@@ -3,7 +3,7 @@ jdk:
   - openjdk11
 language: scala
 scala:
-   - 2.12.2
+   - 2.12.7
 script:
   - sudo ./gradlew provision
   - ./gradlew ci --info
