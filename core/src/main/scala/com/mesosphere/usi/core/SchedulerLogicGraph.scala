@@ -42,39 +42,37 @@ object SchedulerLogicGraph {
 class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event, FrameEffects]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
-  val mesosEvents = Inlet[Mesos.Event]("mesos-events")
-  val specEvents = Inlet[SpecEvent]("specs")
-  val responses = Outlet[FrameEffects]("response")
-  // Define the (sole) output port of this stage
-  val out: Outlet[Int] = Outlet("NumbersSource")
+  val mesosEventsInlet = Inlet[Mesos.Event]("mesos-events")
+  val specEventsInlet = Inlet[SpecEvent]("specs")
+  val effectsOutlet = Outlet[FrameEffects]("effects")
   // Define the shape of this stage, which is SourceShape with the port we defined above
-  override val shape: FanInShape2[SpecEvent, Mesos.Event, FrameEffects] = new FanInShape2(specEvents, mesosEvents, responses)
+  override val shape: FanInShape2[SpecEvent, Mesos.Event, FrameEffects] = new FanInShape2(specEventsInlet, mesosEventsInlet, effectsOutlet)
 
   // This is where the actual (possibly stateful) logic will live
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     val schedulerLogic = new SchedulerLogic
 
     new GraphStageLogic(shape) {
-      val pendingResponses: mutable.Queue[FrameEffects] = mutable.Queue.empty
+      val pendingEffects: mutable.Queue[FrameEffects] = mutable.Queue.empty
 
-      setHandler(mesosEvents, new InHandler {
+      setHandler(mesosEventsInlet, new InHandler {
         override def onPush(): Unit = {
-          handleResponse(schedulerLogic.processMesosEvent(grab(mesosEvents)))
+          pushOrQueueEffects(schedulerLogic.processMesosEvent(grab(mesosEventsInlet)))
           maybePull()
         }
       })
 
-      setHandler(specEvents, new InHandler {
+      setHandler(specEventsInlet, new InHandler {
         override def onPush(): Unit = {
-          handleResponse(schedulerLogic.processSpecEvent(grab(specEvents)))
+          pushOrQueueEffects(schedulerLogic.processSpecEvent(grab(specEventsInlet)))
           maybePull()
         }
       })
 
-      setHandler(responses, new OutHandler {
+      setHandler(effectsOutlet, new OutHandler {
         override def onPull(): Unit = {
-          if (pendingResponses.nonEmpty) {
-            push(responses, pendingResponses.dequeue())
+          if (pendingEffects.nonEmpty) {
+            push(effectsOutlet, pendingEffects.dequeue())
             maybePull()
           }
         }
@@ -82,28 +80,28 @@ class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event,
 
       override def preStart(): Unit = {
         // Start the stream
-        pull(specEvents)
-        pull(mesosEvents)
+        pull(specEventsInlet)
+        pull(mesosEventsInlet)
       }
 
-      def handleResponse(response: FrameEffects): Unit = {
-        if (isAvailable(responses)) {
-          if (pendingResponses.nonEmpty) {
-            throw new IllegalStateException("We should always immediately push on pull if responses are queued")
+      def pushOrQueueEffects(effects: FrameEffects): Unit = {
+        if (isAvailable(effectsOutlet)) {
+          if (pendingEffects.nonEmpty) {
+            throw new IllegalStateException("We should always immediately push on pull if effects are queued")
           }
-          push(responses, response)
+          push(effectsOutlet, effects)
         } else {
-          pendingResponses.enqueue(response)
+          pendingEffects.enqueue(effects)
         }
         maybePull()
       }
 
       def maybePull(): Unit = {
-        if (pendingResponses.length < BUFFER_SIZE) {
-          if (!hasBeenPulled(mesosEvents))
-            pull(mesosEvents)
-          if (!hasBeenPulled(specEvents))
-            pull(specEvents)
+        if (pendingEffects.length < BUFFER_SIZE) {
+          if (!hasBeenPulled(mesosEventsInlet))
+            pull(mesosEventsInlet)
+          if (!hasBeenPulled(specEventsInlet))
+            pull(specEventsInlet)
         }
       }
     }
