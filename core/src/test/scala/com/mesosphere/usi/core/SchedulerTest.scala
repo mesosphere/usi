@@ -5,12 +5,10 @@ import akka.stream.scaladsl.{Flow, GraphDSL, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, FlowShape, OverflowStrategy}
 import com.mesosphere.usi.core.models.{AgentId, Goal, PodId, PodSpec, RunSpec}
 import com.mesosphere.usi.models._
-import com.typesafe.scalalogging.StrictLogging
 import org.scalatest._
+import com.mesosphere.utils.AkkaUnitTest
 
-import scala.concurrent.duration._
-
-class SchedulerTest extends WordSpec with Matchers with AkkaUnitTest with StrictLogging with Inside {
+class SchedulerTest extends AkkaUnitTest with Inside {
   val fakeAgentId = AgentId("fake-agent")
   val mockMesos: Flow[Mesos.Call, Mesos.Event, NotUsed] = {
     Flow[Mesos.Call].async.mapConcat {
@@ -40,8 +38,6 @@ class SchedulerTest extends WordSpec with Matchers with AkkaUnitTest with Strict
       }
     }
   }
-
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(10.minutes, 15.millis)
 
   "It reports a running task when I provide " in {
     implicit val materializer = ActorMaterializer()
