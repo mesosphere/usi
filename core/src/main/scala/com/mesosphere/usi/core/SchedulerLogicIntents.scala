@@ -10,8 +10,13 @@ import com.mesosphere.usi.core.models.{
   StateEvent
 }
 
+case class SchedulerLogicIntents(stateIntents: List[StateEvent] = Nil, mesosIntents: List[Mesos.Call] = Nil)
+object SchedulerLogicIntents {
+  val empty = SchedulerLogicIntents()
+}
+
 /**
-  * Immutable effects builder
+  * Immutable intents builder
   *
   * Effects are appended in lazy fashion by using the exposed effect methods.
   *
@@ -21,17 +26,16 @@ import com.mesosphere.usi.core.models.{
   * @param reverseStateEvents
   * @param reverseMesosCalls
   */
-case class FrameEffects(reverseStateEvents: List[StateEvent] = Nil, reverseMesosCalls: List[Mesos.Call] = Nil) {
-  lazy val stateEvents = reverseStateEvents.reverse
-  lazy val mesosCalls = reverseMesosCalls.reverse
+case class SchedulerLogicIntentsBuilder(reverseStateEvents: List[StateEvent] = Nil, reverseMesosCalls: List[Mesos.Call] = Nil) {
+  lazy val result = SchedulerLogicIntents(reverseStateEvents.reverse, reverseMesosCalls.reverse)
 
-  def ++(other: FrameEffects): FrameEffects = {
-    if (other == FrameEffects.empty)
+  def ++(other: SchedulerLogicIntentsBuilder): SchedulerLogicIntentsBuilder = {
+    if (other == SchedulerLogicIntentsBuilder.empty)
       this
-    else if (this == FrameEffects.empty)
+    else if (this == SchedulerLogicIntentsBuilder.empty)
       other
     else
-      FrameEffects(other.reverseStateEvents ++ reverseStateEvents, other.reverseMesosCalls ++ reverseMesosCalls)
+      SchedulerLogicIntentsBuilder(other.reverseStateEvents ++ reverseStateEvents, other.reverseMesosCalls ++ reverseMesosCalls)
   }
 
   /**
@@ -41,7 +45,7 @@ case class FrameEffects(reverseStateEvents: List[StateEvent] = Nil, reverseMesos
     * @param newStatus Optional value; None means remove
     * @return A FrameEffects with this effect appended
     */
-  def withPodStatus(id: PodId, newStatus: Option[PodStatus]): FrameEffects =
+  def withPodStatus(id: PodId, newStatus: Option[PodStatus]): SchedulerLogicIntentsBuilder =
     withStateUpdated(PodStatusUpdated(id, newStatus))
 
   /**
@@ -51,10 +55,10 @@ case class FrameEffects(reverseStateEvents: List[StateEvent] = Nil, reverseMesos
     * @param newStatus Optional value; None means remove
     * @return A FrameEffects with this effect appended
     */
-  def withPodRecord(id: PodId, newRecord: Option[PodRecord]): FrameEffects =
+  def withPodRecord(id: PodId, newRecord: Option[PodRecord]): SchedulerLogicIntentsBuilder =
     withStateUpdated(PodRecordUpdated(id, newRecord))
 
-  private def withStateUpdated(message: StateEvent): FrameEffects =
+  private def withStateUpdated(message: StateEvent): SchedulerLogicIntentsBuilder =
     copy(reverseStateEvents = message :: reverseStateEvents)
 
   /**
@@ -63,9 +67,9 @@ case class FrameEffects(reverseStateEvents: List[StateEvent] = Nil, reverseMesos
     * @param call The Mesos call
     * @return A FrameEffects with this effect appended
     */
-  def withMesosCall(call: Mesos.Call): FrameEffects = copy(reverseMesosCalls = call :: reverseMesosCalls)
+  def withMesosCall(call: Mesos.Call): SchedulerLogicIntentsBuilder = copy(reverseMesosCalls = call :: reverseMesosCalls)
 }
 
-object FrameEffects {
-  val empty = FrameEffects()
+object SchedulerLogicIntentsBuilder {
+  val empty = SchedulerLogicIntentsBuilder()
 }

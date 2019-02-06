@@ -39,41 +39,41 @@ object SchedulerLogicGraph {
   * It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
   * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
-class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event, FrameEffects]] {
+class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event, FrameResult]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
   val mesosEventsInlet = Inlet[Mesos.Event]("mesos-events")
   val specEventsInlet = Inlet[SpecEvent]("specs")
-  val effectsOutlet = Outlet[FrameEffects]("effects")
+  val frameResultOutlet = Outlet[FrameResult]("effects")
   // Define the shape of this stage, which is SourceShape with the port we defined above
-  override val shape: FanInShape2[SpecEvent, Mesos.Event, FrameEffects] =
-    new FanInShape2(specEventsInlet, mesosEventsInlet, effectsOutlet)
+  override val shape: FanInShape2[SpecEvent, Mesos.Event, FrameResult] =
+    new FanInShape2(specEventsInlet, mesosEventsInlet, frameResultOutlet)
 
   // This is where the actual (possibly stateful) logic will live
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
     val schedulerLogic = new SchedulerLogic
 
     new GraphStageLogic(shape) {
-      val pendingEffects: mutable.Queue[FrameEffects] = mutable.Queue.empty
+      val pendingEffects: mutable.Queue[FrameResult] = mutable.Queue.empty
 
       setHandler(mesosEventsInlet, new InHandler {
         override def onPush(): Unit = {
-          pushOrQueueEffects(schedulerLogic.processMesosEvent(grab(mesosEventsInlet)))
+          pushOrQueueIntents(schedulerLogic.processMesosEvent(grab(mesosEventsInlet)))
           maybePull()
         }
       })
 
       setHandler(specEventsInlet, new InHandler {
         override def onPush(): Unit = {
-          pushOrQueueEffects(schedulerLogic.processSpecEvent(grab(specEventsInlet)))
+          pushOrQueueIntents(schedulerLogic.processSpecEvent(grab(specEventsInlet)))
           maybePull()
         }
       })
 
-      setHandler(effectsOutlet, new OutHandler {
+      setHandler(frameResultOutlet, new OutHandler {
         override def onPull(): Unit = {
           if (pendingEffects.nonEmpty) {
-            push(effectsOutlet, pendingEffects.dequeue())
+            push(frameResultOutlet, pendingEffects.dequeue())
             maybePull()
           }
         }
@@ -85,12 +85,12 @@ class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event,
         pull(mesosEventsInlet)
       }
 
-      def pushOrQueueEffects(effects: FrameEffects): Unit = {
-        if (isAvailable(effectsOutlet)) {
+      def pushOrQueueIntents(effects: FrameResult): Unit = {
+        if (isAvailable(frameResultOutlet)) {
           if (pendingEffects.nonEmpty) {
             throw new IllegalStateException("We should always immediately push on pull if effects are queued")
           }
-          push(effectsOutlet, effects)
+          push(frameResultOutlet, effects)
         } else {
           pendingEffects.enqueue(effects)
         }

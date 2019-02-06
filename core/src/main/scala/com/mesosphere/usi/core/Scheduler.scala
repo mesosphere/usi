@@ -25,8 +25,8 @@ import scala.concurrent.Future
  *                    |                                                                        |
  *                    |  +------------------+          +-------------+         StateEvents     |
  *        SpecEvents  |  |                  |          |             |      /------------------>----> (framework)
- * (framework) >------>-->                  |          |             |     /                   |
- *                    |  |                  | Effects  |             |    /                    |
+ * (framework) >------>-->                  | Frame-   |             |     /                   |
+ *                    |  |                  | Results  |             |    /                    |
  *                    |  |  SchedulerLogic  o----------> Persistence o---+                     |
  *                    |  |                  |          |             |    \                    |
  *       MesosEvents  |  |                  |          |             |     \   MesosCalls      |
@@ -69,15 +69,15 @@ object Scheduler {
         {
           import GraphDSL.Implicits._
 
-          val broadcast = builder.add(Broadcast[FrameEffects](2))
+          val broadcast = builder.add(Broadcast[FrameResult](2))
 
           schedulerLogic.out ~> broadcast.in
 
-          val mesosCalls = broadcast.out(0).mapConcat { effects =>
-            effects.mesosCalls
+          val mesosCalls = broadcast.out(0).mapConcat { frameResult =>
+            frameResult.mesosIntents
           }
-          val stateEvents = broadcast.out(1).mapConcat { effects =>
-            effects.stateEvents
+          val stateEvents = broadcast.out(1).mapConcat { frameResult =>
+            frameResult.stateEvents
           }
 
           BidiShape.apply(schedulerLogic.in0, stateEvents.outlet, schedulerLogic.in1, mesosCalls.outlet)
