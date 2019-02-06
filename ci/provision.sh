@@ -16,4 +16,4 @@ apt-get -y update -o Dir::Etc::sourcelist="sources.list.d/mesosphere.list" \
     -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
 
 # Install Mesos
-apt-get -y install mesos="$MESOS_VERSION-2.0.3" zookeeperd
+apt-get -y install mesos="$MESOS_VERSION-2.0.3"
