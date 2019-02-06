@@ -1,7 +1,7 @@
 package com.mesosphere.usi.core.models
 
 /**
-  * Target state of PodSpec. Scheduler will work towards achieving this goal state.
+  * Target state of [[PodSpec]]. Scheduler will work towards achieving this goal state.
   */
 sealed trait Goal
 
