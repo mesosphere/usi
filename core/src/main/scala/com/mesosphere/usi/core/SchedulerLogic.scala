@@ -10,7 +10,7 @@ case class FrameWithEffects(frame: Frame, effects: FrameEffects, dirtyPodIds: Se
     val newDirty = dirtyPodIds ++ newEffects.reverseStateEvents.iterator.collect {
       case podEvent: PodStateEvent => podEvent.id
     }
-    copy(frame = frame.applyStateEffects(effects), dirtyPodIds = newDirty, effects = effects ++ newEffects)
+    copy(frame = frame.applyStateEffects(newEffects), dirtyPodIds = newDirty, effects = effects ++ newEffects)
   }
 
   def applySpecEvent(specEvent: SpecEvent): FrameWithEffects = {
