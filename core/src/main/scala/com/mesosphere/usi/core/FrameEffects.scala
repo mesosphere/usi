@@ -1,7 +1,14 @@
 package com.mesosphere.usi.core
 
-import com.mesosphere.usi.core.models.{PodId, PodRecord}
-import com.mesosphere.usi.models._
+import com.mesosphere.usi.core.models.{
+  Mesos,
+  PodId,
+  PodRecord,
+  PodRecordUpdated,
+  PodStatus,
+  PodStatusUpdated,
+  StateEvent
+}
 
 /**
   * Immutable effects builder
@@ -47,7 +54,8 @@ case class FrameEffects(reverseStateEvents: List[StateEvent] = Nil, reverseMesos
   def withPodRecord(id: PodId, newRecord: Option[PodRecord]): FrameEffects =
     withStateUpdated(PodRecordUpdated(id, newRecord))
 
-  private def withStateUpdated(message: StateEvent): FrameEffects = copy(reverseStateEvents = message :: reverseStateEvents)
+  private def withStateUpdated(message: StateEvent): FrameEffects =
+    copy(reverseStateEvents = message :: reverseStateEvents)
 
   /**
     * Append an effect which will cause some Mesos call to be emitted

@@ -1,10 +1,9 @@
 package com.mesosphere.usi.core
 
 import akka.NotUsed
-import akka.stream.{BidiShape, FlowShape}
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL}
-import com.mesosphere.usi.core.models.AgentId
-import com.mesosphere.usi.models.{Mesos, SpecEvent, StateEvent}
+import akka.stream.{BidiShape, FlowShape}
+import com.mesosphere.usi.core.models.{Mesos, SpecEvent, StateEvent}
 
 import scala.concurrent.Future
 

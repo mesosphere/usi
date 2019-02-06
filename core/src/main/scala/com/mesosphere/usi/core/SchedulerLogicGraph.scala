@@ -2,7 +2,7 @@ package com.mesosphere.usi.core
 
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
-import com.mesosphere.usi.models.{Mesos, SpecEvent}
+import com.mesosphere.usi.core.models.{Mesos, SpecEvent}
 
 import scala.collection.mutable
 
@@ -46,7 +46,8 @@ class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event,
   val specEventsInlet = Inlet[SpecEvent]("specs")
   val effectsOutlet = Outlet[FrameEffects]("effects")
   // Define the shape of this stage, which is SourceShape with the port we defined above
-  override val shape: FanInShape2[SpecEvent, Mesos.Event, FrameEffects] = new FanInShape2(specEventsInlet, mesosEventsInlet, effectsOutlet)
+  override val shape: FanInShape2[SpecEvent, Mesos.Event, FrameEffects] =
+    new FanInShape2(specEventsInlet, mesosEventsInlet, effectsOutlet)
 
   // This is where the actual (possibly stateful) logic will live
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {

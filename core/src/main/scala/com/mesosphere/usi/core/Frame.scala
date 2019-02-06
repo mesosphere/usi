@@ -1,6 +1,15 @@
 package com.mesosphere.usi.core
-import com.mesosphere.usi.core.models.{PodId, PodRecord, PodSpec}
-import com.mesosphere.usi.models._
+import com.mesosphere.usi.core.models.{
+  AgentRecordUpdated,
+  PodId,
+  PodRecord,
+  PodRecordUpdated,
+  PodSpec,
+  PodStatus,
+  PodStatusUpdated,
+  ReservationStatusUpdated,
+  StateSnapshot
+}
 
 /**
   * Data structure that contains all the state used for the SchedulerLogic. It's state is manipulated through Effects,

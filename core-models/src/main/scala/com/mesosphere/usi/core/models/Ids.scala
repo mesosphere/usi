@@ -13,7 +13,13 @@ case class PodId(value: String)
 case class ReservationId(value: String)
 
 /**
-  * Unique identifier of a mesos agent
+  * Unique identifier of a Mesos agent
   * @param value
   */
 case class AgentId(value: String)
+
+/**
+  * Unique Mesos task identifier
+  * @param value
+  */
+case class TaskId(value: String)

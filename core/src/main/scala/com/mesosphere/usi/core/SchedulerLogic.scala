@@ -3,7 +3,6 @@ package com.mesosphere.usi.core
 import java.time.Instant
 
 import com.mesosphere.usi.core.models._
-import com.mesosphere.usi.models._
 
 case class FrameWithEffects(frame: Frame, effects: FrameEffects, dirtyPodIds: Set[PodId]) {
   def applyEffects(newEffects: FrameEffects): FrameWithEffects = {
@@ -120,7 +119,7 @@ private[core] object SchedulerLogic {
 
   private def taskIdsFor(pod: PodSpec): Seq[TaskId] = {
     // TODO - temporary stub implementation
-    Seq(pod.id.value)
+    Seq(TaskId(pod.id.value))
   }
 
   private def matchOffer(offer: Mesos.Event.Offer, pendingLaunchPodSpecs: Seq[PodSpec]): FrameEffects = {
@@ -150,7 +149,6 @@ private[core] object SchedulerLogic {
     */
   private[core] def computeNextStateForPods(frame: Frame)(changedPodIds: Set[PodId]): FrameEffects = {
     changedPodIds.foldLeft(FrameEffects.empty) { (initialEffects, podId) =>
-
       frame.podSpecs.get(podId) match {
         case None =>
           // TODO - this should be spurious if the podStatus is non-terminal
@@ -222,16 +220,16 @@ private[core] object SchedulerLogic {
     * @return
     */
   def pruneTaskStatuses(frame: Frame)(podIds: Set[PodId]): FrameEffects = {
-    podIds.iterator
-      .filter { podId => frame.podStatuses.contains(podId) }
-      .filter { podId =>
-        val podSpecDefined = !frame.podSpecs.contains(podId)
-        // prune terminal statuses for which there's no defined podSpec
-        !podSpecDefined && terminalOrUnreachable(frame.podStatuses(podId))
-      }.foldLeft(FrameEffects.empty) { (effects, podId) =>
-          effects.withPodStatus(podId, None)
-      }
+    podIds.iterator.filter { podId =>
+      frame.podStatuses.contains(podId)
+    }.filter { podId =>
+      val podSpecDefined = !frame.podSpecs.contains(podId)
+      // prune terminal statuses for which there's no defined podSpec
+      !podSpecDefined && terminalOrUnreachable(frame.podStatuses(podId))
+    }.foldLeft(FrameEffects.empty) { (effects, podId) =>
+      effects.withPodStatus(podId, None)
+    }
   }
 
-  private def podIdFor(taskId: TaskId): PodId = PodId(taskId)
+  private def podIdFor(taskId: TaskId): PodId = PodId(taskId.value)
 }

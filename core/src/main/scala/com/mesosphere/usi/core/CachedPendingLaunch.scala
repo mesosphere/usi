@@ -2,6 +2,7 @@ package com.mesosphere.usi.core
 import com.mesosphere.usi.core.models.PodId
 
 case class CachedPendingLaunch(pendingLaunch: Set[PodId] = Set.empty) {
+
   /**
     * Maintains a cache of pods pending launch, so a full scan isn't required on every offer
     *

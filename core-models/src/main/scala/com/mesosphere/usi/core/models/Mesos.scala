@@ -1,6 +1,4 @@
-package com.mesosphere.usi.models
-
-import com.mesosphere.usi.core.models.AgentId
+package com.mesosphere.usi.core.models
 
 /**
   * Mock Mesos calls / state
@@ -17,17 +15,16 @@ object Mesos {
 
     case class Accept(offerId: String, operations: Seq[Operation]) extends Call
 
-    case class Kill(taskId: String) extends Call
+    case class Kill(taskId: TaskId) extends Call
 
   }
-
 
   // stub class that just launches as
   case class Operation(launch: Launch)
 
   case class Launch(taskInfo: TaskInfo)
 
-  case class TaskInfo(taskId: String)
+  case class TaskInfo(taskId: TaskId)
 
   sealed trait TaskStatus
 
@@ -38,7 +35,6 @@ object Mesos {
     case object TASK_KILLED extends TaskStatus
 
   }
-
 
   sealed trait Event
 

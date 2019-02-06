@@ -1,6 +1,4 @@
-package com.mesosphere.usi.models
-
-import com.mesosphere.usi.core.models.{PodId, PodSpec, ReservationId}
+package com.mesosphere.usi.core.models
 
 sealed trait SpecEvent
 

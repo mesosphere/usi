@@ -1,6 +1,4 @@
-package com.mesosphere.usi.models
-
-import com.mesosphere.usi.core.models.{PodId, PodRecord, ReservationId}
+package com.mesosphere.usi.core.models
 
 /**
   * General trait for snapshot or updated events, used to replicate USI's evolving view of the state.
@@ -14,7 +12,12 @@ sealed trait PodStateEvent extends StateEvent {
   def id: PodId
 }
 
-case class StateSnapshot(podStatuses: Seq[PodStatus], podRecords: Seq[PodRecord], agentRecords: Seq[AgentRecord], reservationStatuses: Seq[ReservationStatus]) extends StateEvent
+case class StateSnapshot(
+    podStatuses: Seq[PodStatus],
+    podRecords: Seq[PodRecord],
+    agentRecords: Seq[AgentRecord],
+    reservationStatuses: Seq[ReservationStatus])
+    extends StateEvent
 
 /**
   * Trait which describes an update for any of the USI managed state.
