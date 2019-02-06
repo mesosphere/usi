@@ -7,7 +7,11 @@ import com.mesosphere.usi.core.models._
 /**
   * Container class responsible for keeping track of the state and cache.
   *
-  * All manipulation to the SchedulerLogic state is done via one of the two processes:
+  * ## Specification state vs SchedulerLogic state
+  *
+  * The SchedulerLogicState is comprised of specification state and other state (records and statuses). The
+  * SchedulerLogic maintains the latter. All manipulation to the SchedulerLogic state is done via one of the two
+  * processes:
   *
   * - For specification state, state is updated through incoming SpecEvents (we consume and replicate the
   * framework-implementation's specificaitons)
@@ -23,6 +27,8 @@ import com.mesosphere.usi.core.models._
   * - It restricts, via the type system, the portions of the SchedulerLogicState the business logic is allowed (IE: it
   * would be illegal for the business logic to update podSpecs, directly)
   *
+  * ## Intents and Events
+  *
   * In the SchedulerLogic code, we'll use the word intents and events. Intents are things not yet applied, and should
   * be. Events are things that were applied and we're notifying you about.
   *
@@ -31,6 +37,29 @@ import com.mesosphere.usi.core.models._
   * can be incrementally persisted and followed). In the SchedulerLogic, we'll refer to a StateEvent as an intent until
   * it is applied, after-which it will be called an event. Mesos calls will be referred to as intents as they are not
   * applied until they are published to the Mesos Master.
+  *
+  * ## Concept of a "Frame"
+  *
+  * Visualized:
+  *
+  * [Incoming Event: offer match]
+  *      |
+  *      v
+  * (beginning of frame)
+  *   apply task launch logic:
+  *     emit Mesos accept offer call for matched pending launch pods
+  *     specify the existence of a podRecord, with the launch time and agentId
+  *   update internal cache
+  *   process revive / suppress need
+  * (end of frame)
+  *      |
+  *      v
+  * [Emit all state events and Mesos call intents]
+  *
+  * In the SchedulerLogic, each event is processed (either a Specification updated event, or a Mesos event) in what we
+  * call a "frame". During the processing of a single event (such as an offer), the SchedulerLogic will be updated
+  * through the application of several functions. The result of that event will lead to the emission of several
+  * stateEvents and Mesos intents, which will be accumulated and emitted via a data structure we call the FrameResult.
   */
 private[core] class SchedulerLogic {
   private var state: SchedulerLogicState = SchedulerLogicState.empty
