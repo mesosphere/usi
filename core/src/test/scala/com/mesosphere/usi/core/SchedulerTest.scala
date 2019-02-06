@@ -9,24 +9,10 @@ import org.scalatest._
 import com.mesosphere.utils.AkkaUnitTest
 
 class SchedulerTest extends AkkaUnitTest with Inside {
-  val fakeAgentId = AgentId("fake-agent")
-  val mockMesos: Flow[Mesos.Call, Mesos.Event, NotUsed] = {
-    Flow[Mesos.Call].async.mapConcat {
-      case Mesos.Call.Revive =>
-        List(
-          Mesos.Event.Offer("fake-offer", fakeAgentId))
-      case Mesos.Call.Accept(offerId, operations) =>
-        operations.map { o =>
-          Mesos.Event.StatusUpdate(o.launch.taskInfo.taskId, Mesos.TaskStatus.TASK_RUNNING)
-        }.toList
-      case _ =>
-        Nil
-    }
-  }
 
   val mockedScheduler: Flow[SpecEvent, USIStateEvent, NotUsed] = {
     Flow.fromGraph {
-      GraphDSL.create(Scheduler.graph, mockMesos)((_, _) => NotUsed) { implicit builder =>
+      GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
           import GraphDSL.Implicits._
 
