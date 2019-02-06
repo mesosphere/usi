@@ -4,19 +4,21 @@ import java.nio.file.Paths
 plugins {
     id 'idea'
     id 'org.ajoberstar.git-publish' version '2.0.0'
+    id 'cz.alenkacz.gradle.scalafmt' version '1.7.2'
 }
 
 ext {
-    // Scala version for all scala dependencies
     scalaVersion = '2.12'
-
     mesosVersion = '1.7.0'
+    akkaVersion = '2.5.19'
 }
 
 allprojects {
 
     version = '0.1'
+
     apply plugin: "scala"
+    apply plugin: 'cz.alenkacz.gradle.scalafmt'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.11
@@ -33,11 +35,12 @@ allprojects {
         scalaCompileOptions.additionalParameters = ["-Xlint", "-Xfatal-warnings"]
     }
 
-    dependencies {
+    compileScala.dependsOn scalafmtAll
 
+    dependencies {
         // Use Scala 2.12 in our library project
         implementation 'org.scala-lang:scala-library:2.12.7'
-        implementation 'com.typesafe.scala-logging:scala-logging_2.12:3.9.2'
+        implementation "com.typesafe.scala-logging:scala-logging_$scalaVersion:3.9.2"
 
         // Use Scalatest for testing our library
         testImplementation 'junit:junit:4.12'
@@ -48,13 +51,25 @@ allprojects {
 
         // Logging
         compile group: 'com.typesafe.scala-logging', name: "scala-logging_$scalaVersion", version: '3.9.2'
+        testRuntime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
 
-        // Akka
+        // Akka and akka-http
         compile group: 'com.typesafe.akka', name: "akka-http_$scalaVersion", version: '10.0.11'
+        compile group: 'com.typesafe.akka', name: "akka-stream_$scalaVersion", version: akkaVersion
+        compile group: 'com.typesafe.akka', name: "akka-slf4j_$scalaVersion", version: akkaVersion
+
+        // Apache Curator. See this [compatibility documentation](http://curator.apache.org/zk-compatibility.html)
+        def withoutZk = { exclude group: 'org.apache.zookeeper', module: 'zookeeper' }
+        compile group: 'org.apache.curator', name: 'curator-recipes', version: '4.0.1', withoutZk
+        compile group: 'org.apache.curator', name: 'curator-client', version: '4.0.1'
+        compile group: 'org.apache.curator', name: 'curator-framework', version: '4.0.1'
+        compile group: 'org.apache.curator', name: 'curator-x-async', version: '4.0.1'
+        compile group: 'org.apache.curator', name: 'curator-test', version: '2.13.0', withoutZk
     }
 
     test {
         reports.html.enabled = false
+        reports.junitXml.destination = file(Paths.get(rootProject.buildDir.toString(), "tests", project.name))
     }
     check {}
 }

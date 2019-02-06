@@ -7,6 +7,7 @@ import org.apache.mesos.v1.scheduler.Protos.Call
 import org.apache.mesos.v1.scheduler.Protos.Call.{Accept, Decline, Reconcile, Revive}
 
 class MesosCalls(frameworkId: FrameworkID) {
+
   /**
     * ***************************************************************************
     * Helper methods to create mesos `Call`s
@@ -14,7 +15,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#calls
     * ***************************************************************************
     */
-
   /**
     * Factory method to construct a TEARDOWN Mesos Call event. Calling this method has no side effects.
     *
@@ -25,7 +25,8 @@ class MesosCalls(frameworkId: FrameworkID) {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#teardown
     */
   def newTeardown(): Call = {
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.TEARDOWN)
       .setFrameworkId(frameworkId)
       .build()
@@ -42,7 +43,8 @@ class MesosCalls(frameworkId: FrameworkID) {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#accept
     */
   def newAccept(accepts: Accept): Call = {
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.ACCEPT)
       .setFrameworkId(frameworkId)
       .setAccept(accepts)
@@ -62,7 +64,8 @@ class MesosCalls(frameworkId: FrameworkID) {
     offerIds.foreach(declineBuilder.addOfferIds)
     filters.foreach(declineBuilder.setFilters)
 
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.DECLINE)
       .setFrameworkId(frameworkId)
       .setDecline(declineBuilder.build())
@@ -80,7 +83,8 @@ class MesosCalls(frameworkId: FrameworkID) {
     val reviveBuilder = Revive.newBuilder()
     role.foreach(reviveBuilder.addRoles)
 
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.REVIVE)
       .setFrameworkId(frameworkId)
       .setRevive(reviveBuilder.build())
@@ -99,7 +103,8 @@ class MesosCalls(frameworkId: FrameworkID) {
     val suppressBuilder = Call.Suppress.newBuilder()
     role.foreach(suppressBuilder.addRoles)
 
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.SUPPRESS)
       .setFrameworkId(frameworkId)
       .setSuppress(suppressBuilder)
@@ -120,12 +125,14 @@ class MesosCalls(frameworkId: FrameworkID) {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#kill
     */
   def newKill(taskId: TaskID, agentId: Option[AgentID] = None, killPolicy: Option[KillPolicy]): Call = {
-    val killBuilder = Call.Kill.newBuilder()
-        .setTaskId(taskId)
+    val killBuilder = Call.Kill
+      .newBuilder()
+      .setTaskId(taskId)
     agentId.foreach(killBuilder.setAgentId)
     killPolicy.foreach(killBuilder.setKillPolicy)
 
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.KILL)
       .setFrameworkId(frameworkId)
       .setKill(killBuilder)
@@ -141,10 +148,16 @@ class MesosCalls(frameworkId: FrameworkID) {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#shutdown
     */
   def newShutdown(executorId: ExecutorID, agentId: AgentID): Call = {
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.SHUTDOWN)
       .setFrameworkId(frameworkId)
-      .setShutdown(Call.Shutdown.newBuilder().setExecutorId(executorId).setAgentId(agentId).build())
+      .setShutdown(
+        Call.Shutdown
+          .newBuilder()
+          .setExecutorId(executorId)
+          .setAgentId(agentId)
+          .build())
       .build()
   }
 
@@ -159,10 +172,17 @@ class MesosCalls(frameworkId: FrameworkID) {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#acknowledge
     */
   def newAcknowledge(agentId: AgentID, taskId: TaskID, uuid: protobuf.ByteString): Call = {
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.ACKNOWLEDGE)
       .setFrameworkId(frameworkId)
-      .setAcknowledge(Call.Acknowledge.newBuilder().setAgentId(agentId).setTaskId(taskId).setUuid(uuid).build())
+      .setAcknowledge(
+        Call.Acknowledge
+          .newBuilder()
+          .setAgentId(agentId)
+          .setTaskId(taskId)
+          .setUuid(uuid)
+          .build())
       .build()
   }
 
@@ -179,7 +199,8 @@ class MesosCalls(frameworkId: FrameworkID) {
     val reconcileBuilder = Call.Reconcile.newBuilder()
     tasks.foreach(reconcileBuilder.addTasks)
 
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.RECONCILE)
       .setFrameworkId(frameworkId)
       .setReconcile(reconcileBuilder)
@@ -195,10 +216,17 @@ class MesosCalls(frameworkId: FrameworkID) {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#message
     */
   def newMessage(agentId: AgentID, executorId: ExecutorID, message: ByteString): Call = {
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.MESSAGE)
       .setFrameworkId(frameworkId)
-      .setMessage(Call.Message.newBuilder().setAgentId(agentId).setExecutorId(executorId).setData( protobuf.ByteString.copyFrom(message.toArray)).build())
+      .setMessage(
+        Call.Message
+          .newBuilder()
+          .setAgentId(agentId)
+          .setExecutorId(executorId)
+          .setData(protobuf.ByteString.copyFrom(message.toArray))
+          .build())
       .build()
   }
 
@@ -214,7 +242,8 @@ class MesosCalls(frameworkId: FrameworkID) {
     val requestBuilder = Call.Request.newBuilder()
     requests.foreach(requestBuilder.addRequests)
 
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.REQUEST)
       .setFrameworkId(frameworkId)
       .setRequest(requestBuilder)
@@ -234,7 +263,8 @@ class MesosCalls(frameworkId: FrameworkID) {
     offers.foreach(acceptInverseBuilder.addInverseOfferIds)
     filters.foreach(acceptInverseBuilder.setFilters)
 
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.ACCEPT_INVERSE_OFFERS)
       .setFrameworkId(frameworkId)
       .setAcceptInverseOffers(acceptInverseBuilder)
@@ -255,7 +285,8 @@ class MesosCalls(frameworkId: FrameworkID) {
     offers.foreach(declineInverseBuilder.addInverseOfferIds)
     filters.foreach(declineInverseBuilder.setFilters)
 
-    Call.newBuilder()
+    Call
+      .newBuilder()
       .setType(Call.Type.DECLINE_INVERSE_OFFERS)
       .setFrameworkId(frameworkId)
       .setDeclineInverseOffers(declineInverseBuilder)

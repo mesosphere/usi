@@ -7,7 +7,8 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 object CallerThreadExecutionContext {
   val executor: Executor = (command: Runnable) => command.run()
 
-  lazy val callerThreadExecutionContext: ExecutionContextExecutor = ExecutionContext.fromExecutor(executor)
+  lazy val callerThreadExecutionContext: ExecutionContextExecutor =
+    ExecutionContext.fromExecutor(executor)
 
   def apply(): ExecutionContext = callerThreadExecutionContext
 }

@@ -6,7 +6,7 @@ task testReport(type: TestReport) {
     description = "Aggregate all test results from subprojects into one test report."
     group = "CI"
 
-    destinationDir = file("$buildDir/reports/allTests")
+    destinationDir = file("${rootProject.buildDir}/reports/tests")
     // Include the results from the `test` task in all subprojects
     reportOn subprojects*.test
     dependsOn(subprojects.check)
@@ -24,7 +24,10 @@ task uploadTestReports(type: S3Upload) {
     region = "us-west-2"
     bucket = "usi-builds"
     prefix = "$repoSlug/$branch/$buildNumber"
-    source = testReport.destinationDir
+    source = fileTree(rootProject.buildDir) {
+        include 'reports/tests/**' // All test HTML reports aggregated by testReport.
+        include 'tests/**'         // All test JUnit XML files saved to ./build/tests. See allprojects.test { ... }.
+    }
 }
 
 task githubReport(type: GithubStatus) {
@@ -36,7 +39,7 @@ task githubReport(type: GithubStatus) {
     commit = TravisEnvironment.commit()
     context = "mesosphere/tests"
     statusDescription = "Test results"
-    targetUrl = "https://s3-us-west-2.amazonaws.com/${uploadTestReports.bucket}/${uploadTestReports.prefix}/index.html"
+    targetUrl = "https://s3-us-west-2.amazonaws.com/${uploadTestReports.bucket}/${uploadTestReports.prefix}/reports/tests/index.html"
 }
 
 gitPublish {

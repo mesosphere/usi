@@ -6,7 +6,10 @@ include 'mesos-client'
 include 'metrics'
 include 'metrics-dropwizard'
 include 'persistence'
+include 'test-utils'
 
 /* example projects*/
 include 'hello-world'
 project(':hello-world').projectDir = new File('examples/hello-world')
+include 'mesos-client-example'
+project(':mesos-client-example').projectDir = new File('examples/mesos-client-example')

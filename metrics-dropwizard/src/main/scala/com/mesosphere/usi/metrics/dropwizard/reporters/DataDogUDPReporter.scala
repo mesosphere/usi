@@ -43,28 +43,43 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
   private def report(socket: ActorRef): Unit = {
     report(
       socket,
-      registry.getGauges, registry.getCounters, registry.getHistograms, registry.getMeters, registry.getTimers)
+      registry.getGauges,
+      registry.getCounters,
+      registry.getHistograms,
+      registry.getMeters,
+      registry.getTimers)
   }
 
   private def report(
-    socket: ActorRef,
-    gauges: util.SortedMap[String, Gauge[_]],
-    counters: util.SortedMap[String, Counter],
-    histograms: util.SortedMap[String, Histogram],
-    meters: util.SortedMap[String, Meter],
-    timers: util.SortedMap[String, Timer]): Unit = {
+      socket: ActorRef,
+      gauges: util.SortedMap[String, Gauge[_]],
+      counters: util.SortedMap[String, Counter],
+      histograms: util.SortedMap[String, Histogram],
+      meters: util.SortedMap[String, Meter],
+      timers: util.SortedMap[String, Timer]): Unit = {
 
-    gauges.asScala.foreach { case (name, value) => reportGauge(socket, sanitizeName(name), value) }
-    counters.asScala.foreach { case (name, value) => reportCounter(socket, sanitizeName(name), value) }
-    histograms.asScala.foreach { case (name, value) => reportHistogram(socket, sanitizeName(name), value) }
-    meters.asScala.foreach { case (name, value) => reportMetered(socket, sanitizeName(name), value) }
-    timers.asScala.foreach { case (name, value) => reportTimer(socket, sanitizeName(name), value) }
+    gauges.asScala.foreach {
+      case (name, value) => reportGauge(socket, sanitizeName(name), value)
+    }
+    counters.asScala.foreach {
+      case (name, value) => reportCounter(socket, sanitizeName(name), value)
+    }
+    histograms.asScala.foreach {
+      case (name, value) => reportHistogram(socket, sanitizeName(name), value)
+    }
+    meters.asScala.foreach {
+      case (name, value) => reportMetered(socket, sanitizeName(name), value)
+    }
+    timers.asScala.foreach {
+      case (name, value) => reportTimer(socket, sanitizeName(name), value)
+    }
 
     flush(socket)
   }
 
   private val forbiddenCharsRe = "[^a-zA-Z0-9_.]".r
-  private def sanitizeName(name: String): String = forbiddenCharsRe.replaceAllIn(name, "_")
+  private def sanitizeName(name: String): String =
+    forbiddenCharsRe.replaceAllIn(name, "_")
 
   private val rateFactor = TimeUnit.SECONDS.toSeconds(1)
   private val durationFactor = 1.0 / TimeUnit.SECONDS.toNanos(1)
@@ -83,10 +98,18 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
     maybeSendAndAppend(socket, s"$name:${counter.getCount}|g\n")
 
   private val histogramSnapshotSuffixes =
-    Seq("min", "average", "median", "75percentile", "95percentile", "98percentile",
-      "99percentile", "999percentile", "max", "stddev")
-  private def reportSnapshot(socket: ActorRef, name: String, snapshot: Snapshot,
-    scaleMetrics: Boolean): Unit = {
+    Seq(
+      "min",
+      "average",
+      "median",
+      "75percentile",
+      "95percentile",
+      "98percentile",
+      "99percentile",
+      "999percentile",
+      "max",
+      "stddev")
+  private def reportSnapshot(socket: ActorRef, name: String, snapshot: Snapshot, scaleMetrics: Boolean): Unit = {
     val values = Seq(
       snapshot.getMin.toDouble,
       snapshot.getMean,
@@ -97,11 +120,14 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
       snapshot.get99thPercentile(),
       snapshot.get999thPercentile(),
       snapshot.getMax.toDouble,
-      snapshot.getStdDev)
-    val scaledValues = if (scaleMetrics) values.map(_ * durationFactor) else values
+      snapshot.getStdDev
+    )
+    val scaledValues =
+      if (scaleMetrics) values.map(_ * durationFactor) else values
 
     histogramSnapshotSuffixes.zip(scaledValues).foreach {
-      case (suffix, value) => maybeSendAndAppend(socket, s"$name.$suffix:$value|g\n")
+      case (suffix, value) =>
+        maybeSendAndAppend(socket, s"$name.$suffix:$value|g\n")
     }
   }
 
@@ -111,16 +137,19 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
     reportSnapshot(socket, name, histogram.getSnapshot, false)
   }
 
-  private val meteredSuffixes = Seq("count", "mean_rate", "m1_rate", "m5_rate", "m15_rate")
+  private val meteredSuffixes =
+    Seq("count", "mean_rate", "m1_rate", "m5_rate", "m15_rate")
   private def reportMetered(socket: ActorRef, name: String, meter: Metered): Unit = {
     val values = Seq(
       meter.getCount.toDouble,
       meter.getMeanRate * rateFactor,
       meter.getOneMinuteRate * rateFactor,
       meter.getFiveMinuteRate * rateFactor,
-      meter.getFifteenMinuteRate * rateFactor)
+      meter.getFifteenMinuteRate * rateFactor
+    )
     meteredSuffixes.zip(values).foreach {
-      case (suffix, value) => maybeSendAndAppend(socket, s"$name.$suffix:$value|g\n")
+      case (suffix, value) =>
+        maybeSendAndAppend(socket, s"$name.$suffix:$value|g\n")
     }
   }
 

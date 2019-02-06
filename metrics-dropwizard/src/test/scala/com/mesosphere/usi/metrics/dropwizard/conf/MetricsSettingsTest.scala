@@ -8,11 +8,7 @@ import org.scalatest.{GivenWhenThen, Inside, Matchers, OptionValues, WordSpec}
 import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
-class MetricsSettingsTest extends WordSpec
-  with Matchers
-  with GivenWhenThen
-  with Inside
-  with OptionValues {
+class MetricsSettingsTest extends WordSpec with Matchers with GivenWhenThen with Inside with OptionValues {
 
   "MetricsSettings" should {
     "parse reference.conf correctly" in {
@@ -20,7 +16,8 @@ class MetricsSettingsTest extends WordSpec
       val config = ConfigFactory.load()
 
       Then("it can be successfully parsed")
-      val settings = MetricsSettings.fromSubConfig(config.getConfig("usi.metrics"))
+      val settings =
+        MetricsSettings.fromSubConfig(config.getConfig("usi.metrics"))
 
       And("values are set correctly")
       settings.namePrefix shouldBe "usi"
@@ -64,7 +61,8 @@ class MetricsSettingsTest extends WordSpec
       val config = ConfigFactory.parseString(conf)
 
       Then("it can be successfully parsed")
-      val settings = MetricsSettings.fromSubConfig(config.getConfig("usi.metrics"))
+      val settings =
+        MetricsSettings.fromSubConfig(config.getConfig("usi.metrics"))
 
       And("StatsD reporter settings are set correctly")
       inside(settings.statsdReporterSettings.value) {
@@ -107,7 +105,8 @@ class MetricsSettingsTest extends WordSpec
       val config = ConfigFactory.parseString(conf)
 
       Then("it can be successfully parsed")
-      val settings = MetricsSettings.fromSubConfig(config.getConfig("usi.metrics"))
+      val settings =
+        MetricsSettings.fromSubConfig(config.getConfig("usi.metrics"))
 
       And("DataDog API reporter settings are set correctly")
       inside(settings.dataDogReporterSettings.value) {
@@ -149,7 +148,8 @@ class MetricsSettingsTest extends WordSpec
       val config = ConfigFactory.parseString(conf)
 
       Then("it can be successfully parsed")
-      val settings = MetricsSettings.fromSubConfig(config.getConfig("usi.metrics"))
+      val settings =
+        MetricsSettings.fromSubConfig(config.getConfig("usi.metrics"))
 
       And("DataDog API reporter settings are set correctly")
       inside(settings.dataDogReporterSettings.value) {

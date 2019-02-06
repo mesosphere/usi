@@ -67,10 +67,11 @@ trait Timer extends TimerAdapter {
 trait Metrics {
   def counter(name: String, unit: UnitOfMeasurement = UnitOfMeasurement.None): Counter
   def gauge(name: String, unit: UnitOfMeasurement = UnitOfMeasurement.None): Gauge
-  def closureGauge[N](name: String, currentValue: () => N,
-                      unit: UnitOfMeasurement = UnitOfMeasurement.None): ClosureGauge
+  def closureGauge[N](
+      name: String,
+      currentValue: () => N,
+      unit: UnitOfMeasurement = UnitOfMeasurement.None): ClosureGauge
   def settableGauge(name: String, unit: UnitOfMeasurement = UnitOfMeasurement.None): SettableGauge
   def meter(name: String): Meter
   def timer(name: String): Timer
 }
-

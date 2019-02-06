@@ -1,8 +1,11 @@
 package com.mesosphere.usi.metrics.dropwizard
 
 import com.mesosphere.usi.metrics.UnitOfMeasurement
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 
+@RunWith(classOf[JUnitRunner])
 class DropwizardMetricsTest extends WordSpec with Matchers {
 
   "DropwizardMetrics.constructName" should {
