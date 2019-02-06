@@ -18,8 +18,8 @@ private[core] class SchedulerLogic {
     handleFrame { builder =>
       builder
         .applySpecEvent(msg)
-        .process { (frame, dirtyPodIds) =>
-          SchedulerLogic.computeNextStateForPods(frame)(dirtyPodIds)
+        .process { (state, dirtyPodIds) =>
+          SchedulerLogic.computeNextStateForPods(state)(dirtyPodIds)
         }
     }
   }
@@ -34,8 +34,8 @@ private[core] class SchedulerLogic {
     * @return The total state effects applied over the life-cycle of this state evaluation.
     */
   private def handleFrame(fn: FrameResultBuilder => FrameResultBuilder): FrameResult = {
-    val frameResultBuilder = fn(FrameResultBuilder.forFrame(this.state)).process { (frame, dirtyPodIds) =>
-      SchedulerLogic.pruneTaskStatuses(frame)(dirtyPodIds)
+    val frameResultBuilder = fn(FrameResultBuilder.givenState(this.state)).process { (state, dirtyPodIds) =>
+      SchedulerLogic.pruneTaskStatuses(state)(dirtyPodIds)
     }.process(updateCachesAndRevive)
 
     // update our state for the next process
@@ -45,8 +45,8 @@ private[core] class SchedulerLogic {
     frameResultBuilder.result
   }
 
-  private def updateCachesAndRevive(frame: SchedulerLogicState, dirtyPodIds: Set[PodId]): SchedulerLogicIntents = {
-    this.cachedPendingLaunch = this.cachedPendingLaunch.update(frame, dirtyPodIds)
+  private def updateCachesAndRevive(state: SchedulerLogicState, dirtyPodIds: Set[PodId]): SchedulerLogicIntents = {
+    this.cachedPendingLaunch = this.cachedPendingLaunch.update(state, dirtyPodIds)
     if (cachedPendingLaunch.pendingLaunch.nonEmpty)
       SchedulerLogicIntents(mesosIntents = List(Mesos.Call.Revive))
     else
@@ -60,9 +60,9 @@ private[core] class SchedulerLogic {
     * @return The events describing state changes as Mesos call intents
     */
   def processMesosEvent(event: Mesos.Event): FrameResult = {
-    handleFrame { frameWithResult =>
-      frameWithResult.process { (frame, _) =>
-        SchedulerLogic.handleMesosEvent(frame, cachedPendingLaunch.pendingLaunch)(event)
+    handleFrame { builder =>
+      builder.process { (state, _) =>
+        SchedulerLogic.handleMesosEvent(state, cachedPendingLaunch.pendingLaunch)(event)
       }
     }
   }
@@ -179,13 +179,13 @@ private[core] object SchedulerLogic {
     * @param podIds podIds changed during the last state
     * @return
     */
-  def pruneTaskStatuses(frame: SchedulerLogicState)(podIds: Set[PodId]): SchedulerLogicIntents = {
+  def pruneTaskStatuses(state: SchedulerLogicState)(podIds: Set[PodId]): SchedulerLogicIntents = {
     podIds.iterator.filter { podId =>
-      frame.podStatuses.contains(podId)
+      state.podStatuses.contains(podId)
     }.filter { podId =>
-      val podSpecDefined = !frame.podSpecs.contains(podId)
+      val podSpecDefined = !state.podSpecs.contains(podId)
       // prune terminal statuses for which there's no defined podSpec
-      !podSpecDefined && terminalOrUnreachable(frame.podStatuses(podId))
+      !podSpecDefined && terminalOrUnreachable(state.podStatuses(podId))
     }.foldLeft(SchedulerLogicIntentsBuilder.empty) { (effects, podId) =>
       effects.withPodStatus(podId, None)
     }.result

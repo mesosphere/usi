@@ -75,5 +75,5 @@ case class FrameResultBuilder(state: SchedulerLogicState, appliedStateEvents: Li
 }
 
 object FrameResultBuilder {
-  def forFrame(frame: SchedulerLogicState): FrameResultBuilder = FrameResultBuilder(frame, Nil, Nil, Set.empty)
+  def givenState(state: SchedulerLogicState): FrameResultBuilder = FrameResultBuilder(state, Nil, Nil, Set.empty)
 }

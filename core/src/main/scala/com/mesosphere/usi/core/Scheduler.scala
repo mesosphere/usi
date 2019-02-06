@@ -11,7 +11,7 @@ import scala.concurrent.Future
  * Provides the scheduler graph component. The component has two inputs, and two outputs:
  *
  * Input:
- * 1) SpecEvents - Used to replicate the specification state from the framework to the USI scheduler
+ * 1) SpecEvents - Used to replicate the specification state from the framework implementation to the USI SchedulerLogic
  * 2) MesosEvents - Events from Mesos; offers, task status updates, etc.
  *
  * Output:
