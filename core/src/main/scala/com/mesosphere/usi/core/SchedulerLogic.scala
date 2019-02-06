@@ -134,20 +134,16 @@ private[core] object SchedulerLogic {
     * @return The effects of launching this offer
     */
   private def matchOffer(offer: Mesos.Event.Offer, pendingLaunchPodSpecs: Seq[PodSpec]): FrameEffects = {
-    var effects = FrameEffects.empty
-
     val operations = pendingLaunchPodSpecs.iterator.flatMap { pod =>
       taskIdsFor(pod).iterator.map { taskId =>
         Mesos.Operation(Mesos.Launch(Mesos.TaskInfo(taskId)))
       }
     }.to[Seq]
 
-    pendingLaunchPodSpecs.foreach { pod =>
-      effects = effects.withPodRecord(pod.id, Some(PodRecord(pod.id, Instant.now(), offer.agentId)))
+    val effects = pendingLaunchPodSpecs.foldLeft(FrameEffects.empty) { (effects, pod) =>
+      effects.withPodRecord(pod.id, Some(PodRecord(pod.id, Instant.now(), offer.agentId)))
     }
-    effects = effects.withMesosCall(Mesos.Call.Accept(offer.offerId, operations = operations))
-
-    effects
+    effects.withMesosCall(Mesos.Call.Accept(offer.offerId, operations = operations))
   }
 
   private[core] def pendingLaunch(goal: Goal, podRecord: Option[PodRecord]): Boolean = {
@@ -156,30 +152,39 @@ private[core] object SchedulerLogic {
 
   private[core] def computeNextStateForPods(frame: Frame)(changedPodIds: Set[PodId]): FrameEffects = {
     changedPodIds.foldLeft(FrameEffects.empty) { (initialEffects, podId) =>
-      var effects = initialEffects
 
       frame.podSpecs.get(podId) match {
         case None =>
           // TODO - this should be spurious if the podStatus is non-terminal
-          if (frame.podStatuses.get(podId).exists { status =>
-              terminalOrUnreachable(status)
-            }) {
-            effects = effects.withPodStatus(podId, None)
+          def maybePrunePodStatus(effects: FrameEffects) = {
+            val existingTerminalStatus = frame.podStatuses.get(podId).exists(terminalOrUnreachable(_))
+            if (existingTerminalStatus) {
+              effects.withPodStatus(podId, None)
+            } else {
+              effects
+            }
           }
 
-          if (frame.podRecords.contains(podId)) {
-            // delete podRecord
-            effects = effects.withPodRecord(podId, None)
+          def maybePruneRecord(effects: FrameEffects) = {
+            if (frame.podRecords.contains(podId)) {
+              // delete podRecord
+              effects.withPodRecord(podId, None)
+            } else {
+              effects
+            }
           }
+
+          maybePrunePodStatus(maybePruneRecord(initialEffects))
 
         case Some(podSpec) =>
           if (podSpec.goal == Goal.Terminal) {
-            taskIdsFor(podSpec).foreach { taskId =>
-              effects = effects.withMesosCall(Mesos.Call.Kill(taskId))
+            taskIdsFor(podSpec).foldLeft(initialEffects) { (effects, taskId) =>
+              effects.withMesosCall(Mesos.Call.Kill(taskId))
             }
+          } else {
+            initialEffects
           }
       }
-      effects
     }
   }
 
@@ -219,17 +224,15 @@ private[core] object SchedulerLogic {
     * @return
     */
   def pruneTaskStatuses(frame: Frame)(podIds: Set[PodId]): FrameEffects = {
-    var effects = FrameEffects.empty
-    podIds.foreach { podId =>
-      if (frame.podStatuses.contains(podId)) {
+    podIds.iterator
+      .filter { podId => frame.podStatuses.contains(podId) }
+      .filter { podId =>
         val podSpecDefined = !frame.podSpecs.contains(podId)
         // prune terminal statuses for which there's no defined podSpec
-        if (!podSpecDefined && terminalOrUnreachable(frame.podStatuses(podId))) {
-          effects = effects.withPodStatus(podId, None)
-        }
+        !podSpecDefined && terminalOrUnreachable(frame.podStatuses(podId))
+      }.foldLeft(FrameEffects.empty) { (effects, podId) =>
+          effects.withPodStatus(podId, None)
       }
-    }
-    effects
   }
 
   private def podIdFor(taskId: TaskId): PodId = PodId(taskId)
