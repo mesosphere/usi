@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1 API  - com.mesosphere.usi.core.models.PodId</title>
-          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.models.PodId" />
-          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.models.PodId" />
+          <title>usi 0.1 API  - com.mesosphere.usi.core.models.ReservationStatus</title>
+          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.models.ReservationStatus" />
+          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.models.ReservationStatus" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -171,8 +171,8 @@
                         <a href="Mesos$.html" title="Mock Mesos calls / state.">Mesos</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="" title="Unique identifier of a pod"></a>
-                        <a href="" title="Unique identifier of a pod">PodId</a>
+                        <a class="class" href="PodId.html" title="Unique identifier of a pod"></a>
+                        <a href="PodId.html" title="Unique identifier of a pod">PodId</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="class" href="PodRecord.html" title="Describes facts about the result of a launched PodSpec from the perspective of USI."></a>
@@ -223,8 +223,8 @@
                         <a href="ReservationState.html" title="">ReservationState</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="ReservationStatus.html" title=""></a>
-                        <a href="ReservationStatus.html" title="">ReservationStatus</a>
+                        <a class="class" href="" title=""></a>
+                        <a href="" title="">ReservationStatus</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="class" href="ReservationStatusUpdated.html" title=""></a>
@@ -270,8 +270,8 @@
       <div id="definition">
         <div class="big-circle class">c</div>
         <p id="owner"><a href="../../../../index.html" class="extype" name="com">com</a>.<a href="../../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../../index.html" class="extype" name="com.mesosphere.usi">usi</a>.<a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a>.<a href="index.html" class="extype" name="com.mesosphere.usi.core.models">models</a></p>
-        <h1>PodId<span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html" title="Permalink">
+        <h1>ReservationStatus<span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -284,12 +284,12 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">PodId</span><span class="params">(<span name="value">value: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">ReservationStatus</span><span class="params">(<span name="id">id: <a href="ReservationId.html" class="extype" name="com.mesosphere.usi.core.models.ReservationId">ReservationId</a></span>, <span name="reservationState">reservationState: <a href="ReservationState.html" class="extype" name="com.mesosphere.usi.core.models.ReservationState">ReservationState</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Unique identifier of a pod</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -319,7 +319,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.usi.core.models.PodId"><span>PodId</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.usi.core.models.ReservationStatus"><span>ReservationStatus</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -339,10 +339,10 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.mesosphere.usi.core.models.PodId#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(value:String):com.mesosphere.usi.core.models.PodId"></a><a id="&lt;init&gt;:PodId"></a>
+              <ol><li name="com.mesosphere.usi.core.models.ReservationStatus#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(id:com.mesosphere.usi.core.models.ReservationId,reservationState:com.mesosphere.usi.core.models.ReservationState):com.mesosphere.usi.core.models.ReservationStatus"></a><a id="&lt;init&gt;:ReservationStatus"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#&lt;init&gt;(value:String):com.mesosphere.usi.core.models.PodId" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#&lt;init&gt;(id:com.mesosphere.usi.core.models.ReservationId,reservationState:com.mesosphere.usi.core.models.ReservationState):com.mesosphere.usi.core.models.ReservationStatus" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -351,7 +351,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">PodId</span><span class="params">(<span name="value">value: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
+        <span class="name">ReservationStatus</span><span class="params">(<span name="id">id: <a href="ReservationId.html" class="extype" name="com.mesosphere.usi.core.models.ReservationId">ReservationId</a></span>, <span name="reservationState">reservationState: <a href="ReservationState.html" class="extype" name="com.mesosphere.usi.core.models.ReservationState">ReservationState</a></span>)</span>
       </span>
       
       
@@ -368,7 +368,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -384,7 +384,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html###():Int" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -400,7 +400,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -416,7 +416,7 @@
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -432,7 +432,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#clone():Object" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -456,7 +456,7 @@
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -472,7 +472,7 @@
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#finalize():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -494,7 +494,7 @@
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -510,10 +510,26 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.ReservationStatus#id" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="id:com.mesosphere.usi.core.models.ReservationId"></a><a id="id:ReservationId"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#id:com.mesosphere.usi.core.models.ReservationId" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">id</span><span class="result">: <a href="ReservationId.html" class="extype" name="com.mesosphere.usi.core.models.ReservationId">ReservationId</a></span>
+      </span>
+      
+      
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -529,7 +545,7 @@
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -545,7 +561,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#notify():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -564,7 +580,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -580,10 +596,26 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.ReservationStatus#reservationState" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="reservationState:com.mesosphere.usi.core.models.ReservationState"></a><a id="reservationState:ReservationState"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#reservationState:com.mesosphere.usi.core.models.ReservationState" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">reservationState</span><span class="result">: <a href="ReservationState.html" class="extype" name="com.mesosphere.usi.core.models.ReservationState">ReservationState</a></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -596,26 +628,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.models.PodId#value" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="value:String"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#value:String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">value</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#wait():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -637,7 +653,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -659,7 +675,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ReservationStatus.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
