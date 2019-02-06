@@ -10,6 +10,9 @@ import com.mesosphere.usi.core.models.{PodId, PodRecord, ReservationId}
   * the framework's domain.
   */
 sealed trait USIStateEvent
+sealed trait USIPodEvent extends USIStateEvent {
+  def id: PodId
+}
 
 case class USIStateSnapshot(podStatuses: Seq[PodStatus], podRecords: Seq[PodRecord], agentRecords: Seq[AgentRecord], reservationStatuses: Seq[ReservationStatus]) extends USIStateEvent
 
@@ -18,7 +21,7 @@ case class USIStateSnapshot(podStatuses: Seq[PodStatus], podRecords: Seq[PodReco
   */
 sealed trait USIStateUpdated extends USIStateEvent
 
-case class PodStatusUpdated(id: PodId, newStatus: Option[PodStatus]) extends USIStateUpdated
-case class PodRecordUpdated(id: PodId, newRecord: Option[PodRecord]) extends USIStateUpdated
-case class AgentRecordUpdated(id: PodId, newRecord: Option[AgentRecord]) extends USIStateUpdated
+case class PodStatusUpdated(id: PodId, newStatus: Option[PodStatus]) extends USIStateUpdated with USIPodEvent
+case class PodRecordUpdated(id: PodId, newRecord: Option[PodRecord]) extends USIStateUpdated with USIPodEvent
+case class AgentRecordUpdated(id: PodId, newRecord: Option[AgentRecord]) extends USIStateUpdated with USIPodEvent
 case class ReservationStatusUpdated(id: ReservationId, newStatus: Option[ReservationStatus]) extends USIStateUpdated

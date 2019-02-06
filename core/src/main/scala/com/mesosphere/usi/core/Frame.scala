@@ -30,32 +30,8 @@ case class Frame(podSpecs: Map[PodId, PodSpec], podRecords: Map[PodId, PodRecord
     copy(podRecords = newPodRecords, podStatuses = newPodStatuses)
   }
 
-  def applySpecEvent(specEvent: SpecEvent): (Frame, Set[PodId]) = {
-    // TODO - assert valid transition
-    specEvent match {
-      case SpecsSnapshot(podSpecSnapshot, reservationSpecSnapshot) =>
-        if (reservationSpecSnapshot.nonEmpty) {
-          // This should make the framework crash
-          throw new NotImplementedError("ReservationSpec support not yet implemented")
-        }
-        val newPodsSpecs: Map[PodId, PodSpec] = podSpecSnapshot.map { pod =>
-          pod.id -> pod
-        }(collection.breakOut)
+}
 
-        val changedPodIds = podSpecs.keySet ++ newPodsSpecs.keySet
-        (copy(podSpecs = newPodsSpecs), changedPodIds)
-
-      case PodSpecUpdated(id, newState) =>
-        val newPodSpecs = newState match {
-          case Some(podSpec) =>
-            podSpecs.updated(id, podSpec)
-          case None =>
-            podSpecs - id
-        }
-        (copy(podSpecs = newPodSpecs)) -> Set(id)
-
-      case ReservationSpecUpdated(id, _) =>
-        throw new NotImplementedError("ReservationSpec support not yet implemented")
-    }
-  }
+object Frame {
+  val empty = Frame(Map.empty, Map.empty, Map.empty)
 }
