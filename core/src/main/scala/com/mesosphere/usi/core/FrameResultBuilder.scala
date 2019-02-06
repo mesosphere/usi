@@ -18,7 +18,7 @@ case class FrameResult(stateEvents: List[StateEvent], mesosIntents: List[Mesos.C
   * @param mesosIntents The cumulative Mesos calls that are intended to be sent
   * @param dirtyPodIds The podIds that have been changed during the lifecycle of this FrameWithEvents instance
   */
-case class FrameResultBuilder(state: SchedulerLogicState, appliedStateEvents: List[StateEvent], mesosIntents: List[Mesos.Call], dirtyPodIds: Set[PodId]) {
+case class FrameResultBuilder(specs: SpecificationState, state: SchedulerLogicState, appliedStateEvents: List[StateEvent], mesosIntents: List[Mesos.Call], dirtyPodIds: Set[PodId]) {
   private def applyAndAccumulate(intents: SchedulerLogicIntents): FrameResultBuilder = {
     // TODO - we need to handle status snapshots and create a mechanism to signal that all cache should be recomputed
     val newDirty = dirtyPodIds ++ intents.stateIntents.iterator.collect {
@@ -48,32 +48,33 @@ case class FrameResultBuilder(state: SchedulerLogicState, appliedStateEvents: Li
           pod.id -> pod
         }(collection.breakOut)
 
-        val changedPodIds = state.podSpecs.keySet ++ newPodsSpecs.keySet
+        val changedPodIds = specs.podSpecs.keySet ++ newPodsSpecs.keySet
 
-        copy(state = state.copy(podSpecs = newPodsSpecs), dirtyPodIds = dirtyPodIds ++ changedPodIds)
+        copy(specs = specs.copy(podSpecs = newPodsSpecs), dirtyPodIds = dirtyPodIds ++ changedPodIds)
 
       case PodSpecUpdated(id, newState) =>
         val newPodSpecs = newState match {
           case Some(podSpec) =>
-            state.podSpecs.updated(id, podSpec)
+            specs.podSpecs.updated(id, podSpec)
           case None =>
-            state.podSpecs - id
+            specs.podSpecs - id
         }
 
-        copy(state = state.copy(podSpecs = newPodSpecs), dirtyPodIds = dirtyPodIds ++ Set(id))
+        copy(specs = specs.copy(podSpecs = newPodSpecs), dirtyPodIds = dirtyPodIds ++ Set(id))
 
       case ReservationSpecUpdated(id, _) =>
         throw new NotImplementedError("ReservationSpec support not yet implemented")
     }
   }
 
-  def process(fn: (SchedulerLogicState, Set[PodId]) => SchedulerLogicIntents): FrameResultBuilder =
-    applyAndAccumulate(fn(this.state, this.dirtyPodIds))
+  def process(fn: (SpecificationState, SchedulerLogicState, Set[PodId]) => SchedulerLogicIntents): FrameResultBuilder =
+    applyAndAccumulate(fn(this.specs, this.state, this.dirtyPodIds))
 
   lazy val result: FrameResult =
     FrameResult(stateEvents = appliedStateEvents, mesosIntents = mesosIntents)
 }
 
 object FrameResultBuilder {
-  def givenState(state: SchedulerLogicState): FrameResultBuilder = FrameResultBuilder(state, Nil, Nil, Set.empty)
+  def givenState(specificationState: SpecificationState, state: SchedulerLogicState): FrameResultBuilder =
+    FrameResultBuilder(specificationState, state, Nil, Nil, Set.empty)
 }

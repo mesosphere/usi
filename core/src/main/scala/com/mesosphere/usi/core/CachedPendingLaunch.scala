@@ -10,10 +10,10 @@ case class CachedPendingLaunch(pendingLaunch: Set[PodId] = Set.empty) {
     *
     * @param podIds
     */
-  def update(state: SchedulerLogicState, podIds: Set[PodId]): CachedPendingLaunch = {
+  def update(specs: SpecificationState, state: SchedulerLogicState, podIds: Set[PodId]): CachedPendingLaunch = {
     var newPendingLaunch = pendingLaunch
     podIds.foreach { podId =>
-      val shouldBeLaunched = state.podSpecs.get(podId).exists { podSpec =>
+      val shouldBeLaunched = specs.podSpecs.get(podId).exists { podSpec =>
         SchedulerLogic.pendingLaunch(podSpec.goal, state.podRecords.get(podId))
       }
       if (shouldBeLaunched)
