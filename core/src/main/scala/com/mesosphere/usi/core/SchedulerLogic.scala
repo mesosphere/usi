@@ -7,8 +7,30 @@ import com.mesosphere.usi.core.models._
 /**
   * Container class responsible for keeping track of the state and cache.
   *
-  * As a general rule, business logic does not manipulate the USI state directly, but rather does so by returning
-  * effects.
+  * All manipulation to the SchedulerLogic state is done via one of the two processes:
+  *
+  * - For specification state, state is updated through incoming SpecEvents (we consume and replicate the
+  * framework-implementation's specificaitons)
+  * - For the rest of the state (statuses, records, etc.), state is updated through StateEvents returned as intents
+  *
+  * As such, it's worth emphasizing that business logic does not have any direct side-effects, and it manipulates the
+  * SchedulerLogic state by returning intents. This allows us the following:
+  *
+  * - It's more efficient, since it saves us the trouble of diffing a large data-structure with each update
+  * - We have built-in guarantees that evolutions to the scheduler state can be reliably replicated by processing these
+  * events, since they led to the changes in the first place
+  * - We can easily know which portions of the state should be persisted during the persistence layer.
+  * - It restricts, via the type system, the portions of the SchedulerLogicState the business logic is allowed (IE: it
+  * would be illegal for the business logic to update podSpecs, directly)
+  *
+  * In the SchedulerLogic code, we'll use the word intents and events. Intents are things not yet applied, and should
+  * be. Events are things that were applied and we're notifying you about.
+  *
+  * In the SchedulerLogic, a StateEvent is used both to manipulate the SchedulerLogic state (similar to how
+  * event-sourced persistent actors evolve their state), and is also used to describe the evolution (so that the state
+  * can be incrementally persisted and followed). In the SchedulerLogic, we'll refer to a StateEvent as an intent until
+  * it is applied, after-which it will be called an event. Mesos calls will be referred to as intents as they are not
+  * applied until they are published to the Mesos Master.
   */
 private[core] class SchedulerLogic {
   private var state: SchedulerLogicState = SchedulerLogicState.empty
