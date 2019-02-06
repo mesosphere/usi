@@ -10,7 +10,7 @@ import com.mesosphere.utils.AkkaUnitTest
 
 class SchedulerTest extends AkkaUnitTest with Inside {
 
-  val mockedScheduler: Flow[SpecEvent, USIStateEvent, NotUsed] = {
+  val mockedScheduler: Flow[SpecEvent, StateEvent, NotUsed] = {
     Flow.fromGraph {
       GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>

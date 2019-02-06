@@ -24,7 +24,7 @@ case class Frame(podSpecs: Map[PodId, PodSpec], podRecords: Map[PodId, PodRecord
         }
       case agentRecordChange: AgentRecordUpdated => // TODO
       case reservationStatusChange: ReservationStatusUpdated => // TODO
-      case statusSnapshot: USIStateSnapshot => // TODO
+      case statusSnapshot: StateSnapshot => // TODO
     }
 
     copy(podRecords = newPodRecords, podStatuses = newPodStatuses)

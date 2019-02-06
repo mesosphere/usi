@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.{BidiShape, FlowShape}
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL}
 import com.mesosphere.usi.core.models.AgentId
-import com.mesosphere.usi.models.{Mesos, SpecEvent, USIStateEvent}
+import com.mesosphere.usi.models.{Mesos, SpecEvent, StateEvent}
 
 import scala.concurrent.Future
 
@@ -46,7 +46,7 @@ import scala.concurrent.Future
 object Scheduler {
   case class MesosConnection(mesosHostName: String)
 
-  def connect(mesosHostName: String): Future[(MesosConnection, Flow[SpecEvent, USIStateEvent, NotUsed])] = {
+  def connect(mesosHostName: String): Future[(MesosConnection, Flow[SpecEvent, StateEvent, NotUsed])] = {
     val flow = Flow.fromGraph {
       GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
@@ -64,7 +64,7 @@ object Scheduler {
 
   /*
    */
-  def unconnectedGraph: BidiFlow[SpecEvent, USIStateEvent, Mesos.Event, Mesos.Call, NotUsed] = {
+  def unconnectedGraph: BidiFlow[SpecEvent, StateEvent, Mesos.Event, Mesos.Call, NotUsed] = {
     BidiFlow.fromGraph {
       GraphDSL.create(new SchedulerLogicGraph) { implicit builder => (schedulerLogic) =>
         {

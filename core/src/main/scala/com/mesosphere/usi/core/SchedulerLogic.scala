@@ -7,8 +7,9 @@ import com.mesosphere.usi.models._
 
 case class FrameWithEffects(frame: Frame, effects: FrameEffects, dirtyPodIds: Set[PodId]) {
   def applyEffects(newEffects: FrameEffects): FrameWithEffects = {
+    // TODO - we need to handle status snapshots and create a mechanism to signal that all cache should be recomputed
     val newDirty = dirtyPodIds ++ newEffects.reverseStateEvents.iterator.collect {
-      case podEvent: USIPodEvent => podEvent.id
+      case podEvent: PodStateEvent => podEvent.id
     }
     copy(frame = frame.applyStateEffects(effects), dirtyPodIds = newDirty, effects = effects ++ newEffects)
   }
