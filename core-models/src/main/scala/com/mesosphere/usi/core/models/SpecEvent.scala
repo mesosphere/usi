@@ -1,5 +1,9 @@
 package com.mesosphere.usi.core.models
 
+/**
+  * Sealed trait which includes all possible events that can describe the evolution of the framework implementation's
+  * Specification state.
+  */
 sealed trait SpecEvent
 
 /**

@@ -1,7 +1,7 @@
 package com.mesosphere.usi.core.models
 
 /**
-  * Mock Mesos calls / state
+  * Mock Mesos calls / state. We'll remove these
   */
 object Mesos {
 

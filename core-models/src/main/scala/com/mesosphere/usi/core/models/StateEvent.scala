@@ -1,11 +1,11 @@
 package com.mesosphere.usi.core.models
 
 /**
-  * General trait for snapshot or updated events, used to replicate USI's evolving view of the state.
+  * Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records).
   *
-  * These events are emitted by the USI Scheduler Logic in response to evolution of specification states and Mesos
-  * events. They are emitted so that a framework can replicate the state and react to changes in a way that best suits
-  * the framework's domain.
+  * These events are emitted by the SchedulerLogic in response to evolution of specification states and Mesos events.
+  * They are provided so the framework-implementation can replicate and react to the evolution of that state as best
+  * suits the framework's domain.
   */
 sealed trait StateEvent
 sealed trait PodStateEvent extends StateEvent {

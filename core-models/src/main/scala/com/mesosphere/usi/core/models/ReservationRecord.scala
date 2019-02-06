@@ -1,7 +1,9 @@
 package com.mesosphere.usi.core.models
 
 /**
-  * Snapshot of the reservation state that can't be obtained from mesos.
+  * Snapshot of reservation state; persists details that can't be reliably obtained from Mesos during Framework
+  * recovery.
+  *
   * @param reservationId id of the corresponding reservation
   * @param agentId id of the agent
   */
