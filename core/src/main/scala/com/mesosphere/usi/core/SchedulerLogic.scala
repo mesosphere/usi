@@ -123,16 +123,6 @@ private[core] object SchedulerLogic {
     Seq(pod.id.value)
   }
 
-  /**
-    * Process the modification of some podSpec.
-    *
-    * - If a podSpec is deleted:
-    *   - Also delete the podRecord.
-    *   - Prune a terminal / unknown task status.
-    * - If a podSpec is marked as terminal, then issue a kill.
-    *
-    * @return The effects of launching this offer
-    */
   private def matchOffer(offer: Mesos.Event.Offer, pendingLaunchPodSpecs: Seq[PodSpec]): FrameEffects = {
     val operations = pendingLaunchPodSpecs.iterator.flatMap { pod =>
       taskIdsFor(pod).iterator.map { taskId =>
@@ -150,6 +140,14 @@ private[core] object SchedulerLogic {
     (goal == Goal.Running) && podRecord.isEmpty
   }
 
+  /**
+    * Process the modification of some podSpec.
+    *
+    * - If a podSpec is deleted:
+    *   - Also delete the podRecord.
+    *   - Prune a terminal / unknown task status.
+    * - If a podSpec is marked as terminal, then issue a kill.
+    */
   private[core] def computeNextStateForPods(frame: Frame)(changedPodIds: Set[PodId]): FrameEffects = {
     changedPodIds.foldLeft(FrameEffects.empty) { (initialEffects, podId) =>
 

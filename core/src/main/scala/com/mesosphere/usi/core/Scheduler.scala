@@ -16,7 +16,7 @@ import scala.concurrent.Future
  * 2) MesosEvents - Events from Mesos; offers, task status updates, etc.
  *
  * Output:
- * 1) USIStateEvents - Used to replicate the state of pods, agents, and reservations to the framework
+ * 1) StateEvents - Used to replicate the state of pods, agents, and reservations to the framework
  * 2) MesosCalls - Actions, such as revive, kill, accept offer, etc., used to realize the specification.
  *
  * Fully wired, the graph looks like this at a high-level view:
@@ -24,7 +24,7 @@ import scala.concurrent.Future
  *                                                 *** SCHEDULER ***
  *                    +------------------------------------------------------------------------+
  *                    |                                                                        |
- *                    |  +------------------+          +-------------+         USIStateEvents  |
+ *                    |  +------------------+          +-------------+         StateEvents     |
  *        SpecEvents  |  |                  |          |             |      /------------------>----> (framework)
  * (framework) >------>-->                  |          |             |     /                   |
  *                    |  |                  | Effects  |             |    /                    |
