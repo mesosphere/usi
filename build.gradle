@@ -5,6 +5,8 @@ plugins {
     id 'idea'
     id 'org.ajoberstar.git-publish' version '2.0.0'
     id 'cz.alenkacz.gradle.scalafmt' version '1.7.2'
+    // Use `$ gradle htmlDependencyReport` to generate project library dependency report
+    id 'project-report'
 }
 
 ext {
