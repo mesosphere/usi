@@ -6,9 +6,7 @@ import net.logstash.logback.encoder.*
 import net.logstash.logback.fieldnames.LogstashFieldNames
 import net.logstash.logback.stacktrace.ShortenedThrowableConverter
 
-def appenderList = ["ASYNC"]
-def env = System.getenv()
-def USI_TCP_DESTINATION = env.get("USI_TCP_LOG_DESTINATION")
+String USI_TCP_DESTINATION_ENV_VAR = "USI_TCP_LOG_DESTINATION"
 
 static def defaultJsonProvider() {
     def json = new LoggingEventJsonProviders()
@@ -79,12 +77,9 @@ static def versionProvider() {
     return ver
 }
 
-appender("CONSOLE", ConsoleAppender) {
-    encoder(LoggingEventCompositeJsonEncoder) {
-        providers = defaultJsonProvider()
-    }
-}
-
+// Conditional appender(s).
+def useTcpAppender = false
+def USI_TCP_DESTINATION = System.getenv().get(USI_TCP_DESTINATION_ENV_VAR)
 if (USI_TCP_DESTINATION != null && !USI_TCP_DESTINATION.isEmpty()) {
     println "Posting logs over tcp to : $USI_TCP_DESTINATION"
     appender("TCP", LogstashTcpSocketAppender) {
@@ -93,13 +88,22 @@ if (USI_TCP_DESTINATION != null && !USI_TCP_DESTINATION.isEmpty()) {
             providers = defaultJsonProvider()
         }
     }
-    appenderList.add("TCP")
+    useTcpAppender = true
+}
+
+appender("CONSOLE", ConsoleAppender) {
+    encoder(LoggingEventCompositeJsonEncoder) {
+        providers = defaultJsonProvider()
+    }
 }
 
 appender("ASYNC", LoggingEventAsyncDisruptorAppender) {
     appenderRef("CONSOLE")
+    if (useTcpAppender) {
+        appenderRef("TCP")
+    }
     includeCallerData = true
     ringBufferSize = 8192
 }
 
-root(TRACE, appenderList)
+root(TRACE, ["ASYNC"])
