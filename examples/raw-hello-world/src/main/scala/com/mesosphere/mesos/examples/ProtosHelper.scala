@@ -4,17 +4,7 @@ import java.util.UUID
 import org.apache.mesos.v1.Protos.Offer.Operation
 import org.apache.mesos.v1.Protos.Offer.Operation.Launch
 import org.apache.mesos.v1.Protos.Value.Scalar
-import org.apache.mesos.v1.Protos.{
-  AgentID,
-  CommandInfo,
-  FrameworkID,
-  FrameworkInfo,
-  Offer,
-  Resource,
-  TaskID,
-  TaskInfo,
-  Value
-}
+import org.apache.mesos.v1.Protos.{AgentID, CommandInfo, FrameworkID, FrameworkInfo, Offer, Resource, TaskID, TaskInfo, Value}
 import org.apache.mesos.v1.scheduler.Protos.Call.Accept
 
 import scala.collection.JavaConverters._
@@ -23,7 +13,7 @@ import scala.sys.SystemProperties
 /**
   * A helper object that simplifies building Mesos protobuf message.
   */
-object BuilderHelper {
+object ProtosHelper {
 
   /**
     * Return a framework info with certain parameters set. Some others like roles and capabilities are hardcoded since
