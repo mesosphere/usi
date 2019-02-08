@@ -164,7 +164,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
 
     Source
       .single(request)
-      .via(info(s"Connecting to the new leader: $url"))
+      .via(info(s"Connecting to the new leader: $url "))
       .via(httpConnection)
       .via(info("HttpResponse: "))
   }
@@ -372,7 +372,7 @@ class MesosClientImpl(
         ))
 
   def httpConnection: Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] =
-    Http().outgoingConnection(connectionInfo.url.getHost, connectionInfo.url.getPort)
+    Http().outgoingConnection(host = connectionInfo.url.getHost, port = connectionInfo.url.getPort)
 
   override val mesosSink: Sink[Call, Future[Done]] =
     Flow[Call]
