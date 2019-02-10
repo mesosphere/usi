@@ -6,9 +6,6 @@ import akka.stream.scaladsl.Sink
 import com.mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.typesafe.config.ConfigFactory
-import org.apache.mesos.v1.Protos.Offer
-import org.apache.mesos.v1.scheduler.Protos.Event.Update
-import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -46,9 +43,8 @@ object RawHelloWorldFramework extends App with StrictLoggingFlow {
                  | Mesos host: ${client.connectionInfo.url}
        """.stripMargin)
 
-
   /**
-    * Main event processor for all Mesos [[Event]]s.
+    * Main event processor for all Mesos [[org.apache.mesos.v1.scheduler.Protos.Event]]s.
     */
   val eventProcessor = new EventProcessor(client.calls)
 
@@ -85,25 +81,24 @@ object RawHelloWorldFramework extends App with StrictLoggingFlow {
     * |              |
     * +--------------+
     *
-    * 1. Once connected to Mesos we start receiving Mesos [[Event]]s from [[MesosClient.mesosSource]]
+    * 1. Once connected to Mesos we start receiving Mesos [[org.apache.mesos.v1.scheduler.Protos.Event]]s from [[MesosClient.mesosSource]]
     *
     * 2. An event handler that currently handles two event types:
     *
-    * [[Offer]]s:
+    * [[org.apache.mesos.v1.Protos.Offer]]s:
     *    - if an offer have enough resources we send Mesos an [[org.apache.mesos.v1.scheduler.Protos.Call.Accept]]
     *      call with task details.
     *    - if not enough resources or no need to launch anything, we decline the offer by sending a
     *    [[org.apache.mesos.v1.scheduler.Protos.Call.Decline]]
     *
-    * [[Update]]s:
+    * [[org.apache.mesos.v1.scheduler.Protos.Event.Update]]s:
     *    - If the task is happily running, we acknowledge the status update
     *    - Any other status will lead to framework termination
     *
-    * 3. The above stage can produce zero or more Mesos [[Call]]s which then are sent using [[MesosClient.mesosSink]]
+    * 3. The above stage can produce zero or more Mesos [[org.apache.mesos.v1.scheduler.Protos.Call]]s which then are sent using [[MesosClient.mesosSink]]
     *
     */
-  client
-    .mesosSource
+  client.mesosSource
     .statefulMapConcat(() => {
 
       // Task state. This variable is overridden when task state changes e.g. task is being launched or received
