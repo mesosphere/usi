@@ -1,7 +1,6 @@
 package com.mesosphere.usi.core
 
 import com.mesosphere.usi.core.models.{
-  Mesos,
   PodId,
   PodRecord,
   PodRecordUpdated,
@@ -9,8 +8,10 @@ import com.mesosphere.usi.core.models.{
   PodStatusUpdated,
   StateEvent
 }
+import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
 
-case class SchedulerLogicIntents(stateIntents: List[StateEvent] = Nil, mesosIntents: List[Mesos.Call] = Nil)
+
+case class SchedulerLogicIntents(stateIntents: List[StateEvent] = Nil, mesosIntents: List[MesosCall] = Nil)
 object SchedulerLogicIntents {
   val empty = SchedulerLogicIntents()
 }
@@ -26,7 +27,7 @@ object SchedulerLogicIntents {
   * @param reverseStateEvents
   * @param reverseMesosCalls
   */
-case class SchedulerLogicIntentsBuilder(reverseStateEvents: List[StateEvent] = Nil, reverseMesosCalls: List[Mesos.Call] = Nil) {
+case class SchedulerLogicIntentsBuilder(reverseStateEvents: List[StateEvent] = Nil, reverseMesosCalls: List[MesosCall] = Nil) {
   lazy val result = SchedulerLogicIntents(reverseStateEvents.reverse, reverseMesosCalls.reverse)
 
   def ++(other: SchedulerLogicIntentsBuilder): SchedulerLogicIntentsBuilder = {
@@ -67,7 +68,7 @@ case class SchedulerLogicIntentsBuilder(reverseStateEvents: List[StateEvent] = N
     * @param call The Mesos call
     * @return A FrameEffects with this effect appended
     */
-  def withMesosCall(call: Mesos.Call): SchedulerLogicIntentsBuilder = copy(reverseMesosCalls = call :: reverseMesosCalls)
+  def withMesosCall(call: MesosCall): SchedulerLogicIntentsBuilder = copy(reverseMesosCalls = call :: reverseMesosCalls)
 }
 
 object SchedulerLogicIntentsBuilder {

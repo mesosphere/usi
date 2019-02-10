@@ -1,9 +1,15 @@
 package com.mesosphere.usi.core
 
 import akka.NotUsed
-import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL}
-import akka.stream.{BidiShape, FlowShape}
-import com.mesosphere.usi.core.models.{Mesos, SpecEvent, StateEvent}
+import akka.actor.ActorSystem
+import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink}
+import akka.stream.{ActorMaterializer, BidiShape, FlowShape}
+import com.mesosphere.mesos.client.MesosClient
+import com.mesosphere.mesos.conf.MesosClientSettings
+import com.mesosphere.usi.core.models.{SpecEvent, StateEvent}
+import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+
+import org.apache.mesos.v1.Protos.FrameworkInfo
 
 import scala.concurrent.Future
 
@@ -45,9 +51,16 @@ import scala.concurrent.Future
 object Scheduler {
   case class MesosConnection(mesosHostName: String)
 
-  def connect(mesosHostName: String): Future[(MesosConnection, Flow[SpecEvent, StateEvent, NotUsed])] = {
-    val flow = Flow.fromGraph {
-      GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
+  def connect(mesosHostName: String)(implicit actorSystem: ActorSystem, materializer: ActorMaterializer): Future[(MesosConnection, Flow[SpecEvent, StateEvent, NotUsed])] = {
+
+
+    val settings = MesosClientSettings(mesosHostName)
+    val frameworkInfo = FrameworkInfo.newBuilder().build
+    import scala.concurrent.ExecutionContext.Implicits.global
+
+    MesosClient(settings, frameworkInfo).runWith(Sink.head).map { client =>
+      val flow = Flow.fromGraph {
+        GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
           import GraphDSL.Implicits._
 
@@ -56,14 +69,17 @@ object Scheduler {
 
           FlowShape(graph.in1, graph.out1)
         }
+        }
       }
+      Future.successful(MesosConnection(mesosHostName) -> flow)
+
     }
-    Future.successful(MesosConnection(mesosHostName) -> flow)
+    ???
   }
 
   /*
    */
-  def unconnectedGraph: BidiFlow[SpecEvent, StateEvent, Mesos.Event, Mesos.Call, NotUsed] = {
+  def unconnectedGraph: BidiFlow[SpecEvent, StateEvent, MesosEvent, MesosCall, NotUsed] = {
     BidiFlow.fromGraph {
       GraphDSL.create(new SchedulerLogicGraph) { implicit builder => (schedulerLogic) =>
         {

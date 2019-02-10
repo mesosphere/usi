@@ -357,7 +357,7 @@ class MesosClientImpl(
       }
     }
 
-  private val eventSerializer: Flow[Call, Array[Byte], NotUsed] = Flow[Call]
+  private val callSerializer: Flow[Call, Array[Byte], NotUsed] = Flow[Call]
     .map(call => call.toByteArray)
 
   private val requestBuilder: Flow[Array[Byte], HttpRequest, NotUsed] =
@@ -378,7 +378,7 @@ class MesosClientImpl(
     Flow[Call]
       .via(sharedKillSwitch.flow[Call])
       .via(debug("Sending "))
-      .via(eventSerializer)
+      .via(callSerializer)
       .via(requestBuilder)
       .via(httpConnection)
       .toMat(responseHandler)(Keep.right)

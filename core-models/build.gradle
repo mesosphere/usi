@@ -1,0 +1,3 @@
+dependencies {
+    compile "org.apache.mesos:mesos:$mesosVersion"
+}

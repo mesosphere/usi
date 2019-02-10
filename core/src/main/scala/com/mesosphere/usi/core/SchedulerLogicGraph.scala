@@ -2,7 +2,9 @@ package com.mesosphere.usi.core
 
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
-import com.mesosphere.usi.core.models.{Mesos, SpecEvent}
+import com.mesosphere.usi.core.models.SpecEvent
+import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
+
 
 import scala.collection.mutable
 
@@ -39,14 +41,14 @@ object SchedulerLogicGraph {
   * It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
   * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
-class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event, FrameResult]] {
+class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, MesosEvent, FrameResult]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
-  val mesosEventsInlet = Inlet[Mesos.Event]("mesos-events")
+  val mesosEventsInlet = Inlet[MesosEvent]("mesos-events")
   val specEventsInlet = Inlet[SpecEvent]("specs")
   val frameResultOutlet = Outlet[FrameResult]("effects")
   // Define the shape of this stage, which is SourceShape with the port we defined above
-  override val shape: FanInShape2[SpecEvent, Mesos.Event, FrameResult] =
+  override val shape: FanInShape2[SpecEvent, MesosEvent, FrameResult] =
     new FanInShape2(specEventsInlet, mesosEventsInlet, frameResultOutlet)
 
   // This is where the actual (possibly stateful) logic will live

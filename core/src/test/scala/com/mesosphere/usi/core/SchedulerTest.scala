@@ -3,9 +3,9 @@ package com.mesosphere.usi.core
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, FlowShape, OverflowStrategy}
+import org.apache.mesos.v1.{Protos => Mesos}
 import com.mesosphere.usi.core.models.{
   Goal,
-  Mesos,
   PodId,
   PodRecordUpdated,
   PodSpec,
@@ -53,7 +53,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     }
     inside(output.pull().futureValue) {
       case Some(podStatusChange: PodStatusUpdated) =>
-        podStatusChange.newStatus.get.taskStatuses(TaskId(podId.value)) shouldBe Mesos.TaskStatus.TASK_RUNNING
+        podStatusChange.newStatus.get.taskStatuses(TaskId(podId.value)).getState shouldBe Mesos.TaskState.TASK_RUNNING
     }
   }
 }

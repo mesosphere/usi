@@ -1,7 +1,8 @@
 package com.mesosphere.usi.core
 import com.mesosphere.usi.core.models._
+import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
 
-case class FrameResult(stateEvents: List[StateEvent], mesosIntents: List[Mesos.Call])
+case class FrameResult(stateEvents: List[StateEvent], mesosIntents: List[MesosCall])
 
 /**
   * Immutable helper data structure which:
@@ -18,17 +19,21 @@ case class FrameResult(stateEvents: List[StateEvent], mesosIntents: List[Mesos.C
   * @param mesosIntents The cumulative Mesos calls that are intended to be sent
   * @param dirtyPodIds The podIds that have been changed during the lifecycle of this FrameWithEvents instance
   */
-case class FrameResultBuilder(specs: SpecificationState, state: SchedulerLogicState, appliedStateEvents: List[StateEvent], mesosIntents: List[Mesos.Call], dirtyPodIds: Set[PodId]) {
+case class FrameResultBuilder(specs: SpecificationState, state: SchedulerLogicState, appliedStateEvents: List[StateEvent], mesosIntents: List[MesosCall], dirtyPodIds: Set[PodId]) {
   private def applyAndAccumulate(intents: SchedulerLogicIntents): FrameResultBuilder = {
-    // TODO - we need to handle status snapshots and create a mechanism to signal that all cache should be recomputed
-    val newDirty = dirtyPodIds ++ intents.stateIntents.iterator.collect {
-      case podEvent: PodStateEvent => podEvent.id
+    if (intents == SchedulerLogicIntents.empty)
+      this
+    else {
+      // TODO - we need to handle status snapshots and create a mechanism to signal that all cache should be recomputed
+      val newDirty = dirtyPodIds ++ intents.stateIntents.iterator.collect {
+        case podEvent: PodStateEvent => podEvent.id
+      }
+      copy(
+        state = state.applyStateIntents(intents.stateIntents),
+        dirtyPodIds = newDirty,
+        appliedStateEvents = appliedStateEvents ++ intents.stateIntents,
+        mesosIntents = mesosIntents ++ intents.mesosIntents)
     }
-    copy(
-      state = state.applyStateIntents(intents.stateIntents),
-      dirtyPodIds = newDirty,
-      appliedStateEvents = appliedStateEvents ++ intents.stateIntents,
-      mesosIntents = mesosIntents ++ intents.mesosIntents)
   }
 
   /**
