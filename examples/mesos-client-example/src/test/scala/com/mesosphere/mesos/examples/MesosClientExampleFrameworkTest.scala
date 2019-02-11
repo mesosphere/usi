@@ -32,8 +32,6 @@ class MesosClientExampleFrameworkTest extends AkkaUnitTest with MesosClusterTest
 
   class Fixture(existingFrameworkId: Option[FrameworkID.Builder] = None) {
     val mesosUrl = new java.net.URI(mesosFacade.url)
-    val mesosHost = mesosUrl.getHost
-    val mesosPort = mesosUrl.getPort
 
     val conf = ConfigFactory.parseString(s"""
                                               |mesos-client.master-url="${mesosUrl.getHost}:${mesosUrl.getPort}"
