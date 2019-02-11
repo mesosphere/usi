@@ -20,7 +20,7 @@ allprojects {
     apply plugin: "scala"
     apply plugin: 'cz.alenkacz.gradle.scalafmt'
 
-    sourceCompatibility = 1.8
+    sourceCompatibility = 1.11
     targetCompatibility = 1.11
     compileScala.targetCompatibility = 1.11
 
