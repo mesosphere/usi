@@ -102,7 +102,7 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
       .setUser("test")
       .setName("Mesos Client Integration Tests")
       .setId(existingFrameworkId.getOrElse(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString)))
-      .addRoles("foo")
+      .addRoles("test")
       .setFailoverTimeout(0.0f)
       .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
       .build()

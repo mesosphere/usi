@@ -281,7 +281,7 @@ case class MesosCluster(
       "MESOS_LAUNCHER" -> "posix",
       "MESOS_CONTAINERIZERS" -> agentsConfig.containerizers,
       "MESOS_LAUNCHER" -> agentsConfig.launcher,
-      "MESOS_ROLES" -> "public,foo",
+      "MESOS_ROLES" -> "public,test",
       "MESOS_ACLS" -> s"file://$aclsPath",
       "MESOS_CREDENTIALS" -> s"file://$credentialsPath",
       "MESOS_SYSTEMD_ENABLE_SUPPORT" -> "false",
