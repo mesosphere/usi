@@ -11,15 +11,15 @@ import org.scalatest.junit.JUnitRunner
 class MesosClientExampleFrameworkTest extends AkkaUnitTest with MesosClusterTest {
 
   "MesosClientExampleFramework should successfully connect to Mesos" in withFixture() { f =>
-    Then("once framework is connected, Mesos should return it's framework Id")
+    Then("once example framework is connected, Mesos should return it's framework Id")
     val frameworks: Seq[ITFramework] = mesosFacade.frameworks().value.frameworks
 
-    val exampleFramewok: ITFramework = frameworks.head
-    exampleFramewok.id shouldBe f.framework.client.frameworkId.getValue
+    val exampleFramework: ITFramework = frameworks.head
+    exampleFramework.id shouldBe f.framework.client.frameworkId.getValue
 
-    And("framework should be active and connected")
-    exampleFramewok.active shouldBe true
-    exampleFramewok.connected shouldBe true
+    And("example framework should be active and connected")
+    exampleFramework.active shouldBe true
+    exampleFramework.connected shouldBe true
   }
 
   def withFixture(frameworkId: Option[FrameworkID.Builder] = None)(fn: Fixture => Unit): Unit = {
@@ -39,6 +39,6 @@ class MesosClientExampleFrameworkTest extends AkkaUnitTest with MesosClusterTest
                                               |mesos-client.master-url="${mesosUrl.getHost}:${mesosUrl.getPort}"
                                             """.stripMargin).withFallback(ConfigFactory.load())
 
-    val framework = new MesosClientExampleFramework(conf.getConfig("mesos-client"))
+    val framework = MesosClientExampleFramework(conf.getConfig("mesos-client"))
   }
 }
