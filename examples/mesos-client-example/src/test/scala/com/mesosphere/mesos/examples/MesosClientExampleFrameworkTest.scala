@@ -1,4 +1,5 @@
 package com.mesosphere.mesos.examples
+
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
@@ -6,6 +7,7 @@ import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkID
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import java.util
 
 @RunWith(classOf[JUnitRunner])
 class MesosClientExampleFrameworkTest extends AkkaUnitTest with MesosClusterTest {
@@ -33,9 +35,9 @@ class MesosClientExampleFrameworkTest extends AkkaUnitTest with MesosClusterTest
   class Fixture(existingFrameworkId: Option[FrameworkID.Builder] = None) {
     val mesosUrl = new java.net.URI(mesosFacade.url)
 
-    val conf = ConfigFactory.parseString(s"""
-                                              |mesos-client.master-url="${mesosUrl.getHost}:${mesosUrl.getPort}"
-                                            """.stripMargin).withFallback(ConfigFactory.load())
+    val conf = ConfigFactory
+      .parseMap(util.Map.of("mesos-client.master-url", s"${mesosUrl.getHost}:${mesosUrl.getPort}"))
+      .withFallback(ConfigFactory.load())
 
     val framework = MesosClientExampleFramework(conf.getConfig("mesos-client"))
   }
