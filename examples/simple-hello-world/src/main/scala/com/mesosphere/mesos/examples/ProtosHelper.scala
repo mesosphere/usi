@@ -4,7 +4,17 @@ import java.util.UUID
 import org.apache.mesos.v1.Protos.Offer.Operation
 import org.apache.mesos.v1.Protos.Offer.Operation.Launch
 import org.apache.mesos.v1.Protos.Value.Scalar
-import org.apache.mesos.v1.Protos.{AgentID, CommandInfo, FrameworkID, FrameworkInfo, Offer, Resource, TaskID, TaskInfo, Value}
+import org.apache.mesos.v1.Protos.{
+  AgentID,
+  CommandInfo,
+  FrameworkID,
+  FrameworkInfo,
+  Offer,
+  Resource,
+  TaskID,
+  TaskInfo,
+  Value
+}
 import org.apache.mesos.v1.scheduler.Protos.Call.Accept
 
 import scala.collection.JavaConverters._

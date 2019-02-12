@@ -21,7 +21,7 @@ import scala.util.{Failure, Success}
   *  Good to test against local Mesos.
   *
   */
-object RawHelloWorldFramework extends App with StrictLoggingFlow {
+object SimpleHelloWorldFramework extends App with StrictLoggingFlow {
   implicit val system = ActorSystem()
   implicit val mat = ActorMaterializer()
   implicit val ec = system.dispatcher

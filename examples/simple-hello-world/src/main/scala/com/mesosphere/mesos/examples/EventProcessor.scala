@@ -36,7 +36,8 @@ class EventProcessor(mesosCalls: MesosCalls) extends StrictLogging {
   private[this] def processOffers(task: Task, offers: Offers): (Task, List[Call]) = {
 
     def accept(task: Task, offer: Offer): Call = mesosCalls.newAccept(ProtosHelper.accept(task, offer).build)
-    def decline(offerIds: Seq[OfferID]): Call = mesosCalls.newDecline(offerIds = offerIds, filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build))
+    def decline(offerIds: Seq[OfferID]): Call =
+      mesosCalls.newDecline(offerIds = offerIds, filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build))
 
     val offersList = offers.getOffersList.asScala
     val offerIds = offersList.map(_.getId)
