@@ -78,13 +78,12 @@ static def stackTraceProvider() {
 }
 
 static def mdcProvider() {
-    def mdc = new MdcJsonProvider()
-    mdc.setFieldName("mdc")
-    return mdc
+    return new MdcJsonProvider()
 }
 
 static def versionProvider() {
     def ver = new LogstashVersionJsonProvider()
+    ver.setFieldName("ver")
     ver.setWriteAsInteger(true)
     return ver
 }

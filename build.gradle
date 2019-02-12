@@ -44,17 +44,15 @@ allprojects {
         implementation 'org.scala-lang:scala-library:2.12.7'
         implementation "com.typesafe.scala-logging:scala-logging_$scalaVersion:3.9.2"
 
-        // Logging
-        implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-        implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '5.3'
-        implementation 'org.codehaus.groovy:groovy:2.5.6'
-
         // Use Scalatest for testing our library
         testImplementation 'junit:junit:4.12'
         testImplementation "org.scalatest:scalatest_$scalaVersion:3.0.5"
 
         // Need scala-xml at test runtime
         testRuntimeOnly "org.scala-lang.modules:scala-xml_$scalaVersion:1.1.1"
+
+        // Logging
+        testRuntime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
 
         // Akka and akka-http
         compile group: 'com.typesafe.akka', name: "akka-http_$scalaVersion", version: '10.0.11'

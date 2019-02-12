@@ -1,26 +1,51 @@
 package com
 
-import com.typesafe.scalalogging.Logger
-import net.logstash.logback.marker.LogstashMarker
-import org.slf4j.Marker
+import com.typesafe.scalalogging.CanLog
+import com.typesafe.scalalogging.LoggerTakingImplicit
+import org.slf4j.MDC
+import scala.language.implicitConversions
 
 package object mesosphere {
 
-  implicit final class LogstashMarkerOps(val self: LogstashMarker) extends AnyVal {
-    def withMarker(marker: Marker): LogstashMarker = self.and[LogstashMarker](marker)
+  type KvArgs = Traversable[(String, Any)]
+
+  implicit val emptyKvArgs : KvArgs = Traversable()
+
+  implicit def tupleToTraversable(kv: (String, Any)): KvArgs = Traversable(kv)
+
+  implicit final class KeyValueOrgOps(val self : KvArgs) extends AnyVal {
+    def and(kv : KvArgs): KvArgs = self ++ kv
+    def and(k : String, v : String): KvArgs = self and ((k, v))
   }
 
-  implicit class LoggerOps(val logger : Logger) extends AnyVal {
-    def withMarker(marker: Marker): (Logger, Marker) = (logger, marker)
-  }
-
-  implicit final class UsiLoggerConverter(val self : (Logger, Marker)) extends AnyVal {
-    def withMarker(markers: Marker*): (Logger, Marker) = {
-      markers.foreach(self._2.add)
-      self
+  implicit case object CanLogKvArgs extends CanLog[KvArgs] {
+    override def logMessage(originalMsg: String, a: KvArgs): String = {
+      for (elem <- a) {
+        MDC.put(elem._1, elem._2.toString)
+      }
+      originalMsg
     }
-    def info(msg: String): Unit = self._1.info(self._2, msg)
 
-    def info(msg : String, y : Any) = self._1.info(self._2, msg, y)
+    override def afterLog(a: KvArgs): Unit = a.foreach(x => MDC.remove(x._1))
+  }
+
+  // This is needed so that we can call logger methods directly on the tuple.
+  implicit def tupleToLogger(
+    t : (LoggerTakingImplicit[KvArgs], KvArgs)
+  ) : LoggerTakingImplicit[KvArgs] = t._1
+
+  implicit class LoggerImplicitOps(val logger: LoggerTakingImplicit[KvArgs]) extends AnyVal {
+    def ctx(tag: KvArgs): (LoggerTakingImplicit[KvArgs], KvArgs) = (logger, tag)
+  }
+
+  implicit final class LoggerImplicitConverter(
+    val self: (LoggerTakingImplicit[KvArgs], KvArgs)
+  ) extends AnyVal {
+
+    implicit def getCtx : KvArgs = self._2
+
+    def ctx(newContext: KvArgs): (LoggerTakingImplicit[KvArgs], KvArgs) = {
+      (self._1, self._2 ++ newContext)
+    }
   }
 }

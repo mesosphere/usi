@@ -3,13 +3,11 @@ package com.mesosphere.usi.core
 import akka.NotUsed
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL}
 import akka.stream.{BidiShape, FlowShape}
-import com.mesosphere.usi.core.models.{Mesos, SpecEvent, StateEvent}
-import com.typesafe.scalalogging.StrictLogging
-import net.logstash.logback.argument.StructuredArguments._
-import net.logstash.logback.marker.Markers._
-import scala.concurrent.Future
-
 import com.mesosphere._
+import com.mesosphere.usi.core.models.{Mesos, SpecEvent, StateEvent}
+import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.scalalogging.Logger
+import scala.concurrent.Future
 
 /*
  * Provides the scheduler graph component. The component has two inputs, and two outputs:
@@ -46,18 +44,14 @@ import com.mesosphere._
  *                                     |                      |
  *                                     +----------------------+
  */
-object Scheduler extends StrictLogging {
+object Scheduler extends LazyLogging {
+
+  val log = Logger.takingImplicit[KvArgs](getClass)
 
   case class MesosConnection(mesosHostName: String)
 
   def connect(mesosHostName: String): Future[(MesosConnection, Flow[SpecEvent, StateEvent, NotUsed])] = {
-    val otherMarks = append("tag2", "value1").withMarker(append("tag3", "value1"))
-    logger.info(otherMarks,"kasdad {}", kv("asd", "asd"))
-    val markedLogger = logger.withMarker(otherMarks)
-    markedLogger
-      .withMarker(append("tag1", "value1"))
-      .withMarker(otherMarks)
-        .info(s"Connecting to {}", kv("mesosHostName", mesosHostName))
+    log.info(s"Connecting to {}", mesosHostName)(("mesosHostName", mesosHostName))
     val flow = Flow.fromGraph {
       GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
