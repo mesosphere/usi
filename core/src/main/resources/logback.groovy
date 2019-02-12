@@ -121,7 +121,7 @@ appender("ASYNC", LoggingEventAsyncDisruptorAppender) {
     if (useTcpAppender) {
         appenderRef("TCP")
     }
-    includeCallerData = true
+    includeCallerData = false
     ringBufferSize = 8192
 }
 
