@@ -167,8 +167,32 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.mesos">mesos</a></dd></dl></div>
     </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="class" href="EventProcessor.html" title=""></a>
+                        <a href="EventProcessor.html" title="">EventProcessor</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="object" href="MesosClientExampleFramework$.html" title="Run a mesos-client example framework that:"></a>
                         <a href="MesosClientExampleFramework$.html" title="Run a mesos-client example framework that:">MesosClientExampleFramework</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="object" href="OfferMatcher$.html" title=""></a>
+                        <a href="OfferMatcher$.html" title="">OfferMatcher</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="object" href="ProtosHelper$.html" title="A helper object that simplifies building Mesos protobuf message."></a>
+                        <a href="ProtosHelper$.html" title="A helper object that simplifies building Mesos protobuf message.">ProtosHelper</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="object" href="SimpleHelloWorldFramework$.html" title="Run a mesos-client example framework that:"></a>
+                        <a href="SimpleHelloWorldFramework$.html" title="Run a mesos-client example framework that:">SimpleHelloWorldFramework</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="Spec.html" title="A minimal version of a task's specification."></a>
+                        <a href="Spec.html" title="A minimal version of a task's specification.">Spec</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="Task.html" title="A minimalistic Mesos task representation"></a>
+                        <a href="Task.html" title="A minimalistic Mesos task representation">Task</a>
                       </li>
               </ul>
             </div>
@@ -230,7 +254,64 @@
         <div id="allMembers">
         
 
-        
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.mesosphere.mesos.examples.EventProcessor" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EventProcessorextendsStrictLogging"></a><a id="EventProcessor:EventProcessor"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/examples/index.html#EventProcessorextendsStrictLogging" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="EventProcessor.html"><span class="name">EventProcessor</span></a><span class="result"> extends <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.mesos.examples.Spec" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SpecextendsProductwithSerializable"></a><a id="Spec:Spec"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/examples/index.html#SpecextendsProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="A minimal version of a task's specification." href="Spec.html"><span class="name">Spec</span></a><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="cmd">cmd: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="cpus">cpus: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">0.1</span></span>, <span name="mem">mem: <span class="extype" name="scala.Double">Double</span> = <span class="symbol">32.0</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">A minimal version of a task's specification.</p><div class="fullcomment"><div class="comment cmt"><p>A minimal version of a task's specification. Contains the command and the necessary resources. Note that we only
+consider memory and cpus for now, ignoring disk, gpus, ports etc.
+</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>task's name</p></dd><dt class="param">cmd</dt><dd class="cmt"><p>command to execute</p></dd><dt class="param">cpus</dt><dd class="cmt"><p>amount of CPU resources</p></dd><dt class="param">mem</dt><dd class="cmt"><p>amount of memory (in Megabytes)</p></dd></dl></div>
+    </li><li name="com.mesosphere.mesos.examples.Task" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TaskextendsProductwithSerializable"></a><a id="Task:Task"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/examples/index.html#TaskextendsProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="A minimalistic Mesos task representation" href="Task.html"><span class="name">Task</span></a><span class="params">(<span name="spec">spec: <a href="Spec.html" class="extype" name="com.mesosphere.mesos.examples.Spec">Spec</a></span>, <span name="taskId">taskId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="state">state: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="org.apache.mesos.v1.Protos.TaskState">TaskState</span>]</span>, <span name="agentId">agentId: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="org.apache.mesos.v1.Protos.AgentID">AgentID</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">A minimalistic Mesos task representation
+</p><div class="fullcomment"><div class="comment cmt"><p>A minimalistic Mesos task representation
+</p></div><dl class="paramcmts block"><dt class="param">spec</dt><dd class="cmt"><p>task spec</p></dd><dt class="param">taskId</dt><dd class="cmt"><p>task Id that is unique for every Mesos task. It is of the form <a href="Spec.html#name:String" class="extmbr" name="com.mesosphere.mesos.examples.Spec#name">Spec.name</a>.<span class="extype" name="UUID">UUID</span>
+              e.g. <code>sleep.5e5601ab-01c7-4299-9eb1-0741763d2749</code></p></dd><dt class="param">state</dt><dd class="cmt"><p>current <span class="extype" name="TaskState">TaskState</span> as reported by Mesos. It's optional since it does not exists until
+               the first status update arrives from Mesos</p></dd><dt class="param">agentId</dt><dd class="cmt"><p>tasks agent Id. It's optional since it does not exists until the task is scheduled to run</p></dd></dl></div>
+    </li></ol>
+            </div>
 
         
 
@@ -253,6 +334,54 @@
       </span>
       
       <p class="shortcomment cmt">Run a mesos-client example framework that:</p><div class="fullcomment"><div class="comment cmt"><p>Run a mesos-client example framework that:</p><ul><li>uses only the raw mesos-client</li><li>successfully subscribes to Mesos master</li><li>declines all offers</li></ul><p> Not much, but shows the basic idea. Good to test against local Mesos.</p></div></div>
+    </li><li name="com.mesosphere.mesos.examples.OfferMatcher" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="OfferMatcher"></a><a id="OfferMatcher:OfferMatcher"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/examples/index.html#OfferMatcher" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="OfferMatcher$.html"><span class="name">OfferMatcher</span></a><span class="result"> extends <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.mesos.examples.ProtosHelper" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ProtosHelper"></a><a id="ProtosHelper:ProtosHelper"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/examples/index.html#ProtosHelper" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="A helper object that simplifies building Mesos protobuf message." href="ProtosHelper$.html"><span class="name">ProtosHelper</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">A helper object that simplifies building Mesos protobuf message.</p>
+    </li><li name="com.mesosphere.mesos.examples.SimpleHelloWorldFramework" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SimpleHelloWorldFramework"></a><a id="SimpleHelloWorldFramework:SimpleHelloWorldFramework"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/examples/index.html#SimpleHelloWorldFramework" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="Run a mesos-client example framework that:" href="SimpleHelloWorldFramework$.html"><span class="name">SimpleHelloWorldFramework</span></a><span class="result"> extends <span class="extype" name="scala.App">App</span> with <a href="../client/StrictLoggingFlow.html" class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow">StrictLoggingFlow</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Run a mesos-client example framework that:</p><div class="fullcomment"><div class="comment cmt"><p>Run a mesos-client example framework that:</p><ul><li>uses only the raw mesos-client</li><li>successfully subscribes to Mesos master</li><li>starts one <code>echo &quot;Hello, world&quot; &amp;&amp; sleep 3600</code> task</li><li>exits should the task fail (or fail to start)</li></ul><p> Good to test against local Mesos.</p></div></div>
     </li>
               </ol>
             </div>
