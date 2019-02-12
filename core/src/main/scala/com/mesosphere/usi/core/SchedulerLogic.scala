@@ -161,12 +161,16 @@ private[core] object SchedulerLogic {
     Seq(TaskId(pod.id.value))
   }
 
+  case class ResourceMatch(podSpec: PodSpec, resources: Seq[Mesos.Resource])
+  private def maybeMatchPodSpec(resources: Seq[Mesos.Resource], podSpec: PodSpec): (Option[ResourceMatch], Seq[Mesos.Resource]) = {
+
+  }
   private def matchOffer(
       offer: Mesos.Offer,
       pendingLaunchPodSpecs: Seq[PodSpec]): (Set[PodId], SchedulerLogicIntentsBuilder) = {
 
-    import ProtoConversions._
-    import ProtoBuilders._
+    import com.mesosphere.usi.core.protos.ProtoConversions._
+    import com.mesosphere.usi.core.protos.ProtoBuilders._
 
     val operations = pendingLaunchPodSpecs.iterator.flatMap { pod =>
       taskIdsFor(pod).iterator.map { taskId =>

@@ -9,12 +9,24 @@ plugins {
     id 'project-report'
 }
 
+configurations {
+    scalaCompilerPlugins { transitive = false }
+}
+
 ext {
     scalaVersion = '2.12'
     mesosVersion = '1.7.0'
     akkaVersion = '2.5.19'
 }
 
+def scalacXPlugins() {
+    return ((configurations.scalaCompilerPlugins.files.collect { "\"-Xplugin:${it.path}\"" }))
+}
+def silencerPluginVersion = "1.1"
+
+dependencies {
+    scalaCompilerPlugins "com.github.ghik:silencer-plugin_$scalaVersion:$silencerPluginVersion"
+}
 allprojects {
 
     version = '0.1'
@@ -34,12 +46,13 @@ allprojects {
 
     // compiler warnings + unused imports are reported as errors
     tasks.withType(ScalaCompile) {
-        scalaCompileOptions.additionalParameters = ["-Xlint", "-Xfatal-warnings"]
+        scalaCompileOptions.additionalParameters = scalacXPlugins() + ["-Xlint"]
     }
 
     compileScala.dependsOn scalafmtAll
 
     dependencies {
+        compile group: "com.github.ghik", name: "silencer-lib_$scalaVersion", version: silencerPluginVersion
         // Use Scala 2.12 in our library project
         implementation 'org.scala-lang:scala-library:2.12.7'
         implementation "com.typesafe.scala-logging:scala-logging_$scalaVersion:3.9.2"

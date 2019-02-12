@@ -1,7 +1,8 @@
 package com.mesosphere.usi.core.models
+import com.mesosphere.usi.core.launching.CommandBuilder
+import com.mesosphere.usi.core.matching.ResourceRequirement
 
 /**
   * Specification used to launch a [[PodSpec]]
-  * @param cpus number of cpus requested by the pod
   */
-case class RunSpec(cpus: Double)
+case class RunSpec(resourceRequirements: Seq[ResourceRequirement], commandBuilder: CommandBuilder)
