@@ -93,7 +93,7 @@ scaladoc {
 idea {
   project {
     jdkName = '1.11'
-    languageLevel = '1.8'
+    languageLevel = '1.11'
     vcs = 'Git'
   }
 }
