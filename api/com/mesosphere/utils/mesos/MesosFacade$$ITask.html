@@ -212,7 +212,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">ITask</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="status">status: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">ITask</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="framework_id">framework_id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="state">state: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -268,9 +268,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.utils.mesos.MesosFacade.ITask#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(id:String,status:Option[String]):com.mesosphere.utils.mesos.MesosFacade.ITask"></a><a id="&lt;init&gt;:ITask"></a>
+      <a id="&lt;init&gt;(id:String,name:String,framework_id:String,state:Option[String]):com.mesosphere.utils.mesos.MesosFacade.ITask"></a><a id="&lt;init&gt;:ITask"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosFacade$$ITask.html#&lt;init&gt;(id:String,status:Option[String]):com.mesosphere.utils.mesos.MesosFacade.ITask" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosFacade$$ITask.html#&lt;init&gt;(id:String,name:String,framework_id:String,state:Option[String]):com.mesosphere.utils.mesos.MesosFacade.ITask" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -279,7 +279,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">ITask</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="status">status: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
+        <span class="name">ITask</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="framework_id">framework_id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="state">state: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
       </span>
       
       
@@ -399,6 +399,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosFacade.ITask#framework_id" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="framework_id:String"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosFacade$$ITask.html#framework_id:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">framework_id</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
@@ -452,6 +468,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosFacade.ITask#name" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="name:String"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosFacade$$ITask.html#name:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">name</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -510,10 +542,10 @@
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.utils.mesos.MesosFacade.ITask#status" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="status:Option[String]"></a>
+    </li><li name="com.mesosphere.utils.mesos.MesosFacade.ITask#state" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="state:Option[String]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosFacade$$ITask.html#status:Option[String]" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosFacade$$ITask.html#state:Option[String]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -522,7 +554,7 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">status</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+        <span class="name">state</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
       

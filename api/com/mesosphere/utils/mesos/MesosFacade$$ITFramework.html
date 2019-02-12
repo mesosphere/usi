@@ -212,7 +212,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">ITFramework</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="tasks">tasks: <span class="extype" name="scala.Seq">Seq</span>[<a href="MesosFacade$$ITask.html" class="extype" name="com.mesosphere.utils.mesos.MesosFacade.ITask">ITask</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">ITFramework</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="active">active: <span class="extype" name="scala.Boolean">Boolean</span></span>, <span name="connected">connected: <span class="extype" name="scala.Boolean">Boolean</span></span>, <span name="tasks">tasks: <span class="extype" name="scala.Seq">Seq</span>[<a href="MesosFacade$$ITask.html" class="extype" name="com.mesosphere.utils.mesos.MesosFacade.ITask">ITask</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -268,9 +268,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.utils.mesos.MesosFacade.ITFramework#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(id:String,name:String,tasks:Seq[com.mesosphere.utils.mesos.MesosFacade.ITask]):com.mesosphere.utils.mesos.MesosFacade.ITFramework"></a><a id="&lt;init&gt;:ITFramework"></a>
+      <a id="&lt;init&gt;(id:String,name:String,active:Boolean,connected:Boolean,tasks:Seq[com.mesosphere.utils.mesos.MesosFacade.ITask]):com.mesosphere.utils.mesos.MesosFacade.ITFramework"></a><a id="&lt;init&gt;:ITFramework"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosFacade$$ITFramework.html#&lt;init&gt;(id:String,name:String,tasks:Seq[com.mesosphere.utils.mesos.MesosFacade.ITask]):com.mesosphere.utils.mesos.MesosFacade.ITFramework" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosFacade$$ITFramework.html#&lt;init&gt;(id:String,name:String,active:Boolean,connected:Boolean,tasks:Seq[com.mesosphere.utils.mesos.MesosFacade.ITask]):com.mesosphere.utils.mesos.MesosFacade.ITFramework" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -279,7 +279,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">ITFramework</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="tasks">tasks: <span class="extype" name="scala.Seq">Seq</span>[<a href="MesosFacade$$ITask.html" class="extype" name="com.mesosphere.utils.mesos.MesosFacade.ITask">ITask</a>]</span>)</span>
+        <span class="name">ITFramework</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="active">active: <span class="extype" name="scala.Boolean">Boolean</span></span>, <span name="connected">connected: <span class="extype" name="scala.Boolean">Boolean</span></span>, <span name="tasks">tasks: <span class="extype" name="scala.Seq">Seq</span>[<a href="MesosFacade$$ITask.html" class="extype" name="com.mesosphere.utils.mesos.MesosFacade.ITask">ITask</a>]</span>)</span>
       </span>
       
       
@@ -341,6 +341,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosFacade.ITFramework#active" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="active:Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosFacade$$ITFramework.html#active:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">active</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
@@ -383,6 +399,22 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosFacade.ITFramework#connected" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="connected:Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosFacade$$ITFramework.html#connected:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">connected</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
