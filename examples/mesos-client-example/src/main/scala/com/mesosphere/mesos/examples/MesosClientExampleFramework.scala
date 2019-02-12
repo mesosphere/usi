@@ -7,7 +7,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import com.mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.Event
 
@@ -25,7 +25,7 @@ import scala.collection.JavaConverters._
   *  Not much, but shows the basic idea. Good to test against local Mesos.
   *
   */
-object MesosClientExampleFramework extends App with StrictLoggingFlow {
+class MesosClientExampleFramework(conf: Config) extends StrictLoggingFlow {
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
@@ -42,7 +42,7 @@ object MesosClientExampleFramework extends App with StrictLoggingFlow {
     .setFailoverTimeout(0d)
     .build()
 
-  val settings = MesosClientSettings(ConfigFactory.load().getConfig("mesos-client"))
+  val settings = MesosClientSettings(conf)
   val client = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   client.mesosSource
@@ -71,4 +71,14 @@ object MesosClientExampleFramework extends App with StrictLoggingFlow {
       case Failure(e) =>
         logger.error(s"Error in stream: $e"); system.terminate()
     }
+}
+
+object MesosClientExampleFramework {
+
+  def main(args: Array[String]): Unit = {
+    val conf = ConfigFactory.load().getConfig("mesos-client")
+    MesosClientExampleFramework(conf)
+  }
+
+  def apply(conf: Config): MesosClientExampleFramework = new MesosClientExampleFramework(conf)
 }
