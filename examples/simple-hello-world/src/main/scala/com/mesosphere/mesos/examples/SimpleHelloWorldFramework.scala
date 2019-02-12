@@ -5,7 +5,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import com.mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -21,7 +21,7 @@ import scala.util.{Failure, Success}
   *  Good to test against local Mesos.
   *
   */
-object SimpleHelloWorldFramework extends App with StrictLoggingFlow {
+class SimpleHelloWorldFramework(conf: Config) extends StrictLoggingFlow {
   implicit val system = ActorSystem()
   implicit val mat = ActorMaterializer()
   implicit val ec = system.dispatcher
@@ -29,13 +29,13 @@ object SimpleHelloWorldFramework extends App with StrictLoggingFlow {
   /**
     * Framework info
     */
-  val frameworkInfo = ProtosHelper.frameworkInfo(user = "test", name = "RawHelloWorldExample").build()
+  val frameworkInfo = ProtosHelper.frameworkInfo(user = "test", name = "SimpleHelloWorldExample").build()
 
   /**
     * Mesos client and its settings. We wait for the client to connect to Mesos for 10 seconds. If it can't
     * the framework will exit with a [[java.util.concurrent.TimeoutException]]
     */
-  val settings = MesosClientSettings(ConfigFactory.load().getConfig("mesos-client"))
+  val settings = MesosClientSettings(conf)
   val client = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   logger.info(s"""Successfully subscribed to Mesos:
@@ -98,7 +98,8 @@ object SimpleHelloWorldFramework extends App with StrictLoggingFlow {
     * 3. The above stage can produce zero or more Mesos [[org.apache.mesos.v1.scheduler.Protos.Call]]s which then are sent using [[MesosClient.mesosSink]]
     *
     */
-  client.mesosSource
+  client
+    .mesosSource
     .statefulMapConcat(() => {
 
       // Task state. This variable is overridden when task state changes e.g. task is being launched or received
@@ -106,7 +107,7 @@ object SimpleHelloWorldFramework extends App with StrictLoggingFlow {
       // "Hello, world" and sleeps for an hour.
       var task: Task = new Task(
         Spec(
-          name = "sleep",
+          name = "hello-world",
           cmd = """echo "Hello, world" && sleep 3600""",
           cpus = 0.1,
           mem = 32.0
@@ -126,4 +127,14 @@ object SimpleHelloWorldFramework extends App with StrictLoggingFlow {
         logger.error(s"Error in stream: $e");
         system.terminate()
     }
+}
+
+object SimpleHelloWorldFramework {
+
+  def main(args: Array[String]): Unit = {
+    val conf = ConfigFactory.load().getConfig("mesos-client")
+    SimpleHelloWorldFramework(conf)
+  }
+
+  def apply(conf: Config): SimpleHelloWorldFramework = new SimpleHelloWorldFramework(conf)
 }
