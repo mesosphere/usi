@@ -1,12 +1,15 @@
 import net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender
 import net.logstash.logback.appender.LogstashTcpSocketAppender
+import net.logstash.logback.composite.ContextJsonProvider
 import net.logstash.logback.composite.LogstashVersionJsonProvider
 import net.logstash.logback.composite.loggingevent.*
 import net.logstash.logback.encoder.*
 import net.logstash.logback.fieldnames.LogstashFieldNames
 import net.logstash.logback.stacktrace.ShortenedThrowableConverter
 
+
 String USI_TCP_DESTINATION_ENV_VAR = "USI_TCP_LOG_DESTINATION"
+String USI_DISABLE_JSON_LOG_ENV_VAR = "USI_DISABLE_JSON_LOG"
 
 static def defaultJsonProvider() {
     def json = new LoggingEventJsonProviders()
@@ -17,9 +20,12 @@ static def defaultJsonProvider() {
     json.addMessage(msgProvider())
     json.addCallerData(callerDataProvider())
     json.addStackTrace(stackTraceProvider())
-    json.addMdc(new MdcJsonProvider())
+    json.addContext(new ContextJsonProvider())
+    json.addMdc(mdcProvider())
     json.addArguments(new ArgumentsJsonProvider())
     json.addVersion(versionProvider())
+    json.addContext(new ContextJsonProvider())
+    json.addLogstashMarkers(new LogstashMarkersJsonProvider())
     return json
 }
 
@@ -71,6 +77,12 @@ static def stackTraceProvider() {
     stackTrace
 }
 
+static def mdcProvider() {
+    def mdc = new MdcJsonProvider()
+    mdc.setFieldName("mdc")
+    return mdc
+}
+
 static def versionProvider() {
     def ver = new LogstashVersionJsonProvider()
     ver.setWriteAsInteger(true)
@@ -79,7 +91,7 @@ static def versionProvider() {
 
 // Conditional appender(s).
 def useTcpAppender = false
-def USI_TCP_DESTINATION = System.getenv().get(USI_TCP_DESTINATION_ENV_VAR)
+def USI_TCP_DESTINATION = System.getenv(USI_TCP_DESTINATION_ENV_VAR)
 if (USI_TCP_DESTINATION != null && !USI_TCP_DESTINATION.isEmpty()) {
     println "Posting logs over tcp to : $USI_TCP_DESTINATION"
     appender("TCP", LogstashTcpSocketAppender) {
@@ -92,8 +104,15 @@ if (USI_TCP_DESTINATION != null && !USI_TCP_DESTINATION.isEmpty()) {
 }
 
 appender("CONSOLE", ConsoleAppender) {
-    encoder(LoggingEventCompositeJsonEncoder) {
-        providers = defaultJsonProvider()
+    def jsonLogDisabled = System.getenv(USI_DISABLE_JSON_LOG_ENV_VAR)
+    if (jsonLogDisabled != null && !jsonLogDisabled.isEmpty()) {
+        encoder(PatternLayoutEncoder) {
+            pattern = "[%date] %-5level %message \\(%logger:%thread\\)%n"
+        }
+    } else {
+        encoder(LoggingEventCompositeJsonEncoder) {
+            providers = defaultJsonProvider()
+        }
     }
 }
 
