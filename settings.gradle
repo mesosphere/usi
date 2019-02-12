@@ -13,3 +13,6 @@ include 'hello-world'
 project(':hello-world').projectDir = new File('examples/hello-world')
 include 'mesos-client-example'
 project(':mesos-client-example').projectDir = new File('examples/mesos-client-example')
+include 'simple-hello-world'
+project(':simple-hello-world')?.projectDir = new File('examples/simple-hello-world')
+
