@@ -1,4 +1,7 @@
 dependencies {
     compile project(':core-models')
     implementation project(':metrics')
+
+    compile "org.scala-lang.modules:scala-async_$scalaVersion:0.9.7"
+    compile "com.wix:accord-core_$scalaVersion:0.7.1"
 }
