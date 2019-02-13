@@ -5,6 +5,9 @@ import java.time.Instant
 import com.mesosphere.usi.core.models._
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+import scala.collection.JavaConverters._
+
+import scala.annotation.tailrec
 
 /**
   * Container class responsible for keeping track of the state and cache.
@@ -162,38 +165,81 @@ private[core] object SchedulerLogic {
   }
 
   case class ResourceMatch(podSpec: PodSpec, resources: Seq[Mesos.Resource])
-  private def maybeMatchPodSpec(resources: Seq[Mesos.Resource], podSpec: PodSpec): (Option[ResourceMatch], Seq[Mesos.Resource]) = {
-
-  }
-  private def matchOffer(
-      offer: Mesos.Offer,
-      pendingLaunchPodSpecs: Seq[PodSpec]): (Set[PodId], SchedulerLogicIntentsBuilder) = {
-
-    import com.mesosphere.usi.core.protos.ProtoConversions._
-    import com.mesosphere.usi.core.protos.ProtoBuilders._
-
-    val operations = pendingLaunchPodSpecs.iterator.flatMap { pod =>
-      taskIdsFor(pod).iterator.map { taskId =>
-        val taskInfo = newTaskInfo(
-          taskId.asProto,
-          name = "hi",
-          agentId = offer.getAgentId,
-          command = Mesos.CommandInfo.newBuilder().build())
-
-        newOfferOperation(
-          newOperationId("testing"),
-          Mesos.Offer.Operation.Type.LAUNCH,
-          launch = newOfferOperationLaunch(List(taskInfo)))
-      }
-    }.to[Seq]
-
-    val intentsBuilder = pendingLaunchPodSpecs.foldLeft(SchedulerLogicIntentsBuilder.empty) { (effects, pod) =>
-      effects.withPodRecord(pod.id, Some(PodRecord(pod.id, Instant.now(), offer.getAgentId.asModel)))
+  @tailrec private def maybeMatchPodSpec(
+      remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
+      matchedResources: List[Mesos.Resource],
+      resourceRequirements: List[ResourceRequirement]): Option[(List[Mesos.Resource], Map[ResourceType, Seq[Mesos.Resource]])] = {
+    resourceRequirements match {
+      case Nil =>
+        Some((matchedResources, remainingResources))
+      case req :: rest =>
+        req.matchAndConsume(remainingResources.getOrElse(req.resourceType, Nil)) match {
+          case Some(matchResult) =>
+            maybeMatchPodSpec(
+              remainingResources.updated(req.resourceType, matchResult.remainingResource),
+              matchResult.matchedResources.toList ++ matchedResources,
+              rest)
+          case None =>
+            // we didn't match
+            // TODO - expose explanation as to why we didn't match
+            None
+        }
     }
+  }
+
+  @tailrec private def matchPodSpecsTaskRecords(
+      offer: Mesos.Offer,
+      remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
+      result: Map[PodId, List[Mesos.TaskInfo]],
+      pendingLaunchPodSpecs: List[PodSpec]): Map[PodId, List[Mesos.TaskInfo]] = {
+
+    import ProtoConversions._
+    import ProtoBuilders._
+
+    pendingLaunchPodSpecs match {
+      case Nil =>
+        result
+
+      case podSpec :: rest =>
+        maybeMatchPodSpec(remainingResources, Nil, podSpec.runSpec.resourceRequirements.toList) match {
+          case Some((matchedResources, newRemainingResources)) =>
+            // Note - right now, runSpec only describes a single task. This needs to be improved in the future.
+            val taskInfos: List[Mesos.TaskInfo] = taskIdsFor(podSpec).map { taskId =>
+              newTaskInfo(taskId.asProto,
+                name = "hi",
+                agentId = offer.getAgentId,
+                command = podSpec.runSpec.commandBuilder.buildCommandInfo(),
+                resources = matchedResources
+              )
+            }(collection.breakOut)
+
+            matchPodSpecsTaskRecords(offer, newRemainingResources, result.updated(podSpec.id, taskInfos), rest)
+          case None =>
+            matchPodSpecsTaskRecords(offer, remainingResources, result, rest)
+        }
+    }
+  }
+
+  def matchOffer(offer: Mesos.Offer, specs: Iterable[PodSpec]): (Set[PodId], SchedulerLogicIntentsBuilder) = {
+    import ProtoConversions._
+    import ProtoBuilders._
+    val groupedResources = offer.getResourcesList.asScala.groupBy { r =>
+      ResourceType.fromName(r.getName)
+    }
+    val taskInfos = matchPodSpecsTaskRecords(offer, groupedResources, Map.empty, specs.toList)
+    val intentsBuilder = taskInfos.keys.foldLeft(SchedulerLogicIntentsBuilder.empty) { (intents, podId) =>
+      intents.withPodRecord(podId, Some(PodRecord(podId, Instant.now(), offer.getAgentId.asModel)))
+    }
+
+    val op = newOfferOperation(
+      newOperationId("testing"),
+      Mesos.Offer.Operation.Type.LAUNCH,
+      launch = newOfferOperationLaunch(taskInfos.values.flatten))
+
     val acceptBuilder = MesosCall.Accept.newBuilder()
-    operations.foreach(acceptBuilder.addOperations)
-    acceptBuilder.addOfferIds(offer.getId)
-    acceptBuilder.setFilters(Mesos.Filters.newBuilder().setRefuseSeconds(15.0))
+        .addOperations(op)
+        .addOfferIds(offer.getId)
+
     val intents = intentsBuilder.withMesosCall(
       MesosCall
         .newBuilder()
@@ -201,7 +247,7 @@ private[core] object SchedulerLogic {
         .setAccept(acceptBuilder)
         .build)
 
-    pendingLaunchPodSpecs.map(_.id).toSet -> intents
+    (taskInfos.keySet, intents)
   }
 
   private[core] def pendingLaunch(goal: Goal, podRecord: Option[PodRecord]): Boolean = {
@@ -267,14 +313,12 @@ private[core] object SchedulerLogic {
   def handleMesosEvent(specs: SpecificationState, state: SchedulerLogicState, pendingLaunch: Set[PodId])(
       event: MesosEvent): SchedulerLogicIntents = {
     if (event.hasOffers) {
-      var intents = SchedulerLogicIntentsBuilder.empty
-      var currentPendingLaunch = pendingLaunch
-      event.getOffers.getOffersList.forEach { (offer) =>
+      val (intents, pending) = event.getOffers.getOffersList.asScala.foldLeft((SchedulerLogicIntentsBuilder.empty, pendingLaunch) ) { case ((intents, pending), offer) =>
         val (matchedPodIds, offerMatchIntents) = matchOffer(offer, pendingLaunch.flatMap { podId =>
           specs.podSpecs.get(podId)
         }(collection.breakOut))
-        intents ++= offerMatchIntents
-        currentPendingLaunch --= matchedPodIds
+
+        (intents ++ offerMatchIntents, pending -- matchedPodIds)
       }
       intents.result
     } else if (event.hasUpdate) {

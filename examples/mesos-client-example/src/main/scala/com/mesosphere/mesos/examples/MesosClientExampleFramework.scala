@@ -42,7 +42,7 @@ class MesosClientExampleFramework(conf: Config) extends StrictLoggingFlow {
     .setFailoverTimeout(0d)
     .build()
 
-  val settings = MesosClientSettings(conf)
+  val settings = MesosClientSettings.fromConfig(conf)
   val client = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   client.mesosSource

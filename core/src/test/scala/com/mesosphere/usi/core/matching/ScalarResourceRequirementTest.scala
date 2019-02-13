@@ -1,14 +1,14 @@
 package com.mesosphere.usi.core.matching
 
+import com.mesosphere.usi.core.models.{ResourceMatchResult, ResourceType}
+import com.mesosphere.usi.core.{ProtoBuilders, ProtoConversions}
 import com.mesosphere.utils.UnitTest
-import com.mesosphere.usi.core.models.ResourceType
-import com.mesosphere.usi.core.protos.ProtoBuilders
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest.Inside
 
 class ScalarResourceRequirementTest extends UnitTest with Inside {
 
-  import com.mesosphere.usi.core.protos.ProtoConversions._
+  import ProtoConversions._
   "ScalarResourceRequirement" should {
     "match and consume a cpu resource" in {
       val matchers = ScalarResourceRequirement(ResourceType.CPUS, 2.0)

@@ -1,4 +1,5 @@
-package com.mesosphere.usi.core.protos
+package com.mesosphere.usi.core
+
 import com.google.protobuf.ByteString
 import org.apache.mesos.v1.{Protos => Mesos}
 

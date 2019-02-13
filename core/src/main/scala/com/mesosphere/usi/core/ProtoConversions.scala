@@ -1,8 +1,7 @@
-package com.mesosphere.usi.core.protos
+package com.mesosphere.usi.core
 
 import com.mesosphere.usi.core.models.{AgentId, TaskId}
 import org.apache.mesos.v1.{Protos => Mesos}
-
 import scala.collection.immutable.NumericRange
 
 private[usi] object ProtoConversions {
@@ -42,5 +41,3 @@ private[usi] object ProtoConversions {
     }
   }
 }
-
-

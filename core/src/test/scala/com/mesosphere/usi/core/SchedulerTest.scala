@@ -3,27 +3,27 @@ package com.mesosphere.usi.core
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, FlowShape, OverflowStrategy}
-import org.apache.mesos.v1.{Protos => Mesos}
-import com.mesosphere.usi.core.models.{
-  Goal,
-  PodId,
-  PodRecordUpdated,
-  PodSpec,
-  PodSpecUpdated,
-  PodStatusUpdated,
-  RunSpec,
-  SpecEvent,
-  StateEvent,
-  TaskId
-}
+import com.mesosphere.usi.core.launching.SimpleShellCommandInfoGenerator
+import com.mesosphere.usi.core.matching.ScalarResourceRequirement
+import com.mesosphere.usi.core.models._
 import org.scalatest._
 import com.mesosphere.utils.AkkaUnitTest
+import org.apache.mesos.v1.Protos
+import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
 class SchedulerTest extends AkkaUnitTest with Inside {
 
+  val loggingMesosFakeFlow: Flow[MesosCall, MesosEvent, NotUsed] = Flow[MesosCall].map { call =>
+    logger.info(s"Mesos call: ${call}")
+    call
+  }.via(FakeMesos.flow).map { event =>
+    logger.info(s"Mesos event: ${event}")
+    event
+  }
+
   val mockedScheduler: Flow[SpecEvent, StateEvent, NotUsed] = {
     Flow.fromGraph {
-      GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
+      GraphDSL.create(Scheduler.unconnectedGraph, loggingMesosFakeFlow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
           import GraphDSL.Implicits._
 
@@ -45,7 +45,12 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       .toMat(Sink.queue())(Keep.both)
       .run
 
-    input.offer(PodSpecUpdated(podId, Some(PodSpec(podId, Goal.Running, RunSpec(1)))))
+    input.offer(PodSpecUpdated(podId, Some(PodSpec(podId, Goal.Running, RunSpec(
+      resourceRequirements = List(
+        ScalarResourceRequirement(ResourceType.CPUS, 1),
+        ScalarResourceRequirement(ResourceType.MEM, 256)),
+      commandBuilder = SimpleShellCommandInfoGenerator("sleep 3600"))))))
+
     inside(output.pull().futureValue) {
       case Some(podRecord: PodRecordUpdated) =>
         podRecord.id shouldBe podId
@@ -53,7 +58,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     }
     inside(output.pull().futureValue) {
       case Some(podStatusChange: PodStatusUpdated) =>
-        podStatusChange.newStatus.get.taskStatuses(TaskId(podId.value)).getState shouldBe Mesos.TaskState.TASK_RUNNING
+        podStatusChange.newStatus.get.taskStatuses(TaskId(podId.value)).getState shouldBe Protos.TaskState.TASK_RUNNING
     }
   }
 }

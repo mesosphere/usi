@@ -1,18 +1,12 @@
 package com.mesosphere.usi.core.matching
-
-import org.apache.mesos.v1.{Protos => Mesos}
+import com.mesosphere.usi.core.ResourceUtil
+import com.mesosphere.usi.core.models.{ResourceMatchResult, ResourceRequirement, ResourceType}
 
 import scala.annotation.tailrec
-import com.mesosphere.usi.core.protos.ProtoConversions._
-import com.mesosphere.usi.core.models.ResourceType
-
-trait ResourceRequirement {
-  def description: String
-  def resourceType: ResourceType
-  def matchAndConsume(resource: Seq[Mesos.Resource]): Option[ResourceMatchResult]
-}
+import org.apache.mesos.v1.{Protos => Mesos}
 
 case class ScalarResourceRequirement(resourceType: ResourceType, amount: Double) extends ResourceRequirement {
+  import com.mesosphere.usi.core.ProtoConversions._
   override def description: String = s"${resourceType}:${amount}"
   @tailrec private def iter(
       unmatchedResources: List[Mesos.Resource],

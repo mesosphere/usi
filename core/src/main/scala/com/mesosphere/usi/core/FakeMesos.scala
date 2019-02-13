@@ -1,7 +1,6 @@
 package com.mesosphere.usi.core
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
-import com.mesosphere.usi.core.protos.ProtoBuilders
 import com.mesosphere.usi.core.models.AgentId
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
@@ -9,7 +8,7 @@ import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEv
 import scala.collection.JavaConverters._
 
 object FakeMesos {
-  import com.mesosphere.usi.core.protos.ProtoConversions._
+  import ProtoConversions._
   import ProtoBuilders._
   val fakeAgentId = AgentId("fake-agent")
   val fakeFrameworkId = ProtoBuilders.newFrameworkId("fake-framework")

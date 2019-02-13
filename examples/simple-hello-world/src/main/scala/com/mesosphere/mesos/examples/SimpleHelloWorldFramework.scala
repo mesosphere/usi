@@ -35,7 +35,7 @@ class SimpleHelloWorldFramework(conf: Config) extends StrictLoggingFlow {
     * Mesos client and its settings. We wait for the client to connect to Mesos for 10 seconds. If it can't
     * the framework will exit with a [[java.util.concurrent.TimeoutException]]
     */
-  val settings = MesosClientSettings(conf)
+  val settings = MesosClientSettings.fromConfig(conf)
   val client = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   logger.info(s"""Successfully subscribed to Mesos:

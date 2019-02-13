@@ -10,9 +10,10 @@ object ResourceType {
   case object DISK extends ResourceType { val name = "disk" }
   case object PORTS extends ResourceType { val name = "ports" }
   case object GPUS extends ResourceType { val name = "gpus" }
+  case class UNKNOWN(name: String) extends ResourceType
   private val all = Seq(CPUS, MEM, DISK, PORTS, GPUS)
 
-  def fromName(name: String): Option[ResourceType] = {
-    all.find(_.name == name)
+  def fromName(name: String): ResourceType = {
+    all.find(_.name == name).getOrElse(UNKNOWN(name))
   }
 }
