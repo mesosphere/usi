@@ -33,9 +33,15 @@ package object mesosphere {
    *    // This needs an evidence of CanLog[KvArgs] to compile which was brought in to scope by above import.
    *    val log = Logger.takingImplicit[KvArgs](getClass)
    *
-   *    // Make a simple log statement with no context.
+   *    // Make a log statement with no context.
    *    // This needs an implicit context but the above import bought an empty context in to scope.
    *    log.info("hello world!")
+   *
+   *    // Make a log statement with some context.
+   *    log.info("hello world!")(("key1", "value1"))
+   *
+   *    // Make a log statement with more context.
+   *    log.info("hello world!")(("key1", "value1").and("key2", "value2").and("key3", "value3"))
    *
    *    // Now compose the logger with static meta data.
    *    // The withContext method here is defined on a value class of LoggerTakingImplicit.
