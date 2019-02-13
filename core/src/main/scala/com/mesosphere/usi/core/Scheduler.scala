@@ -50,8 +50,8 @@ object Scheduler {
   case class MesosConnection(mesosHostName: String)
 
   def connect(mesosHostName: String): Future[(MesosConnection, Flow[SpecEvent, StateEvent, NotUsed])] = {
-    val composedLogger = log.withCtx("mesosHostName", mesosHostName)
-    composedLogger.info(s"Connecting to $mesosHostName")(composedLogger.ctx)
+    val composedLogger = log.withContext("mesosHostName", mesosHostName)
+    composedLogger.info(s"Connecting to $mesosHostName")(composedLogger.context)
     val flow = Flow.fromGraph {
       GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
