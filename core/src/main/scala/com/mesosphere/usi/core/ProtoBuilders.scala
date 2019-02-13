@@ -126,8 +126,8 @@ private[usi] object ProtoBuilders {
       Mesos.OperationID.newBuilder().setValue(value).build()
 
     def newOfferOperation(
-        id: Mesos.OperationID,
         operationType: Mesos.Offer.Operation.Type,
+        id: Mesos.OperationID = null,
         create: Mesos.Offer.Operation.Create = null,
         createDisk: Mesos.Offer.Operation.CreateDisk = null,
         destroy: Mesos.Offer.Operation.Destroy = null,
@@ -141,9 +141,9 @@ private[usi] object ProtoBuilders {
 
       val b = Mesos.Offer.Operation
         .newBuilder()
-        .setId(id)
         .setType(operationType)
 
+      if (id != null) b.setId(id)
       if (create != null) b.setCreate(create)
       if (createDisk != null) b.setCreateDisk(createDisk)
       if (destroy != null) b.setDestroy(destroy)

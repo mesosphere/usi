@@ -48,7 +48,7 @@ trait MesosClient {
     * executors started by the framework. Make sure to set `failoverTimeout` appropriately.
     *
     * See `teardown()` Call factory method for another way to shutdown a framework.
-    */
+    **/
   def killSwitch: KillSwitch
 
   /**
@@ -140,12 +140,15 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#subscribe-1
     */
   private def newSubscribeCall(frameworkInfo: FrameworkInfo): Call = {
-    Call
-      .newBuilder()
-      .setType(Call.Type.SUBSCRIBE)
-      .setFrameworkId(frameworkInfo.getId)
-      .setSubscribe(Call.Subscribe.newBuilder().setFrameworkInfo(frameworkInfo))
-      .build()
+    val b =
+      Call
+        .newBuilder()
+        .setType(Call.Type.SUBSCRIBE)
+        .setSubscribe(Call.Subscribe.newBuilder().setFrameworkInfo(frameworkInfo))
+
+    if (frameworkInfo.hasId) b.setFrameworkId(frameworkInfo.getId)
+
+    b.build()
   }
 
   private val eventDeserializer: Flow[ByteString, Event, NotUsed] =
@@ -293,7 +296,11 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       system: ActorSystem,
       materializer: ActorMaterializer): Source[MesosClient, NotUsed] = {
 
-    val initialUrl = new java.net.URI(s"http://${conf.master}")
+    val initialUrl =
+      if (conf.master.toLowerCase().startsWith("http://"))
+        new java.net.URI(conf.master)
+      else
+        new java.net.URI(s"http://${conf.master}")
 
     val httpConnection: Source[(HttpResponse, ConnectionInfo), NotUsed] =
       mesosHttpConnection(frameworkInfo, initialUrl, conf.redirectRetries)

@@ -3,6 +3,7 @@ package com.mesosphere.usi.core
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, FlowShape, OverflowStrategy}
+import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.launching.SimpleShellCommandInfoGenerator
 import com.mesosphere.usi.core.matching.ScalarResourceRequirement
 import com.mesosphere.usi.core.models._
@@ -23,7 +24,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   val mockedScheduler: Flow[SpecEvent, StateEvent, NotUsed] = {
     Flow.fromGraph {
-      GraphDSL.create(Scheduler.unconnectedGraph, loggingMesosFakeFlow)((_, _) => NotUsed) { implicit builder =>
+      GraphDSL.create(Scheduler.unconnectedGraph(new MesosCalls(FakeMesos.fakeFrameworkId)), loggingMesosFakeFlow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
           import GraphDSL.Implicits._
 

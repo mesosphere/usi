@@ -2,11 +2,13 @@ package com.mesosphere.usi.core
 
 import java.time.Instant
 
+import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.models._
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
-import scala.collection.JavaConverters._
 
+import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 
 /**
@@ -66,15 +68,16 @@ import scala.annotation.tailrec
   * through the application of several functions. The result of that event will lead to the emission of several
   * stateEvents and Mesos intents, which will be accumulated and emitted via a data structure we call the FrameResult.
   */
-private[core] class SchedulerLogic {
+private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) extends StrictLogging {
 
+  private val schedulerLogic = new SchedulerLogic(mesosCallFactory)
   /**
     * Our view of the framework-implementations specifications, which we replicate by consuming Specification events
     */
   private var specs: SpecificationState = SpecificationState.empty
 
   /**
-    * State managed by the SchedulerLogic (records and statuses). Statuses are derived from Mesos events. Records
+    * State managed by the SchedulerLogicHandler (records and statuses). Statuses are derived from Mesos events. Records
     * contain persistent, non-recoverable facts from Mesos, such as pod-launched time, agentId on which a pod was
     * launched, agent information or the time at which a pod was first seen as unhealthy or unreachable.
     */
@@ -91,7 +94,7 @@ private[core] class SchedulerLogic {
       builder
         .applySpecEvent(msg)
         .process { (specs, state, dirtyPodIds) =>
-          SchedulerLogic.computeNextStateForPods(specs, state)(dirtyPodIds)
+          schedulerLogic.computeNextStateForPods(specs, state)(dirtyPodIds)
         }
     }
   }
@@ -108,7 +111,7 @@ private[core] class SchedulerLogic {
   private def handleFrame(fn: FrameResultBuilder => FrameResultBuilder): FrameResult = {
     val frameResultBuilder = fn(FrameResultBuilder.givenState(this.specs, this.state)).process {
       (specs, state, dirtyPodIds) =>
-        SchedulerLogic.pruneTaskStatuses(specs, state)(dirtyPodIds)
+        schedulerLogic.pruneTaskStatuses(specs, state)(dirtyPodIds)
     }.process(updateCachesAndRevive)
 
     // update our state for the next frame processing
@@ -127,10 +130,7 @@ private[core] class SchedulerLogic {
     if (cachedPendingLaunch.pendingLaunch.nonEmpty)
       SchedulerLogicIntents(
         mesosIntents = List(
-          MesosCall
-            .newBuilder()
-            .setRevive(MesosCall.Revive.newBuilder())
-            .build()))
+          mesosCallFactory.newRevive(None)))
     else
       SchedulerLogicIntents.empty
   }
@@ -144,7 +144,7 @@ private[core] class SchedulerLogic {
   def processMesosEvent(event: MesosEvent): FrameResult = {
     handleFrame { builder =>
       builder.process { (specs, state, _) =>
-        SchedulerLogic.handleMesosEvent(specs, state, cachedPendingLaunch.pendingLaunch)(event)
+        schedulerLogic.handleMesosEvent(specs, state, cachedPendingLaunch.pendingLaunch)(event)
       }
     }
   }
@@ -153,7 +153,7 @@ private[core] class SchedulerLogic {
 /**
   * The current home for USI business logic
   */
-private[core] object SchedulerLogic {
+private[core] class SchedulerLogic(mesosCallFactory: MesosCalls) extends StrictLogging  {
   private def terminalOrUnreachable(status: PodStatus): Boolean = {
     // TODO - temporary stub implementation
     status.taskStatuses.values.forall(status => status.getState == Mesos.TaskState.TASK_RUNNING)
@@ -168,7 +168,8 @@ private[core] object SchedulerLogic {
   @tailrec private def maybeMatchPodSpec(
       remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
       matchedResources: List[Mesos.Resource],
-      resourceRequirements: List[ResourceRequirement]): Option[(List[Mesos.Resource], Map[ResourceType, Seq[Mesos.Resource]])] = {
+      resourceRequirements: List[ResourceRequirement])
+    : Option[(List[Mesos.Resource], Map[ResourceType, Seq[Mesos.Resource]])] = {
     resourceRequirements match {
       case Nil =>
         Some((matchedResources, remainingResources))
@@ -205,12 +206,12 @@ private[core] object SchedulerLogic {
           case Some((matchedResources, newRemainingResources)) =>
             // Note - right now, runSpec only describes a single task. This needs to be improved in the future.
             val taskInfos: List[Mesos.TaskInfo] = taskIdsFor(podSpec).map { taskId =>
-              newTaskInfo(taskId.asProto,
+              newTaskInfo(
+                taskId.asProto,
                 name = "hi",
                 agentId = offer.getAgentId,
                 command = podSpec.runSpec.commandBuilder.buildCommandInfo(),
-                resources = matchedResources
-              )
+                resources = matchedResources)
             }(collection.breakOut)
 
             matchPodSpecsTaskRecords(offer, newRemainingResources, result.updated(podSpec.id, taskInfos), rest)
@@ -232,26 +233,18 @@ private[core] object SchedulerLogic {
     }
 
     val op = newOfferOperation(
-      newOperationId("testing"),
       Mesos.Offer.Operation.Type.LAUNCH,
       launch = newOfferOperationLaunch(taskInfos.values.flatten))
 
-    val acceptBuilder = MesosCall.Accept.newBuilder()
-        .addOperations(op)
-        .addOfferIds(offer.getId)
+    val acceptBuilder = MesosCall.Accept
+      .newBuilder()
+      .addOperations(op)
+      .addOfferIds(offer.getId)
 
     val intents = intentsBuilder.withMesosCall(
-      MesosCall
-        .newBuilder()
-        .setType(MesosCall.Type.ACCEPT)
-        .setAccept(acceptBuilder)
-        .build)
+      mesosCallFactory.newAccept(acceptBuilder.build))
 
     (taskInfos.keySet, intents)
-  }
-
-  private[core] def pendingLaunch(goal: Goal, podRecord: Option[PodRecord]): Boolean = {
-    (goal == Goal.Running) && podRecord.isEmpty
   }
 
   /**
@@ -264,6 +257,7 @@ private[core] object SchedulerLogic {
     */
   private[core] def computeNextStateForPods(specs: SpecificationState, state: SchedulerLogicState)(
       changedPodIds: Set[PodId]): SchedulerLogicIntents = {
+    import ProtoConversions._
     changedPodIds
       .foldLeft(SchedulerLogicIntentsBuilder.empty) { (initialIntents, podId) =>
         specs.podSpecs.get(podId) match {
@@ -293,14 +287,7 @@ private[core] object SchedulerLogic {
             if (podSpec.goal == Goal.Terminal) {
               taskIdsFor(podSpec).foldLeft(initialIntents) { (effects, taskId) =>
                 effects.withMesosCall(
-                  MesosCall
-                    .newBuilder()
-                    .setKill(
-                      MesosCall.Kill.newBuilder
-                        .setTaskId(Mesos.TaskID
-                          .newBuilder()
-                          .setValue(taskId.value)))
-                    .build())
+                  mesosCallFactory.newKill(taskId.asProto, state.podRecords.get(podSpec.id).map(_.agentId.asProto), None))
               }
             } else {
               initialIntents
@@ -312,35 +299,41 @@ private[core] object SchedulerLogic {
 
   def handleMesosEvent(specs: SpecificationState, state: SchedulerLogicState, pendingLaunch: Set[PodId])(
       event: MesosEvent): SchedulerLogicIntents = {
-    if (event.hasOffers) {
-      val (intents, pending) = event.getOffers.getOffersList.asScala.foldLeft((SchedulerLogicIntentsBuilder.empty, pendingLaunch) ) { case ((intents, pending), offer) =>
-        val (matchedPodIds, offerMatchIntents) = matchOffer(offer, pendingLaunch.flatMap { podId =>
-          specs.podSpecs.get(podId)
-        }(collection.breakOut))
+    import ProtoConversions.EventMatchers._
+    event match {
+      case OffersEvent(offersEvent) =>
+        val (intents, pending) =
+          offersEvent.getOffersList.asScala.foldLeft((SchedulerLogicIntentsBuilder.empty, pendingLaunch)) {
+            case ((intents, pending), offer) =>
+              val (matchedPodIds, offerMatchIntents) = matchOffer(offer, pendingLaunch.flatMap { podId =>
+                specs.podSpecs.get(podId)
+              }(collection.breakOut))
 
-        (intents ++ offerMatchIntents, pending -- matchedPodIds)
-      }
-      intents.result
-    } else if (event.hasUpdate) {
-      val taskStatus: Mesos.TaskStatus = event.getUpdate.getStatus
-      val taskId = TaskId(taskStatus.getTaskId.getValue)
-      val podId = podIdFor(taskId)
+              (intents ++ offerMatchIntents, pending -- matchedPodIds)
+          }
+        intents.result
 
-      if (specs.podSpecs.contains(podId)) {
-        val newState = state.podStatuses.get(podId) match {
-          case Some(status) =>
-            status.copy(taskStatuses = status.taskStatuses.updated(taskId, taskStatus))
-          case None =>
-            PodStatus(podId, Map(taskId -> taskStatus))
+      case UpdateEvent(updateEvent) =>
+        val taskStatus: Mesos.TaskStatus = updateEvent.getStatus
+        val taskId = TaskId(taskStatus.getTaskId.getValue)
+        val podId = podIdFor(taskId)
+
+        if (specs.podSpecs.contains(podId)) {
+          val newState = state.podStatuses.get(podId) match {
+            case Some(status) =>
+              status.copy(taskStatuses = status.taskStatuses.updated(taskId, taskStatus))
+            case None =>
+              PodStatus(podId, Map(taskId -> taskStatus))
+          }
+
+          SchedulerLogicIntents(stateIntents = List(PodStatusUpdated(podId, Some(newState))))
+
+        } else {
+          SchedulerLogicIntents.empty
         }
-
-        SchedulerLogicIntents(stateIntents = List(PodStatusUpdated(podId, Some(newState))))
-
-      } else {
+      case other =>
+        logger.warn(s"No handler defined for event ${other.getType} - ${other}")
         SchedulerLogicIntents.empty
-      }
-    } else {
-      ???
     }
   }
 

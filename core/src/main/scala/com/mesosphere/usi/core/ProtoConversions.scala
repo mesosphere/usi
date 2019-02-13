@@ -3,6 +3,7 @@ package com.mesosphere.usi.core
 import com.mesosphere.usi.core.models.{AgentId, TaskId}
 import org.apache.mesos.v1.{Protos => Mesos}
 import scala.collection.immutable.NumericRange
+import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
 private[usi] object ProtoConversions {
   implicit class AgentIdProtoConversions(agentId: AgentId) {
@@ -38,6 +39,17 @@ private[usi] object ProtoConversions {
         .setBegin(n.toLong(value.head))
         .setEnd(n.toLong(value.last))
         .build()
+    }
+  }
+
+  object EventMatchers {
+    object OffersEvent {
+      def unapply(event: MesosEvent): Option[MesosEvent.Offers] =
+        if (event.hasOffers) Some(event.getOffers) else None
+    }
+    object UpdateEvent {
+      def unapply(event: MesosEvent): Option[MesosEvent.Update] =
+        if (event.hasUpdate) Some(event.getUpdate) else None
     }
   }
 }

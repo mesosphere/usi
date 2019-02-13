@@ -2,9 +2,9 @@ package com.mesosphere.usi.core
 
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
+import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.models.SpecEvent
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
-
 
 import scala.collection.mutable
 
@@ -41,7 +41,7 @@ object SchedulerLogicGraph {
   * It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
   * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
-class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, MesosEvent, FrameResult]] {
+class SchedulerLogicGraph(mesosCallFactory: MesosCalls) extends GraphStage[FanInShape2[SpecEvent, MesosEvent, FrameResult]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
   val mesosEventsInlet = Inlet[MesosEvent]("mesos-events")
@@ -53,21 +53,21 @@ class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, MesosEvent, 
 
   // This is where the actual (possibly stateful) logic will live
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
-    val schedulerLogic = new SchedulerLogic
+    val handler = new SchedulerLogicHandler(mesosCallFactory)
 
     new GraphStageLogic(shape) {
       val pendingEffects: mutable.Queue[FrameResult] = mutable.Queue.empty
 
       setHandler(mesosEventsInlet, new InHandler {
         override def onPush(): Unit = {
-          pushOrQueueIntents(schedulerLogic.processMesosEvent(grab(mesosEventsInlet)))
+          pushOrQueueIntents(handler.processMesosEvent(grab(mesosEventsInlet)))
           maybePull()
         }
       })
 
       setHandler(specEventsInlet, new InHandler {
         override def onPush(): Unit = {
-          pushOrQueueIntents(schedulerLogic.processSpecEvent(grab(specEventsInlet)))
+          pushOrQueueIntents(handler.processSpecEvent(grab(specEventsInlet)))
           maybePull()
         }
       })

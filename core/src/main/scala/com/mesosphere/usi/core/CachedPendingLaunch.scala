@@ -1,5 +1,5 @@
 package com.mesosphere.usi.core
-import com.mesosphere.usi.core.models.PodId
+import com.mesosphere.usi.core.models.{Goal, PodId, PodRecord}
 
 case class CachedPendingLaunch(pendingLaunch: Set[PodId] = Set.empty) {
 
@@ -14,7 +14,7 @@ case class CachedPendingLaunch(pendingLaunch: Set[PodId] = Set.empty) {
     var newPendingLaunch = pendingLaunch
     podIds.foreach { podId =>
       val shouldBeLaunched = specs.podSpecs.get(podId).exists { podSpec =>
-        SchedulerLogic.pendingLaunch(podSpec.goal, state.podRecords.get(podId))
+        pendingLaunch(podSpec.goal, state.podRecords.get(podId))
       }
       if (shouldBeLaunched)
         newPendingLaunch += podId
@@ -23,5 +23,9 @@ case class CachedPendingLaunch(pendingLaunch: Set[PodId] = Set.empty) {
     }
 
     CachedPendingLaunch(newPendingLaunch)
+  }
+
+  private[core] def pendingLaunch(goal: Goal, podRecord: Option[PodRecord]): Boolean = {
+    (goal == Goal.Running) && podRecord.isEmpty
   }
 }
