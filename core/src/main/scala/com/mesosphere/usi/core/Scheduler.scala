@@ -5,7 +5,6 @@ import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL}
 import akka.stream.{BidiShape, FlowShape}
 import com.mesosphere._
 import com.mesosphere.usi.core.models.{Mesos, SpecEvent, StateEvent}
-import com.typesafe.scalalogging.LazyLogging
 import com.typesafe.scalalogging.Logger
 import scala.concurrent.Future
 
@@ -44,15 +43,15 @@ import scala.concurrent.Future
  *                                     |                      |
  *                                     +----------------------+
  */
-object Scheduler extends LazyLogging {
+object Scheduler {
 
-  val log = Logger.takingImplicit[KvArgs](getClass)
+  private val log = Logger.takingImplicit[KvArgs](getClass)
 
   case class MesosConnection(mesosHostName: String)
 
   def connect(mesosHostName: String): Future[(MesosConnection, Flow[SpecEvent, StateEvent, NotUsed])] = {
-    val composedLogger = log.ctx(("mesosHostName", mesosHostName))
-    composedLogger.info(s"Connecting to $mesosHostName")(composedLogger.getCtx)
+    val composedLogger = log.withCtx("mesosHostName", mesosHostName)
+    composedLogger.info(s"Connecting to $mesosHostName")(composedLogger.ctx)
     val flow = Flow.fromGraph {
       GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
