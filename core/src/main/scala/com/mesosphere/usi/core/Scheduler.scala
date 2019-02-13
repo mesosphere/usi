@@ -51,7 +51,8 @@ object Scheduler extends LazyLogging {
   case class MesosConnection(mesosHostName: String)
 
   def connect(mesosHostName: String): Future[(MesosConnection, Flow[SpecEvent, StateEvent, NotUsed])] = {
-    log.info(s"Connecting to {}", mesosHostName)(("mesosHostName", mesosHostName))
+    val composedLogger = log.ctx(("mesosHostName", mesosHostName))
+    composedLogger.info(s"Connecting to $mesosHostName")(composedLogger.getCtx)
     val flow = Flow.fromGraph {
       GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
