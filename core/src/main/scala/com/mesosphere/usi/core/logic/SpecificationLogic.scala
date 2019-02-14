@@ -9,14 +9,9 @@ import org.apache.mesos.v1.{Protos => Mesos}
 /**
   * The current home for USI business logic
   *
-  * TODO separate the Mesos and the specification logic.
   */
 private[core] class SpecificationLogic(mesosCallFactory: MesosCalls) extends StrictLogging {
   import SchedulerLogicHelpers._
-  private def terminalOrUnreachable(status: PodStatus): Boolean = {
-    // TODO - temporary stub implementation
-    status.taskStatuses.values.forall(status => status.getState == Mesos.TaskState.TASK_RUNNING)
-  }
 
   /**
     * Process the modification of some podSpec.
@@ -30,12 +25,12 @@ private[core] class SpecificationLogic(mesosCallFactory: MesosCalls) extends Str
       changedPodIds: Set[PodId]): SchedulerEvents = {
     import com.mesosphere.usi.core.protos.ProtoConversions._
     changedPodIds
-      .foldLeft(SchedulerEventsBuilder.empty) { (initialIntents, podId) =>
+      .foldLeft(SchedulerEventsBuilder.empty) { (initialSchedulerEvents, podId) =>
         specs.podSpecs.get(podId) match {
           case None =>
             // TODO - this should be spurious if the podStatus is non-terminal
             def maybePrunePodStatus(effects: SchedulerEventsBuilder) = {
-              val existingTerminalStatus = state.podStatuses.get(podId).exists(terminalOrUnreachable(_))
+              val existingTerminalStatus = state.podStatuses.get(podId).exists(_.isTerminalOrUnreachable)
               if (existingTerminalStatus) {
                 effects.withPodStatus(podId, None)
               } else {
@@ -52,40 +47,18 @@ private[core] class SpecificationLogic(mesosCallFactory: MesosCalls) extends Str
               }
             }
 
-            maybePrunePodStatus(maybePruneRecord(initialIntents))
+            maybePrunePodStatus(maybePruneRecord(initialSchedulerEvents))
 
           case Some(podSpec) =>
             if (podSpec.goal == Goal.Terminal) {
-              taskIdsFor(podSpec).foldLeft(initialIntents) { (effects, taskId) =>
+              taskIdsFor(podSpec).foldLeft(initialSchedulerEvents) { (effects, taskId) =>
                 effects.withMesosCall(
                   mesosCallFactory.newKill(taskId.asProto, state.podRecords.get(podSpec.id).map(_.agentId.asProto), None))
               }
             } else {
-              initialIntents
+              initialSchedulerEvents
             }
         }
-      }
-      .result
-  }
-
-  /**
-    * We remove a task if it is not reachable and running, and it has no podSpec defined
-    *
-    * Should be called with the effects already applied for the specified podIds
-    *
-    * @param podIds podIds changed during the last state
-    * @return
-    */
-  def pruneTaskStatuses(specs: SpecState, state: SchedulerState)(
-      podIds: Set[PodId]): SchedulerEvents = {
-    podIds.iterator.filter { podId =>
-      state.podStatuses.contains(podId)
-    }.filter { podId =>
-      val podSpecDefined = !specs.podSpecs.contains(podId)
-      // prune terminal statuses for which there's no defined podSpec
-      !podSpecDefined && terminalOrUnreachable(state.podStatuses(podId))
-    }.foldLeft(SchedulerEventsBuilder.empty) { (effects, podId) =>
-        effects.withPodStatus(podId, None)
       }
       .result
   }

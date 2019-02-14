@@ -18,19 +18,19 @@ import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
   * @param dirtyPodIds The podIds that have been changed during the lifecycle of this FrameWithEvents instance
   */
 case class FrameResultBuilder(specs: SpecState, state: SchedulerState, appliedStateEvents: List[StateEvent], mesosCalls: List[MesosCall], dirtyPodIds: Set[PodId]) {
-  private def applyAndAccumulate(intents: SchedulerEvents): FrameResultBuilder = {
-    if (intents == SchedulerEvents.empty)
+  private def applyAndAccumulate(schedulerEvents: SchedulerEvents): FrameResultBuilder = {
+    if (schedulerEvents == SchedulerEvents.empty)
       this
     else {
       // TODO - we need to handle status snapshots and create a mechanism to signal that all cache should be recomputed
-      val newDirty = dirtyPodIds ++ intents.stateEvents.iterator.collect {
+      val newDirty = dirtyPodIds ++ schedulerEvents.stateEvents.iterator.collect {
         case podEvent: PodStateEvent => podEvent.id
       }
       copy(
-        state = state.applyStateIntents(intents.stateEvents),
+        state = state.applyStateIntents(schedulerEvents.stateEvents),
         dirtyPodIds = newDirty,
-        appliedStateEvents = appliedStateEvents ++ intents.stateEvents,
-        mesosCalls = mesosCalls ++ intents.mesosCalls)
+        appliedStateEvents = appliedStateEvents ++ schedulerEvents.stateEvents,
+        mesosCalls = mesosCalls ++ schedulerEvents.mesosCalls)
     }
   }
 

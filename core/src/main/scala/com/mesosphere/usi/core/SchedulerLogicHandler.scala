@@ -106,7 +106,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) extends 
   private def handleFrame(fn: FrameResultBuilder => FrameResultBuilder): SchedulerEvents = {
     val frameResultBuilder = fn(FrameResultBuilder.givenState(this.specs, this.state)).process {
       (specs, state, dirtyPodIds) =>
-        schedulerLogic.pruneTaskStatuses(specs, state)(dirtyPodIds)
+        pruneTaskStatuses(specs, state)(dirtyPodIds)
     }.process(updateCachesAndRevive)
 
     // update our state for the next frame processing
@@ -142,5 +142,27 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) extends 
         mesosEventsLogic.processEvent(specs, state, cachedPendingLaunch.pendingLaunch)(event)
       }
     }
+  }
+
+  /**
+    * We remove a task if it is not reachable and running, and it has no podSpec defined
+    *
+    * Should be called with the effects already applied for the specified podIds
+    *
+    * @param podIds podIds changed during the last state
+    * @return
+    */
+  private def pruneTaskStatuses(specs: SpecState, state: SchedulerState)(
+    podIds: Set[PodId]): SchedulerEvents = {
+    podIds.iterator.filter { podId =>
+      state.podStatuses.contains(podId)
+    }.filter { podId =>
+      val podSpecDefined = !specs.podSpecs.contains(podId)
+      // prune terminal statuses for which there's no defined podSpec
+      !podSpecDefined && state.podStatuses(podId).isTerminalOrUnreachable
+    }.foldLeft(SchedulerEventsBuilder.empty) { (effects, podId) =>
+      effects.withPodStatus(podId, None)
+    }
+      .result
   }
 }
