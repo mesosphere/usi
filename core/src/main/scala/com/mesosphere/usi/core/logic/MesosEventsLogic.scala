@@ -107,16 +107,16 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Stric
     import com.mesosphere.usi.core.protos.ProtoConversions.EventMatchers._
     event match {
       case OffersEvent(offersList) =>
-        val (intents, pending) =
+        val (schedulerEventsBuilder, _) =
           offersList.asScala.foldLeft((SchedulerEventsBuilder.empty, pendingLaunch)) {
-            case ((intents, pending), offer) =>
-              val (matchedPodIds, offerMatchIntents) = matchOffer(offer, pendingLaunch.flatMap { podId =>
+            case ((builder, pending), offer) =>
+              val (matchedPodIds, offerMatchSchedulerEvents) = matchOffer(offer, pendingLaunch.flatMap { podId =>
                 specs.podSpecs.get(podId)
               }(collection.breakOut))
 
-              (intents ++ offerMatchIntents, pending -- matchedPodIds)
+              (builder ++ offerMatchSchedulerEvents, pending -- matchedPodIds)
           }
-        intents.result
+        schedulerEventsBuilder.result
 
       case UpdateEvent(taskStatus) =>
         val taskId = TaskId(taskStatus.getTaskId.getValue)

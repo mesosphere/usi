@@ -18,19 +18,19 @@ import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
   * @param dirtyPodIds The podIds that have been changed during the lifecycle of this FrameWithEvents instance
   */
 case class FrameResultBuilder(specs: SpecState, state: SchedulerState, appliedStateEvents: List[StateEvent], mesosCalls: List[MesosCall], dirtyPodIds: Set[PodId]) {
-  private def applyAndAccumulate(intents: SchedulerEvents): FrameResultBuilder = {
-    if (intents == SchedulerEvents.empty)
+  private def applyAndAccumulate(schedulerEvents: SchedulerEvents): FrameResultBuilder = {
+    if (schedulerEvents == SchedulerEvents.empty)
       this
     else {
       // TODO - we need to handle status snapshots and create a mechanism to signal that all cache should be recomputed
-      val newDirty = dirtyPodIds ++ intents.stateEvents.iterator.collect {
+      val newDirty = dirtyPodIds ++ schedulerEvents.stateEvents.iterator.collect {
         case podEvent: PodStateEvent => podEvent.id
       }
       copy(
-        state = state.applyStateIntents(intents.stateEvents),
+        state = state.applyStateIntents(schedulerEvents.stateEvents),
         dirtyPodIds = newDirty,
-        appliedStateEvents = appliedStateEvents ++ intents.stateEvents,
-        mesosCalls = mesosCalls ++ intents.mesosCalls)
+        appliedStateEvents = appliedStateEvents ++ schedulerEvents.stateEvents,
+        mesosCalls = mesosCalls ++ schedulerEvents.mesosCalls)
     }
   }
 
@@ -75,6 +75,51 @@ case class FrameResultBuilder(specs: SpecState, state: SchedulerState, appliedSt
 
   lazy val result: SchedulerEvents =
     SchedulerEvents(stateEvents = appliedStateEvents, mesosCalls = mesosCalls)
+
+  /**
+    * Instantiate a frameResultBuilder instance, call the handler, then follow up with housekeeping:
+    *
+    * - Prune terminal / unreachable podStatuses for which no podSpec is defined
+    * - Update the pending launch set index / cache
+    * - (WIP) issue any revive calls (this should be done elsewhere)
+    *
+    * @return The total state effects applied over the life-cycle of this state evaluation.
+    */
+  def handleFrame(fn: FrameResultBuilder => FrameResultBuilder): SchedulerEvents = {
+    val frameResultBuilder = fn(FrameResultBuilder.givenState(this.specs, this.state)).process {
+      (specs, state, dirtyPodIds) =>
+        pruneTaskStatuses(specs, state)(dirtyPodIds)
+    }.process(updateCachesAndRevive)
+
+    // update our state for the next frame processing
+    this.state = frameResultBuilder.state
+    this.specs = frameResultBuilder.specs
+
+    // Return our result
+    frameResultBuilder.result
+  }
+
+  /**
+    * We remove a task if it is not reachable and running, and it has no podSpec defined
+    *
+    * Should be called with the effects already applied for the specified podIds
+    *
+    * @param podIds podIds changed during the last state
+    * @return
+    */
+  def pruneTaskStatuses(specs: SpecState, state: SchedulerState)(
+    podIds: Set[PodId]): SchedulerEvents = {
+    podIds.iterator.filter { podId =>
+      state.podStatuses.contains(podId)
+    }.filter { podId =>
+      val podSpecDefined = !specs.podSpecs.contains(podId)
+      // prune terminal statuses for which there's no defined podSpec
+      !podSpecDefined && terminalOrUnreachable(state.podStatuses(podId))
+    }.foldLeft(SchedulerEventsBuilder.empty) { (effects, podId) =>
+      effects.withPodStatus(podId, None)
+    }
+      .result
+  }
 }
 
 object FrameResultBuilder {
