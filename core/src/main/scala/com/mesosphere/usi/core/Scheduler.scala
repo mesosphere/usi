@@ -5,7 +5,6 @@ import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL}
 import akka.stream.{BidiShape, FlowShape}
 import com.mesosphere._
 import com.mesosphere.usi.core.models.{Mesos, SpecEvent, StateEvent}
-import com.typesafe.scalalogging.Logger
 import scala.concurrent.Future
 
 /*
@@ -43,15 +42,12 @@ import scala.concurrent.Future
  *                                     |                      |
  *                                     +----------------------+
  */
-object Scheduler {
-
-  private val log = Logger.takingImplicit[KvArgs](getClass)
+object Scheduler extends ImplicitStrictLogging {
 
   case class MesosConnection(mesosHostName: String)
 
   def connect(mesosHostName: String): Future[(MesosConnection, Flow[SpecEvent, StateEvent, NotUsed])] = {
-    val composedLogger = log.withContext("mesosHostName", mesosHostName)
-    composedLogger.info(s"Connecting to $mesosHostName")(composedLogger.context)
+    logger.info(s"Connecting to $mesosHostName")(kv("mesosHostName", mesosHostName))
     val flow = Flow.fromGraph {
       GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
