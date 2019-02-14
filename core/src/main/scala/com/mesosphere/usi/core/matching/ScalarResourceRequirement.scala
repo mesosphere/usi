@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 import org.apache.mesos.v1.{Protos => Mesos}
 
 case class ScalarResourceRequirement(resourceType: ResourceType, amount: Double) extends ResourceRequirement {
-  import com.mesosphere.usi.core.ProtoConversions._
+  import com.mesosphere.usi.core.protos.ProtoConversions._
   override def description: String = s"${resourceType}:${amount}"
   @tailrec private def iter(
       unmatchedResources: List[Mesos.Resource],

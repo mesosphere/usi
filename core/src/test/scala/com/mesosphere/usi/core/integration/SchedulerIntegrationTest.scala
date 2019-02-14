@@ -1,8 +1,10 @@
 package com.mesosphere.usi.core.integration
-import akka.stream.{ActorMaterializer, OverflowStrategy}
-import akka.stream.scaladsl.{Keep, Sink, Source}
+
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.Keep
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
+import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
 import com.mesosphere.usi.core.launching.SimpleShellCommandInfoGenerator
 import com.mesosphere.usi.core.matching.ScalarResourceRequirement
 import com.mesosphere.usi.core.models._
@@ -21,10 +23,9 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     val client = Scheduler.connect(settings, frameworkInfo).futureValue
 
     val podId = PodId("pod-1")
-    val (input, output) = Source
-      .queue[SpecEvent](16, OverflowStrategy.fail)
+    val (input, output) = specInputSource(SpecsSnapshot.empty)
       .via(client.schedulerFlow)
-      .toMat(Sink.queue())(Keep.both)
+      .toMat(outputFlatteningSink)(Keep.both)
       .run
 
     input.offer(PodSpecUpdated(podId, Some(PodSpec(podId, Goal.Running, RunSpec(
@@ -33,6 +34,10 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
         ScalarResourceRequirement(ResourceType.MEM, 256)),
       commandBuilder = SimpleShellCommandInfoGenerator("sleep 3600"))))))
 
+    inside(output.pull().futureValue) {
+      case Some(snapshot: StateSnapshot) =>
+        snapshot shouldBe StateSnapshot.empty
+    }
     inside(output.pull().futureValue) {
       case Some(podRecord: PodRecordUpdated) =>
         podRecord.id shouldBe podId

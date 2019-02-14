@@ -1,9 +1,11 @@
-package com.mesosphere.usi.core
-
+package com.mesosphere.usi.core.protos
 import com.mesosphere.usi.core.models.{AgentId, TaskId}
-import org.apache.mesos.v1.{Protos => Mesos}
+
 import scala.collection.immutable.NumericRange
+import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
+
+
 
 private[usi] object ProtoConversions {
   implicit class AgentIdProtoConversions(agentId: AgentId) {

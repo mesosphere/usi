@@ -1,7 +1,7 @@
 package com.mesosphere.usi.core.matching
 
 import com.mesosphere.usi.core.models.{ResourceMatchResult, ResourceType}
-import com.mesosphere.usi.core.{ProtoBuilders, ProtoConversions}
+import com.mesosphere.usi.core.protos.{ProtoBuilders, ProtoConversions}
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest.Inside

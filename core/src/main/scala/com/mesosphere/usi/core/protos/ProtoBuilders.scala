@@ -1,8 +1,17 @@
-package com.mesosphere.usi.core
-
+package com.mesosphere.usi.core.protos
 import com.google.protobuf.ByteString
+
 import org.apache.mesos.v1.{Protos => Mesos}
 
+/**
+  * Collection of helper ProtoBuilders for convenience
+  *
+  * These are maintained by hand. All proto builders implemented should follow the following rule:
+  *
+  * - Repeated proto fields are specified by an Iterable, which defaults to empty
+  * - Required fields are required by the method signature
+  * - Non-required fields should default to null, with the exception of primitives (int, double, etc.); primitives use Optional out of necessity
+  */
 private[usi] object ProtoBuilders {
     def newAgentId(id: String): Mesos.AgentID = {
       Mesos.AgentID.newBuilder().setValue(id).build

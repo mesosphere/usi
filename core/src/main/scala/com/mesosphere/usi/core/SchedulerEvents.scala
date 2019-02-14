@@ -11,9 +11,9 @@ import com.mesosphere.usi.core.models.{
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
 
 
-case class SchedulerLogicIntents(stateIntents: List[StateEvent] = Nil, mesosIntents: List[MesosCall] = Nil)
-object SchedulerLogicIntents {
-  val empty = SchedulerLogicIntents()
+case class SchedulerEvents(stateEvents: List[StateEvent] = Nil, mesosCalls: List[MesosCall] = Nil)
+object SchedulerEvents {
+  val empty = SchedulerEvents()
 }
 
 /**
@@ -24,19 +24,18 @@ object SchedulerLogicIntents {
   * Effects preserve order. For append-efficiency a link-list data structure is used. List is lazily reversed when
   * effects are asked for.
   *
-  * @param reverseStateEvents
-  * @param reverseMesosCalls
+  * Note, SchedulerEventsBuilder will accumulate state events. The scheduler logic loop happens to consume this.
   */
-case class SchedulerLogicIntentsBuilder(reverseStateEvents: List[StateEvent] = Nil, reverseMesosCalls: List[MesosCall] = Nil) {
-  lazy val result = SchedulerLogicIntents(reverseStateEvents.reverse, reverseMesosCalls.reverse)
+case class SchedulerEventsBuilder(reverseStateEvents: List[StateEvent] = Nil, reverseMesosCalls: List[MesosCall] = Nil) {
+  lazy val result = SchedulerEvents(reverseStateEvents.reverse, reverseMesosCalls.reverse)
 
-  def ++(other: SchedulerLogicIntentsBuilder): SchedulerLogicIntentsBuilder = {
-    if (other == SchedulerLogicIntentsBuilder.empty)
+  def ++(other: SchedulerEventsBuilder): SchedulerEventsBuilder = {
+    if (other == SchedulerEventsBuilder.empty)
       this
-    else if (this == SchedulerLogicIntentsBuilder.empty)
+    else if (this == SchedulerEventsBuilder.empty)
       other
     else
-      SchedulerLogicIntentsBuilder(other.reverseStateEvents ++ reverseStateEvents, other.reverseMesosCalls ++ reverseMesosCalls)
+      SchedulerEventsBuilder(other.reverseStateEvents ++ reverseStateEvents, other.reverseMesosCalls ++ reverseMesosCalls)
   }
 
   /**
@@ -46,7 +45,7 @@ case class SchedulerLogicIntentsBuilder(reverseStateEvents: List[StateEvent] = N
     * @param newStatus Optional value; None means remove
     * @return A FrameEffects with this effect appended
     */
-  def withPodStatus(id: PodId, newStatus: Option[PodStatus]): SchedulerLogicIntentsBuilder =
+  def withPodStatus(id: PodId, newStatus: Option[PodStatus]): SchedulerEventsBuilder =
     withStateUpdated(PodStatusUpdated(id, newStatus))
 
   /**
@@ -56,10 +55,10 @@ case class SchedulerLogicIntentsBuilder(reverseStateEvents: List[StateEvent] = N
     * @param newStatus Optional value; None means remove
     * @return A FrameEffects with this effect appended
     */
-  def withPodRecord(id: PodId, newRecord: Option[PodRecord]): SchedulerLogicIntentsBuilder =
+  def withPodRecord(id: PodId, newRecord: Option[PodRecord]): SchedulerEventsBuilder =
     withStateUpdated(PodRecordUpdated(id, newRecord))
 
-  private def withStateUpdated(message: StateEvent): SchedulerLogicIntentsBuilder =
+  private def withStateUpdated(message: StateEvent): SchedulerEventsBuilder =
     copy(reverseStateEvents = message :: reverseStateEvents)
 
   /**
@@ -68,9 +67,9 @@ case class SchedulerLogicIntentsBuilder(reverseStateEvents: List[StateEvent] = N
     * @param call The Mesos call
     * @return A FrameEffects with this effect appended
     */
-  def withMesosCall(call: MesosCall): SchedulerLogicIntentsBuilder = copy(reverseMesosCalls = call :: reverseMesosCalls)
+  def withMesosCall(call: MesosCall): SchedulerEventsBuilder = copy(reverseMesosCalls = call :: reverseMesosCalls)
 }
 
-object SchedulerLogicIntentsBuilder {
-  val empty = SchedulerLogicIntentsBuilder()
+object SchedulerEventsBuilder {
+  val empty = SchedulerEventsBuilder()
 }
