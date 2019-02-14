@@ -106,9 +106,9 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Stric
     event: MesosEvent): SchedulerEvents = {
     import com.mesosphere.usi.core.protos.ProtoConversions.EventMatchers._
     event match {
-      case OffersEvent(offersEvent) =>
+      case OffersEvent(offersList) =>
         val (intents, pending) =
-          offersEvent.getOffersList.asScala.foldLeft((SchedulerEventsBuilder.empty, pendingLaunch)) {
+          offersList.asScala.foldLeft((SchedulerEventsBuilder.empty, pendingLaunch)) {
             case ((intents, pending), offer) =>
               val (matchedPodIds, offerMatchIntents) = matchOffer(offer, pendingLaunch.flatMap { podId =>
                 specs.podSpecs.get(podId)
@@ -118,8 +118,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Stric
           }
         intents.result
 
-      case UpdateEvent(updateEvent) =>
-        val taskStatus: Mesos.TaskStatus = updateEvent.getStatus
+      case UpdateEvent(taskStatus) =>
         val taskId = TaskId(taskStatus.getTaskId.getValue)
         val podId = podIdFor(taskId)
 

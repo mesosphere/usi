@@ -46,12 +46,13 @@ private[usi] object ProtoConversions {
 
   object EventMatchers {
     object OffersEvent {
-      def unapply(event: MesosEvent): Option[MesosEvent.Offers] =
-        if (event.hasOffers) Some(event.getOffers) else None
+      def unapply(event: MesosEvent): Option[java.util.List[Mesos.Offer]] =
+        if (event.hasOffers) Some(event.getOffers.getOffersList) else None
     }
+
     object UpdateEvent {
-      def unapply(event: MesosEvent): Option[MesosEvent.Update] =
-        if (event.hasUpdate) Some(event.getUpdate) else None
+      def unapply(event: MesosEvent): Option[Mesos.TaskStatus] =
+        if (event.hasUpdate) Some(event.getUpdate.getStatus) else None
     }
   }
 }
