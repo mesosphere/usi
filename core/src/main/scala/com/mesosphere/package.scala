@@ -6,6 +6,20 @@ import com.typesafe.scalalogging.LoggerTakingImplicit
 import org.slf4j.MDC
 
 package object mesosphere {
+  implicit case object CanLogKvArgsEv extends CanLog[KvArgs] {
+    override def logMessage(originalMsg: String, a: KvArgs): String = {
+      for (elem <- a.args) {
+        val (key, value) = elem
+        MDC.put(key, value.toString)
+      }
+      originalMsg
+    }
+
+    override def afterLog(a: KvArgs): Unit = a.args.foreach { case (key, _) => MDC.remove(key) }
+  }
+}
+
+package mesosphere {
 
   /**
    * Abstractions in this class were designed with below interests:
@@ -27,15 +41,17 @@ package object mesosphere {
    *    // import all the implicit defined here in to scope.
    *    import com.mesosphere._
    *
-   *    // Make a log statement with no context.
-   *    // This needs an implicit context but the above import bought an empty context in to scope.
-   *    logger.info("hello world!")
+   *    // Mixin one of the traits.
+   *    class MyClass with ImplicitStrictLogging {....
+   *
+   *    // Make a log statement with no (empty) context.
+   *    logger.info("hello world!")(KvArgs())
    *
    *    // Make a log statement with some context.
-   *    logger.info("hello world!")(kv("key1", "value1"))
+   *    logger.info("hello world!")(KvArgs("key1", "value1"))
    *
    *    // Make a log statement with more context.
-   *    val moreContext = kv("key1", "value1").and("key2", "value2").and("key3", "value3")
+   *    val moreContext = KvArgs("key1", "value1").and("key2", "value2").and("key3", "value3")
    *    log.info("hello world!")(moreContext.and("key3", "key4"))
    *
    *    // The above statement will log through whatever backend slf4j was tied to statically.
@@ -44,38 +60,25 @@ package object mesosphere {
    * }}}
    */
 
-  type KvArgs = Traversable[(String, Any)]
-
-  implicit case object CanLogKvArgsEv extends CanLog[KvArgs] {
-    override def logMessage(originalMsg: String, a: KvArgs): String = {
-      for (elem <- a) {
-        val (key, value) = elem
-        MDC.put(key, value.toString)
-      }
-      originalMsg
-    }
-
-    override def afterLog(a: KvArgs): Unit = a.foreach { case (key, _) => MDC.remove(key) }
-  }
-
-  implicit val emptyKvArgs: KvArgs = Traversable()
-
-  def kv(kv: (String, Any)): KvArgs = Traversable(kv)
-
-  def kv(key: String, value: Any): KvArgs = kv((key, value))
-
-  implicit class KvArgsOps(val self: KvArgs) extends AnyVal {
+  case class KvArgs(args: Traversable[(String, Any)]) {
     /**
      * Helper methods to enable fluent composition of context parameter(s).
      */
-    def and(kv: KvArgs): KvArgs = self ++ kv
+    def and(kv: KvArgs): KvArgs = copy(args ++ kv.args)
 
-    def and(k: String, v: String): KvArgs = self and kv(k, v)
+    def and(k: String, v: String): KvArgs = and(KvArgs(k, v))
   }
 
-}
+  object KvArgs {
+    // This defines an empty context.
+    // Can be used to make log statements with implicit logger that needs no context.
+    def apply(): KvArgs = KvArgs(Traversable())
 
-package mesosphere {
+    def apply(kv: (String, Any)*): KvArgs = KvArgs(kv)
+
+    def apply(key: String, value: Any): KvArgs = KvArgs((key, value))
+  }
+
   /**
    * Defines `logger` as a value initialized with an underlying `org.slf4j.Logger`
    * named according to the class into which this trait is mixed.
@@ -88,14 +91,14 @@ package mesosphere {
   }
 
   /**
-   * Defines `logger` as a value initialized with an underlying `org.slf4j.Logger`
+   * Defines `logger` as a lazy value initialized with an underlying `org.slf4j.Logger`
    * named according to the class into which this trait is mixed.
    *
    * Also refer [[com.typesafe.scalalogging.LazyLogging]]
    */
   trait ImplicitLazyLogging {
     @transient
-    protected val logger: LoggerTakingImplicit[KvArgs] =
+    protected lazy val logger: LoggerTakingImplicit[KvArgs] =
       Logger.takingImplicit[KvArgs](getClass)
   }
 }

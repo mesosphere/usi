@@ -47,7 +47,7 @@ object Scheduler extends ImplicitStrictLogging {
   case class MesosConnection(mesosHostName: String)
 
   def connect(mesosHostName: String): Future[(MesosConnection, Flow[SpecEvent, StateEvent, NotUsed])] = {
-    logger.info(s"Connecting to $mesosHostName")(kv("mesosHostName", mesosHostName))
+    logger.info(s"Connecting to $mesosHostName")(KvArgs("mesosHostName", mesosHostName))
     val flow = Flow.fromGraph {
       GraphDSL.create(Scheduler.unconnectedGraph, FakeMesos.flow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
