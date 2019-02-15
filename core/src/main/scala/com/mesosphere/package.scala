@@ -33,7 +33,6 @@ package mesosphere {
    *     - Pass the context to another method or class which has no information about context built so far
    *       and thus can chose to built context further on top of the current context OR start fresh.
    *
-   * The types declared here such as [[KvArgs]] and its value classes can be used through out the project.
    * Following snippet shows an example of how the [[LoggerTakingImplicit]] can be used with the
    * abstractions defined here :
    *
@@ -60,21 +59,21 @@ package mesosphere {
    * }}}
    */
 
-  case class KvArgs(args: Traversable[(String, Any)]) {
+  case class KvArgs(args: List[(String, Any)]) {
     /**
      * Helper methods to enable fluent composition of context parameter(s).
      */
     def and(kv: KvArgs): KvArgs = copy(args ++ kv.args)
 
-    def and(k: String, v: String): KvArgs = and(KvArgs(k, v))
+    def and(k: String, v: Any): KvArgs = copy(args ++ KvArgs(k, v).args)
   }
 
   object KvArgs {
     // This defines an empty context.
     // Can be used to make log statements with implicit logger that needs no context.
-    def apply(): KvArgs = KvArgs(Traversable())
+    def apply(): KvArgs = KvArgs(List())
 
-    def apply(kv: (String, Any)*): KvArgs = KvArgs(kv)
+    def apply(kv: (String, Any)*): KvArgs = KvArgs(kv.toList)
 
     def apply(key: String, value: Any): KvArgs = KvArgs((key, value))
   }
