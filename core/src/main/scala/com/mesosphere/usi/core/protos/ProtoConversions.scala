@@ -4,8 +4,7 @@ import com.mesosphere.usi.core.models.{AgentId, TaskId}
 import scala.collection.immutable.NumericRange
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
-
-
+import scala.collection.JavaConverters._
 
 private[usi] object ProtoConversions {
   implicit class AgentIdProtoConversions(agentId: AgentId) {
@@ -35,12 +34,26 @@ private[usi] object ProtoConversions {
     }
   }
 
-  implicit class RangeAsValueRange[T: Numeric](value: NumericRange.Inclusive[T])(implicit n: Numeric[T]) {
+  implicit class RangeAsValueRange(value: Range.Inclusive) {
+    def asProtoRange: Mesos.Value.Range = {
+      Mesos.Value.Range.newBuilder
+        .setBegin(value.head.toLong)
+        .setEnd(value.last.toLong)
+        .build()
+    }
+  }
+  implicit class NumericRangeAsValueRange[T: Numeric](value: NumericRange.Inclusive[T])(implicit n: Numeric[T]) {
     def asProtoRange: Mesos.Value.Range = {
       Mesos.Value.Range.newBuilder
         .setBegin(n.toLong(value.head))
         .setEnd(n.toLong(value.last))
         .build()
+    }
+  }
+
+  implicit class IterableStringStringLikeAsLabels(mapLike: Iterable[(String, String)]) {
+    def asProtoLabels: Mesos.Labels = {
+      Mesos.Labels.newBuilder().addAllLabels(mapLike.map { case (key, value) => Mesos.Label.newBuilder().setKey(key).setValue(value).build }.asJava).build
     }
   }
 

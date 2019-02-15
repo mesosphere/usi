@@ -4,13 +4,12 @@ import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
 import com.mesosphere.usi.core.models._
 import com.typesafe.scalalogging.StrictLogging
-import org.apache.mesos.v1.{Protos => Mesos}
 
 /**
   * The current home for USI business logic
   *
   */
-private[core] class SpecificationLogic(mesosCallFactory: MesosCalls) extends StrictLogging {
+private[core] class SpecLogic(mesosCallFactory: MesosCalls) extends StrictLogging {
   import SchedulerLogicHelpers._
 
   /**

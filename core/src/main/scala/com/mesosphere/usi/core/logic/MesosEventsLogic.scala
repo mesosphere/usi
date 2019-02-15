@@ -19,7 +19,7 @@ import scala.collection.JavaConverters._
   */
 private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends StrictLogging {
   import SchedulerLogicHelpers._
-  case class ResourceMatch(podSpec: PodSpec, resources: Seq[Mesos.Resource])
+  private case class ResourceMatch(podSpec: PodSpec, resources: Seq[Mesos.Resource])
   @tailrec private def maybeMatchPodSpec(
                                           remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
                                           matchedResources: List[Mesos.Resource],
@@ -76,7 +76,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Stric
     }
   }
 
-  def matchOffer(offer: Mesos.Offer, specs: Iterable[PodSpec]): (Set[PodId], SchedulerEventsBuilder) = {
+  private def matchOffer(offer: Mesos.Offer, specs: Iterable[PodSpec]): (Set[PodId], SchedulerEventsBuilder) = {
     import com.mesosphere.usi.core.protos.ProtoBuilders._
     import com.mesosphere.usi.core.protos.ProtoConversions._
     val groupedResources = offer.getResourcesList.asScala.groupBy { r =>

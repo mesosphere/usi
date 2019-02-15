@@ -1,6 +1,6 @@
 package com.mesosphere.usi.core
 import com.mesosphere.mesos.client.MesosCalls
-import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecificationLogic}
+import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
 import com.mesosphere.usi.core.models.{PodId, SpecEvent}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
@@ -64,7 +64,7 @@ import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
   */
 private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) extends StrictLogging {
 
-  private val schedulerLogic = new SpecificationLogic(mesosCallFactory)
+  private val schedulerLogic = new SpecLogic(mesosCallFactory)
   private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory)
   /**
     * Our view of the framework-implementations specifications, which we replicate by consuming Specification events
