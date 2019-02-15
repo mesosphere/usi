@@ -1,7 +1,8 @@
 package com.mesosphere.usi.core.integration
 
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Keep
+import akka.stream.scaladsl.{Keep, Sink}
+import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
@@ -19,11 +20,12 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     val settings = MesosClientSettings(mesosFacade.url)
     val frameworkInfo = Protos.FrameworkInfo.newBuilder().setUser("test").setName("SimpleHelloWorldExample").build()
 
-    val client = Scheduler.connect(settings, frameworkInfo).futureValue
+    val client = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
+    val schedulerFlow = Scheduler.fromClient(client)
 
     val podId = PodId("pod-1")
     val (input, output) = specInputSource(SpecsSnapshot.empty)
-      .via(client.schedulerFlow)
+      .via(schedulerFlow)
       .toMat(outputFlatteningSink)(Keep.both)
       .run
 

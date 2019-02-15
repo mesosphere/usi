@@ -54,23 +54,11 @@ object Scheduler {
 
   type StateOutput = (StateSnapshot, Source[StateEvent, Any])
 
-  case class MesosConnection(mesosHostName: String, mesosCallFactory: MesosCalls, frameworkId: FrameworkID, schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])
-
-  // TODO - provide abstraction for FrameworkID persistence, recovery, etc.; we'll want to exclude the frameworkId
-  // TODO - This layer should provide a cancellation mechanism and an auto-reconnect mechanism
-  def connect(settings: MesosClientSettings, frameworkInfo: FrameworkInfo)(
-      implicit actorSystem: ActorSystem,
-      materializer: ActorMaterializer): Future[MesosConnection] = {
-
-    import scala.concurrent.ExecutionContext.Implicits.global
-
-    MesosClient(settings, frameworkInfo).runWith(Sink.head).map { client =>
-      val flow = mesosConnectedGraph(client.calls, Flow.fromSinkAndSource(client.mesosSink, client.mesosSource))
-      MesosConnection(settings.master, client.calls, client.frameworkId, flow)
-    }
+  def fromClient(client: MesosClient): Flow[SpecInput, StateOutput, NotUsed] = {
+    fromFlow(client.calls, Flow.fromSinkAndSource(client.mesosSink, client.mesosSource))
   }
 
-  def mesosConnectedGraph(mesosCallFactory: MesosCalls, mesosFlow: Flow[MesosCall, MesosEvent, Any]): Flow[SpecInput, StateOutput, NotUsed] = {
+  def fromFlow(mesosCallFactory: MesosCalls, mesosFlow: Flow[MesosCall, MesosEvent, Any]): Flow[SpecInput, StateOutput, NotUsed] = {
     Flow.fromGraph {
       GraphDSL.create(unconnectedGraph(mesosCallFactory), mesosFlow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mesos) =>
