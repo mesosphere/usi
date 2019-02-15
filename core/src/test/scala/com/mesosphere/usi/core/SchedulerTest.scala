@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep}
 import akka.stream.{ActorMaterializer, FlowShape}
 import com.mesosphere.mesos.client.MesosCalls
-import com.mesosphere.usi.core.helpers.FakeMesos
+import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
 import com.mesosphere.usi.core.matching.ScalarResourceRequirement
 import com.mesosphere.usi.core.models._
@@ -15,17 +15,17 @@ import org.scalatest._
 
 class SchedulerTest extends AkkaUnitTest with Inside {
 
-  val loggingMesosFakeFlow: Flow[MesosCall, MesosEvent, NotUsed] = Flow[MesosCall].map { call =>
+  val loggingMockMesosFlow: Flow[MesosCall, MesosEvent, NotUsed] = Flow[MesosCall].map { call =>
     logger.info(s"Mesos call: ${call}")
     call
-  }.via(FakeMesos.flow).map { event =>
+  }.via(MesosMock.flow).map { event =>
     logger.info(s"Mesos event: ${event}")
     event
   }
 
   val mockedScheduler: Flow[Scheduler.SpecInput, Scheduler.StateOutput, NotUsed] = {
     Flow.fromGraph {
-      GraphDSL.create(Scheduler.unconnectedGraph(new MesosCalls(FakeMesos.fakeFrameworkId)), loggingMesosFakeFlow)((_, _) => NotUsed) { implicit builder =>
+      GraphDSL.create(Scheduler.unconnectedGraph(new MesosCalls(MesosMock.mockFrameworkId)), loggingMockMesosFlow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
           import GraphDSL.Implicits._
 
@@ -40,7 +40,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   "It reports a running task when I provide " in {
     implicit val materializer = ActorMaterializer()
-    val podId = PodId("pod-1")
+    val podId = PodId("running-pod-on-a-mocked-mesos")
     val (input, output) = specInputSource(SpecsSnapshot.empty)
       .via(mockedScheduler)
       .toMat(outputFlatteningSink)(Keep.both)
@@ -59,7 +59,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     inside(output.pull().futureValue) {
       case Some(podRecord: PodRecordUpdated) =>
         podRecord.id shouldBe podId
-        podRecord.newRecord.get.agentId shouldBe FakeMesos.fakeAgentId
+        podRecord.newRecord.get.agentId shouldBe MesosMock.mockAgentId
     }
     inside(output.pull().futureValue) {
       case Some(podStatusChange: PodStatusUpdated) =>

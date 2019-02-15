@@ -6,6 +6,7 @@ import org.apache.mesos.v1.{Protos => Mesos}
   * Used for resource matching.
   */
 trait ResourceRequirement {
+
   /**
     * A human readable description for this resource requirement
     */

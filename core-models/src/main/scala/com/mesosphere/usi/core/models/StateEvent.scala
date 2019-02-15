@@ -21,6 +21,7 @@ case class StateSnapshot(
 object StateSnapshot {
   def empty = StateSnapshot(Nil, Nil, Nil, Nil)
 }
+
 /**
   * Trait which describes an update for any of the USI managed state.
   */

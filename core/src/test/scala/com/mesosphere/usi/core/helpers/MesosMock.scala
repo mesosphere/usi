@@ -8,19 +8,19 @@ import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import scala.collection.JavaConverters._
 
-object FakeMesos {
+object MesosMock {
   import com.mesosphere.usi.core.protos.ProtoBuilders._
   import com.mesosphere.usi.core.protos.ProtoConversions._
-  val fakeAgentId = AgentId("fake-agent")
-  val fakeFrameworkId = ProtoBuilders.newFrameworkId("fake-framework")
+  val mockAgentId = AgentId("mock-agent")
+  val mockFrameworkId = ProtoBuilders.newFrameworkId("mock-framework")
   val flow: Flow[MesosCall, MesosEvent, NotUsed] = {
     Flow[MesosCall].async.mapConcat { call =>
       val result: List[MesosEvent] = if (call.hasRevive) {
 
         val offer = newOffer(
           id = newOfferId("testing"),
-          agentId = fakeAgentId.asProto,
-          frameworkID = fakeFrameworkId,
+          agentId = mockAgentId.asProto,
+          frameworkID = mockFrameworkId,
           hostname = "some-host",
           resources = Seq(
             newResource("cpus", Mesos.Value.Type.SCALAR, scalar = 4.asProtoScalar),
