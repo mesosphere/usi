@@ -48,7 +48,7 @@ import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
   *      v
   * (beginning of frame)
   *   apply pod launch logic:
-  *     emit Mesos accept offer call for matched pending launch pods
+  *     create an intent for Mesos accept offer call for matched pending launch pods
   *     specify the existence of a podRecord, with the launch time and agentId
   *   update internal cache
   *   process revive / suppress need
