@@ -84,11 +84,11 @@ object Scheduler {
     rest.prepend(Source.single(snapshot))
   }
 
+  // TODO (DCOS-47476) use actual prefixAndTail and expect first event to be a Snapshot; change the prefixAndTail param from 0 value to 1, let fail, etc.
   private val stateOutputBreakoutFlow: Flow[StateEvent, StateOutput, NotUsed] = Flow[StateEvent].prefixAndTail(0).map { case (_, stateEvents) =>
-    // TODO (DCOS-47476) use actual prefixAndTail and expect first event to be a Snapshot
     val stateUpdates = stateEvents.map {
       case c: StateUpdated => c
-      case _ => ???
+      case _: StateSnapshot => throw new IllegalStateException("Only the first event is allowed to be a state snapshot")
     }
     (StateSnapshot.empty, stateUpdates)
   }
