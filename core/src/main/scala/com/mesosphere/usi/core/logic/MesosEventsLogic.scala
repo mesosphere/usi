@@ -21,10 +21,10 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Stric
   import SchedulerLogicHelpers._
   private case class ResourceMatch(podSpec: PodSpec, resources: Seq[Mesos.Resource])
   @tailrec private def maybeMatchPodSpec(
-                                          remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
-                                          matchedResources: List[Mesos.Resource],
-                                          resourceRequirements: List[ResourceRequirement])
-  : Option[(List[Mesos.Resource], Map[ResourceType, Seq[Mesos.Resource]])] = {
+      remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
+      matchedResources: List[Mesos.Resource],
+      resourceRequirements: List[ResourceRequirement])
+    : Option[(List[Mesos.Resource], Map[ResourceType, Seq[Mesos.Resource]])] = {
     resourceRequirements match {
       case Nil =>
         Some((matchedResources, remainingResources))
@@ -44,10 +44,10 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Stric
   }
 
   @tailrec private def matchPodSpecsTaskRecords(
-                                                 offer: Mesos.Offer,
-                                                 remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
-                                                 result: Map[PodId, List[Mesos.TaskInfo]],
-                                                 pendingLaunchPodSpecs: List[PodSpec]): Map[PodId, List[Mesos.TaskInfo]] = {
+      offer: Mesos.Offer,
+      remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
+      result: Map[PodId, List[Mesos.TaskInfo]],
+      pendingLaunchPodSpecs: List[PodSpec]): Map[PodId, List[Mesos.TaskInfo]] = {
 
     import com.mesosphere.usi.core.protos.ProtoBuilders._
     import com.mesosphere.usi.core.protos.ProtoConversions._
@@ -65,8 +65,13 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Stric
                 taskId.asProto,
                 name = "hi",
                 agentId = offer.getAgentId,
-                command = podSpec.runSpec.commandBuilder.buildCommandInfo(),
-                resources = matchedResources)
+                command = Mesos.CommandInfo
+                  .newBuilder()
+                  .setShell(true)
+                  .setValue(podSpec.runSpec.shellCommand)
+                  .build,
+                resources = matchedResources
+              )
             }(collection.breakOut)
 
             matchPodSpecsTaskRecords(offer, newRemainingResources, result.updated(podSpec.id, taskInfos), rest)
@@ -87,23 +92,21 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Stric
       intents.withPodRecord(podId, Some(PodRecord(podId, Instant.now(), offer.getAgentId.asModel)))
     }
 
-    val op = newOfferOperation(
-      Mesos.Offer.Operation.Type.LAUNCH,
-      launch = newOfferOperationLaunch(taskInfos.values.flatten))
+    val op =
+      newOfferOperation(Mesos.Offer.Operation.Type.LAUNCH, launch = newOfferOperationLaunch(taskInfos.values.flatten))
 
     val acceptBuilder = MesosCall.Accept
       .newBuilder()
       .addOperations(op)
       .addOfferIds(offer.getId)
 
-    val intents = intentsBuilder.withMesosCall(
-      mesosCallFactory.newAccept(acceptBuilder.build))
+    val intents = intentsBuilder.withMesosCall(mesosCallFactory.newAccept(acceptBuilder.build))
 
     (taskInfos.keySet, intents)
   }
 
   def processEvent(specs: SpecState, state: SchedulerState, pendingLaunch: Set[PodId])(
-    event: MesosEvent): SchedulerEvents = {
+      event: MesosEvent): SchedulerEvents = {
     import com.mesosphere.usi.core.protos.ProtoConversions.EventMatchers._
     event match {
       case OffersEvent(offersList) =>

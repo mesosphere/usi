@@ -5,7 +5,6 @@ import akka.stream.scaladsl.Keep
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
-import com.mesosphere.usi.core.launching.SimpleShellCommandInfoGenerator
 import com.mesosphere.usi.core.matching.ScalarResourceRequirement
 import com.mesosphere.usi.core.models._
 import com.mesosphere.utils.AkkaUnitTest
@@ -32,7 +31,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
       resourceRequirements = List(
         ScalarResourceRequirement(ResourceType.CPUS, 1),
         ScalarResourceRequirement(ResourceType.MEM, 256)),
-      commandBuilder = SimpleShellCommandInfoGenerator("sleep 3600"))))))
+      shellCommand = "sleep 3600")))))
 
     inside(output.pull().futureValue) {
       case Some(snapshot: StateSnapshot) =>
