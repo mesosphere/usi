@@ -11,19 +11,24 @@ import com.mesosphere.usi.core.models.{SpecEvent, SpecUpdated, SpecsSnapshot, St
   */
 object SchedulerStreamTestHelpers {
   def specInputSource(snapshot: SpecsSnapshot): Source[Scheduler.SpecInput, SourceQueueWithComplete[SpecUpdated]] = {
-    Source.queue[SpecEvent](32, OverflowStrategy.fail).mapMaterializedValue { specQueue =>
-      specQueue.offer(snapshot)
-      specQueue.asInstanceOf[SourceQueueWithComplete[SpecUpdated]]
-    }.prefixAndTail(1).map { case (Seq(snapshot), updates) =>
-      (snapshot.asInstanceOf[SpecsSnapshot], updates.asInstanceOf[Source[SpecUpdated, NotUsed]])
-    }
+    Source
+      .queue[SpecEvent](32, OverflowStrategy.fail)
+      .mapMaterializedValue { specQueue =>
+        specQueue.offer(snapshot)
+        specQueue.asInstanceOf[SourceQueueWithComplete[SpecUpdated]]
+      }
+      .prefixAndTail(1)
+      .map {
+        case (Seq(snapshot), updates) =>
+          (snapshot.asInstanceOf[SpecsSnapshot], updates.asInstanceOf[Source[SpecUpdated, NotUsed]])
+      }
   }
 
   def outputFlatteningSink: Sink[Scheduler.StateOutput, SinkQueueWithCancel[StateEvent]] = {
-    Flow[Scheduler.StateOutput].flatMapConcat { case (snapshot, updates) =>
-      updates.prepend(Source.single(snapshot))
+    Flow[Scheduler.StateOutput].flatMapConcat {
+      case (snapshot, updates) =>
+        updates.prepend(Source.single(snapshot))
     }.toMat(Sink.queue())(Keep.right)
   }
-
 
 }

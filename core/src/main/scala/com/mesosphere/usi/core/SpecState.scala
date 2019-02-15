@@ -5,4 +5,3 @@ case class SpecState(podSpecs: Map[PodId, PodSpec])
 object SpecState {
   val empty = SpecState(Map.empty)
 }
-

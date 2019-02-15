@@ -66,6 +66,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) extends 
 
   private val schedulerLogic = new SpecLogic(mesosCallFactory)
   private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory)
+
   /**
     * Our view of the framework-implementations specifications, which we replicate by consuming Specification events
     */
@@ -123,9 +124,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) extends 
       dirtyPodIds: Set[PodId]): SchedulerEvents = {
     this.cachedPendingLaunch = this.cachedPendingLaunch.update(specs, state, dirtyPodIds)
     if (cachedPendingLaunch.pendingLaunch.nonEmpty)
-      SchedulerEvents(
-        mesosCalls = List(
-          mesosCallFactory.newRevive(None)))
+      SchedulerEvents(mesosCalls = List(mesosCallFactory.newRevive(None)))
     else
       SchedulerEvents.empty
   }
@@ -152,8 +151,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) extends 
     * @param podIds podIds changed during the last state
     * @return
     */
-  private def pruneTaskStatuses(specs: SpecState, state: SchedulerState)(
-    podIds: Set[PodId]): SchedulerEvents = {
+  private def pruneTaskStatuses(specs: SpecState, state: SchedulerState)(podIds: Set[PodId]): SchedulerEvents = {
     podIds.iterator.filter { podId =>
       state.podStatuses.contains(podId)
     }.filter { podId =>
@@ -161,8 +159,8 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) extends 
       // prune terminal statuses for which there's no defined podSpec
       !podSpecDefined && state.podStatuses(podId).isTerminalOrUnreachable
     }.foldLeft(SchedulerEventsBuilder.empty) { (effects, podId) =>
-      effects.withPodStatus(podId, None)
-    }
+        effects.withPodStatus(podId, None)
+      }
       .result
   }
 }

@@ -17,7 +17,12 @@ import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
   * @param mesosCalls The cumulative Mesos calls that are intended to be sent
   * @param dirtyPodIds The podIds that have been changed during the lifecycle of this FrameWithEvents instance
   */
-case class FrameResultBuilder(specs: SpecState, state: SchedulerState, appliedStateEvents: List[StateEvent], mesosCalls: List[MesosCall], dirtyPodIds: Set[PodId]) {
+case class FrameResultBuilder(
+    specs: SpecState,
+    state: SchedulerState,
+    appliedStateEvents: List[StateEvent],
+    mesosCalls: List[MesosCall],
+    dirtyPodIds: Set[PodId]) {
   private def applyAndAccumulate(schedulerEvents: SchedulerEvents): FrameResultBuilder = {
     if (schedulerEvents == SchedulerEvents.empty)
       this
@@ -32,16 +37,20 @@ case class FrameResultBuilder(specs: SpecState, state: SchedulerState, appliedSt
         state = state.applyStateIntents(schedulerEvents.stateEvents),
         dirtyPodIds = newDirty,
         appliedStateEvents = appliedStateEvents ++ schedulerEvents.stateEvents,
-        mesosCalls = mesosCalls ++ schedulerEvents.mesosCalls)
+        mesosCalls = mesosCalls ++ schedulerEvents.mesosCalls
+      )
     }
   }
 
-  private def assertValidPodspecTransition(id: PodId, maybeOldState: Option[PodSpec], maybeNewState: Option[PodSpec]): Unit = {
+  private def assertValidPodspecTransition(
+      id: PodId,
+      maybeOldState: Option[PodSpec],
+      maybeNewState: Option[PodSpec]): Unit = {
     (maybeOldState, maybeNewState) match {
       case (Some(oldState), Some(newState)) if newState.goal == Goal.Running && oldState.goal == Goal.Terminal =>
         throw new RuntimeException("It is illegal to transition a podSpec from terminal to running")
       case _ =>
-        // Okie dokie
+      // Okie dokie
     }
   }
 

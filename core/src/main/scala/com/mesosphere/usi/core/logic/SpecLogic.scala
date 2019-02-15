@@ -52,7 +52,8 @@ private[core] class SpecLogic(mesosCallFactory: MesosCalls) extends StrictLoggin
             if (podSpec.goal == Goal.Terminal) {
               taskIdsFor(podSpec).foldLeft(initialSchedulerEvents) { (effects, taskId) =>
                 effects.withMesosCall(
-                  mesosCallFactory.newKill(taskId.asProto, state.podRecords.get(podSpec.id).map(_.agentId.asProto), None))
+                  mesosCallFactory
+                    .newKill(taskId.asProto, state.podRecords.get(podSpec.id).map(_.agentId.asProto), None))
               }
             } else {
               initialSchedulerEvents
@@ -62,4 +63,3 @@ private[core] class SpecLogic(mesosCallFactory: MesosCalls) extends StrictLoggin
       .result
   }
 }
-

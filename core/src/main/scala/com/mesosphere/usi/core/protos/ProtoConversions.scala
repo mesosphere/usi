@@ -53,7 +53,11 @@ private[usi] object ProtoConversions {
 
   implicit class IterableStringStringLikeAsLabels(mapLike: Iterable[(String, String)]) {
     def asProtoLabels: Mesos.Labels = {
-      Mesos.Labels.newBuilder().addAllLabels(mapLike.map { case (key, value) => Mesos.Label.newBuilder().setKey(key).setValue(value).build }.asJava).build
+      Mesos.Labels
+        .newBuilder()
+        .addAllLabels(
+          mapLike.map { case (key, value) => Mesos.Label.newBuilder().setKey(key).setValue(value).build }.asJava)
+        .build
     }
   }
 

@@ -98,8 +98,7 @@ class SimpleHelloWorldFramework(conf: Config) extends StrictLoggingFlow {
     * 3. The above stage can produce zero or more Mesos [[org.apache.mesos.v1.scheduler.Protos.Call]]s which then are sent using [[MesosClient.mesosSink]]
     *
     */
-  client
-    .mesosSource
+  client.mesosSource
     .statefulMapConcat(() => {
 
       // Task state. This variable is overridden when task state changes e.g. task is being launched or received

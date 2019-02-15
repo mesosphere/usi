@@ -199,7 +199,9 @@ object ResourceUtil extends StrictLogging {
     val principal = resource.getReservationsList().asScala.lastOption.map(_.getPrincipal)
 
     lazy val resourceName = {
-      val principalString = principal.map { p => s", RESERVED for ${p}" }.getOrElse("")
+      val principalString = principal.map { p =>
+        s", RESERVED for ${p}"
+      }.getOrElse("")
       val diskString =
         if (resource.hasDisk && resource.getDisk.hasPersistence)
           s", diskId ${resource.getDisk.getPersistence.getId}"

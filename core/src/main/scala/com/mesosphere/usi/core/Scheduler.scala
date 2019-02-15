@@ -1,16 +1,11 @@
 package com.mesosphere.usi.core
 
 import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, Source}
-import akka.stream.{ActorMaterializer, BidiShape, FlowShape}
+import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Source}
+import akka.stream.{BidiShape, FlowShape}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
-import com.mesosphere.mesos.conf.MesosClientSettings
-import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.core.models.{SpecEvent, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot, StateUpdated}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
-import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo}
-
-import scala.concurrent.Future
 
 /*
  * Provides the scheduler graph component. The component has two inputs, and two outputs:
@@ -58,7 +53,9 @@ object Scheduler {
     fromFlow(client.calls, Flow.fromSinkAndSource(client.mesosSink, client.mesosSource))
   }
 
-  def fromFlow(mesosCallFactory: MesosCalls, mesosFlow: Flow[MesosCall, MesosEvent, Any]): Flow[SpecInput, StateOutput, NotUsed] = {
+  def fromFlow(
+      mesosCallFactory: MesosCalls,
+      mesosFlow: Flow[MesosCall, MesosEvent, Any]): Flow[SpecInput, StateOutput, NotUsed] = {
     Flow.fromGraph {
       GraphDSL.create(unconnectedGraph(mesosCallFactory), mesosFlow)((_, _) => NotUsed) { implicit builder =>
         { (graph, mesos) =>
@@ -80,20 +77,24 @@ object Scheduler {
     *
     * However, for convenience in working with streams, internally we deal with a single stream of SpecEvents.
     */
-  private val specInputFlatteningFlow: Flow[SpecInput, SpecEvent, NotUsed] = Flow[SpecInput].flatMapConcat { case (snapshot, rest) =>
-    rest.prepend(Source.single(snapshot))
+  private val specInputFlatteningFlow: Flow[SpecInput, SpecEvent, NotUsed] = Flow[SpecInput].flatMapConcat {
+    case (snapshot, rest) =>
+      rest.prepend(Source.single(snapshot))
   }
 
   // TODO (DCOS-47476) use actual prefixAndTail and expect first event to be a Snapshot; change the prefixAndTail param from 0 value to 1, let fail, etc.
-  private val stateOutputBreakoutFlow: Flow[StateEvent, StateOutput, NotUsed] = Flow[StateEvent].prefixAndTail(0).map { case (_, stateEvents) =>
-    val stateUpdates = stateEvents.map {
-      case c: StateUpdated => c
-      case _: StateSnapshot => throw new IllegalStateException("Only the first event is allowed to be a state snapshot")
-    }
-    (StateSnapshot.empty, stateUpdates)
+  private val stateOutputBreakoutFlow: Flow[StateEvent, StateOutput, NotUsed] = Flow[StateEvent].prefixAndTail(0).map {
+    case (_, stateEvents) =>
+      val stateUpdates = stateEvents.map {
+        case c: StateUpdated => c
+        case _: StateSnapshot =>
+          throw new IllegalStateException("Only the first event is allowed to be a state snapshot")
+      }
+      (StateSnapshot.empty, stateUpdates)
   }
 
-  def unconnectedGraph(mesosCallFactory: MesosCalls): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
+  def unconnectedGraph(
+      mesosCallFactory: MesosCalls): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
     BidiFlow.fromGraph {
       GraphDSL.create(new SchedulerLogicGraph(mesosCallFactory)) { implicit builder => (schedulerLogic) =>
         {

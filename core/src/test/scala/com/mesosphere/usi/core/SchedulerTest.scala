@@ -25,7 +25,8 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   val mockedScheduler: Flow[Scheduler.SpecInput, Scheduler.StateOutput, NotUsed] = {
     Flow.fromGraph {
-      GraphDSL.create(Scheduler.unconnectedGraph(new MesosCalls(MesosMock.mockFrameworkId)), loggingMockMesosFlow)((_, _) => NotUsed) { implicit builder =>
+      GraphDSL.create(Scheduler.unconnectedGraph(new MesosCalls(MesosMock.mockFrameworkId)), loggingMockMesosFlow)(
+        (_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
           import GraphDSL.Implicits._
 
@@ -46,11 +47,18 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       .toMat(outputFlatteningSink)(Keep.both)
       .run
 
-    input.offer(PodSpecUpdated(podId, Some(PodSpec(podId, Goal.Running, RunSpec(
-      resourceRequirements = List(
-        ScalarResourceRequirement(ResourceType.CPUS, 1),
-        ScalarResourceRequirement(ResourceType.MEM, 256)),
-      shellCommand = "sleep 3600")))))
+    input.offer(
+      PodSpecUpdated(
+        podId,
+        Some(PodSpec(
+          podId,
+          Goal.Running,
+          RunSpec(
+            resourceRequirements =
+              List(ScalarResourceRequirement(ResourceType.CPUS, 1), ScalarResourceRequirement(ResourceType.MEM, 256)),
+            shellCommand = "sleep 3600")
+        ))
+      ))
 
     inside(output.pull().futureValue) {
       case Some(snapshot: StateSnapshot) =>
