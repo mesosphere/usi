@@ -113,8 +113,6 @@ trait MesosClient {
   def mesosSink: Sink[Call, Future[Done]]
 }
 
-// TODO: Add more integration tests
-
 object MesosClient extends StrictLogging with StrictLoggingFlow {
   case class MesosRedirectException(leader: URI) extends Exception(s"New mesos leader available at $leader")
 

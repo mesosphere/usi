@@ -27,8 +27,8 @@ private[core] class SpecLogic(mesosCallFactory: MesosCalls) extends StrictLoggin
       .foldLeft(SchedulerEventsBuilder.empty) { (initialSchedulerEvents, podId) =>
         specs.podSpecs.get(podId) match {
           case None =>
-            // TODO - this should be spurious if the podStatus is non-terminal
             def maybePrunePodStatus(effects: SchedulerEventsBuilder) = {
+              // This is spurious if e have a non-terminal podStatus
               val existingTerminalStatus = state.podStatuses.get(podId).exists(_.isTerminalOrUnreachable)
               if (existingTerminalStatus) {
                 effects.withPodStatus(podId, None)

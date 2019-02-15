@@ -35,9 +35,9 @@ case class SchedulerState(podRecords: Map[PodId, PodRecord], podStatuses: Map[Po
           case None =>
             newPodStatuses -= statusChange.id
         }
-      case agentRecordChange: AgentRecordUpdated => // TODO
-      case reservationStatusChange: ReservationStatusUpdated => // TODO
-      case statusSnapshot: StateSnapshot => // TODO
+      case agentRecordChange: AgentRecordUpdated => ???
+      case reservationStatusChange: ReservationStatusUpdated => ???
+      case statusSnapshot: StateSnapshot => ???
     }
 
     copy(podRecords = newPodRecords, podStatuses = newPodStatuses)

@@ -14,8 +14,6 @@ import scala.collection.JavaConverters._
 
 /**
   * The current home for USI Mesos event related logic
-  *
-  * TODO separate the Mesos and the specification logic.
   */
 private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends StrictLogging {
   import SchedulerLogicHelpers._
@@ -37,7 +35,6 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Stric
               rest)
           case None =>
             // we didn't match
-            // TODO - expose explanation as to why we didn't match
             None
         }
     }

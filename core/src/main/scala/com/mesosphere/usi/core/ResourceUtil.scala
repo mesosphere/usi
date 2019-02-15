@@ -15,21 +15,33 @@ object ResourceUtil extends StrictLogging {
     */
   private[this] case class ResourceMatchKey(
       name: String,
+      allocationRole: String,
       reservations: Seq[ReservationInfo],
       disk: Option[DiskInfo])
 
   private[this] object ResourceMatchKey {
     def apply(resource: Mesos.Resource): ResourceMatchKey = {
+      require(resource.hasAllocationInfo, "AllocationInfo is expected to be set")
+      val allocationRole = resource.getAllocationInfo.getRole
       val reservations = resource.getReservationsList.asScala
       val disk = if (resource.hasDisk) Some(resource.getDisk) else None
       // role is included in the ResourceMatchKey by the reservation.
-      ResourceMatchKey(resource.getName, reservations.toList, disk)
+      ResourceMatchKey(resource.getName, allocationRole, reservations.toList, disk)
     }
   }
 
   /**
     * Decrements the scalar resource by amount
     *
+    * Note: we're doing floating point math here (with double precision). This means there is some small amount of
+    * rounding errors. Historically, these have not been known to cause actual problems. There are corner cases where,
+    * when launching multiple tasks on the same scalar resource, we could think have a micro-fraction less remaining for
+    * some resource than we actually do, and where some other task would've fit perfectly we assume it to not.
+    *
+    * As far as Mesos is concerned, small amounts of precision errors (< 1E-13) are not an issue, because Mesos uses
+    * fixed precision for Scalar resources with 3 significant digits.
+    *
+    * See https://issues.apache.org/jira/browse/MESOS-4687 for more info.
     */
   def consumeScalarResource(resource: Mesos.Resource, amount: Double): Option[Mesos.Resource] = {
     require(resource.getType == Mesos.Value.Type.SCALAR)
@@ -37,7 +49,6 @@ object ResourceUtil extends StrictLogging {
       resource.hasDisk && resource.getDisk.hasSource &&
         (resource.getDisk.getSource.getType == Source.Type.MOUNT)
 
-    // TODO(jdef) would be nice to use fixed precision like Mesos does for scalar math
     val leftOver: Double = resource.getScalar.getValue - amount
     if (leftOver <= 0 || isMountDiskResource) {
       None

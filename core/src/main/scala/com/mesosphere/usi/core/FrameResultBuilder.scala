@@ -22,9 +22,11 @@ case class FrameResultBuilder(specs: SpecState, state: SchedulerState, appliedSt
     if (schedulerEvents == SchedulerEvents.empty)
       this
     else {
-      // TODO - we need to handle status snapshots and create a mechanism to signal that all cache should be recomputed
       val newDirty = dirtyPodIds ++ schedulerEvents.stateEvents.iterator.collect {
         case podEvent: PodStateEvent => podEvent.id
+        case _: StateSnapshot =>
+          // We need to handle status snapshots and create a mechanism to signal that all cache should be recomputed
+          ???
       }
       copy(
         state = state.applyStateIntents(schedulerEvents.stateEvents),
@@ -34,13 +36,21 @@ case class FrameResultBuilder(specs: SpecState, state: SchedulerState, appliedSt
     }
   }
 
+  private def assertValidPodspecTransition(id: PodId, maybeOldState: Option[PodSpec], maybeNewState: Option[PodSpec]): Unit = {
+    (maybeOldState, maybeNewState) match {
+      case (Some(oldState), Some(newState)) if newState.goal == Goal.Running && oldState.goal == Goal.Terminal =>
+        throw new RuntimeException("It is illegal to transition a podSpec from terminal to running")
+      case _ =>
+        // Okie dokie
+    }
+  }
+
   /**
     * Applies the specEvent to the frame, marking podIds as dirty accordingly
     *
     * @param specEvent
     */
   def applySpecEvent(specEvent: SpecEvent): FrameResultBuilder = {
-    // TODO - assert valid transition
     specEvent match {
       case SpecsSnapshot(podSpecSnapshot, reservationSpecSnapshot) =>
         if (reservationSpecSnapshot.nonEmpty) {
@@ -56,6 +66,7 @@ case class FrameResultBuilder(specs: SpecState, state: SchedulerState, appliedSt
         copy(specs = specs.copy(podSpecs = newPodsSpecs), dirtyPodIds = dirtyPodIds ++ changedPodIds)
 
       case PodSpecUpdated(id, newState) =>
+        assertValidPodspecTransition(id, specs.podSpecs.get(id), newState)
         val newPodSpecs = newState match {
           case Some(podSpec) =>
             specs.podSpecs.updated(id, podSpec)

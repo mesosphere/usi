@@ -12,9 +12,8 @@ import org.apache.mesos.v1.{Protos => Mesos}
   * If we have a [[PodStatus]] without a [[PodRecord]], then this means we have discovered a spurious pod for which
   * there is no specification.
   */
-case class PodStatus(id: PodId, taskStatuses: Map[TaskId, Mesos.TaskStatus] /* TODO: use Mesos task state */ ) {
+case class PodStatus(id: PodId, taskStatuses: Map[TaskId, Mesos.TaskStatus]) {
   def isTerminalOrUnreachable: Boolean = {
-    // TODO - temporary stub implementation
     taskStatuses.values.forall(status => status.getState == Mesos.TaskState.TASK_RUNNING)
   }
 }

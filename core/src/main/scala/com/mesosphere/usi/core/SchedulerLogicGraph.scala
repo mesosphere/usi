@@ -41,7 +41,8 @@ object SchedulerLogicGraph {
   * It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
   * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
-class SchedulerLogicGraph(mesosCallFactory: MesosCalls) extends GraphStage[FanInShape2[SpecEvent, MesosEvent, SchedulerEvents]] {
+class SchedulerLogicGraph(mesosCallFactory: MesosCalls)
+    extends GraphStage[FanInShape2[SpecEvent, MesosEvent, SchedulerEvents]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
   val mesosEventsInlet = Inlet[MesosEvent]("mesos-events")
