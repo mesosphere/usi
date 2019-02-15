@@ -23,7 +23,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     val client = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
     val schedulerFlow = Scheduler.fromClient(client)
 
-    val podId = PodId("pod-1")
+    val podId = PodId("scheduler-integration-test-pod")
     val (input, output) = specInputSource(SpecsSnapshot.empty)
       .via(schedulerFlow)
       .toMat(outputFlatteningSink)(Keep.both)
