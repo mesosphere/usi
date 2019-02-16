@@ -115,7 +115,7 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
          |mesos-client.master-url="${mesosUrl.getHost}:${mesosUrl.getPort}"
     """.stripMargin).withFallback(ConfigFactory.load())
 
-    val settings = MesosClientSettings(config.getConfig("mesos-client"))
+    val settings = MesosClientSettings.fromConfig(config.getConfig("mesos-client"))
 
     val client = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
 

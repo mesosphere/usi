@@ -2,7 +2,9 @@ package com.mesosphere.usi.core
 
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
-import com.mesosphere.usi.core.models.{Mesos, SpecEvent}
+import com.mesosphere.mesos.client.MesosCalls
+import com.mesosphere.usi.core.models.SpecEvent
+import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
 import scala.collection.mutable
 
@@ -39,33 +41,34 @@ object SchedulerLogicGraph {
   * It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
   * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
-class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event, FrameResult]] {
+class SchedulerLogicGraph(mesosCallFactory: MesosCalls)
+    extends GraphStage[FanInShape2[SpecEvent, MesosEvent, SchedulerEvents]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
-  val mesosEventsInlet = Inlet[Mesos.Event]("mesos-events")
+  val mesosEventsInlet = Inlet[MesosEvent]("mesos-events")
   val specEventsInlet = Inlet[SpecEvent]("specs")
-  val frameResultOutlet = Outlet[FrameResult]("effects")
+  val frameResultOutlet = Outlet[SchedulerEvents]("effects")
   // Define the shape of this stage, which is SourceShape with the port we defined above
-  override val shape: FanInShape2[SpecEvent, Mesos.Event, FrameResult] =
+  override val shape: FanInShape2[SpecEvent, MesosEvent, SchedulerEvents] =
     new FanInShape2(specEventsInlet, mesosEventsInlet, frameResultOutlet)
 
   // This is where the actual (possibly stateful) logic will live
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
-    val schedulerLogic = new SchedulerLogic
+    val handler = new SchedulerLogicHandler(mesosCallFactory)
 
     new GraphStageLogic(shape) {
-      val pendingEffects: mutable.Queue[FrameResult] = mutable.Queue.empty
+      val pendingEffects: mutable.Queue[SchedulerEvents] = mutable.Queue.empty
 
       setHandler(mesosEventsInlet, new InHandler {
         override def onPush(): Unit = {
-          pushOrQueueIntents(schedulerLogic.processMesosEvent(grab(mesosEventsInlet)))
+          pushOrQueueIntents(handler.handleMesosEvent(grab(mesosEventsInlet)))
           maybePull()
         }
       })
 
       setHandler(specEventsInlet, new InHandler {
         override def onPush(): Unit = {
-          pushOrQueueIntents(schedulerLogic.processSpecEvent(grab(specEventsInlet)))
+          pushOrQueueIntents(handler.handleSpecEvent(grab(specEventsInlet)))
           maybePull()
         }
       })
@@ -85,7 +88,7 @@ class SchedulerLogicGraph extends GraphStage[FanInShape2[SpecEvent, Mesos.Event,
         pull(mesosEventsInlet)
       }
 
-      def pushOrQueueIntents(effects: FrameResult): Unit = {
+      def pushOrQueueIntents(effects: SchedulerEvents): Unit = {
         if (isAvailable(frameResultOutlet)) {
           if (pendingEffects.nonEmpty) {
             throw new IllegalStateException("We should always immediately push on pull if effects are queued")

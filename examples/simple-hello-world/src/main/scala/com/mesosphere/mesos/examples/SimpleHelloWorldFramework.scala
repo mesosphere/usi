@@ -35,7 +35,7 @@ class SimpleHelloWorldFramework(conf: Config) extends StrictLoggingFlow {
     * Mesos client and its settings. We wait for the client to connect to Mesos for 10 seconds. If it can't
     * the framework will exit with a [[java.util.concurrent.TimeoutException]]
     */
-  val settings = MesosClientSettings(conf)
+  val settings = MesosClientSettings.fromConfig(conf)
   val client = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   logger.info(s"""Successfully subscribed to Mesos:
@@ -98,8 +98,7 @@ class SimpleHelloWorldFramework(conf: Config) extends StrictLoggingFlow {
     * 3. The above stage can produce zero or more Mesos [[org.apache.mesos.v1.scheduler.Protos.Call]]s which then are sent using [[MesosClient.mesosSink]]
     *
     */
-  client
-    .mesosSource
+  client.mesosSource
     .statefulMapConcat(() => {
 
       // Task state. This variable is overridden when task state changes e.g. task is being launched or received
