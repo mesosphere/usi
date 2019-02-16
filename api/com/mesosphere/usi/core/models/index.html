@@ -133,6 +133,38 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../index.html" class="extype" name="com.mesosphere.usi">usi</a></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.logic" visbl="pub" class="indented5 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="logic"></a><a id="logic:logic"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#logic" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="../logic/index.html"><span class="name">logic</span></a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.matching" visbl="pub" class="indented5 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="matching"></a><a id="matching:matching"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#matching" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="../matching/index.html"><span class="name">matching</span></a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
     </li><li name="com.mesosphere.usi.core.models" visbl="pub" class="indented5 current" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="models"></a><a id="models:models"></a>
       <span class="permalink">
@@ -165,10 +197,6 @@
                         <a class="object" href="Goal$.html" title=""></a>
                         <a class="trait" href="Goal.html" title="Target state of PodSpec."></a>
                         <a href="Goal.html" title="Target state of PodSpec.">Goal</a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
-                        <a class="object" href="Mesos$.html" title="Mock Mesos calls / state."></a>
-                        <a href="Mesos$.html" title="Mock Mesos calls / state.">Mesos</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="class" href="PodId.html" title="Unique identifier of a pod"></a>
@@ -231,6 +259,18 @@
                         <a href="ReservationStatusUpdated.html" title="">ReservationStatusUpdated</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
+                        <a class="class" href="ResourceMatchResult.html" title=""></a>
+                        <a href="ResourceMatchResult.html" title="">ResourceMatchResult</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="trait" href="ResourceRequirement.html" title="Used for resource matching."></a>
+                        <a href="ResourceRequirement.html" title="Used for resource matching.">ResourceRequirement</a>
+                      </li><li class="current-entities indented5">
+                        <a class="object" href="ResourceType$.html" title=""></a>
+                        <a class="trait" href="ResourceType.html" title=""></a>
+                        <a href="ResourceType.html" title="">ResourceType</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
                         <a class="class" href="RunSpec.html" title="Specification used to launch a PodSpec"></a>
                         <a href="RunSpec.html" title="Specification used to launch a PodSpec">RunSpec</a>
                       </li><li class="current-entities indented5">
@@ -242,15 +282,15 @@
                         <a class="trait" href="SpecUpdated.html" title="Used to communicate that a specification was updated (added, changed, or deleted)"></a>
                         <a href="SpecUpdated.html" title="Used to communicate that a specification was updated (added, changed, or deleted)">SpecUpdated</a>
                       </li><li class="current-entities indented5">
-                        <span class="separator"></span>
+                        <a class="object" href="SpecsSnapshot$.html" title=""></a>
                         <a class="class" href="SpecsSnapshot.html" title="Used to describe the initial state on which all SpecUpdated events will apply"></a>
                         <a href="SpecsSnapshot.html" title="Used to describe the initial state on which all SpecUpdated events will apply">SpecsSnapshot</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="trait" href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records)."></a>
-                        <a href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records).">StateEvent</a>
+                        <a class="trait" href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records)."></a>
+                        <a href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records).">StateEvent</a>
                       </li><li class="current-entities indented5">
-                        <span class="separator"></span>
+                        <a class="object" href="StateSnapshot$.html" title=""></a>
                         <a class="class" href="StateSnapshot.html" title=""></a>
                         <a href="StateSnapshot.html" title="">StateSnapshot</a>
                       </li><li class="current-entities indented5">
@@ -504,7 +544,7 @@ can be killed by specifying a <a href="PodSpec.html" class="extype" name="com.me
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Describes the task statuses of some pod." href="PodStatus.html"><span class="name">PodStatus</span></a><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="taskStatuses">taskStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="TaskId.html" class="extype" name="com.mesosphere.usi.core.models.TaskId">TaskId</a>, <a href="Mesos$$TaskStatus.html" class="extype" name="com.mesosphere.usi.core.models.Mesos.TaskStatus">TaskStatus</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Describes the task statuses of some pod." href="PodStatus.html"><span class="name">PodStatus</span></a><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="taskStatuses">taskStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="TaskId.html" class="extype" name="com.mesosphere.usi.core.models.TaskId">TaskId</a>, <span class="extype" name="org.apache.mesos.v1.Protos.TaskStatus">TaskStatus</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Describes the task statuses of some pod.</p><div class="fullcomment"><div class="comment cmt"><p>Describes the task statuses of some pod. Note, this is a separate piece of data from a <a href="PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>. USI manages
@@ -643,6 +683,54 @@ recovery.
       </span>
       
       
+    </li><li name="com.mesosphere.usi.core.models.ResourceMatchResult" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ResourceMatchResultextendsProductwithSerializable"></a><a id="ResourceMatchResult:ResourceMatchResult"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#ResourceMatchResultextendsProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="ResourceMatchResult.html"><span class="name">ResourceMatchResult</span></a><span class="params">(<span name="matchedResources">matchedResources: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="org.apache.mesos.v1.Protos.Resource">Resource</span>]</span>, <span name="remainingResource">remainingResource: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="org.apache.mesos.v1.Protos.Resource">Resource</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.ResourceRequirement" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ResourceRequirementextendsAnyRef"></a><a id="ResourceRequirement:ResourceRequirement"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#ResourceRequirementextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Used for resource matching." href="ResourceRequirement.html"><span class="name">ResourceRequirement</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Used for resource matching.</p>
+    </li><li name="com.mesosphere.usi.core.models.ResourceType" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ResourceTypeextendsAnyRef"></a><a id="ResourceType:ResourceType"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#ResourceTypeextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="ResourceType.html"><span class="name">ResourceType</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      
     </li><li name="com.mesosphere.usi.core.models.RunSpec" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="RunSpecextendsProductwithSerializable"></a><a id="RunSpec:RunSpec"></a>
       <span class="permalink">
@@ -655,10 +743,12 @@ recovery.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Specification used to launch a PodSpec" href="RunSpec.html"><span class="name">RunSpec</span></a><span class="params">(<span name="cpus">cpus: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Specification used to launch a PodSpec" href="RunSpec.html"><span class="name">RunSpec</span></a><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
-      <p class="shortcomment cmt">Specification used to launch a <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a></p><div class="fullcomment"><div class="comment cmt"><p>Specification used to launch a <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a></p></div><dl class="paramcmts block"><dt class="param">cpus</dt><dd class="cmt"><p>number of cpus requested by the pod</p></dd></dl></div>
+      <p class="shortcomment cmt">Specification used to launch a <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a></p><div class="fullcomment"><div class="comment cmt"><p>Specification used to launch a <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a></p><p>We currently only support a shellCommand. This is primitive. We will add richer support for TaskInfo and
+TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
+</p></div></div>
     </li><li name="com.mesosphere.usi.core.models.SpecEvent" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="SpecEventextendsAnyRef"></a><a id="SpecEvent:SpecEvent"></a>
       <span class="permalink">
@@ -721,10 +811,10 @@ Specification state.</p>
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a title="Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records)." href="StateEvent.html"><span class="name">StateEvent</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <a title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records)." href="StateEvent.html"><span class="name">StateEvent</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       
-      <p class="shortcomment cmt">Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records).</p><div class="fullcomment"><div class="comment cmt"><p>Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records).</p><p>These events are emitted by the SchedulerLogic in response to evolution of specification states and Mesos events.
+      <p class="shortcomment cmt">Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records).</p><div class="fullcomment"><div class="comment cmt"><p>Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records).</p><p>These events are emitted by the SchedulerLogic in response to evolution of specification states and Mesos events.
 They are provided so the framework-implementation can replicate and react to the evolution of that state as best
 suits the framework's domain.
 </p></div></div>
@@ -800,23 +890,6 @@ suits the framework's domain.
       </span>
       
       
-    </li><li name="com.mesosphere.usi.core.models.Mesos" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="Mesos"></a><a id="Mesos:Mesos"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/index.html#Mesos" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a title="Mock Mesos calls / state." href="Mesos$.html"><span class="name">Mesos</span></a>
-      </span>
-      
-      <p class="shortcomment cmt">Mock Mesos calls / state.</p><div class="fullcomment"><div class="comment cmt"><p>Mock Mesos calls / state. We'll remove these
-</p></div></div>
     </li><li name="com.mesosphere.usi.core.models.ReservationState" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="ReservationState"></a><a id="ReservationState:ReservationState"></a>
       <span class="permalink">
@@ -830,6 +903,54 @@ suits the framework's domain.
       </span>
       <span class="symbol">
         <a title="" href="ReservationState$.html"><span class="name">ReservationState</span></a>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.ResourceType" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ResourceType"></a><a id="ResourceType:ResourceType"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#ResourceType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="ResourceType$.html"><span class="name">ResourceType</span></a>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.SpecsSnapshot" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SpecsSnapshot"></a><a id="SpecsSnapshot:SpecsSnapshot"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#SpecsSnapshot" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="SpecsSnapshot$.html"><span class="name">SpecsSnapshot</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.StateSnapshot" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="StateSnapshot"></a><a id="StateSnapshot:StateSnapshot"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#StateSnapshot" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="StateSnapshot$.html"><span class="name">StateSnapshot</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       

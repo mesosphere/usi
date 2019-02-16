@@ -167,10 +167,6 @@
                         <a href="Goal.html" title="Target state of PodSpec.">Goal</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="object" href="Mesos$.html" title="Mock Mesos calls / state."></a>
-                        <a href="Mesos$.html" title="Mock Mesos calls / state.">Mesos</a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
                         <a class="class" href="PodId.html" title="Unique identifier of a pod"></a>
                         <a href="PodId.html" title="Unique identifier of a pod">PodId</a>
                       </li><li class="current-entities indented5">
@@ -231,6 +227,18 @@
                         <a href="ReservationStatusUpdated.html" title="">ReservationStatusUpdated</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
+                        <a class="class" href="ResourceMatchResult.html" title=""></a>
+                        <a href="ResourceMatchResult.html" title="">ResourceMatchResult</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="trait" href="ResourceRequirement.html" title="Used for resource matching."></a>
+                        <a href="ResourceRequirement.html" title="Used for resource matching.">ResourceRequirement</a>
+                      </li><li class="current-entities indented5">
+                        <a class="object" href="ResourceType$.html" title=""></a>
+                        <a class="trait" href="ResourceType.html" title=""></a>
+                        <a href="ResourceType.html" title="">ResourceType</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
                         <a class="class" href="" title="Specification used to launch a PodSpec"></a>
                         <a href="" title="Specification used to launch a PodSpec">RunSpec</a>
                       </li><li class="current-entities indented5">
@@ -242,15 +250,15 @@
                         <a class="trait" href="SpecUpdated.html" title="Used to communicate that a specification was updated (added, changed, or deleted)"></a>
                         <a href="SpecUpdated.html" title="Used to communicate that a specification was updated (added, changed, or deleted)">SpecUpdated</a>
                       </li><li class="current-entities indented5">
-                        <span class="separator"></span>
+                        <a class="object" href="SpecsSnapshot$.html" title=""></a>
                         <a class="class" href="SpecsSnapshot.html" title="Used to describe the initial state on which all SpecUpdated events will apply"></a>
                         <a href="SpecsSnapshot.html" title="Used to describe the initial state on which all SpecUpdated events will apply">SpecsSnapshot</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="trait" href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records)."></a>
-                        <a href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records).">StateEvent</a>
+                        <a class="trait" href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records)."></a>
+                        <a href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records).">StateEvent</a>
                       </li><li class="current-entities indented5">
-                        <span class="separator"></span>
+                        <a class="object" href="StateSnapshot$.html" title=""></a>
                         <a class="class" href="StateSnapshot.html" title=""></a>
                         <a href="StateSnapshot.html" title="">StateSnapshot</a>
                       </li><li class="current-entities indented5">
@@ -284,12 +292,14 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">RunSpec</span><span class="params">(<span name="cpus">cpus: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">RunSpec</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Specification used to launch a <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a></p></div><dl class="paramcmts block"><dt class="param">cpus</dt><dd class="cmt"><p>number of cpus requested by the pod</p></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Specification used to launch a <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a></p><p>We currently only support a shellCommand. This is primitive. We will add richer support for TaskInfo and
+TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
+</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -339,10 +349,10 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.mesosphere.usi.core.models.RunSpec#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(cpus:Double):com.mesosphere.usi.core.models.RunSpec"></a><a id="&lt;init&gt;:RunSpec"></a>
+              <ol><li name="com.mesosphere.usi.core.models.RunSpec#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.ResourceRequirement],shellCommand:String):com.mesosphere.usi.core.models.RunSpec"></a><a id="&lt;init&gt;:RunSpec"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#&lt;init&gt;(cpus:Double):com.mesosphere.usi.core.models.RunSpec" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.ResourceRequirement],shellCommand:String):com.mesosphere.usi.core.models.RunSpec" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -351,10 +361,10 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">RunSpec</span><span class="params">(<span name="cpus">cpus: <span class="extype" name="scala.Double">Double</span></span>)</span>
+        <span class="name">RunSpec</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
       </span>
       
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">cpus</dt><dd class="cmt"><p>number of cpus requested by the pod</p></dd></dl></div>
+      
     </li></ol>
             </div>
 
@@ -455,22 +465,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.models.RunSpec#cpus" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="cpus:Double"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#cpus:Double" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">cpus</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -582,6 +576,38 @@
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.RunSpec#resourceRequirements" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="resourceRequirements:Seq[com.mesosphere.usi.core.models.ResourceRequirement]"></a><a id="resourceRequirements:Seq[ResourceRequirement]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#resourceRequirements:Seq[com.mesosphere.usi.core.models.ResourceRequirement]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">resourceRequirements</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.ResourceRequirement">ResourceRequirement</a>]</span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.RunSpec#shellCommand" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="shellCommand:String"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#shellCommand:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">shellCommand</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">

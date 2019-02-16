@@ -167,10 +167,6 @@
                         <a href="Goal.html" title="Target state of PodSpec.">Goal</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="object" href="Mesos$.html" title="Mock Mesos calls / state."></a>
-                        <a href="Mesos$.html" title="Mock Mesos calls / state.">Mesos</a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
                         <a class="class" href="PodId.html" title="Unique identifier of a pod"></a>
                         <a href="PodId.html" title="Unique identifier of a pod">PodId</a>
                       </li><li class="current-entities indented5">
@@ -231,6 +227,18 @@
                         <a href="ReservationStatusUpdated.html" title="">ReservationStatusUpdated</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
+                        <a class="class" href="ResourceMatchResult.html" title=""></a>
+                        <a href="ResourceMatchResult.html" title="">ResourceMatchResult</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="trait" href="ResourceRequirement.html" title="Used for resource matching."></a>
+                        <a href="ResourceRequirement.html" title="Used for resource matching.">ResourceRequirement</a>
+                      </li><li class="current-entities indented5">
+                        <a class="object" href="ResourceType$.html" title=""></a>
+                        <a class="trait" href="ResourceType.html" title=""></a>
+                        <a href="ResourceType.html" title="">ResourceType</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
                         <a class="class" href="RunSpec.html" title="Specification used to launch a PodSpec"></a>
                         <a href="RunSpec.html" title="Specification used to launch a PodSpec">RunSpec</a>
                       </li><li class="current-entities indented5">
@@ -242,15 +250,15 @@
                         <a class="trait" href="SpecUpdated.html" title="Used to communicate that a specification was updated (added, changed, or deleted)"></a>
                         <a href="SpecUpdated.html" title="Used to communicate that a specification was updated (added, changed, or deleted)">SpecUpdated</a>
                       </li><li class="current-entities indented5">
-                        <span class="separator"></span>
+                        <a class="object" href="SpecsSnapshot$.html" title=""></a>
                         <a class="class" href="SpecsSnapshot.html" title="Used to describe the initial state on which all SpecUpdated events will apply"></a>
                         <a href="SpecsSnapshot.html" title="Used to describe the initial state on which all SpecUpdated events will apply">SpecsSnapshot</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="trait" href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records)."></a>
-                        <a href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records).">StateEvent</a>
+                        <a class="trait" href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records)."></a>
+                        <a href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records).">StateEvent</a>
                       </li><li class="current-entities indented5">
-                        <span class="separator"></span>
+                        <a class="object" href="StateSnapshot$.html" title=""></a>
                         <a class="class" href="StateSnapshot.html" title=""></a>
                         <a href="StateSnapshot.html" title="">StateSnapshot</a>
                       </li><li class="current-entities indented5">
@@ -284,7 +292,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">PodStatus</span><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="taskStatuses">taskStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="TaskId.html" class="extype" name="com.mesosphere.usi.core.models.TaskId">TaskId</a>, <a href="Mesos$$TaskStatus.html" class="extype" name="com.mesosphere.usi.core.models.Mesos.TaskStatus">TaskStatus</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">PodStatus</span><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="taskStatuses">taskStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="TaskId.html" class="extype" name="com.mesosphere.usi.core.models.TaskId">TaskId</a>, <span class="extype" name="org.apache.mesos.v1.Protos.TaskStatus">TaskStatus</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -344,9 +352,9 @@ there is no specification.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.core.models.PodStatus#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(id:com.mesosphere.usi.core.models.PodId,taskStatuses:Map[com.mesosphere.usi.core.models.TaskId,com.mesosphere.usi.core.models.Mesos.TaskStatus]):com.mesosphere.usi.core.models.PodStatus"></a><a id="&lt;init&gt;:PodStatus"></a>
+      <a id="&lt;init&gt;(id:com.mesosphere.usi.core.models.PodId,taskStatuses:Map[com.mesosphere.usi.core.models.TaskId,org.apache.mesos.v1.Protos.TaskStatus]):com.mesosphere.usi.core.models.PodStatus"></a><a id="&lt;init&gt;:PodStatus"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodStatus.html#&lt;init&gt;(id:com.mesosphere.usi.core.models.PodId,taskStatuses:Map[com.mesosphere.usi.core.models.TaskId,com.mesosphere.usi.core.models.Mesos.TaskStatus]):com.mesosphere.usi.core.models.PodStatus" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/PodStatus.html#&lt;init&gt;(id:com.mesosphere.usi.core.models.PodId,taskStatuses:Map[com.mesosphere.usi.core.models.TaskId,org.apache.mesos.v1.Protos.TaskStatus]):com.mesosphere.usi.core.models.PodStatus" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -355,7 +363,7 @@ there is no specification.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">PodStatus</span><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="taskStatuses">taskStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="TaskId.html" class="extype" name="com.mesosphere.usi.core.models.TaskId">TaskId</a>, <a href="Mesos$$TaskStatus.html" class="extype" name="com.mesosphere.usi.core.models.Mesos.TaskStatus">TaskStatus</a>]</span>)</span>
+        <span class="name">PodStatus</span><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="taskStatuses">taskStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="TaskId.html" class="extype" name="com.mesosphere.usi.core.models.TaskId">TaskId</a>, <span class="extype" name="org.apache.mesos.v1.Protos.TaskStatus">TaskStatus</span>]</span>)</span>
       </span>
       
       
@@ -528,6 +536,22 @@ there is no specification.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.PodStatus#isTerminalOrUnreachable" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isTerminalOrUnreachable:Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/PodStatus.html#isTerminalOrUnreachable:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isTerminalOrUnreachable</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -603,9 +627,9 @@ there is no specification.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="com.mesosphere.usi.core.models.PodStatus#taskStatuses" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="taskStatuses:Map[com.mesosphere.usi.core.models.TaskId,com.mesosphere.usi.core.models.Mesos.TaskStatus]"></a><a id="taskStatuses:Map[TaskId,TaskStatus]"></a>
+      <a id="taskStatuses:Map[com.mesosphere.usi.core.models.TaskId,org.apache.mesos.v1.Protos.TaskStatus]"></a><a id="taskStatuses:Map[TaskId,TaskStatus]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodStatus.html#taskStatuses:Map[com.mesosphere.usi.core.models.TaskId,com.mesosphere.usi.core.models.Mesos.TaskStatus]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/PodStatus.html#taskStatuses:Map[com.mesosphere.usi.core.models.TaskId,org.apache.mesos.v1.Protos.TaskStatus]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -614,7 +638,7 @@ there is no specification.
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">taskStatuses</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="TaskId.html" class="extype" name="com.mesosphere.usi.core.models.TaskId">TaskId</a>, <a href="Mesos$$TaskStatus.html" class="extype" name="com.mesosphere.usi.core.models.Mesos.TaskStatus">TaskStatus</a>]</span>
+        <span class="name">taskStatuses</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="TaskId.html" class="extype" name="com.mesosphere.usi.core.models.TaskId">TaskId</a>, <span class="extype" name="org.apache.mesos.v1.Protos.TaskStatus">TaskStatus</span>]</span>
       </span>
       
       

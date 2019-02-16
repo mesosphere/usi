@@ -134,7 +134,7 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.mesos">mesos</a></dd></dl></div>
     </li><li class="current-entities indented4">
-                        <span class="separator"></span>
+                        <a class="object" href="MesosClientSettings$.html" title=""></a>
                         <a class="class" href="" title=""></a>
                         <a href="" title="">MesosClientSettings</a>
                       </li>
@@ -144,14 +144,16 @@
           <div id="content">
             <body class="class type">
       <div id="definition">
-        <div class="big-circle class">c</div>
+        <a href="MesosClientSettings$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
         <p id="owner"><a href="../../../index.html" class="extype" name="com">com</a>.<a href="../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../index.html" class="extype" name="com.mesosphere.mesos">mesos</a>.<a href="index.html" class="extype" name="com.mesosphere.mesos.conf">conf</a></p>
-        <h1>MesosClientSettings<span class="permalink">
+        <h1><a href="MesosClientSettings$.html" title="See companion object">MesosClientSettings</a><span class="permalink">
       <a href="../../../../com/mesosphere/mesos/conf/MesosClientSettings.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"></span></h3>
+        <h3><span class="morelinks"><div>
+            Companion <a href="MesosClientSettings$.html" title="See companion object">object MesosClientSettings</a>
+          </div></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
@@ -160,7 +162,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">MesosClientSettings</span><span class="params">(<span name="conf">conf: <span class="extype" name="com.typesafe.config.Config">Config</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">MesosClientSettings</span><span class="params">(<span name="master">master: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="redirectRetries">redirectRetries: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">3</span></span>, <span name="idleTimeout">idleTimeout: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span> = <span class="symbol">75.seconds</span></span>, <span name="sourceBufferSize">sourceBufferSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">10</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -216,9 +218,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.mesos.conf.MesosClientSettings#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(conf:com.typesafe.config.Config):com.mesosphere.mesos.conf.MesosClientSettings"></a><a id="&lt;init&gt;:MesosClientSettings"></a>
+      <a id="&lt;init&gt;(master:String,redirectRetries:Int,idleTimeout:scala.concurrent.duration.FiniteDuration,sourceBufferSize:Int):com.mesosphere.mesos.conf.MesosClientSettings"></a><a id="&lt;init&gt;:MesosClientSettings"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/conf/MesosClientSettings.html#&lt;init&gt;(conf:com.typesafe.config.Config):com.mesosphere.mesos.conf.MesosClientSettings" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/conf/MesosClientSettings.html#&lt;init&gt;(master:String,redirectRetries:Int,idleTimeout:scala.concurrent.duration.FiniteDuration,sourceBufferSize:Int):com.mesosphere.mesos.conf.MesosClientSettings" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -227,7 +229,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">MesosClientSettings</span><span class="params">(<span name="conf">conf: <span class="extype" name="com.typesafe.config.Config">Config</span></span>)</span>
+        <span class="name">MesosClientSettings</span><span class="params">(<span name="master">master: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="redirectRetries">redirectRetries: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">3</span></span>, <span name="idleTimeout">idleTimeout: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span> = <span class="symbol">75.seconds</span></span>, <span name="sourceBufferSize">sourceBufferSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">10</span></span>)</span>
       </span>
       
       
@@ -331,22 +333,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.mesos.conf.MesosClientSettings#conf" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="conf:com.typesafe.config.Config"></a><a id="conf:Config"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/conf/MesosClientSettings.html#conf:com.typesafe.config.Config" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">conf</span><span class="result">: <span class="extype" name="com.typesafe.config.Config">Config</span></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">

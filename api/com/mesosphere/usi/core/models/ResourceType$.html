@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1 API  - com.mesosphere.usi.core.models.Mesos</title>
-          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.models.Mesos" />
-          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.models.Mesos" />
+          <title>usi 0.1 API  - com.mesosphere.usi.core.models.ResourceType</title>
+          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.models.ResourceType" />
+          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.models.ResourceType" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -167,10 +167,6 @@
                         <a href="Goal.html" title="Target state of PodSpec.">Goal</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="object" href="" title="Mock Mesos calls / state."></a>
-                        <a href="" title="Mock Mesos calls / state.">Mesos</a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
                         <a class="class" href="PodId.html" title="Unique identifier of a pod"></a>
                         <a href="PodId.html" title="Unique identifier of a pod">PodId</a>
                       </li><li class="current-entities indented5">
@@ -231,6 +227,18 @@
                         <a href="ReservationStatusUpdated.html" title="">ReservationStatusUpdated</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
+                        <a class="class" href="ResourceMatchResult.html" title=""></a>
+                        <a href="ResourceMatchResult.html" title="">ResourceMatchResult</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="trait" href="ResourceRequirement.html" title="Used for resource matching."></a>
+                        <a href="ResourceRequirement.html" title="Used for resource matching.">ResourceRequirement</a>
+                      </li><li class="current-entities indented5">
+                        <a class="object" href="" title=""></a>
+                        <a class="trait" href="ResourceType.html" title=""></a>
+                        <a href="ResourceType.html" title="">ResourceType</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
                         <a class="class" href="RunSpec.html" title="Specification used to launch a PodSpec"></a>
                         <a href="RunSpec.html" title="Specification used to launch a PodSpec">RunSpec</a>
                       </li><li class="current-entities indented5">
@@ -242,15 +250,15 @@
                         <a class="trait" href="SpecUpdated.html" title="Used to communicate that a specification was updated (added, changed, or deleted)"></a>
                         <a href="SpecUpdated.html" title="Used to communicate that a specification was updated (added, changed, or deleted)">SpecUpdated</a>
                       </li><li class="current-entities indented5">
-                        <span class="separator"></span>
+                        <a class="object" href="SpecsSnapshot$.html" title=""></a>
                         <a class="class" href="SpecsSnapshot.html" title="Used to describe the initial state on which all SpecUpdated events will apply"></a>
                         <a href="SpecsSnapshot.html" title="Used to describe the initial state on which all SpecUpdated events will apply">SpecsSnapshot</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="trait" href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records)."></a>
-                        <a href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records).">StateEvent</a>
+                        <a class="trait" href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records)."></a>
+                        <a href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records).">StateEvent</a>
                       </li><li class="current-entities indented5">
-                        <span class="separator"></span>
+                        <a class="object" href="StateSnapshot$.html" title=""></a>
                         <a class="class" href="StateSnapshot.html" title=""></a>
                         <a href="StateSnapshot.html" title="">StateSnapshot</a>
                       </li><li class="current-entities indented5">
@@ -268,14 +276,16 @@
           <div id="content">
             <body class="object value">
       <div id="definition">
-        <div class="big-circle object">o</div>
+        <a href="ResourceType.html" title="See companion trait"><div class="big-circle object-companion-trait">o</div></a>
         <p id="owner"><a href="../../../../index.html" class="extype" name="com">com</a>.<a href="../../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../../index.html" class="extype" name="com.mesosphere.usi">usi</a>.<a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a>.<a href="index.html" class="extype" name="com.mesosphere.usi.core.models">models</a></p>
-        <h1>Mesos<span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html" title="Permalink">
+        <h1><a href="ResourceType.html" title="See companion trait">ResourceType</a><span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"></span></h3>
+        <h3><span class="morelinks"><div>
+            Companion <a href="ResourceType.html" title="See companion trait">trait ResourceType</a>
+          </div></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
@@ -284,13 +294,12 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">Mesos</span>
+        <span class="name">ResourceType</span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Mock Mesos calls / state. We'll remove these
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -320,7 +329,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.usi.core.models.Mesos"><span>Mesos</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.usi.core.models.ResourceType"><span>ResourceType</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -342,42 +351,10 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.mesosphere.usi.core.models.Mesos.Call" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="CallextendsAnyRef"></a><a id="Call:Call"></a>
+              <ol><li name="com.mesosphere.usi.core.models.ResourceType.UNKNOWN" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UNKNOWNextendsResourceTypewithProductwithSerializable"></a><a id="UNKNOWN:UNKNOWN"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#CallextendsAnyRef" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">sealed </span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="Mesos$$Call.html"><span class="name">Call</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.models.Mesos.Event" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="EventextendsAnyRef"></a><a id="Event:Event"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#EventextendsAnyRef" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">sealed </span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="Mesos$$Event.html"><span class="name">Event</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.models.Mesos.Launch" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="LaunchextendsProductwithSerializable"></a><a id="Launch:Launch"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#LaunchextendsProductwithSerializable" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#UNKNOWNextendsResourceTypewithProductwithSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -386,55 +363,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="" href="Mesos$$Launch.html"><span class="name">Launch</span></a><span class="params">(<span name="taskInfo">taskInfo: <a href="Mesos$$TaskInfo.html" class="extype" name="com.mesosphere.usi.core.models.Mesos.TaskInfo">TaskInfo</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.models.Mesos.Operation" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="OperationextendsProductwithSerializable"></a><a id="Operation:Operation"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#OperationextendsProductwithSerializable" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="Mesos$$Operation.html"><span class="name">Operation</span></a><span class="params">(<span name="launch">launch: <a href="Mesos$$Launch.html" class="extype" name="com.mesosphere.usi.core.models.Mesos.Launch">Launch</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.models.Mesos.TaskInfo" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="TaskInfoextendsProductwithSerializable"></a><a id="TaskInfo:TaskInfo"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#TaskInfoextendsProductwithSerializable" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="Mesos$$TaskInfo.html"><span class="name">TaskInfo</span></a><span class="params">(<span name="taskId">taskId: <a href="TaskId.html" class="extype" name="com.mesosphere.usi.core.models.TaskId">TaskId</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.models.Mesos.TaskStatus" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="TaskStatusextendsAnyRef"></a><a id="TaskStatus:TaskStatus"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#TaskStatusextendsAnyRef" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">sealed </span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="Mesos$$TaskStatus.html"><span class="name">TaskStatus</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <a title="" href="ResourceType$$UNKNOWN.html"><span class="name">UNKNOWN</span></a><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.ResourceType">ResourceType</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
@@ -449,7 +378,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -465,7 +394,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html###():Int" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -481,7 +410,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -497,7 +426,7 @@
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -513,7 +442,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#clone():Object" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -539,7 +468,7 @@
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -555,7 +484,7 @@
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -568,10 +497,26 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.ResourceType#fromName" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="fromName(name:String):com.mesosphere.usi.core.models.ResourceType"></a><a id="fromName(String):ResourceType"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#fromName(name:String):com.mesosphere.usi.core.models.ResourceType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fromName</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.ResourceType">ResourceType</a></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -592,7 +537,7 @@
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#hashCode():Int" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -613,7 +558,7 @@
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -629,7 +574,7 @@
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -645,7 +590,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#notify():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -666,7 +611,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -687,7 +632,7 @@
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -703,7 +648,7 @@
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#toString():String" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -719,7 +664,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -741,7 +686,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -765,7 +710,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#wait():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -784,10 +729,10 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.models.Mesos.Call" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Call"></a><a id="Call:Call"></a>
+    </li><li name="com.mesosphere.usi.core.models.ResourceType.CPUS" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CPUS"></a><a id="CPUS:CPUS"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#Call" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#CPUS" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -796,14 +741,14 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a title="" href="Mesos$$Call$.html"><span class="name">Call</span></a>
+        <a title="" href="ResourceType$$CPUS$.html"><span class="name">CPUS</span></a><span class="result"> extends <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.ResourceType">ResourceType</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
-    </li><li name="com.mesosphere.usi.core.models.Mesos.Event" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Event"></a><a id="Event:Event"></a>
+    </li><li name="com.mesosphere.usi.core.models.ResourceType.DISK" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DISK"></a><a id="DISK:DISK"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#Event" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#DISK" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -812,14 +757,14 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a title="" href="Mesos$$Event$.html"><span class="name">Event</span></a>
+        <a title="" href="ResourceType$$DISK$.html"><span class="name">DISK</span></a><span class="result"> extends <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.ResourceType">ResourceType</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
-    </li><li name="com.mesosphere.usi.core.models.Mesos.TaskStatus" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="TaskStatus"></a><a id="TaskStatus:TaskStatus"></a>
+    </li><li name="com.mesosphere.usi.core.models.ResourceType.GPUS" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GPUS"></a><a id="GPUS:GPUS"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#TaskStatus" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#GPUS" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -828,7 +773,39 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a title="" href="Mesos$$TaskStatus$.html"><span class="name">TaskStatus</span></a>
+        <a title="" href="ResourceType$$GPUS$.html"><span class="name">GPUS</span></a><span class="result"> extends <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.ResourceType">ResourceType</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.ResourceType.MEM" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MEM"></a><a id="MEM:MEM"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#MEM" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="ResourceType$$MEM$.html"><span class="name">MEM</span></a><span class="result"> extends <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.ResourceType">ResourceType</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.ResourceType.PORTS" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PORTS"></a><a id="PORTS:PORTS"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#PORTS" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="ResourceType$$PORTS$.html"><span class="name">PORTS</span></a><span class="result"> extends <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.ResourceType">ResourceType</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
@@ -843,7 +820,7 @@
               <ol><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/Mesos$.html#finalize():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/ResourceType$.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
