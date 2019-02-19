@@ -6,7 +6,7 @@ import com.typesafe.scalalogging.LoggerTakingImplicit
 import org.slf4j.MDC
 
 package object mesosphere {
-  implicit case object CanLogKvArgsEv extends CanLog[LoggingArgs] {
+  implicit case object LoggingArgsCanLogEvidence extends CanLog[LoggingArgs] {
     override def logMessage(originalMsg: String, a: LoggingArgs): String = {
       for (elem <- a.args) {
         val (key, value) = elem
@@ -49,11 +49,11 @@ package mesosphere {
     *    logger.info("hello world!") // Note that this uses the implicit empty context.
     *
     *    // Make a log statement with some context.
-    *    logger.info("hello world!")(KvArgs("key1", "value1"))
+    *    logger.info("hello world!")(LoggingArgs("key1", "value1"))
     *
     *    // Make a log statement with more context.
-    *    val moreContext = KvArgs("key1", "value1").and("key2", "value2").and("key3", "value3")
-    *    log.info("hello world!")(moreContext.and("key3", "key4"))
+    *    val moreContext = LoggingArgs("key1" -> "value1").and("key2" -> "value2").and("key3" -> "value3")
+    *    log.info("hello world!")(moreContext.and("key3" -> "key4"))
     *
     *    // The above statement will log through whatever backend slf4j was tied to statically.
     *    // All the key value parameters in context are populated in MDC just before the log statement is made and are
