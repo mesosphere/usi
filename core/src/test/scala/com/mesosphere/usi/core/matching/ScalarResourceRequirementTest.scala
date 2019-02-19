@@ -11,7 +11,7 @@ class ScalarResourceRequirementTest extends UnitTest with Inside {
   import ProtoConversions._
   "ScalarResourceRequirement" should {
     "match and consume a cpu resource" in {
-      val matchers = ScalarResourceRequirement(ResourceType.CPUS, 2.0)
+      val matchers = ScalarResource.cpus(2.0)
 
       val resources =
         List(ProtoBuilders.newResource(ResourceType.CPUS.name, Mesos.Value.Type.SCALAR, scalar = 10.asProtoScalar))

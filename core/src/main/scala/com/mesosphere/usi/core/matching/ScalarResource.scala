@@ -5,7 +5,7 @@ import com.mesosphere.usi.core.models.{ResourceMatchResult, ResourceRequirement,
 import scala.annotation.tailrec
 import org.apache.mesos.v1.{Protos => Mesos}
 
-case class ScalarResourceRequirement(resourceType: ResourceType, amount: Double) extends ResourceRequirement {
+case class ScalarResource(resourceType: ResourceType, amount: Double) extends ResourceRequirement {
   import com.mesosphere.usi.core.protos.ProtoConversions._
   override def description: String = s"${resourceType}:${amount}"
   @tailrec private def iter(
@@ -29,4 +29,11 @@ case class ScalarResourceRequirement(resourceType: ResourceType, amount: Double)
   override def matchAndConsume(resources: Seq[Mesos.Resource]): Option[ResourceMatchResult] = {
     iter(Nil, resources.toList)
   }
+}
+
+object ScalarResource {
+  def cpus(amount: Double): ScalarResource = ScalarResource(ResourceType.CPUS, amount)
+  def memory(amount: Double): ScalarResource = ScalarResource(ResourceType.MEM, amount)
+  def disk(amount: Double): ScalarResource = ScalarResource(ResourceType.DISK, amount)
+  def gpus(amount: Double): ScalarResource = ScalarResource(ResourceType.GPUS, amount)
 }
