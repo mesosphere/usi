@@ -4,7 +4,7 @@
 package com.mesosphere.usi
 
 import com.mesosphere.ImplicitStrictLogging
-import com.mesosphere.KvArgs
+import com.mesosphere.LoggingArgs
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -12,7 +12,7 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class DummySuite extends FunSuite with ImplicitStrictLogging {
   test("true is always true") {
-    logger.info("test is about to pass")(KvArgs("context", "is useful").and("result", "success"))
+    logger.info("test is about to pass")(LoggingArgs("context" -> "is useful").and("result" -> "success"))
     assert(true == true)
   }
 }

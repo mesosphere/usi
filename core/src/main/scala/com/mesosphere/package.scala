@@ -6,8 +6,8 @@ import com.typesafe.scalalogging.LoggerTakingImplicit
 import org.slf4j.MDC
 
 package object mesosphere {
-  implicit case object CanLogKvArgsEv extends CanLog[KvArgs] {
-    override def logMessage(originalMsg: String, a: KvArgs): String = {
+  implicit case object CanLogKvArgsEv extends CanLog[LoggingArgs] {
+    override def logMessage(originalMsg: String, a: LoggingArgs): String = {
       for (elem <- a.args) {
         val (key, value) = elem
         MDC.put(key, value.toString)
@@ -15,10 +15,10 @@ package object mesosphere {
       originalMsg
     }
 
-    override def afterLog(a: KvArgs): Unit = a.args.foreach { case (key, _) => MDC.remove(key) }
+    override def afterLog(a: LoggingArgs): Unit = a.args.foreach { case (key, _) => MDC.remove(key) }
   }
 
-  implicit val emptyKvArgs: KvArgs = KvArgs()
+  implicit val emptyLoggingArgs: LoggingArgs = LoggingArgs()
 }
 
 package mesosphere {
@@ -60,26 +60,8 @@ package mesosphere {
     *    // deleted immediately after. This happens every time the `logger` object is used to generate a log statement.
     * }}}
     */
-  case class KvArgs(args: List[(String, Any)]) {
-
-    /**
-      * Helper methods to enable fluent composition of context parameter(s).
-      */
-    def and(kv: KvArgs): KvArgs = copy(args ++ kv.args)
-
-    def and(k: String, v: Any): KvArgs = copy(args ++ KvArgs(k, v).args)
-  }
-
-  object KvArgs {
-    // This defines an empty context.
-    // Can be used to make log statements with implicit logger that needs no context.
-    def apply(): KvArgs = KvArgs(List())
-
-    def apply(kv: (String, Any)*): KvArgs = KvArgs(kv.toList)
-
-    def apply(key: String, value: Any): KvArgs = KvArgs((key, value))
-
-    def apply(key: Any, value: Any): KvArgs = KvArgs(key.toString, value)
+  case class LoggingArgs(args:(String, Any)*) {
+    def and(other:(String, Any)*): LoggingArgs = LoggingArgs(args ++ other:_*)
   }
 
   /**
@@ -89,8 +71,8 @@ package mesosphere {
     * Also refer [[com.typesafe.scalalogging.StrictLogging]]
     */
   trait ImplicitStrictLogging {
-    protected val logger: LoggerTakingImplicit[KvArgs] =
-      Logger.takingImplicit[KvArgs](getClass)
+    protected val logger: LoggerTakingImplicit[LoggingArgs] =
+      Logger.takingImplicit[LoggingArgs](getClass)
   }
 
   /**
@@ -101,7 +83,7 @@ package mesosphere {
     */
   trait ImplicitLazyLogging {
     @transient
-    protected lazy val logger: LoggerTakingImplicit[KvArgs] =
-      Logger.takingImplicit[KvArgs](getClass)
+    protected lazy val logger: LoggerTakingImplicit[LoggingArgs] =
+      Logger.takingImplicit[LoggingArgs](getClass)
   }
 }
