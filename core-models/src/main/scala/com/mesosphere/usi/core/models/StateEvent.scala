@@ -1,7 +1,7 @@
 package com.mesosphere.usi.core.models
 
 /**
-  * Sealed trait including all events that can describe the evolution of SchedulerLogicState (statuses and records).
+  * Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records).
   *
   * These events are emitted by the SchedulerLogic in response to evolution of specification states and Mesos events.
   * They are provided so the framework-implementation can replicate and react to the evolution of that state as best
@@ -18,6 +18,9 @@ case class StateSnapshot(
     agentRecords: Seq[AgentRecord],
     reservationStatuses: Seq[ReservationStatus])
     extends StateEvent
+object StateSnapshot {
+  def empty = StateSnapshot(Nil, Nil, Nil, Nil)
+}
 
 /**
   * Trait which describes an update for any of the USI managed state.

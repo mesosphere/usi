@@ -12,6 +12,9 @@ sealed trait SpecEvent
   * @param reservationSpecs
   */
 case class SpecsSnapshot(podSpecs: Seq[PodSpec], reservationSpecs: Seq[ReservationSpec]) extends SpecEvent
+object SpecsSnapshot {
+  def empty = SpecsSnapshot(Nil, Nil)
+}
 
 /**
   * Used to communicate that a specification was updated (added, changed, or deleted)
