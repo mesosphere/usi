@@ -1,13 +1,13 @@
 package com.mesosphere.usi.core
 
-import com.typesafe.scalalogging.StrictLogging
+import com.mesosphere.ImplicitStrictLogging
 import org.apache.mesos.v1.Protos.Resource.DiskInfo.Source
 import org.apache.mesos.v1.Protos.Resource.{DiskInfo, ReservationInfo}
 import org.apache.mesos.v1.{Protos => Mesos}
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
-object ResourceUtil extends StrictLogging {
+object ResourceUtil extends ImplicitStrictLogging {
 
   /**
     * The resources in launched tasks, should

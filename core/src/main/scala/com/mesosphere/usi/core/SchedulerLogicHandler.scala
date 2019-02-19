@@ -1,8 +1,8 @@
 package com.mesosphere.usi.core
+
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
 import com.mesosphere.usi.core.models.{PodId, SpecEvent}
-import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
 /**
@@ -62,7 +62,7 @@ import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
   * through the application of several functions. The result of that event will lead to the emission of several
   * stateEvents and Mesos intents, which will be accumulated and emitted via a data structure we call the FrameResult.
   */
-private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) extends StrictLogging {
+private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
 
   private val schedulerLogic = new SpecLogic(mesosCallFactory)
   private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory)
