@@ -1,21 +1,19 @@
 package com.mesosphere.usi.core.logic
 
+import com.mesosphere.ImplicitStrictLogging
 import java.time.Instant
-
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
 import com.mesosphere.usi.core.models._
-import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
-
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
 /**
   * The current home for USI Mesos event related logic
   */
-private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends StrictLogging {
+private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends ImplicitStrictLogging {
   import SchedulerLogicHelpers._
   private case class ResourceMatch(podSpec: PodSpec, resources: Seq[Mesos.Resource])
   @tailrec private def maybeMatchPodSpec(
