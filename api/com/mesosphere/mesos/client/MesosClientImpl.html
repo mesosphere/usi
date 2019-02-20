@@ -571,9 +571,9 @@ reconnect to Mesos in such an event. As such, this information will be current, 
         <span class="name">killSwitch</span><span class="result">: <span class="extype" name="akka.stream.KillSwitch">KillSwitch</span></span>
       </span>
       
-      <p class="shortcomment cmt">Calling shutdown()<code> or </code>abort()<code> on this will close both the original connection to Mesos and all event publisher
-connections created by materializing mesosSink.</code></p><div class="fullcomment"><div class="comment cmt"><p>Calling shutdown()<code> or </code>abort()<code> on this will close both the original connection to Mesos and all event publisher
-connections created by materializing mesosSink.</code></p><p>Note that depending on <code>failoverTimeout</code> provided with SUBSCRIBED call, Mesos could start killing tasks and
+      <p class="shortcomment cmt">Calling <code>shutdown()</code> or <code>abort()</code> on this will close both the original connection to Mesos and all event publisher
+connections created by materializing mesosSink.</p><div class="fullcomment"><div class="comment cmt"><p>Calling <code>shutdown()</code> or <code>abort()</code> on this will close both the original connection to Mesos and all event publisher
+connections created by materializing mesosSink.</p><p>Note that depending on <code>failoverTimeout</code> provided with SUBSCRIBED call, Mesos could start killing tasks and
 executors started by the framework. Make sure to set <code>failoverTimeout</code> appropriately.</p><p>See <code>teardown()</code> Call factory method for another way to shutdown a framework.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.mesos.client.MesosClientImpl">MesosClientImpl</a> → <a href="MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></dd></dl></div>
     </li><li name="com.typesafe.scalalogging.StrictLogging#logger" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
