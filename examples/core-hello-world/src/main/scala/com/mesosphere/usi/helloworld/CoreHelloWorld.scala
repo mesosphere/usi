@@ -1,16 +1,15 @@
 package com.mesosphere.usi.helloworld
 import java.util.UUID
 
+import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.QueueOfferResult.Enqueued
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
-import akka.stream.{ActorMaterializer, OverflowStrategy}
-import akka.{Done, NotUsed}
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.matching.ScalarResourceRequirement
-import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodSpecUpdated, PodStatus, PodStatusUpdated, ResourceType, RunSpec, SpecEvent, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodStatus, PodStatusUpdated, ResourceType, RunSpec, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{FrameworkInfo, TaskState, TaskStatus}
@@ -65,7 +64,7 @@ class CoreHelloWorld(conf: Config) extends StrictLogging {
     *
     * In a nutshell: frameworks sends [[PodSpec]] updates down the flow and receives [[StateEvent]]s when things
     * change. So why is the input parameter of that Flow not simply a [[SpecUpdated]] but a tuple of
-    * [[SpecsSnapshot]] and Source [[SpecUpdated]]? This is because the first message sent to the scheduler
+    * [[SpecsSnapshot]] and Source[[SpecUpdated]]? This is because the first message sent to the scheduler
     * by the framework should be a snapshot of all PodSpecs known to the framework - a [[SpecsSnapshot]]. Internally
     * this will trigger [task reconciliation](http://mesos.apache.org/documentation/latest/reconciliation/) by the
     * scheduler.
@@ -81,25 +80,43 @@ class CoreHelloWorld(conf: Config) extends StrictLogging {
     : Flow[(SpecsSnapshot, Source[SpecUpdated, Any]), (StateSnapshot, Source[StateEvent, Any]), NotUsed] =
     Scheduler.fromClient(client)
 
-  // Initial snapshot is empty - we'll add our hello-world spec later
-  val specsSnapshot = SpecsSnapshot.empty
+  // Lets construct the initial specs snapshot which will contain our hello-world PodSpec. For that we generate
+  // - a unique PodId
+  // - a RunSpec with minimal resource requirements and hello-world shell command
+  // - a snapshot containing our PodSpec
+  val podId = PodId(s"hello-world.${UUID.randomUUID()}")
+  val runSpec = RunSpec(
+    resourceRequirements =
+      List(
+        ScalarResourceRequirement(ResourceType.CPUS, 0.1),
+        ScalarResourceRequirement(ResourceType.MEM, 32)),
+    shellCommand = """echo "Hello, world" && sleep 3600"""
+  )
+  val podSpec = PodSpec(
+    id = podId,
+    goal = Goal.Running,
+    runSpec = runSpec
+  )
 
-  val (queue, completed) = Source
-    .queue[SpecEvent](32, OverflowStrategy.fail)
-    .mapMaterializedValue { specQueue =>
-      specQueue.offer(specsSnapshot)
-      specQueue.asInstanceOf[SourceQueueWithComplete[SpecUpdated]]
-    }
-    .prefixAndTail(1)
-    .map {
-      case (Seq(snapshot), updates) =>
-        (snapshot.asInstanceOf[SpecsSnapshot], updates.asInstanceOf[Source[SpecUpdated, NotUsed]])
-    }
+  val specsSnapshot = SpecsSnapshot(
+    podSpecs = Seq(podSpec),
+    reservationSpecs = Seq.empty
+  )
+
+  val completed = Source
+    // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
+    // which emits a materialized promise which when completed with a Some, that value will be produced downstream,
+    // followed by completion. To avoid stream completion we never complete the promise but prepend the stream with
+    // our snapshot together with an empty source for subsequent SpecUpdates (which we're not going to send)
+    .maybe
+    .prepend(Source.single(specsSnapshot))
+    .map(snapshot => (snapshot, Source.empty))
+    // Here our initial snapshot is going to the scheduler flow
     .via(schedulerFlow)
+    // We flatten the output of the scheduler flow which is a tuple of an initial snapshot and a source of all
+    // later updates, into one stream where the first element is the snapshot and all later elements are single
+    // state events. This makes the event handling a simple match-case
     .flatMapConcat {
-      // We flatten the output of the scheduler flow which is a tuple of an initial snapshot and a source of all
-      // later updates, into one source where the first element is the snapshot and all later elements are single
-      // state events
       case (snapshot, updates) =>
         updates.prepend(Source.single(snapshot))
     }
@@ -121,7 +138,7 @@ class CoreHelloWorld(conf: Config) extends StrictLogging {
       case e =>
         logger.error(s"Unhandled event: $e") // we ignore everything else for now
     }
-    .toMat(Sink.ignore)(Keep.both)
+    .toMat(Sink.ignore)(Keep.right)
     .run()
 
   completed.onComplete {
@@ -133,21 +150,6 @@ class CoreHelloWorld(conf: Config) extends StrictLogging {
       system.terminate()
   }
 
-  val podId = PodId(s"hello-world.${UUID.randomUUID()}")
-  val runSpec = RunSpec(
-    resourceRequirements =
-      List(
-        ScalarResourceRequirement(ResourceType.CPUS, 0.1),
-        ScalarResourceRequirement(ResourceType.MEM, 32)),
-    shellCommand = """echo "Hello, world" && sleep 3600"""
-  )
-
-  val podSpec = PodSpec(id = podId, goal = Goal.Running, runSpec = runSpec)
-
-  queue.offer(PodSpecUpdated(podId, Some(podSpec))).map {
-    case Enqueued => logger.debug(s"Queued new podSpec with id ${podSpec.id}"); Done
-    case _ => throw new RuntimeException(s"Failed to add a podSpec to the queue")
-  }
 
   // We let the framework run "forever" (or at least until our task completes/fails)
   Await.result(completed, Duration.Inf)
