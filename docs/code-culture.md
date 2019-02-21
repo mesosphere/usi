@@ -15,7 +15,7 @@ Our defaults are:
 
 ## Code is Legible on GitHub
 
-This default speaks to the desire to write code that can be understood without needing an IDE. Marathon is written in Scala, so our defaults are specific as such.
+This default speaks to the desire to write code that can be understood without needing an IDE. USI is written in Scala, so our defaults are specific as such.
 
 ### On Implicits
 
