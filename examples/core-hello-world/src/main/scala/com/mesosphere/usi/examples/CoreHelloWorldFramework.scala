@@ -1,7 +1,8 @@
-package com.mesosphere.usi.helloworld
+package com.mesosphere.usi.examples
+
 import java.util.UUID
 
-import akka.NotUsed
+import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
@@ -9,12 +10,24 @@ import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.matching.ScalarResourceRequirement
-import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodStatus, PodStatusUpdated, ResourceType, RunSpec, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.{
+  Goal,
+  PodId,
+  PodSpec,
+  PodStatus,
+  PodStatusUpdated,
+  ResourceType,
+  RunSpec,
+  SpecUpdated,
+  SpecsSnapshot,
+  StateEvent,
+  StateSnapshot
+}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{FrameworkInfo, TaskState, TaskStatus}
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.sys.SystemProperties
 import scala.util.{Failure, Success}
@@ -30,7 +43,7 @@ import scala.util.{Failure, Success}
   *  Good to test against local Mesos.
   *
   */
-class CoreHelloWorld(conf: Config) extends StrictLogging {
+class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
   implicit val system = ActorSystem()
   implicit val mat = ActorMaterializer()
   implicit val ec = system.dispatcher
@@ -87,9 +100,7 @@ class CoreHelloWorld(conf: Config) extends StrictLogging {
   val podId = PodId(s"hello-world.${UUID.randomUUID()}")
   val runSpec = RunSpec(
     resourceRequirements =
-      List(
-        ScalarResourceRequirement(ResourceType.CPUS, 0.1),
-        ScalarResourceRequirement(ResourceType.MEM, 32)),
+      List(ScalarResourceRequirement(ResourceType.CPUS, 0.1), ScalarResourceRequirement(ResourceType.MEM, 32)),
     shellCommand = """echo "Hello, world" && sleep 3600"""
   )
   val podSpec = PodSpec(
@@ -103,12 +114,12 @@ class CoreHelloWorld(conf: Config) extends StrictLogging {
     reservationSpecs = Seq.empty
   )
 
-  val completed = Source
-    // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
-    // which emits a materialized promise which when completed with a Some, that value will be produced downstream,
-    // followed by completion. To avoid stream completion we never complete the promise but prepend the stream with
-    // our snapshot together with an empty source for subsequent SpecUpdates (which we're not going to send)
-    .maybe
+  val completed: Future[Done] = Source
+  // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
+  // which emits a materialized promise which when completed with a Some, that value will be produced downstream,
+  // followed by completion. To avoid stream completion we never complete the promise but prepend the stream with
+  // our snapshot together with an empty source for subsequent SpecUpdates (which we're not going to send)
+  .maybe
     .prepend(Source.single(specsSnapshot))
     .map(snapshot => (snapshot, Source.empty))
     // Here our initial snapshot is going to the scheduler flow
@@ -150,17 +161,16 @@ class CoreHelloWorld(conf: Config) extends StrictLogging {
       system.terminate()
   }
 
-
   // We let the framework run "forever" (or at least until our task completes/fails)
   Await.result(completed, Duration.Inf)
 }
 
-object CoreHelloWorld {
+object CoreHelloWorldFramework {
 
   def main(args: Array[String]): Unit = {
     val conf = ConfigFactory.load().getConfig("mesos-client")
-    CoreHelloWorld(conf)
+    CoreHelloWorldFramework(conf)
   }
 
-  def apply(conf: Config): CoreHelloWorld = new CoreHelloWorld(conf)
+  def apply(conf: Config): CoreHelloWorldFramework = new CoreHelloWorldFramework(conf)
 }
