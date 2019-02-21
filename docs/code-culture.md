@@ -61,7 +61,7 @@ groups.map { group =>
 
 Code golf is a game in which you implement some program in as few characters as possible.
 
-We prefer not to play this game when working on Marathon. Instead, we focus on removing noise (boilerplate), while preserving valuable signal pertaining to the problem at hand.
+We prefer not to play this game when working on USI. Instead, we focus on removing noise (boilerplate), while preserving valuable signal pertaining to the problem at hand.
 
 ### On Imports
 
