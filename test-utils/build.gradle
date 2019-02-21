@@ -3,4 +3,5 @@ dependencies {
     compile group: 'de.heikoseeberger', name: "akka-http-play-json_$scalaVersion", version: '1.18.1'
     compile group: 'org.scala-lang.modules', name: "scala-async_$scalaVersion", version: '0.9.7'
     compile "org.scalatest:scalatest_$scalaVersion:3.0.5"
+    compile 'junit:junit:4.12'
 }

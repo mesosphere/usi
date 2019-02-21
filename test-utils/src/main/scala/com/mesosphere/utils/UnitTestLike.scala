@@ -1,11 +1,13 @@
 package com.mesosphere.utils
 
+import org.junit.runner.RunWith
 import akka.actor.{ActorSystem, Scheduler}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.scalactic.source.Position
 import org.scalatest.concurrent.{Eventually, JavaFutures, ScalaFutures, TimeLimitedTests}
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.time.{Minute, Seconds, Span}
 import org.scalatest.{
   AppendedClues,
@@ -69,6 +71,7 @@ trait UnitTestLike
   override implicit lazy val patienceConfig: PatienceConfig = PatienceConfig(timeout = Span(5, Seconds))
 }
 
+@RunWith(classOf[JUnitRunner])
 abstract class UnitTest extends WordSpec with UnitTestLike
 
 trait AkkaUnitTestLike extends UnitTestLike {
@@ -87,4 +90,5 @@ trait AkkaUnitTestLike extends UnitTestLike {
   }
 }
 
+@RunWith(classOf[JUnitRunner])
 abstract class AkkaUnitTest extends UnitTest with AkkaUnitTestLike
