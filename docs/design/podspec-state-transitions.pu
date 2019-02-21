@@ -1,0 +1,39 @@
+@startuml
+
+[*] --> Initial
+
+state Initial
+state Killing
+state Deleted as "[Deleted]"
+Initial: Goal running
+
+Initial --> Killing
+Killing: Goal terminal
+
+Initial --> Deleted: Expunge\n(Task is already\nreported terminal)
+
+Killing --> Deleted
+Deleted: PodSpec is removed
+
+note right of Initial
+  New specification
+  RunSpec is required
+end note
+
+note right of Killing
+  RunSpec is optional, but if
+  specified must not differ from
+  Initial.
+end note
+
+
+note right of Deleted
+  UnifiedScheduler removes
+  associated PodRecord info.
+
+  If task is still running, it will
+  be reported as a spurious task.
+end note
+
+Deleted --> [*]
+@enduml
