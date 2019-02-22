@@ -4,6 +4,7 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep}
 import akka.stream.{ActorMaterializer, FlowShape}
 import com.mesosphere.mesos.client.MesosCalls
+import com.mesosphere.usi.core.helpers.FrameworkMock
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
 import com.mesosphere.usi.core.matching.ScalarResource

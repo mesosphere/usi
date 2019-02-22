@@ -11,30 +11,29 @@ import scala.collection.JavaConverters._
 object MesosMock {
   import com.mesosphere.usi.core.protos.ProtoBuilders._
   import com.mesosphere.usi.core.protos.ProtoConversions._
-  val mockAgentId = AgentId("mock-agent")
-  val mockFrameworkId = ProtoBuilders.newFrameworkId("mock-framework")
+  val mockAgentId: AgentId = AgentId("mock-agent")
+  val mockFrameworkId: Mesos.FrameworkID = ProtoBuilders.newFrameworkId("mock-framework")
+  val mockOffer: Mesos.Offer = newOffer(
+    id = newOfferId("testing"),
+    agentId = mockAgentId.asProto,
+    frameworkID = mockFrameworkId,
+    hostname = "some-host",
+    resources = Seq(
+      newResource("cpus", Mesos.Value.Type.SCALAR, scalar = 4.asProtoScalar),
+      newResource("mem", Mesos.Value.Type.SCALAR, scalar = 4096.asProtoScalar),
+      newResource("disk", Mesos.Value.Type.SCALAR, scalar = 256000.asProtoScalar)
+    )
+  )
+
   val flow: Flow[MesosCall, MesosEvent, NotUsed] = {
     Flow[MesosCall].async.mapConcat { call =>
       val result: List[MesosEvent] = if (call.hasRevive) {
-
-        val offer = newOffer(
-          id = newOfferId("testing"),
-          agentId = mockAgentId.asProto,
-          frameworkID = mockFrameworkId,
-          hostname = "some-host",
-          resources = Seq(
-            newResource("cpus", Mesos.Value.Type.SCALAR, scalar = 4.asProtoScalar),
-            newResource("mem", Mesos.Value.Type.SCALAR, scalar = 4096.asProtoScalar),
-            newResource("disk", Mesos.Value.Type.SCALAR, scalar = 256000.asProtoScalar)
-          )
-        )
-
         List(
           MesosEvent
             .newBuilder()
             .setOffers(MesosEvent.Offers
               .newBuilder()
-              .addOffers(offer))
+              .addOffers(mockOffer))
             .build())
       } else if (call.hasAccept) {
         val events = for {
