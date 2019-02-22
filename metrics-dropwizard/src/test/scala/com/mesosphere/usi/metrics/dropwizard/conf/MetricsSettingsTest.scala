@@ -1,5 +1,6 @@
 package com.mesosphere.usi.metrics.dropwizard.conf
 
+import com.mesosphere.utils.UnitTest
 import com.typesafe.config.ConfigFactory
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -7,8 +8,7 @@ import org.scalatest.{GivenWhenThen, Inside, Matchers, OptionValues, WordSpec}
 
 import scala.concurrent.duration._
 
-@RunWith(classOf[JUnitRunner])
-class MetricsSettingsTest extends WordSpec with Matchers with GivenWhenThen with Inside with OptionValues {
+class MetricsSettingsTest extends UnitTest with Inside {
 
   "MetricsSettings" should {
     "parse reference.conf correctly" in {

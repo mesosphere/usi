@@ -18,7 +18,6 @@ import org.scalatest.junit.JUnitRunner
 import scala.annotation.tailrec
 import scala.concurrent.Future
 
-@RunWith(classOf[JUnitRunner])
 class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
 
   "Mesos client should successfully subscribe to mesos without framework Id" in withFixture() { f =>

@@ -9,7 +9,6 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import java.util
 
-@RunWith(classOf[JUnitRunner])
 class SimpleHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest {
 
   "MesosClientExampleFramework should successfully connect to Mesos" in withFixture() { f =>

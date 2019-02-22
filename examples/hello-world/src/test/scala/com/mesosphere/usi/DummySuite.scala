@@ -3,13 +3,14 @@
  */
 package com.mesosphere.usi
 
+import com.mesosphere.utils.UnitTest
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
-class DummySuite extends FunSuite {
-  test("true is always true") {
-    assert(true == true)
+class DummySuite extends UnitTest {
+  "Hello world" should {
+    "true is always true" in {
+      assert(true == true)
+    }
   }
 }
