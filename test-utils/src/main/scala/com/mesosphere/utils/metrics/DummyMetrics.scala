@@ -1,4 +1,4 @@
-package com.mesosphere.usi.metrics.dummy
+package com.mesosphere.utils.metrics
 
 import java.time.Clock
 
@@ -8,6 +8,10 @@ import com.mesosphere.usi.metrics.{UnitOfMeasurement => DropwizardUnitOfMeasurem
 
 import scala.concurrent.Future
 
+/**
+  * As the name suggest, this is a dummy metrics implementation of the [[Metrics]] interface found in the `metrics`
+  * module. Should be used for testing only.
+  */
 object DummyMetrics extends Metrics {
   class DummyCounter extends Counter {
     override def increment(): Unit = ()

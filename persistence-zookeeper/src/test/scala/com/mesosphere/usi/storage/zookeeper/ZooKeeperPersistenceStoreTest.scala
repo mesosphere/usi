@@ -5,21 +5,21 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import akka.util.ByteString
-import com.typesafe.scalalogging.StrictLogging
-import com.mesosphere.usi.storage.UnitTest
-import com.mesosphere.usi.storage.zookeeper.PersistenceStore._
 import com.mesosphere.usi.metrics.Metrics
-import com.mesosphere.usi.metrics.dummy.DummyMetrics
+import com.mesosphere.usi.storage.zookeeper.PersistenceStore._
+import com.mesosphere.utils.UnitTest
+import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.zookeeper.ZookeeperServerTest
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.curator.framework.CuratorFramework
 import org.apache.zookeeper.KeeperException.{NoNodeException, NodeExistsException}
-
-import scala.collection.immutable.Seq
-import scala.collection.concurrent.TrieMap
-import scala.concurrent.{Await, ExecutionContext}
-import scala.util.{Failure, Random, Success}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+
+import scala.collection.concurrent.TrieMap
+import scala.collection.immutable.Seq
+import scala.concurrent.{Await, ExecutionContext}
+import scala.util.{Failure, Random, Success}
 
 @RunWith(classOf[JUnitRunner])
 class ZooKeeperPersistenceStoreTest extends UnitTest with ZookeeperServerTest with StrictLogging {

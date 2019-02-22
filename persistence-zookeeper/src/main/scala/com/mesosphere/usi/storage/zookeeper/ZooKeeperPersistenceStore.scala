@@ -5,13 +5,13 @@ import java.nio.file.Paths
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
 import akka.{Done, NotUsed}
-import com.typesafe.scalalogging.StrictLogging
-import com.mesosphere.usi.storage.zookeeper.PersistenceStore._
 import com.mesosphere.usi.metrics.Metrics
+import com.mesosphere.usi.storage.zookeeper.PersistenceStore._
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.zookeeper.KeeperException.{NoNodeException, NodeExistsException}
 
-import scala.collection.immutable.Seq
 import scala.collection.JavaConverters
+import scala.collection.immutable.Seq
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Try}
