@@ -1,8 +1,8 @@
 package com.mesosphere.usi.core
 import com.mesosphere.usi.core.models.ResourceType
-import com.mesosphere.utils.UnitTest
 import com.mesosphere.usi.core.protos.ProtoBuilders
 import com.mesosphere.usi.core.protos.ProtoConversions._
+import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.Protos
 import org.apache.mesos.v1.Protos.Resource.DiskInfo.Persistence
 import org.apache.mesos.v1.Protos.Resource.{DiskInfo, ReservationInfo}
@@ -40,7 +40,7 @@ class ResourceUtilTest extends UnitTest {
   }
 
   "ResourceUtil" should {
-    "no base resources" in {
+    "have no leftover for empty resources" in {
       val leftOvers = ResourceUtil.consumeResources(
         Seq(),
         Seq(ports(2 to 12))
@@ -48,7 +48,7 @@ class ResourceUtilTest extends UnitTest {
       assert(leftOvers == Seq())
     }
 
-    "resource mix" in {
+    "match on mix of resources" in {
       val leftOvers = ResourceUtil.consumeResources(
         Seq(
           newScalarResource(ResourceType.CPUS, 3),
@@ -63,7 +63,7 @@ class ResourceUtilTest extends UnitTest {
           set(ResourceType.UNKNOWN("labels"), Set("b"))))
     }
 
-    "resource repeated consumed resources with the same name/role" in {
+    "combine used resource and match on all available resource" in {
       val leftOvers = ResourceUtil.consumeResources(
         Seq(newScalarResource(ResourceType.CPUS, 3)),
         Seq(newScalarResource(ResourceType.CPUS, 2), newScalarResource(ResourceType.CPUS, 1))
@@ -71,7 +71,7 @@ class ResourceUtilTest extends UnitTest {
       assert(leftOvers == Seq())
     }
 
-    "resource consumption considers roles" in {
+    "consider roles when consuming resources" in {
       val leftOvers = ResourceUtil.consumeResources(
         Seq(
           newScalarResource(ResourceType.CPUS, 2),
@@ -88,7 +88,7 @@ class ResourceUtilTest extends UnitTest {
           newScalarResource(ResourceType.CPUS, 0.5, reservations = Seq(reservedForRole("marathon")))))
     }
 
-    "resource consumption considers reservation state" in {
+    "consider reservation state when consuming resources" in {
       val reservationInfo = ProtoBuilders.newResourceReservationInfo(
         ReservationInfo.Type.STATIC,
         role = "marathon",
@@ -145,13 +145,13 @@ class ResourceUtilTest extends UnitTest {
       ) should be(Seq(resourceWithReservation))
     }
 
-    "resource consumption fully consumes mount disks" in {
+    "fully consume mount disks" in {
       ResourceUtil.consumeScalarResource(
         newScalarResource(ResourceType.DISK, 1024.0, disk = Some(mountDisk(Some("/mnt/disk1")))),
         32.0) shouldBe (None)
     }
 
-    "resource consumption considers reservation labels" in {
+    "consider reservation labels" in {
       val reservationInfo1 = ProtoBuilders.newResourceReservationInfo(ReservationInfo.Type.STATIC, "role", "principal")
 
       val reservationInfo2 = reservationInfo1.toBuilder
@@ -208,14 +208,14 @@ class ResourceUtilTest extends UnitTest {
       ) should be(Seq(resourceWithReservation1))
     }
 
-    "display resources indicates reservation" in {
+    "format reservation into `displayResource` output" in {
       val reservationInfo = ProtoBuilders.newResourceReservationInfo(ReservationInfo.Type.STATIC, "role", "principal")
       val resource = newScalarResource(ResourceType.DISK, 1024, Some(reservationInfo))
       val resourceString = ResourceUtil.displayResources(Seq(resource), maxRanges = 10)
       resourceString should equal("disk(role, RESERVED for principal) 1024.0")
     }
 
-    "display resources displays disk and reservation info" in {
+    "show disk and reservation info in `displayResources`" in {
       val reservationInfo = ProtoBuilders.newResourceReservationInfo(ReservationInfo.Type.STATIC, "role", "principal")
       val disk = DiskInfo.newBuilder().setPersistence(Persistence.newBuilder().setId("persistenceId")).build()
       val resource = newScalarResource(ResourceType.DISK, 1024, Some(reservationInfo), Some(disk))

@@ -60,8 +60,8 @@ package mesosphere {
     *    // deleted immediately after. This happens every time the `logger` object is used to generate a log statement.
     * }}}
     */
-  case class LoggingArgs(args:(String, Any)*) {
-    def and(other:(String, Any)*): LoggingArgs = LoggingArgs(args ++ other:_*)
+  case class LoggingArgs(args: (String, Any)*) {
+    def and(other: (String, Any)*): LoggingArgs = LoggingArgs(args ++ other: _*)
   }
 
   /**

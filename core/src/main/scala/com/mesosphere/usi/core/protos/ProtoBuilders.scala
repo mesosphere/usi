@@ -91,7 +91,12 @@ private[usi] object ProtoBuilders {
 
     reservations.foreach(b.addReservations)
 
-    if (allocationInfo != null) b.setAllocationInfo(allocationInfo)
+    if (allocationInfo != null) {
+      b.setAllocationInfo(allocationInfo)
+    } else {
+      // allocation info is required property
+      b.setAllocationInfo(Mesos.Resource.AllocationInfo.newBuilder())
+    }
     if (disk != null) b.setDisk(disk)
     if (providerId != null) b.setProviderId(providerId)
     if (ranges != null) b.setRanges(ranges)
