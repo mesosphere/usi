@@ -41,7 +41,7 @@ trait MesosClient {
   def calls: MesosCalls
 
   /**
-    * Calling shutdown()` or `abort()` on this will close both the original connection to Mesos and all event publisher
+    * Calling `shutdown()` or `abort()` on this will close both the original connection to Mesos and all event publisher
     * connections created by materializing mesosSink.
     *
     * Note that depending on `failoverTimeout` provided with SUBSCRIBED call, Mesos could start killing tasks and

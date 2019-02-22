@@ -71,7 +71,7 @@ object Scheduler {
   }
 
   /**
-    * We expess an interface of receiving a snapshot, followed by a series of events, to guide consumers of USI down a
+    * We express an interface of receiving a snapshot, followed by a series of events, to guide consumers of USI down a
     * proper implementation path. A SpecSnapshot should be the very first thing that the USI Scheduler receives from the
     * Framework implementation.
     *
