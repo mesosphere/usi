@@ -6,6 +6,8 @@ import com.mesosphere.usi.core.models.PodId
 import com.mesosphere.usi.core.models.PodSpec
 import com.mesosphere.usi.core.models.ResourceType
 import com.mesosphere.usi.core.models.RunSpec
+import com.mesosphere.usi.core.protos.ProtoBuilders
+import org.apache.mesos.v1.{Protos => Mesos}
 
 object FrameworkMock {
 
@@ -19,5 +21,5 @@ object FrameworkMock {
     Goal.Running,
     mockRunSpec
   )
-
+  val mockFrameworkId: Mesos.FrameworkID = ProtoBuilders.newFrameworkId("mock-framework")
 }

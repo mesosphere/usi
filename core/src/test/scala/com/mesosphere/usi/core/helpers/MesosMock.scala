@@ -3,7 +3,6 @@ package com.mesosphere.usi.core.helpers
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.mesosphere.usi.core.models.AgentId
-import com.mesosphere.usi.core.protos.ProtoBuilders
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import scala.collection.JavaConverters._
@@ -12,11 +11,10 @@ object MesosMock {
   import com.mesosphere.usi.core.protos.ProtoBuilders._
   import com.mesosphere.usi.core.protos.ProtoConversions._
   val mockAgentId: AgentId = AgentId("mock-agent")
-  val mockFrameworkId: Mesos.FrameworkID = ProtoBuilders.newFrameworkId("mock-framework")
   val mockOffer: Mesos.Offer = newOffer(
     id = newOfferId("testing"),
     agentId = mockAgentId.asProto,
-    frameworkID = mockFrameworkId,
+    frameworkID = FrameworkMock.mockFrameworkId,
     hostname = "some-host",
     resources = Seq(
       newResource("cpus", Mesos.Value.Type.SCALAR, scalar = 4.asProtoScalar),

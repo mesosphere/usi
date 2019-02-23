@@ -88,18 +88,23 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
     }
 
     val offerIntent = if (taskInfos.isEmpty) {
-      // This offer is not useful for current set of PodSpec's
+      logger.debug(s"Declining offer with id ${offer.getId}")
       mesosCallFactory.newDecline(Seq(offer.getId))
     } else {
       val op = newOfferOperation(
         Mesos.Offer.Operation.Type.LAUNCH,
         launch = newOfferOperationLaunch(taskInfos.values.flatten)
       )
-      mesosCallFactory.newAccept(MesosCall.Accept
-        .newBuilder()
-        .addOperations(op)
-        .addOfferIds(offer.getId)
-        .build())
+      logger.debug(s"Launching taskId${if (op.getLaunch.getTaskInfosCount > 1) "s"} : " +
+        s"[${op.getLaunch.getTaskInfosList.asScala.map(_.getTaskId).mkString(",")}] for offerId ${offer.getId}")
+      mesosCallFactory.newAccept(
+        MesosCall
+          .Accept
+          .newBuilder()
+          .addOperations(op)
+          .addOfferIds(offer.getId)
+          .build()
+      )
     }
 
     (taskInfos.keySet, intentsBuilder.withMesosCall(offerIntent))
@@ -115,7 +120,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
             case ((builder, pending), offer) =>
               val (matchedPodIds, offerMatchSchedulerEvents) = matchOffer(
                 offer,
-                pendingLaunch.flatMap(specs.podSpecs.get)(collection.breakOut)
+                pendingLaunch.flatMap(specs.podSpecs.get)
               )
 
               (builder ++ offerMatchSchedulerEvents, pending -- matchedPodIds)

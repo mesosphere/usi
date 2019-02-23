@@ -10,7 +10,7 @@ import com.mesosphere.utils.UnitTest
 
 class MesosEventsLogicTest extends UnitTest {
 
-  val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId))
+  private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(FrameworkMock.mockFrameworkId))
 
   "MesosEventsLogic" should {
     "decline an offer when PodSpec's are empty" in {
@@ -38,9 +38,9 @@ class MesosEventsLogicTest extends UnitTest {
       declines.get(0) shouldEqual MesosMock.mockOffer.getId
     }
 
-    "accept an offer when PodSpec's resource requirements are met" in {
+    "accept an offer when some PodSpec's resource requirements are met" in {
       val (matchedPodIds, schedulerEventsBuilder) = mesosEventLogic matchOffer(
-        MesosMock.mockOffer,
+        MesosMock.mockOffer.,
         Seq(
           FrameworkMock.mockPodSpec.copy(id = PodId("podid-1")),
           FrameworkMock.mockPodSpec.copy(id = PodId("podid-2")),
