@@ -40,7 +40,7 @@ class MesosEventsLogicTest extends UnitTest {
 
     "accept an offer when some PodSpec's resource requirements are met" in {
       val (matchedPodIds, schedulerEventsBuilder) = mesosEventLogic matchOffer(
-        MesosMock.mockOffer.,
+        MesosMock.mockOffer,
         Seq(
           FrameworkMock.mockPodSpec.copy(id = PodId("podid-1")),
           FrameworkMock.mockPodSpec.copy(id = PodId("podid-2")),

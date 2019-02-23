@@ -26,7 +26,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   val mockedScheduler: Flow[Scheduler.SpecInput, Scheduler.StateOutput, NotUsed] = {
     Flow.fromGraph {
-      GraphDSL.create(Scheduler.unconnectedGraph(new MesosCalls(MesosMock.mockFrameworkId)), loggingMockMesosFlow)(
+      GraphDSL.create(Scheduler.unconnectedGraph(new MesosCalls(FrameworkMock.mockFrameworkId)), loggingMockMesosFlow)(
         (_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
           import GraphDSL.Implicits._
