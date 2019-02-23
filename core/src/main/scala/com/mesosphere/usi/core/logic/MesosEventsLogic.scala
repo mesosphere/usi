@@ -88,15 +88,19 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
     }
 
     val offerIntent = if (taskInfos.isEmpty) {
-      logger.debug(s"Declining offer with id ${offer.getId}")
+      logger.debug(s"Declining offer with id [{}] {}",
+        offer.getId.getValue,
+        if (specs.isEmpty) "as there are no specs to be launched"
+        else s"due to unmet requirement for pods : [${specs.map(_.id.value).mkString(", ")}]")
       mesosCallFactory.newDecline(Seq(offer.getId))
     } else {
       val op = newOfferOperation(
         Mesos.Offer.Operation.Type.LAUNCH,
         launch = newOfferOperationLaunch(taskInfos.values.flatten)
       )
-      logger.debug(s"Launching taskId${if (op.getLaunch.getTaskInfosCount > 1) "s"} : " +
-        s"[${op.getLaunch.getTaskInfosList.asScala.map(_.getTaskId).mkString(",")}] for offerId ${offer.getId}")
+      logger.debug(s"Launching taskId${if (op.getLaunch.getTaskInfosCount > 1) "s"} : [{}] for offerId {}",
+        op.getLaunch.getTaskInfosList.asScala.map(_.getTaskId.getValue).mkString(", "),
+        offer.getId.getValue)
       mesosCallFactory.newAccept(
         MesosCall
           .Accept
