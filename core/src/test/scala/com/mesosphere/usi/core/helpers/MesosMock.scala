@@ -41,7 +41,10 @@ object MesosMock {
           operation <- call.getAccept.getOperationsList.iterator.asScala
           taskInfo <- operation.getLaunch.getTaskInfosList.asScala
         } yield {
-          val taskStatus = newTaskStatus(taskId = taskInfo.getTaskId, state = Mesos.TaskState.TASK_RUNNING)
+          val taskStatus = newTaskStatus(
+            taskId = taskInfo.getTaskId,
+            state = Mesos.TaskState.TASK_RUNNING,
+            agentId = mockAgentId.asProto)
           MesosEvent.newBuilder
             .setUpdate(
               MesosEvent.Update

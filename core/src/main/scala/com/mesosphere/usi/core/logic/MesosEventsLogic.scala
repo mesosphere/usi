@@ -1,12 +1,14 @@
 package com.mesosphere.usi.core.logic
 
-import com.mesosphere.ImplicitStrictLogging
+import com.mesosphere.{ImplicitStrictLogging, LoggingArgs}
 import java.time.Instant
+
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
 import com.mesosphere.usi.core.models._
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
+
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
@@ -119,6 +121,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
       case UpdateEvent(taskStatus) =>
         val taskId = TaskId(taskStatus.getTaskId.getValue)
         val podId = podIdFor(taskId)
+        logger.info(s"Received task status update from taskId $taskId and podId $podId with status ${taskStatus.getState}", LoggingArgs(("taskId", taskId), ("podId", podId)))
 
         if (specs.podSpecs.contains(podId)) {
           val newState = state.podStatuses.get(podId) match {
@@ -128,7 +131,11 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
               PodStatus(podId, Map(taskId -> taskStatus))
           }
 
-          SchedulerEvents(stateEvents = List(PodStatusUpdated(podId, Some(newState))))
+          SchedulerEvents(
+            stateEvents = List(PodStatusUpdated(podId, Some(newState))),
+            mesosCalls =
+              List(mesosCallFactory.newAcknowledge(taskStatus.getAgentId, taskStatus.getTaskId, taskStatus.getUuid))
+          )
 
         } else {
           SchedulerEvents.empty
