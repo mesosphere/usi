@@ -40,7 +40,7 @@ class ResourceUtilTest extends UnitTest {
   }
 
   "ResourceUtil" should {
-    "have no leftover for empty resources" in {
+    "have no leftOvers for empty resources" in {
       val leftOvers = ResourceUtil.consumeResources(
         Seq(),
         Seq(ports(2 to 12))
