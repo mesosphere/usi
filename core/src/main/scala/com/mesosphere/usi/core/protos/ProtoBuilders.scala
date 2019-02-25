@@ -48,7 +48,12 @@ private[usi] object ProtoBuilders {
     executorIds.foreach(b.addExecutorIds)
     resources.foreach(b.addResources)
 
-    if (allocationInfo != null) b.setAllocationInfo(allocationInfo)
+    if (allocationInfo != null) {
+      b.setAllocationInfo(allocationInfo)
+    } else {
+      // allocation info is required property
+      b.setAllocationInfo(Mesos.Resource.AllocationInfo.newBuilder())
+    }
     if (domain != null) b.setDomain(domain)
     if (frameworkID != null) b.setFrameworkId(frameworkID)
     if (unavailability != null) b.setUnavailability(unavailability)
