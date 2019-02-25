@@ -4,13 +4,12 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep}
 import akka.stream.{ActorMaterializer, FlowShape}
 import com.mesosphere.mesos.client.MesosCalls
-import com.mesosphere.usi.core.helpers.FrameworkMock
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
 import com.mesosphere.usi.core.matching.ScalarResource
 import com.mesosphere.usi.core.models._
 import com.mesosphere.utils.AkkaUnitTest
-import org.apache.mesos.v1.Protos
+import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.scalatest._
 
@@ -26,7 +25,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   val mockedScheduler: Flow[Scheduler.SpecInput, Scheduler.StateOutput, NotUsed] = {
     Flow.fromGraph {
-      GraphDSL.create(Scheduler.unconnectedGraph(new MesosCalls(FrameworkMock.mockFrameworkId)), loggingMockMesosFlow)(
+      GraphDSL.create(Scheduler.unconnectedGraph(new MesosCalls(MesosMock.mockFrameworkId)), loggingMockMesosFlow)(
         (_, _) => NotUsed) { implicit builder =>
         { (graph, mockMesos) =>
           import GraphDSL.Implicits._
@@ -51,14 +50,14 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     input.offer(
       PodSpecUpdated(
         podId,
-        Some(PodSpec(
-          podId,
-          Goal.Running,
-          RunSpec(
-            resourceRequirements =
-              List(ScalarResource.cpus(1), ScalarResource.memory(256)),
-            shellCommand = "sleep 3600")
-        ))
+        Some(
+          PodSpec(
+            podId,
+            Goal.Running,
+            RunSpec(
+              resourceRequirements = List(ScalarResource.cpus(1), ScalarResource.memory(256)),
+              shellCommand = "sleep 3600")
+          ))
       ))
 
     inside(output.pull().futureValue) {
@@ -72,7 +71,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     }
     inside(output.pull().futureValue) {
       case Some(podStatusChange: PodStatusUpdated) =>
-        podStatusChange.newStatus.get.taskStatuses(TaskId(podId.value)).getState shouldBe Protos.TaskState.TASK_RUNNING
+        podStatusChange.newStatus.get.taskStatuses(TaskId(podId.value)).getState shouldBe Mesos.TaskState.TASK_RUNNING
     }
   }
 }

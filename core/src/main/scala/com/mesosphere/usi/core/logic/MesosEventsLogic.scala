@@ -1,6 +1,7 @@
 package com.mesosphere.usi.core.logic
 
 import com.mesosphere.ImplicitStrictLogging
+import com.mesosphere._
 import java.time.Instant
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
@@ -83,27 +84,34 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
       ResourceType.fromName(r.getName)
     }
     val taskInfos = matchPodSpecsTaskRecords(offer, groupedResources, Map.empty, specs.toList)
-    val intentsBuilder = taskInfos.keys.foldLeft(SchedulerEventsBuilder.empty) { (intents, podId) =>
-      intents.withPodRecord(podId, Some(PodRecord(podId, Instant.now(), offer.getAgentId.asModel)))
+    val eventsBuilder = taskInfos.keys.foldLeft(SchedulerEventsBuilder.empty) { (events, podId) =>
+      events.withPodRecord(podId, Some(PodRecord(podId, Instant.now(), offer.getAgentId.asModel)))
     }
 
-    val offerIntent = if (taskInfos.isEmpty) {
-      logger.debug(s"Declining offer with id [{}] {}",
+    val offerEvent = if (taskInfos.isEmpty) {
+      logger.info(
+        s"Declining offer with id [{}] {}",
         offer.getId.getValue,
         if (specs.isEmpty) "as there are no specs to be launched"
-        else s"due to unmet requirement for pods : [${specs.map(_.id.value).mkString(", ")}]")
+        else s"due to unmet requirement for pods : [${specs.map(_.id.value).mkString(", ")}]"
+      )(
+        LoggingArgs("offerId" -> offer.getId.getValue).and("mesosOperation" -> "DECLINE")
+      )
       mesosCallFactory.newDecline(Seq(offer.getId))
     } else {
       val op = newOfferOperation(
         Mesos.Offer.Operation.Type.LAUNCH,
         launch = newOfferOperationLaunch(taskInfos.values.flatten)
       )
-      logger.debug(s"Launching taskId${if (op.getLaunch.getTaskInfosCount > 1) "s"} : [{}] for offerId {}",
+      logger.info(
+        s"Launching taskId${if (op.getLaunch.getTaskInfosCount > 1) "s"} : [{}] for offerId {}",
         op.getLaunch.getTaskInfosList.asScala.map(_.getTaskId.getValue).mkString(", "),
-        offer.getId.getValue)
+        offer.getId.getValue
+      )(
+        LoggingArgs("offerId" -> offer.getId.getValue).and("mesosOperation" -> "LAUNCH")
+      )
       mesosCallFactory.newAccept(
-        MesosCall
-          .Accept
+        MesosCall.Accept
           .newBuilder()
           .addOperations(op)
           .addOfferIds(offer.getId)
@@ -111,7 +119,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
       )
     }
 
-    (taskInfos.keySet, intentsBuilder.withMesosCall(offerIntent))
+    (taskInfos.keySet, eventsBuilder.withMesosCall(offerEvent))
   }
 
   def processEvent(specs: SpecState, state: SchedulerState, pendingLaunch: Set[PodId])(

@@ -3,6 +3,7 @@ package com.mesosphere.usi.core.helpers
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.mesosphere.usi.core.models.AgentId
+import com.mesosphere.usi.core.protos.ProtoBuilders
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import scala.collection.JavaConverters._
@@ -11,17 +12,7 @@ object MesosMock {
   import com.mesosphere.usi.core.protos.ProtoBuilders._
   import com.mesosphere.usi.core.protos.ProtoConversions._
   val mockAgentId: AgentId = AgentId("mock-agent")
-  val mockOffer: Mesos.Offer = newOffer(
-    id = newOfferId("testing"),
-    agentId = mockAgentId.asProto,
-    frameworkID = FrameworkMock.mockFrameworkId,
-    hostname = "some-host",
-    resources = Seq(
-      newResource("cpus", Mesos.Value.Type.SCALAR, scalar = 4.asProtoScalar),
-      newResource("mem", Mesos.Value.Type.SCALAR, scalar = 4096.asProtoScalar),
-      newResource("disk", Mesos.Value.Type.SCALAR, scalar = 256000.asProtoScalar)
-    )
-  )
+  val mockFrameworkId: Mesos.FrameworkID = ProtoBuilders.newFrameworkId("mock-framework")
 
   val flow: Flow[MesosCall, MesosEvent, NotUsed] = {
     Flow[MesosCall].async.mapConcat { call =>
@@ -31,7 +22,7 @@ object MesosMock {
             .newBuilder()
             .setOffers(MesosEvent.Offers
               .newBuilder()
-              .addOffers(mockOffer))
+              .addOffers(createMockOffer()))
             .build())
       } else if (call.hasAccept) {
         val events = for {
@@ -54,5 +45,21 @@ object MesosMock {
       result
     }
   }
+
+  // Parametrize this method as we need to mock more values in an offer.
+  def createMockOffer(
+      cpus: Double = 4,
+      mem: Double = 4096,
+  ): Mesos.Offer = newOffer(
+    id = newOfferId("testing"),
+    agentId = mockAgentId.asProto,
+    frameworkID = mockFrameworkId,
+    hostname = "some-host",
+    resources = Seq(
+      newResource("cpus", Mesos.Value.Type.SCALAR, scalar = cpus.asProtoScalar),
+      newResource("mem", Mesos.Value.Type.SCALAR, scalar = mem.asProtoScalar),
+      newResource("disk", Mesos.Value.Type.SCALAR, scalar = 256000.asProtoScalar)
+    )
+  )
 
 }
