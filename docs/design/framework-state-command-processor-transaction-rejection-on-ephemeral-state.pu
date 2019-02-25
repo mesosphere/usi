@@ -1,0 +1,40 @@
+@startuml
+Participant API
+Participant CommandProcessor
+Participant CommandProcessorStorage
+Participant Subscribers
+
+API -> CommandProcessor: **Transaction 1**\nDelete Instance A
+hnote over CommandProcessor
+  Validate and apply
+  command
+end hnote
+
+CommandProcessor -> CommandProcessorStorage: Instance A deleted
+
+API -> CommandProcessor: **Transaction 2**\nIncrement incarnation\nfor Instance A
+hnote over CommandProcessor
+  Unpersisted state does not
+  have Instance A; transaction
+  rejected by in-memory state
+  and not currently-persisted
+  state.
+end hnote
+
+CommandProcessor -> CommandProcessorStorage: Transaction 2 failed
+hnote over CommandProcessorStorage
+  Update storage to remove
+  instance A
+end hnote
+
+hnote over CommandProcessorStorage
+  Nothing to store for
+  transaction 2
+
+  We preserve the order of
+  events
+end hnote
+
+CommandProcessorStorage -> Subscribers: Instance A deleted
+CommandProcessorStorage -> Subscribers: Transaction 2 failed
+@enduml
