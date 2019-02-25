@@ -30,7 +30,7 @@ private[usi] object ProtoBuilders {
       agentId: Mesos.AgentID,
       frameworkID: Mesos.FrameworkID,
       hostname: String,
-      allocationInfo: Mesos.Resource.AllocationInfo = null,
+      allocationInfo: Mesos.Resource.AllocationInfo,
       domain: Mesos.DomainInfo = null,
       executorIds: Iterable[Mesos.ExecutorID] = Nil,
       attributes: Iterable[Mesos.Attribute] = Nil,
@@ -43,17 +43,12 @@ private[usi] object ProtoBuilders {
       .setId(id)
       .setAgentId(agentId)
       .setHostname(hostname)
+      .setAllocationInfo(allocationInfo)
 
     attributes.foreach(b.addAttributes)
     executorIds.foreach(b.addExecutorIds)
     resources.foreach(b.addResources)
 
-    if (allocationInfo != null) {
-      b.setAllocationInfo(allocationInfo)
-    } else {
-      // allocation info is required property
-      b.setAllocationInfo(Mesos.Resource.AllocationInfo.newBuilder())
-    }
     if (domain != null) b.setDomain(domain)
     if (frameworkID != null) b.setFrameworkId(frameworkID)
     if (unavailability != null) b.setUnavailability(unavailability)
@@ -77,11 +72,18 @@ private[usi] object ProtoBuilders {
     b.build()
   }
 
+  def newResourceAllocationInfo(role: String): Mesos.Resource.AllocationInfo = {
+    Mesos.Resource.AllocationInfo
+      .newBuilder()
+      .setRole(role)
+      .build()
+  }
+
   def newResource(
       name: String,
       resourceType: Mesos.Value.Type,
+      allocationInfo: Mesos.Resource.AllocationInfo,
       reservations: Iterable[Mesos.Resource.ReservationInfo] = Nil,
-      allocationInfo: Mesos.Resource.AllocationInfo = null,
       disk: Mesos.Resource.DiskInfo = null,
       providerId: Mesos.ResourceProviderID = null,
       ranges: Mesos.Value.Ranges = null,
@@ -89,19 +91,15 @@ private[usi] object ProtoBuilders {
       scalar: Mesos.Value.Scalar = null,
       set: Mesos.Value.Set = null,
       shared: Mesos.Resource.SharedInfo = null): Mesos.Resource = {
-    val b = Mesos.Resource.newBuilder()
 
-    b.setType(resourceType)
-    b.setName(name)
+    val b = Mesos.Resource
+      .newBuilder()
+      .setType(resourceType)
+      .setName(name)
+      .setAllocationInfo(allocationInfo)
 
     reservations.foreach(b.addReservations)
 
-    if (allocationInfo != null) {
-      b.setAllocationInfo(allocationInfo)
-    } else {
-      // allocation info is required property
-      b.setAllocationInfo(Mesos.Resource.AllocationInfo.newBuilder())
-    }
     if (disk != null) b.setDisk(disk)
     if (providerId != null) b.setProviderId(providerId)
     if (ranges != null) b.setRanges(ranges)

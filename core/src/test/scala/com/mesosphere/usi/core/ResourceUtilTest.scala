@@ -30,13 +30,16 @@ class ResourceUtilTest extends UnitTest {
       resourceType: ResourceType,
       amount: T,
       reservations: Iterable[Protos.Resource.ReservationInfo] = Nil,
-      disk: Option[DiskInfo] = None): Protos.Resource = {
+      disk: Option[DiskInfo] = None,
+      role: String = "mock-role"): Protos.Resource = {
     ProtoBuilders.newResource(
       resourceType.name,
       Protos.Value.Type.SCALAR,
+      ProtoBuilders.newResourceAllocationInfo(role),
       scalar = amount.asProtoScalar,
       reservations = reservations,
-      disk = disk.getOrElse(null))
+      disk = disk.getOrElse(null)
+    )
   }
 
   "ResourceUtil" should {
@@ -282,7 +285,11 @@ class ResourceUtilTest extends UnitTest {
   }
 
   private[this] def set(resourceType: ResourceType, labels: Set[String]): Protos.Resource = {
-    ProtoBuilders.newResource(resourceType.name, Protos.Value.Type.SET, set = labels.asProtoSet)
+    ProtoBuilders.newResource(
+      resourceType.name,
+      Protos.Value.Type.SET,
+      ProtoBuilders.newResourceAllocationInfo("some-role"),
+      set = labels.asProtoSet)
   }
 
   private[this] def portsTest(
@@ -303,7 +310,9 @@ class ResourceUtilTest extends UnitTest {
     ProtoBuilders.newResource(
       ResourceType.PORTS.name,
       Protos.Value.Type.RANGES,
-      ranges = ProtoBuilders.newValueRanges(ranges.map(_.asProtoRange)))
+      ProtoBuilders.newResourceAllocationInfo("some-role"),
+      ranges = ProtoBuilders.newValueRanges(ranges.map(_.asProtoRange))
+    )
   }
 
   private[this] def scalarTest(consumedResource: Double, baseResource: Double, expectedResult: Option[Double]): Unit = {
