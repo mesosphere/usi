@@ -14,7 +14,12 @@ class ScalarResourceRequirementTest extends UnitTest with Inside {
       val matchers = ScalarResource.cpus(2.0)
 
       val resources =
-        List(ProtoBuilders.newResource(ResourceType.CPUS.name, Mesos.Value.Type.SCALAR, scalar = 10.asProtoScalar))
+        List(
+          ProtoBuilders.newResource(
+            ResourceType.CPUS.name,
+            Mesos.Value.Type.SCALAR,
+            ProtoBuilders.newResourceAllocationInfo("some-role"),
+            scalar = 10.asProtoScalar))
       inside(matchers.matchAndConsume(resources)) {
         case Some(ResourceMatchResult(List(matchedResult), List(unmatched))) =>
           matchedResult.getScalar.getValue shouldBe 2.0

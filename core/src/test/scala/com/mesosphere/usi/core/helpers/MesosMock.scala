@@ -22,10 +22,23 @@ object MesosMock {
           agentId = mockAgentId.asProto,
           frameworkID = mockFrameworkId,
           hostname = "some-host",
+          newResourceAllocationInfo("some-role"),
           resources = Seq(
-            newResource("cpus", Mesos.Value.Type.SCALAR, scalar = 4.asProtoScalar),
-            newResource("mem", Mesos.Value.Type.SCALAR, scalar = 4096.asProtoScalar),
-            newResource("disk", Mesos.Value.Type.SCALAR, scalar = 256000.asProtoScalar)
+            newResource(
+              "cpus",
+              Mesos.Value.Type.SCALAR,
+              newResourceAllocationInfo("some-role"),
+              scalar = 4.asProtoScalar),
+            newResource(
+              "mem",
+              Mesos.Value.Type.SCALAR,
+              newResourceAllocationInfo("some-role"),
+              scalar = 4096.asProtoScalar),
+            newResource(
+              "disk",
+              Mesos.Value.Type.SCALAR,
+              newResourceAllocationInfo("some-role"),
+              scalar = 256000.asProtoScalar)
           )
         )
 
