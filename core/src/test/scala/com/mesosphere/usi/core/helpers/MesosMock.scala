@@ -46,20 +46,35 @@ object MesosMock {
     }
   }
 
-  // Parametrize this method as we need to mock more values in an offer.
+  // Add more arguments as needed.
   def createMockOffer(
       cpus: Double = 4,
       mem: Double = 4096,
-  ): Mesos.Offer = newOffer(
-    id = newOfferId("testing"),
-    agentId = mockAgentId.asProto,
-    frameworkID = mockFrameworkId,
-    hostname = "some-host",
-    resources = Seq(
-      newResource("cpus", Mesos.Value.Type.SCALAR, scalar = cpus.asProtoScalar),
-      newResource("mem", Mesos.Value.Type.SCALAR, scalar = mem.asProtoScalar),
-      newResource("disk", Mesos.Value.Type.SCALAR, scalar = 256000.asProtoScalar)
+  ): Mesos.Offer = {
+    newOffer(
+      id = newOfferId("testing"),
+      agentId = mockAgentId.asProto,
+      frameworkID = mockFrameworkId,
+      hostname = "some-host",
+      newResourceAllocationInfo("some-role"),
+      resources = Seq(
+        newResource(
+          "cpus",
+          Mesos.Value.Type.SCALAR,
+          newResourceAllocationInfo("some-role"),
+          scalar = cpus.asProtoScalar),
+        newResource(
+          "mem",
+          Mesos.Value.Type.SCALAR,
+          newResourceAllocationInfo("some-role"),
+          scalar = mem.asProtoScalar),
+        newResource(
+          "disk",
+          Mesos.Value.Type.SCALAR,
+          newResourceAllocationInfo("some-role"),
+          scalar = 256000.asProtoScalar)
+      )
     )
-  )
+  }
 
 }
