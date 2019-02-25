@@ -9,7 +9,7 @@ import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatten
 import com.mesosphere.usi.core.matching.ScalarResource
 import com.mesosphere.usi.core.models._
 import com.mesosphere.utils.AkkaUnitTest
-import org.apache.mesos.v1.Protos
+import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.scalatest._
 
@@ -50,14 +50,14 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     input.offer(
       PodSpecUpdated(
         podId,
-        Some(PodSpec(
-          podId,
-          Goal.Running,
-          RunSpec(
-            resourceRequirements =
-              List(ScalarResource.cpus(1), ScalarResource.memory(256)),
-            shellCommand = "sleep 3600")
-        ))
+        Some(
+          PodSpec(
+            podId,
+            Goal.Running,
+            RunSpec(
+              resourceRequirements = List(ScalarResource.cpus(1), ScalarResource.memory(256)),
+              shellCommand = "sleep 3600")
+          ))
       ))
 
     inside(output.pull().futureValue) {
@@ -71,7 +71,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     }
     inside(output.pull().futureValue) {
       case Some(podStatusChange: PodStatusUpdated) =>
-        podStatusChange.newStatus.get.taskStatuses(TaskId(podId.value)).getState shouldBe Protos.TaskState.TASK_RUNNING
+        podStatusChange.newStatus.get.taskStatuses(TaskId(podId.value)).getState shouldBe Mesos.TaskState.TASK_RUNNING
     }
   }
 }
