@@ -23,7 +23,7 @@ class MesosEventsLogicTest extends UnitTest {
   )
 
   "MesosEventsLogic" should {
-    "decline an offer when there is not PodSpec to launch" in {
+    "decline an offer when there is no PodSpec to launch" in {
       val someOffer = MesosMock.createMockOffer()
       val (_, schedulerEventsBuilder) = mesosEventLogic matchOffer (
         someOffer,
@@ -35,7 +35,7 @@ class MesosEventsLogicTest extends UnitTest {
       declines.get(0) shouldEqual someOffer.getId
     }
 
-    "decline an offer when PodSpec's resource requirements are unmet" in {
+    "decline an offer when none of the PodSpec's resource requirements are met" in {
       val insufficientOffer = MesosMock.createMockOffer(cpus = 1)
       val (_, schedulerEventsBuilder) = mesosEventLogic matchOffer (
         insufficientOffer,
