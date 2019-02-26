@@ -9,7 +9,6 @@ task testReport(type: TestReport) {
     destinationDir = file("${rootProject.buildDir}/reports/tests")
     // Include the results from the `test` task in all subprojects
     reportOn subprojects*.test
-    dependsOn(subprojects.check)
 }
 
 task uploadTestReports(type: S3Upload) {
@@ -65,6 +64,7 @@ task provision(type: Exec) {
 task ci {
     description = "The main target for CI builds."
     group = "CI"
+
     if (TravisEnvironment.isMasterBuild()) {
         dependsOn githubReport, gitPublishPush
     } else if (TravisEnvironment.isSecureBuild())  {
