@@ -32,14 +32,14 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     input.offer(
       PodSpecUpdated(
         podId,
-        Some(PodSpec(
-          podId,
-          Goal.Running,
-          RunSpec(
-            resourceRequirements =
-              List(ScalarResource.cpus(1), ScalarResource.memory(256)),
-            shellCommand = "sleep 3600")
-        ))
+        Some(
+          PodSpec(
+            podId,
+            Goal.Running,
+            RunSpec(
+              resourceRequirements = List(ScalarResource.cpus(1), ScalarResource.memory(256)),
+              shellCommand = "sleep 3600")
+          ))
       ))
 
     inside(output.pull().futureValue) {

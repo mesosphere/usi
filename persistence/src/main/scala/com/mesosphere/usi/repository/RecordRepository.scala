@@ -2,11 +2,7 @@ package com.mesosphere.usi.repository
 
 import scala.concurrent.Future
 
-trait RecordRepository {
-
-  type Record
-
-  type RecordId
+trait RecordRepository[Record, RecordId] {
 
   /**
     * Stores the provided record in the repository if it doesn't exist.
