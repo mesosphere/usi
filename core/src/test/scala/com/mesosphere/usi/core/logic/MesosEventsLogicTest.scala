@@ -1,19 +1,23 @@
 package com.mesosphere.usi.core.logic
 
-import java.util.UUID
-
 import com.mesosphere.mesos.client.MesosCalls
+import com.mesosphere.usi.core.SchedulerState
+import com.mesosphere.usi.core.SpecState
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.matching.ScalarResource
 import com.mesosphere.usi.core.models.Goal
 import com.mesosphere.usi.core.models.PodId
 import com.mesosphere.usi.core.models.PodSpec
+import com.mesosphere.usi.core.models.PodStatus
+import com.mesosphere.usi.core.models.PodStatusUpdated
 import com.mesosphere.usi.core.models.ResourceType
 import com.mesosphere.usi.core.models.RunSpec
+import com.mesosphere.usi.core.models.TaskId
+import com.mesosphere.usi.core.protos.ProtoBuilders.newAgentId
+import com.mesosphere.usi.core.protos.ProtoBuilders.newTaskStatus
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.Protos
-import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}
-import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+import org.apache.mesos.v1.{Protos => Mesos}
 
 class MesosEventsLogicTest extends UnitTest {
 
@@ -75,21 +79,64 @@ class MesosEventsLogicTest extends UnitTest {
       matchedPodIds.size shouldEqual 4
     }
 
-    "acknowledge status updates" in {
-      val taskId: Protos.TaskID = null
-      mesosEventLogic.processEvent(null, null, Set.empty)(taskUpdateEvent(taskId))
+    "acknowledge status updates for new pods (first task update)" in {
+      import com.mesosphere.usi.core.protos.ProtoBuilders._
+
+      val taskId = newTaskId(mockPodSpecWith1Cpu256Mem.id.value)
+      val taskUpdate = MesosMock.taskUpdateEvent(taskStatus(taskId))
+      val specs = SpecState(Map(mockPodSpecWith1Cpu256Mem.id -> mockPodSpecWith1Cpu256Mem))
+
+      val events = mesosEventLogic.processEvent(specs, SchedulerState.empty, Set.empty)(taskUpdate)
+
+      events.mesosCalls.length shouldEqual 1
+      events.mesosCalls.head.getAcknowledge.getTaskId shouldEqual taskId
+
+      events.stateEvents.length shouldEqual 1
+      events.stateEvents.head shouldBe a[PodStatusUpdated]
+      val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdated]
+      podStatusUpdate.newStatus shouldBe defined
+      podStatusUpdate.newStatus.get.taskStatuses should contain (
+        TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus
+      )
+    }
+
+    "acknowledge status updates for old pods (new task update)" in {
+      import com.mesosphere.usi.core.protos.ProtoBuilders._
+
+      val taskId = newTaskId(mockPodSpecWith1Cpu256Mem.id.value)
+      val taskUpdate = MesosMock.taskUpdateEvent(taskStatus(taskId))
+      val specs = SpecState(Map(mockPodSpecWith1Cpu256Mem.id -> mockPodSpecWith1Cpu256Mem))
+      val podStatus = Map(mockPodSpecWith1Cpu256Mem.id -> PodStatus(mockPodSpecWith1Cpu256Mem.id, Map(
+        TaskId(mockPodSpecWith1Cpu256Mem.id.value) -> taskUpdate.getUpdate.getStatus
+      )))
+
+      val events = mesosEventLogic.processEvent(
+        specs,
+        SchedulerState(Map.empty, podStatus),
+        Set.empty
+      )(taskUpdate)
+
+      events.mesosCalls.length shouldEqual 1
+      events.mesosCalls.head.getAcknowledge.getTaskId shouldEqual taskId
+
+      events.stateEvents.length shouldEqual 1
+      events.stateEvents.head shouldBe a[PodStatusUpdated]
+      val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdated]
+      podStatusUpdate.newStatus shouldBe defined
+      podStatusUpdate.newStatus.get.taskStatuses should contain (
+        TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus
+      )
     }
   }
 
-  private def taskUpdateEvent(taskId: Protos.TaskID, taskState: TaskState = TaskState.TASK_RUNNING): MesosEvent = {
-    MesosEvent.newBuilder()
-        .setUpdate(MesosEvent.Update.newBuilder()
-          .setStatus(TaskStatus.newBuilder()
-            .setTaskId(taskId)
-            .setState(TaskState.TASK_RUNNING)
-              .setUuid(UUID.randomUUID().toString)
-          .setAgentId()))
-      .build()
-  }
+  private def taskStatus(
+    taskId: Mesos.TaskID,
+    state: Mesos.TaskState = Mesos.TaskState.TASK_RUNNING,
+    agentId: Mesos.AgentID = newAgentId("some-agent-id")
+  ): Protos.TaskStatus = newTaskStatus(
+    taskId = taskId,
+    state = state,
+    agentId = agentId,
+  )
 
 }
