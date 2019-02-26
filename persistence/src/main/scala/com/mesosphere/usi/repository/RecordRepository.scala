@@ -30,12 +30,12 @@ trait RecordRepository[Record, RecordId] {
 
   /**
     * Deletes the record if it exists. If the record is missing,
-    * * the future will be failed with an [[RecordNotFoundException]].
+    * the future will be failed with an [[RecordNotFoundException]].
     *
-    * @param record
+    * @param recordId
     * @return id of the deleted record
     */
-  def delete(record: Record): Future[RecordId]
+  def delete(recordId: RecordId): Future[RecordId]
 }
 
 case class RecordAlreadyExistsException(id: String) extends RuntimeException(s"record with id $id already exists.")

@@ -32,8 +32,8 @@ class PodRecordRepository(val store: PersistenceStore) extends PodRecordReposito
     }
   }
 
-  override def delete(record: PodRecord): Future[PodId] = async {
-    val path = await(store.delete(record.podId.value))
+  override def delete(podId: PodId): Future[PodId] = async {
+    val path = await(store.delete(podId.value))
     PodId(path)
     // TODO: RecordNotFoundException
   }

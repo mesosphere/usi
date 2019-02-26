@@ -13,12 +13,15 @@ trait RepositoryBehavior { this: UnitTest =>
 
   def podRecordRepository(newRepo: => PodRecordRepository): Unit = {
 
-    "create a record" in new Fixture() { f =>
+    "create a record" in {
+      val f = Fixture()
       val repo = newRepo
       repo.create(f.record).futureValue should be(f.record.podId)
     }
 
-    "no create a record a second time" in new Fixture() { f =>
+    "no create a record a second time" in {
+      val f = Fixture()
+
       Given("a record already exists")
       val repo = newRepo
       repo.create(f.record).futureValue should be(f.record.podId)
@@ -30,7 +33,9 @@ trait RepositoryBehavior { this: UnitTest =>
       result should be(RecordAlreadyExistsException(f.podId.value))
     }
 
-    "read a record" in new Fixture() { f =>
+    "read a record" in {
+      val f = Fixture()
+
       Given(s"a known record id ${f.podId}")
       val repo = newRepo
       repo.create(f.record).futureValue
@@ -53,9 +58,72 @@ trait RepositoryBehavior { this: UnitTest =>
       Then("the record is None")
       maybeRecord should be(None)
     }
+
+    "delete a record" in {
+      val f = Fixture()
+
+      Given(s"a known record id ${f.podId}")
+      val repo = newRepo
+      repo.create(f.record).futureValue
+
+      When("the record is deleted")
+      val maybeId = repo.delete(f.podId).futureValue
+
+      Then("the record id should be returned")
+      maybeId should be(f.podId)
+
+      And("the record should not exist")
+      repo.read(f.podId).futureValue should be(None)
+    }
+
+    "delete an unknown record" in {
+      Given(s"an unknown record id")
+      val repo = newRepo
+      val unknownPodId = PodId("unknown")
+
+      When("the unknown record is  deleted")
+      val result = repo.delete(unknownPodId).failed.futureValue
+
+      Then("an error is returned")
+      result should be(RecordNotFoundException(unknownPodId.value))
+    }
+
+    "update a record" in {
+      val f = Fixture()
+
+      Given(s"a known record id ${f.podId}")
+      val repo = newRepo
+      repo.create(f.record).futureValue
+
+      And("and updated record")
+      val newAgentId = AgentId("new_agent")
+      val updatedRecord = f.record.copy(agentId = newAgentId)
+
+      When("the record is updated")
+      repo.update(updatedRecord).futureValue
+
+      Then("the updated record should be saved")
+      repo.read(f.podId).futureValue should be(Some(updatedRecord))
+
+      And("the old record should be gone")
+      repo.read(f.podId).futureValue should not be (Some(f.record))
+    }
+
+    "update an unknown record" in {
+      Given(s"an unknown record id")
+      val repo = newRepo
+      val unknownPodId = PodId("unknown")
+
+      When("the unknown record is updated")
+      val unknownRecord = PodRecord(unknownPodId, Instant.now(), AgentId("my_agent"))
+      val result = repo.update(unknownRecord).failed.futureValue
+
+      Then("an error is returned")
+      result should be(RecordNotFoundException(unknownPodId.value))
+    }
   }
 
-  class Fixture() {
+  case class Fixture() {
     val podId = PodId("my_pod")
     val agentId = AgentId("my_agent")
     val record = PodRecord(podId, Instant.now(), agentId)
