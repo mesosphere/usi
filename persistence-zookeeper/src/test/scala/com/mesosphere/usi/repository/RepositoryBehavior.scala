@@ -11,11 +11,16 @@ import com.mesosphere.utils.UnitTest
   */
 trait RepositoryBehavior { this: UnitTest =>
 
-  def podRecordRepository(newRepo: => PodRecordRepository): Unit = {
+  /**
+    * This defines the expected behavior of a pod record repository.
+    *
+    * @param newRepo A repo factory function. Each test case creates its own repository.
+    */
+  def podRecordRepository(newRepo: () => PodRecordRepository): Unit = {
 
     "create a record" in {
       val f = Fixture()
-      val repo = newRepo
+      val repo = newRepo()
       repo.create(f.record).futureValue should be(f.record.podId)
     }
 
@@ -23,7 +28,7 @@ trait RepositoryBehavior { this: UnitTest =>
       val f = Fixture()
 
       Given("a record already exists")
-      val repo = newRepo
+      val repo = newRepo()
       repo.create(f.record).futureValue should be(f.record.podId)
 
       When("the record is created again")
@@ -37,7 +42,7 @@ trait RepositoryBehavior { this: UnitTest =>
       val f = Fixture()
 
       Given(s"a known record id ${f.podId}")
-      val repo = newRepo
+      val repo = newRepo()
       repo.create(f.record).futureValue
 
       When("the record is read by id")
@@ -49,7 +54,7 @@ trait RepositoryBehavior { this: UnitTest =>
 
     "read an unknown record" in {
       Given(s"an unknown record id")
-      val repo = newRepo
+      val repo = newRepo()
       val podId = PodId("unknown")
 
       When("the record is read by id")
@@ -63,7 +68,7 @@ trait RepositoryBehavior { this: UnitTest =>
       val f = Fixture()
 
       Given(s"a known record id ${f.podId}")
-      val repo = newRepo
+      val repo = newRepo()
       repo.create(f.record).futureValue
 
       When("the record is deleted")
@@ -78,7 +83,7 @@ trait RepositoryBehavior { this: UnitTest =>
 
     "delete an unknown record" in {
       Given(s"an unknown record id")
-      val repo = newRepo
+      val repo = newRepo()
       val unknownPodId = PodId("unknown")
 
       When("the unknown record is  deleted")
@@ -92,7 +97,7 @@ trait RepositoryBehavior { this: UnitTest =>
       val f = Fixture()
 
       Given(s"a known record id ${f.podId}")
-      val repo = newRepo
+      val repo = newRepo()
       repo.create(f.record).futureValue
 
       And("and updated record")
@@ -111,7 +116,7 @@ trait RepositoryBehavior { this: UnitTest =>
 
     "update an unknown record" in {
       Given(s"an unknown record id")
-      val repo = newRepo
+      val repo = newRepo()
       val unknownPodId = PodId("unknown")
 
       When("the unknown record is updated")

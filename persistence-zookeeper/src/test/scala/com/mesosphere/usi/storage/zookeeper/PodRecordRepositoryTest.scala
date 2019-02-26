@@ -23,7 +23,7 @@ class PodRecordRepositoryTest extends UnitTest with ZookeeperServerTest with Rep
   lazy val metrics: Metrics = DummyMetrics
   lazy val store: ZooKeeperPersistenceStore = new ZooKeeperPersistenceStore(metrics, factory, parallelism = 1)
 
-  def podRepo: PodRecordRepository = new PodRecordRepository(store)
+  def podRepo(): PodRecordRepository = new PodRecordRepository(store)
 
   "The Zookeeper backed pod record repository" should { behave like podRecordRepository(podRepo) }
 }
