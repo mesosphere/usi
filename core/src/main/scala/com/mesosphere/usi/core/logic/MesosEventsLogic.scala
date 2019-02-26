@@ -145,7 +145,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
       case UpdateEvent(taskStatus) =>
         val taskId = TaskId(taskStatus.getTaskId.getValue)
         val podId = podIdFor(taskId)
-        logger.info(s"Received task status update from taskId $taskId and podId $podId with status ${taskStatus.getState}", LoggingArgs(("taskId", taskId), ("podId", podId)))
+        logger.info(s"Received task status update from taskId $taskId and podId $podId with status ${taskStatus.getState}")(LoggingArgs(("taskId", taskId), ("podId", podId)))
 
         if (specs.podSpecs.contains(podId)) {
           val newState = state.podStatuses.get(podId) match {

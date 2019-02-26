@@ -1,5 +1,7 @@
 package com.mesosphere.usi.core.logic
 
+import java.util.UUID
+
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.matching.ScalarResource
@@ -9,6 +11,9 @@ import com.mesosphere.usi.core.models.PodSpec
 import com.mesosphere.usi.core.models.ResourceType
 import com.mesosphere.usi.core.models.RunSpec
 import com.mesosphere.utils.UnitTest
+import org.apache.mesos.v1.Protos
+import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}
+import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
 class MesosEventsLogicTest extends UnitTest {
 
@@ -25,7 +30,7 @@ class MesosEventsLogicTest extends UnitTest {
   "MesosEventsLogic" should {
     "decline an offer when there is no PodSpec to launch" in {
       val someOffer = MesosMock.createMockOffer()
-      val (_, schedulerEventsBuilder) = mesosEventLogic matchOffer (
+      val (_, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
         someOffer,
         Seq()
       )
@@ -37,7 +42,7 @@ class MesosEventsLogicTest extends UnitTest {
 
     "decline an offer when none of the PodSpec's resource requirements are met" in {
       val insufficientOffer = MesosMock.createMockOffer(cpus = 1)
-      val (_, schedulerEventsBuilder) = mesosEventLogic matchOffer (
+      val (_, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
         insufficientOffer,
         Seq(
           mockPodSpecWith1Cpu256Mem.copy(
@@ -53,7 +58,7 @@ class MesosEventsLogicTest extends UnitTest {
 
     "accept an offer when some PodSpec's resource requirements are met" in {
       val offerFor4Pods = MesosMock.createMockOffer(cpus = 1 * 10, mem = 256 * 4)
-      val (matchedPodIds, schedulerEventsBuilder) = mesosEventLogic matchOffer (
+      val (matchedPodIds, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
         offerFor4Pods,
         Seq(
           mockPodSpecWith1Cpu256Mem.copy(id = PodId("podid-1")),
@@ -69,6 +74,22 @@ class MesosEventsLogicTest extends UnitTest {
       accepts.get(0) shouldEqual offerFor4Pods.getId
       matchedPodIds.size shouldEqual 4
     }
+
+    "acknowledge status updates" in {
+      val taskId: Protos.TaskID = null
+      mesosEventLogic.processEvent(null, null, Set.empty)(taskUpdateEvent(taskId))
+    }
+  }
+
+  private def taskUpdateEvent(taskId: Protos.TaskID, taskState: TaskState = TaskState.TASK_RUNNING): MesosEvent = {
+    MesosEvent.newBuilder()
+        .setUpdate(MesosEvent.Update.newBuilder()
+          .setStatus(TaskStatus.newBuilder()
+            .setTaskId(taskId)
+            .setState(TaskState.TASK_RUNNING)
+              .setUuid(UUID.randomUUID().toString)
+          .setAgentId()))
+      .build()
   }
 
 }
