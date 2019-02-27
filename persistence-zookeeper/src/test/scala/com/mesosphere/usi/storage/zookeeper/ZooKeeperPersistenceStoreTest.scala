@@ -186,7 +186,7 @@ class ZooKeeperPersistenceStoreTest extends UnitTest with ZookeeperServerTest wi
         store.delete(path).futureValue shouldBe path
       }
 
-      "delete a non-existing node does not lead to an exception" in {
+      "delete a non-existing node does not lead to an exception" ignore {
         When("trying to delete a non-existing node")
         val path = randomPath()
 

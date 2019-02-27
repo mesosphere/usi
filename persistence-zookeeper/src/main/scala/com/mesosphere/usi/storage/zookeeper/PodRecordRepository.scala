@@ -4,7 +4,11 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, 
 
 import akka.util.ByteString
 import com.mesosphere.usi.core.models.{PodId, PodRecord}
-import com.mesosphere.usi.repository.{RecordAlreadyExistsException, RecordNotFoundException, PodRecordRepository => PodRecordRepositoryInterface}
+import com.mesosphere.usi.repository.{
+  RecordAlreadyExistsException,
+  RecordNotFoundException,
+  PodRecordRepository => PodRecordRepositoryInterface
+}
 import com.mesosphere.usi.storage.zookeeper.PersistenceStore.Node
 import org.apache.zookeeper.KeeperException
 import org.apache.zookeeper.KeeperException.NoNodeException
@@ -27,9 +31,9 @@ class PodRecordRepository(val store: PersistenceStore) extends PodRecordReposito
 
     val node = Node(path, ByteString(data))
     store.create(node).transform {
-        case Success(_) => Success(record.podId)
-        case Failure(_: KeeperException.NodeExistsException) => Failure(RecordAlreadyExistsException(record.podId.value))
-        case Failure(other) => Failure(other)
+      case Success(_) => Success(record.podId)
+      case Failure(_: KeeperException.NodeExistsException) => Failure(RecordAlreadyExistsException(record.podId.value))
+      case Failure(other) => Failure(other)
     }
   }
 
@@ -53,7 +57,7 @@ class PodRecordRepository(val store: PersistenceStore) extends PodRecordReposito
     val path = s"/${podId.value}"
     store.delete(path).transform {
       case Success(_) => Success(podId)
-      case Failure(_: KeeperException.NoNodeException)  => Failure(RecordNotFoundException(podId.value))
+      case Failure(_: KeeperException.NoNodeException) => Failure(RecordNotFoundException(podId.value))
       case Failure(other) => Failure(other)
     }
   }
@@ -70,7 +74,7 @@ class PodRecordRepository(val store: PersistenceStore) extends PodRecordReposito
     val node = Node(path, ByteString(data))
     store.update(node).transform {
       case Success(_) => Success(record.podId)
-      case Failure(_: KeeperException.NoNodeException)  => Failure(RecordNotFoundException(record.podId.value))
+      case Failure(_: KeeperException.NoNodeException) => Failure(RecordNotFoundException(record.podId.value))
       case Failure(other) => Failure(other)
     }
   }
