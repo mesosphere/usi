@@ -15,4 +15,4 @@ import java.time.Instant
   * @param launchedAt time at which we accepted an offer and initiated launch of this pod
   * @param agentId id of Mesos agent from which we accepted offer to launch this pod
   */
-case class PodRecord(podId: PodId, launchedAt: Instant, agentId: AgentId)
+case class PodRecord(podId: PodId, launchedAt: Instant, agentId: AgentId) extends Serializable

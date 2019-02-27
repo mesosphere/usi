@@ -8,5 +8,10 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class InMemoryRepositoryTest extends UnitTest with RepositoryBehavior with StrictLogging {
 
-  "The in-memory pod record repository" should { behave like podRecordRepository(InMemoryPodRecordRepository.apply) }
+  "The in-memory pod record repository" should {
+    behave like podRecordCreate(() => InMemoryPodRecordRepository.apply())
+    behave like podRecordRead(() => InMemoryPodRecordRepository.apply())
+    behave like podRecordDelete(() => InMemoryPodRecordRepository.apply())
+    behave like podRecordUpdate(() => InMemoryPodRecordRepository.apply())
+  }
 }

@@ -1,6 +1,7 @@
 package com.mesosphere.usi.repository
 
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicInteger
 
 import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord}
 import com.mesosphere.utils.UnitTest
@@ -11,12 +12,14 @@ import com.mesosphere.utils.UnitTest
   */
 trait RepositoryBehavior { this: UnitTest =>
 
+  val podCount = new AtomicInteger()
+
   /**
-    * This defines the expected behavior of a pod record repository.
+    * This defines the expected behavior of creating/saving pods in a repository.
     *
     * @param newRepo A repo factory function. Each test case creates its own repository.
     */
-  def podRecordRepository(newRepo: () => PodRecordRepository): Unit = {
+  def podRecordCreate(newRepo: () => PodRecordRepository): Unit = {
 
     "create a record" in {
       val f = Fixture()
@@ -26,17 +29,27 @@ trait RepositoryBehavior { this: UnitTest =>
 
     "no create a record a second time" in {
       val f = Fixture()
+      val podId = PodId("second_pod")
+      val record = f.record.copy(podId = podId)
 
       Given("a record already exists")
       val repo = newRepo()
-      repo.create(f.record).futureValue should be(f.record.podId)
+      repo.create(record).futureValue should be(podId)
 
       When("the record is created again")
-      val result = repo.create(f.record).failed.futureValue
+      val result = repo.create(record).failed.futureValue
 
       Then("the creation should fail")
-      result should be(RecordAlreadyExistsException(f.podId.value))
+      result should be(RecordAlreadyExistsException(podId.value))
     }
+  }
+
+  /**
+    * This defines the expected behavior of reading pods from a repository.
+    *
+    * @param newRepo A repo factory function. Each test case creates its own repository.
+    */
+  def podRecordRead(newRepo: () => PodRecordRepository): Unit = {
 
     "read a record" in {
       val f = Fixture()
@@ -63,6 +76,14 @@ trait RepositoryBehavior { this: UnitTest =>
       Then("the record is None")
       maybeRecord should be(None)
     }
+  }
+
+  /**
+    * This defines the expected behavior of deleting pods from a repository.
+    *
+    * @param newRepo A repo factory function. Each test case creates its own repository.
+    */
+  def podRecordDelete(newRepo: () => PodRecordRepository): Unit = {
 
     "delete a record" in {
       val f = Fixture()
@@ -92,6 +113,14 @@ trait RepositoryBehavior { this: UnitTest =>
       Then("an error is returned")
       result should be(RecordNotFoundException(unknownPodId.value))
     }
+  }
+
+  /**
+    * This defines the expected behavior of updating pods from a repository.
+    *
+    * @param newRepo A repo factory function. Each test case creates its own repository.
+    */
+  def podRecordUpdate(newRepo: () => PodRecordRepository): Unit = {
 
     "update a record" in {
       val f = Fixture()
@@ -129,7 +158,7 @@ trait RepositoryBehavior { this: UnitTest =>
   }
 
   case class Fixture() {
-    val podId = PodId("my_pod")
+    val podId = PodId(s"pod_${podCount.getAndIncrement()}")
     val agentId = AgentId("my_agent")
     val record = PodRecord(podId, Instant.now(), agentId)
   }

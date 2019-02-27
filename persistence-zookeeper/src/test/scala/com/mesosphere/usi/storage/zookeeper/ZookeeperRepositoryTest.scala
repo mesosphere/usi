@@ -13,7 +13,7 @@ import org.scalatest.junit.JUnitRunner
 import scala.concurrent.ExecutionContext
 
 @RunWith(classOf[JUnitRunner])
-class PodRecordRepositoryTest extends UnitTest with ZookeeperServerTest with RepositoryBehavior {
+class ZookeeperRepositoryTest extends UnitTest with ZookeeperServerTest with RepositoryBehavior {
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val ec: ExecutionContext = system.dispatcher
@@ -23,7 +23,12 @@ class PodRecordRepositoryTest extends UnitTest with ZookeeperServerTest with Rep
   lazy val metrics: Metrics = DummyMetrics
   lazy val store: ZooKeeperPersistenceStore = new ZooKeeperPersistenceStore(metrics, factory, parallelism = 1)
 
-  def podRepo(): PodRecordRepository = new PodRecordRepository(store)
+  val podRepo = () => new PodRecordRepository(store)
 
-  "The Zookeeper backed pod record repository" should { behave like podRecordRepository(podRepo) }
+  "The Zookeeper backed pod record repository" should {
+    behave like podRecordCreate(podRepo)
+    behave like podRecordRead(podRepo)
+    behave like podRecordDelete(podRepo)
+    behave like podRecordUpdate(podRepo)
+  }
 }

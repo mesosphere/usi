@@ -22,7 +22,7 @@ import scala.collection.JavaConverters
   */
 case class AsyncCuratorBuilderSettings(
     createOptions: Set[CreateOption] = Set(CreateOption.createParentsIfNeeded, CreateOption.compress),
-    deleteOptions: Set[DeleteOption] = Set(DeleteOption.deletingChildrenIfNeeded, DeleteOption.quietly),
+    deleteOptions: Set[DeleteOption] = Set(DeleteOption.deletingChildrenIfNeeded),
     existsOptions: Set[ExistsOption] = Set.empty,
     createMode: CreateMode = CreateMode.PERSISTENT,
     acl: Seq[ACL] = Seq.empty,
