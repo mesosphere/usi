@@ -63,11 +63,7 @@ object MesosMock {
           Mesos.Value.Type.SCALAR,
           newResourceAllocationInfo("some-role"),
           scalar = cpus.asProtoScalar),
-        newResource(
-          "mem",
-          Mesos.Value.Type.SCALAR,
-          newResourceAllocationInfo("some-role"),
-          scalar = mem.asProtoScalar),
+        newResource("mem", Mesos.Value.Type.SCALAR, newResourceAllocationInfo("some-role"), scalar = mem.asProtoScalar),
         newResource(
           "disk",
           Mesos.Value.Type.SCALAR,
