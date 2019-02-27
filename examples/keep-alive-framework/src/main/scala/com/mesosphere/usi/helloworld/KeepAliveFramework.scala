@@ -20,8 +20,7 @@ import org.apache.mesos.v1.Protos.{FrameworkInfo, TaskState, TaskStatus}
 import scala.concurrent.{Await, Future}
 import scala.sys.SystemProperties
 import scala.concurrent.duration._
-import scala.util.{Failure, Success, Try}
-
+import scala.util.{Failure, Success}
 
 class KeepAliveFramework(conf: Config) extends StrictLogging {
 
@@ -36,23 +35,19 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
       new SystemProperties()
         .get("user.name")
         .getOrElse(throw new IllegalArgumentException("A local user is needed to launch Mesos tasks")))
-    .setName("CoreHelloWorldExample")
+    .setName("KeepAliveFramework")
     .setFailoverTimeout(0d)
     .build()
 
   val client: MesosClient = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   val schedulerFlow
-  : Flow[(SpecsSnapshot, Source[SpecUpdated, Any]), (StateSnapshot, Source[StateEvent, Any]), NotUsed] =
+    : Flow[(SpecsSnapshot, Source[SpecUpdated, Any]), (StateSnapshot, Source[StateEvent, Any]), NotUsed] =
     Scheduler.fromClient(client)
-
 
   val podId = PodId(s"hello-world.${UUID.randomUUID()}.1")
   val runSpec = RunSpec(
-    resourceRequirements =
-      List(
-        ScalarResource(ResourceType.CPUS, 0.1),
-        ScalarResource(ResourceType.MEM, 32)),
+    resourceRequirements = List(ScalarResource(ResourceType.CPUS, 0.1), ScalarResource(ResourceType.MEM, 32)),
     shellCommand = """echo "Hello, world" && sleep 3600"""
   )
   val podSpec = PodSpec(
@@ -71,37 +66,36 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
     val (currentIncarnation, podIdWithoutIncarnation) = podId.value match {
       case idAndIncarnation(id, inc) => id -> inc.toLong
     }
-    PodId(s"$podIdWithoutIncarnation.${currentIncarnation+1}")
+    PodId(s"$podIdWithoutIncarnation.${currentIncarnation + 1}")
   }
 
   // This flow consumes state events, checks if anything failed and then issues spec commands
-  val keepAliveWatcher: Flow[StateEvent, SpecUpdated, NotUsed] = Flow[StateEvent]
-    .mapConcat {
-      // Main state event handler. We log happy events and restart the pod if something goes wrong
-      case s: StateSnapshot =>
-        logger.info(s"Initial state snapshot: $s")
+  val keepAliveWatcher: Flow[StateEvent, SpecUpdated, NotUsed] = Flow[StateEvent].mapConcat {
+    // Main state event handler. We log happy events and restart the pod if something goes wrong
+    case s: StateSnapshot =>
+      logger.info(s"Initial state snapshot: $s")
+      Nil
+
+    case PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
+      import TaskState._
+      def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
+
+      // We're only interested in the bad task statuses for our pod
+      val failedTasks = taskStatuses.filterNot { case (id, status) => activeTask(status) }
+
+      logger.info(s"Task status updates for podId: $id: ${taskStatuses}")
+
+      if (failedTasks.nonEmpty) {
+        val newIncarnation = createNewIncarnationId(podId)
+        PodSpecUpdated(id, Some(PodSpec(newIncarnation, Goal.Running, runSpec))) :: Nil
+      } else {
         Nil
+      }
 
-      case PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
-        import TaskState._
-        def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
-
-        // We're only interested in the bad task statuses for our pod
-        val failedTasks = taskStatuses.filterNot { case (id, status) => activeTask(status) }
-
-        logger.info(s"Task status updates for podId: $id: ${taskStatuses}")
-
-        if (failedTasks.nonEmpty) {
-          val newIncarnation = createNewIncarnationId(podId)
-          PodSpecUpdated(id, Some(PodSpec(newIncarnation, Goal.Running, runSpec))) :: Nil
-        } else {
-          Nil
-        }
-
-      case e =>
-        logger.error(s"Unhandled event: $e") // we ignore everything else for now
-        Nil
-    }
+    case e =>
+      logger.error(s"Unhandled event: $e") // we ignore everything else for now
+      Nil
+  }
 
   // to communicate with keep alive flow, we use a queue since the scheduler interface can't be nicely plugged-in here
   val (keepAliveStateQueue, keepAliveStateSource) =
@@ -110,31 +104,39 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
   val (keepAliveSpecQueue, keepAliveSpecSink) =
     Sink.queue[SpecUpdated]().preMaterialize()
 
-
   keepAliveStateSource.via(keepAliveWatcher).to(keepAliveSpecSink).run()
 
-
-  val running = Source.single(specsSnapshot)
+  val running = Source.maybe
+    .prepend(Source.single(specsSnapshot))
     // A trick to make our stream run, we use a workaround to transform the sink of our keep alive mechanism into
     // a source. If we change the scheduler interface this will be much more elegant
-    .map(snapshot => (snapshot, Source.unfoldResourceAsync[SpecUpdated, SinkQueueWithCancel[SpecUpdated]](
-      () => Future.successful(keepAliveSpecQueue),
-      q => q.pull(),
-      q => { q.cancel(); Future.successful(Done)}
-    )))
+    .map { snapshot =>
+      logger.info("received snapshot " + snapshot)
+      (
+        snapshot,
+        Source.unfoldResourceAsync[SpecUpdated, SinkQueueWithCancel[SpecUpdated]](
+          () => Future.successful(keepAliveSpecQueue),
+          q => q.pull(),
+          q => {
+            q.cancel(); Future.successful(Done)
+          }
+        ))
+    }
     // Here our initial snapshot is going to the scheduler flow
+    .map(e => { println("before scheduler"); e })
     .via(schedulerFlow)
     // We flatten the output of the scheduler flow which is a tuple of an initial snapshot and a source of all
     // later updates, into one stream where the first element is the snapshot and all later elements are single
     // state events. This makes the event handling a simple match-case
     .flatMapConcat {
-    case (snapshot, updates) =>
-      updates.prepend(Source.single(snapshot))
-  }
+      case reply @ (snapshot, updates) =>
+        logger.info("snap after scheduler " + snapshot)
+        updates.prepend(Source.single(snapshot))
+    }
     .mapAsync(1)(keepAliveStateQueue.offer)
     .map {
       case QueueOfferResult.Enqueued =>
-        // everything is good, do nothing.
+      // everything is good, do nothing.
 
       case _ =>
         logger.error(s"Something wrong happened to the keepalive mechanism")
@@ -153,12 +155,10 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
       system.terminate()
   }
 
-
   // We let the framework run "forever" (or at least until our task completes/fails)
   Await.result(running, Duration.Inf)
 
 }
-
 
 object KeepAliveFramework {
 
