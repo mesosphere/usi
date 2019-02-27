@@ -2,6 +2,8 @@ sudo: required
 jdk:
   - openjdk11
 language: scala
+install:
+  - true
 scala:
    - 2.12.7
 script:

@@ -37,7 +37,7 @@ allprojects {
         scalaCompileOptions.additionalParameters = ["-Xlint", "-Xfatal-warnings"]
     }
 
-    // compileScala.dependsOn scalafmtAll
+    compileScala.dependsOn scalafmtAll
 
     dependencies {
         // Use Scala 2.12 in our library project
