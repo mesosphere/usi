@@ -75,16 +75,18 @@ task ci {
         dependsOn githubReport
     }
 
-    // fail build when test failed
-    File reportsDir = file("${rootProject.buildDir}/reports/tests")
-    if (!reportsDir.exists()) {
-        println("does not exist")
-    } else {
-        reportsDir.eachFile(FileType.FILES) {
-            String content = it.text
-            def myMatcher = content =~ /(?s)<div class="infoBox" id="failures">\s*<div class="counter">0<\\/div>/
-            if (!myMatcher.matches()) {
-                throw new GradleException("There were failing tests. See the report at: ${it.toURI()}")
+    doLast {
+        // fail build when test failed
+        File reportsDir = file("${rootProject.buildDir}/reports/tests")
+        if (!reportsDir.exists()) {
+            println("does not exist")
+        } else {
+            reportsDir.eachFile(FileType.FILES) {
+                String content = it.text
+                def myMatcher = content =~ /(?s)<div class="infoBox" id="failures">\s*<div class="counter">0<\\/div>/
+                if (!myMatcher.matches()) {
+                    throw new GradleException("There were failing tests. See the report at: ${it.toURI()}")
+                }
             }
         }
     }
