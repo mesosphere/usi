@@ -11,30 +11,18 @@ import scala.collection.JavaConverters._
 object MesosMock {
   import com.mesosphere.usi.core.protos.ProtoBuilders._
   import com.mesosphere.usi.core.protos.ProtoConversions._
-  val mockAgentId = AgentId("mock-agent")
-  val mockFrameworkId = ProtoBuilders.newFrameworkId("mock-framework")
+  val mockAgentId: AgentId = AgentId("mock-agent")
+  val mockFrameworkId: Mesos.FrameworkID = ProtoBuilders.newFrameworkId("mock-framework")
+
   val flow: Flow[MesosCall, MesosEvent, NotUsed] = {
     Flow[MesosCall].async.mapConcat { call =>
       val result: List[MesosEvent] = if (call.hasRevive) {
-
-        val offer = newOffer(
-          id = newOfferId("testing"),
-          agentId = mockAgentId.asProto,
-          frameworkID = mockFrameworkId,
-          hostname = "some-host",
-          resources = Seq(
-            newResource("cpus", Mesos.Value.Type.SCALAR, scalar = 4.asProtoScalar),
-            newResource("mem", Mesos.Value.Type.SCALAR, scalar = 4096.asProtoScalar),
-            newResource("disk", Mesos.Value.Type.SCALAR, scalar = 256000.asProtoScalar)
-          )
-        )
-
         List(
           MesosEvent
             .newBuilder()
             .setOffers(MesosEvent.Offers
               .newBuilder()
-              .addOffers(offer))
+              .addOffers(createMockOffer()))
             .build())
       } else if (call.hasAccept) {
         val events = for {
@@ -56,6 +44,33 @@ object MesosMock {
       }
       result
     }
+  }
+
+  // Add more arguments as needed.
+  def createMockOffer(
+      cpus: Double = 4,
+      mem: Double = 4096,
+  ): Mesos.Offer = {
+    newOffer(
+      id = newOfferId("testing"),
+      agentId = mockAgentId.asProto,
+      frameworkID = mockFrameworkId,
+      hostname = "some-host",
+      newResourceAllocationInfo("some-role"),
+      resources = Seq(
+        newResource(
+          "cpus",
+          Mesos.Value.Type.SCALAR,
+          newResourceAllocationInfo("some-role"),
+          scalar = cpus.asProtoScalar),
+        newResource("mem", Mesos.Value.Type.SCALAR, newResourceAllocationInfo("some-role"), scalar = mem.asProtoScalar),
+        newResource(
+          "disk",
+          Mesos.Value.Type.SCALAR,
+          newResourceAllocationInfo("some-role"),
+          scalar = 256000.asProtoScalar)
+      )
+    )
   }
 
 }

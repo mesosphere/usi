@@ -6,6 +6,7 @@ include 'mesos-client'
 include 'metrics'
 include 'metrics-dropwizard'
 include 'persistence'
+include 'persistence-zookeeper'
 include 'test-utils'
 
 /* example projects*/

@@ -1,0 +1,47 @@
+@startuml Participant FrameworkState
+Participant Scheduler
+Participant SchedulerStorage
+Participant Mesos
+Participant Orchestrator
+
+FrameworkState -> Scheduler: PodSpec A#1 goal running
+hnote over Scheduler
+  No task exists for A#1; lets run.
+  Task placed into internal list of
+  pending instances.
+  Offers wanted signaled
+end hnote
+
+Scheduler -> SchedulerStorage: Revive
+hnote over SchedulerStorage
+  Nothing to store; just forward
+end hnote
+
+SchedulerStorage -> Mesos: Revive
+
+Mesos -> Scheduler: Offer
+hnote over Scheduler
+  Matches offers against pending
+  PodSpecs in a single, synchronous
+  frame
+
+  The offer matches
+end hnote
+
+Scheduler -> SchedulerStorage: Offer match result
+hnote over SchedulerStorage
+  Persist PodRecord with details of
+  launch
+end hnote
+
+SchedulerStorage -> Mesos: Offer match result
+SchedulerStorage -> Orchestrator: PodStatus A#1 launched
+
+
+Mesos -> Scheduler: Task for Pod A#1 Running
+Scheduler -> SchedulerStorage: PodStatus A#1 running
+hnote over SchedulerStorage
+  Nothing to persist
+end hnote
+SchedulerStorage -> Orchestrator: PodStatus A#1 running
+@enduml
