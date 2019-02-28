@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package zookeeper;
+
+message PodRecord {
+    required string id = 1;
+}

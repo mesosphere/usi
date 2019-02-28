@@ -25,12 +25,8 @@ case class InMemoryPodRecordRepository() extends PodRecordRepository with Strict
   }
 
   override def delete(podId: PodId): Future[PodId] = synchronized {
-    if (!data.contains(podId)) {
-      Future.failed(RecordNotFoundException(podId.value))
-    } else {
-      data -= podId
-      Future.successful(podId)
-    }
+    data -= podId
+    Future.successful(podId)
   }
 
   override def read(recordId: PodId): Future[Option[PodRecord]] = synchronized {

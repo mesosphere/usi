@@ -1,6 +1,18 @@
 import mesosphere.gradle.aws.S3Upload
 import mesosphere.gradle.github.GithubStatus
+import mesosphere.gradle.protobuf.ScalaPb
 import mesosphere.gradle.travis.TravisEnvironment
+
+import java.nio.file.Paths
+
+// TODO: make this a target just inside persistence-zookeeper
+task zookeeperProtobuf(type: ScalaPb) {
+    // TODO: use source set.
+    protos = fileTree(project(':persistence-zookeeper').projectDir) {
+        include '**/*.proto'
+    }
+    outputDir = file(Paths.get(project(':persistence-zookeeper').buildDir.toString(), "protos"))
+}
 
 task testReport(type: TestReport) {
     description = "Aggregate all test results from subprojects into one test report."

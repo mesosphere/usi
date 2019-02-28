@@ -93,10 +93,10 @@ trait RepositoryBehavior { this: UnitTest =>
       repo.create(f.record).futureValue
 
       When("the record is deleted")
-      val maybeId = repo.delete(f.podId).futureValue
+      val podId = repo.delete(f.podId).futureValue
 
       Then("the record id should be returned")
-      maybeId should be(f.podId)
+      podId should be(f.podId)
 
       And("the record should not exist")
       repo.read(f.podId).futureValue should be(None)
@@ -108,10 +108,13 @@ trait RepositoryBehavior { this: UnitTest =>
       val unknownPodId = PodId("unknown")
 
       When("the unknown record is  deleted")
-      val result = repo.delete(unknownPodId).failed.futureValue
+      val podId = repo.delete(unknownPodId).futureValue
 
-      Then("an error is returned")
-      result should be(RecordNotFoundException(unknownPodId.value))
+      Then("no error is returned")
+      podId should be(unknownPodId)
+
+      And("the record should not exist")
+      repo.read(unknownPodId).futureValue should be(None)
     }
   }
 

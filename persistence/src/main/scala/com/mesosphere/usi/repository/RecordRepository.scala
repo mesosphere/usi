@@ -7,6 +7,7 @@ trait RecordRepository[Record, RecordId] {
   /**
     * Stores the provided record in the repository if it doesn't exist.
     * If the record is already there, resulting future will be failed with a [[RecordAlreadyExistsException]].
+    *
     * @param record
     * @return id of the provided record
     */
@@ -14,6 +15,7 @@ trait RecordRepository[Record, RecordId] {
 
   /**
     * Retrieves the record if it exists.
+    *
     * @param recordId
     * @return Option(record) if it exists, None otherwise
     */
@@ -29,8 +31,7 @@ trait RecordRepository[Record, RecordId] {
   def update(record: Record): Future[RecordId]
 
   /**
-    * Deletes the record if it exists. If the record is missing,
-    * the future will be failed with an [[RecordNotFoundException]].
+    * Deletes the record if it exists. It will not fail if the record does not exit.
     *
     * @param recordId
     * @return id of the deleted record
