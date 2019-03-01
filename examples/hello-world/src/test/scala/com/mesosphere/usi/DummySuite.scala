@@ -3,16 +3,12 @@
  */
 package com.mesosphere.usi
 
-import com.mesosphere.ImplicitStrictLogging
-import com.mesosphere.LoggingArgs
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import com.mesosphere.utils.UnitTest
 
-@RunWith(classOf[JUnitRunner])
-class DummySuite extends FunSuite with ImplicitStrictLogging {
-  test("true is always true") {
-    logger.info("test is about to pass")(LoggingArgs("context" -> "is useful").and("result" -> "success"))
-    assert(true == true)
+class DummySuite extends UnitTest {
+  "Hello world" should {
+    "true is always true" in {
+      assert(true == true)
+    }
   }
 }

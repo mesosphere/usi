@@ -52,8 +52,8 @@ object MesosMock {
 
   // Add more arguments as needed.
   def createMockOffer(
-    cpus: Double = 4,
-    mem: Double = 4096,
+      cpus: Double = 4,
+      mem: Double = 4096,
   ): Mesos.Offer = {
     newOffer(
       id = newOfferId("testing"),
@@ -78,10 +78,11 @@ object MesosMock {
   }
 
   def taskUpdateEvent(
-    taskStatus : Protos.TaskStatus
-  ): MesosEvent = MesosEvent
-    .newBuilder()
-    .setUpdate(MesosEvent.Update.newBuilder().setStatus(taskStatus))
-    .build()
+      taskStatus: Protos.TaskStatus
+  ): MesosEvent =
+    MesosEvent
+      .newBuilder()
+      .setUpdate(MesosEvent.Update.newBuilder().setStatus(taskStatus))
+      .build()
 
 }

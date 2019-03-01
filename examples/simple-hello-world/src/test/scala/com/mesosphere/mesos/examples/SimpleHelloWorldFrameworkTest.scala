@@ -1,15 +1,13 @@
 package com.mesosphere.mesos.examples
 
+import java.util
+
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
 import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkID
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import java.util
 
-@RunWith(classOf[JUnitRunner])
 class SimpleHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest {
 
   "MesosClientExampleFramework should successfully connect to Mesos" in withFixture() { f =>
