@@ -75,6 +75,12 @@ allprojects {
         reports.junitXml.destination = file(Paths.get(rootProject.buildDir.toString(), "tests", project.name))
     }
     check {}
+    protobuf {
+        protoc {
+            // Download from repositories
+            artifact = 'com.google.protobuf:protoc:3.0.0'
+        }
+    }
 }
 
 apply from: 'ci.gradle'
