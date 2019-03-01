@@ -1,9 +1,11 @@
 package com.mesosphere.usi.storage.zookeeper
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
+import java.io.ByteArrayInputStream
+import java.time.Instant
 
 import akka.util.ByteString
-import com.mesosphere.usi.core.models.{PodId, PodRecord}
+import com.google.protobuf.Timestamp
+import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord}
 import com.mesosphere.usi.repository.{
   RecordAlreadyExistsException,
   RecordNotFoundException,
@@ -20,16 +22,34 @@ import scala.util.{Failure, Success}
 
 class PodRecordRepository(val store: PersistenceStore) extends PodRecordRepositoryInterface {
 
+  private def serialize(record: PodRecord): ByteString = {
+    val launchedAt = Timestamp
+      .newBuilder()
+      .setSeconds(record.launchedAt.getEpochSecond)
+      .setNanos(record.launchedAt.getNano)
+      .build()
+    val data = ZooKeeperStorageModel.PodRecord
+      .newBuilder()
+      .setId(record.podId.value)
+      .setLaunchedAt(launchedAt)
+      .setAgentId(record.agentId.value)
+      .build()
+      .toByteArray()
+
+    ByteString(data)
+  }
+
+  private def deserialize(bytes: ByteString): PodRecord = {
+    val data = ZooKeeperStorageModel.PodRecord.parseFrom(new ByteArrayInputStream(bytes.toArray))
+    val launchedAt = Instant.ofEpochSecond(data.getLaunchedAt().getSeconds(), data.getLaunchedAt().getNanos().toInt)
+    PodRecord(PodId(data.getId()), launchedAt, AgentId(data.getAgentId()))
+  }
+
   override def create(record: PodRecord): Future[PodId] = {
-    val bos = new ByteArrayOutputStream()
-    val out = new ObjectOutputStream(bos)
-    out.writeObject(record)
-    out.flush()
-    val data = bos.toByteArray()
 
     val path = s"/${record.podId.value}"
 
-    val node = Node(path, ByteString(data))
+    val node = Node(path, serialize(record))
     store.create(node).transform {
       case Success(_) => Success(record.podId)
       case Failure(_: KeeperException.NodeExistsException) => Failure(RecordAlreadyExistsException(record.podId.value))
@@ -43,13 +63,8 @@ class PodRecordRepository(val store: PersistenceStore) extends PodRecordReposito
 
     // We uncheck our match because the only failure case is the [[NoNodeException]]. The future fails in all other cases.
     (await(store.read(path)): @unchecked) match {
-      case Success(node) =>
-        val ois = new ObjectInputStream(new ByteArrayInputStream(node.data.toArray))
-        val record = ois.readObject.asInstanceOf[PodRecord]
-
-        Some(record)
-      case Failure(_: NoNodeException) =>
-        None
+      case Success(node) => Some(deserialize(node.data))
+      case Failure(_: NoNodeException) => None
     }
   }
 
@@ -65,13 +80,7 @@ class PodRecordRepository(val store: PersistenceStore) extends PodRecordReposito
   override def update(record: PodRecord): Future[PodId] = {
     val path = s"/${record.podId.value}"
 
-    val bos = new ByteArrayOutputStream()
-    val out = new ObjectOutputStream(bos)
-    out.writeObject(record)
-    out.flush()
-    val data = bos.toByteArray()
-
-    val node = Node(path, ByteString(data))
+    val node = Node(path, serialize(record))
     store.update(node).transform {
       case Success(_) => Success(record.podId)
       case Failure(_: KeeperException.NoNodeException) => Failure(RecordNotFoundException(record.podId.value))

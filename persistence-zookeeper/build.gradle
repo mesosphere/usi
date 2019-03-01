@@ -5,5 +5,6 @@ dependencies {
     implementation project(':metrics')
     testCompile project(':test-utils')
 
+    compile 'com.google.protobuf:protobuf-java:3.0.0'
     compile "org.scala-lang.modules:scala-async_$scalaVersion:0.9.7"
 }

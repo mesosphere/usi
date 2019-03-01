@@ -13,7 +13,7 @@ import org.scalatest.junit.JUnitRunner
 import scala.concurrent.ExecutionContext
 
 @RunWith(classOf[JUnitRunner])
-class ZookeeperRepositoryTest extends UnitTest with ZookeeperServerTest with RepositoryBehavior {
+class ZooKeeperRepositoryTest extends UnitTest with ZookeeperServerTest with RepositoryBehavior {
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val ec: ExecutionContext = system.dispatcher

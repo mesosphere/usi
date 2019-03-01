@@ -5,6 +5,7 @@ plugins {
     id 'idea'
     id 'org.ajoberstar.git-publish' version '2.0.0'
     id 'cz.alenkacz.gradle.scalafmt' version '1.7.2'
+    id "com.google.protobuf" version "0.8.8"
     // Use `$ gradle htmlDependencyReport` to generate project library dependency report
     id 'project-report'
 }
@@ -21,6 +22,7 @@ allprojects {
 
     apply plugin: "scala"
     apply plugin: 'cz.alenkacz.gradle.scalafmt'
+    apply plugin: 'com.google.protobuf'
 
     sourceCompatibility = 1.11
     targetCompatibility = 1.11
@@ -91,10 +93,22 @@ scaladoc {
     }
 }
 
+task foo {
+    doLast {
+        println(Paths.get(project(':persistence-zookeeper').protobuf.generatedFilesBaseDir, "main", "java"))
+        println(project(':persistence-zookeeper').sourceSets.main.java.srcDirs)
+    }
+}
+
 idea {
   project {
     jdkName = '1.11'
     languageLevel = '1.11'
     vcs = 'Git'
+  }
+  module {
+      def generatedZooKeeper = Paths.get(project(':persistence-zookeeper').protobuf.generatedFilesBaseDir, "main", "java")
+      sourceDirs += file(generatedZooKeeper)
+      generatedSourceDirs+= file(generatedZooKeeper)
   }
 }

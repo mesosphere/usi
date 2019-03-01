@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package com.mesosphere.usi.storage.zookeeper;
+
+message PodRecord {
+    string id = 1;
+    google.protobuf.Timestamp launchedAt = 2;
+    string agentId = 3;
+}
