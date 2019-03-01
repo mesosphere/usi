@@ -3,13 +3,11 @@
  */
 package com.mesosphere.usi
 
-import com.mesosphere.LoggingArgs
 import com.mesosphere.utils.UnitTest
 
 class DummySuite extends UnitTest {
   "Hello world" should {
     "true is always true" in {
-      logger.info("test is about to pass")(LoggingArgs("context" -> "is useful").and("result" -> "success"))
       assert(true == true)
     }
   }

@@ -2,9 +2,6 @@ package com.mesosphere.usi.metrics.dropwizard
 
 import com.mesosphere.usi.metrics.UnitOfMeasurement
 import com.mesosphere.utils.UnitTest
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.{Matchers, WordSpec}
 
 class DropwizardMetricsTest extends UnitTest {
 
