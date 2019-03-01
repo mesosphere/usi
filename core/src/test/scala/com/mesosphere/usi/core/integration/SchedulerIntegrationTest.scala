@@ -51,9 +51,13 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
         podRecord.id shouldBe podId
         println(s"agentId = ${podRecord.newRecord.get.agentId}")
     }
-    inside(output.pull().futureValue) {
-      case Some(podStatusChange: PodStatusUpdated) =>
-        podStatusChange.newStatus.get.taskStatuses(TaskId(podId.value)).getState shouldBe Protos.TaskState.TASK_RUNNING
+    eventually {
+      inside(output.pull().futureValue) {
+        case Some(podStatusChange: PodStatusUpdated) =>
+          podStatusChange.newStatus.get
+            .taskStatuses(TaskId(podId.value))
+            .getState shouldBe Protos.TaskState.TASK_RUNNING
+      }
     }
   }
 }
