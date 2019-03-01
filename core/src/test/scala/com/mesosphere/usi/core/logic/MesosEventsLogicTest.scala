@@ -95,7 +95,7 @@ class MesosEventsLogicTest extends UnitTest {
       events.stateEvents.head shouldBe a[PodStatusUpdated]
       val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdated]
       podStatusUpdate.newStatus shouldBe defined
-      podStatusUpdate.newStatus.get.taskStatuses should contain (
+      podStatusUpdate.newStatus.get.taskStatuses should contain(
         TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus
       )
     }
@@ -106,9 +106,12 @@ class MesosEventsLogicTest extends UnitTest {
       val taskId = newTaskId(mockPodSpecWith1Cpu256Mem.id.value)
       val taskUpdate = MesosMock.taskUpdateEvent(taskStatus(taskId))
       val specs = SpecState(Map(mockPodSpecWith1Cpu256Mem.id -> mockPodSpecWith1Cpu256Mem))
-      val podStatus = Map(mockPodSpecWith1Cpu256Mem.id -> PodStatus(mockPodSpecWith1Cpu256Mem.id, Map(
-        TaskId(mockPodSpecWith1Cpu256Mem.id.value) -> taskUpdate.getUpdate.getStatus
-      )))
+      val podStatus = Map(
+        mockPodSpecWith1Cpu256Mem.id -> PodStatus(
+          mockPodSpecWith1Cpu256Mem.id,
+          Map(
+            TaskId(mockPodSpecWith1Cpu256Mem.id.value) -> taskUpdate.getUpdate.getStatus
+          )))
 
       val events = mesosEventLogic.processEvent(
         specs,
@@ -123,16 +126,16 @@ class MesosEventsLogicTest extends UnitTest {
       events.stateEvents.head shouldBe a[PodStatusUpdated]
       val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdated]
       podStatusUpdate.newStatus shouldBe defined
-      podStatusUpdate.newStatus.get.taskStatuses should contain (
+      podStatusUpdate.newStatus.get.taskStatuses should contain(
         TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus
       )
     }
   }
 
   private def taskStatus(
-    taskId: Mesos.TaskID,
-    state: Mesos.TaskState = Mesos.TaskState.TASK_RUNNING,
-    agentId: Mesos.AgentID = newAgentId("some-agent-id")
+      taskId: Mesos.TaskID,
+      state: Mesos.TaskState = Mesos.TaskState.TASK_RUNNING,
+      agentId: Mesos.AgentID = newAgentId("some-agent-id")
   ): Protos.TaskStatus = newTaskStatus(
     taskId = taskId,
     state = state,

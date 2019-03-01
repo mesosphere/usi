@@ -1,12 +1,9 @@
 package com.mesosphere.usi.metrics.dropwizard
 
 import com.mesosphere.usi.metrics.UnitOfMeasurement
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.{Matchers, WordSpec}
+import com.mesosphere.utils.UnitTest
 
-@RunWith(classOf[JUnitRunner])
-class DropwizardMetricsTest extends WordSpec with Matchers {
+class DropwizardMetricsTest extends UnitTest {
 
   "DropwizardMetrics.constructName" should {
     "not append a unit of measurement suffix, when none is given" in {
