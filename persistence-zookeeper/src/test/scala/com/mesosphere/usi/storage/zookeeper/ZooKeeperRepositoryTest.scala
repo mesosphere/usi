@@ -7,12 +7,9 @@ import com.mesosphere.utils.UnitTest
 import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.zookeeper.ZookeeperServerTest
 import org.apache.curator.framework.CuratorFramework
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 
 import scala.concurrent.ExecutionContext
 
-@RunWith(classOf[JUnitRunner])
 class ZooKeeperRepositoryTest extends UnitTest with ZookeeperServerTest with RepositoryBehavior {
 
   implicit val system: ActorSystem = ActorSystem()
