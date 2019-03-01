@@ -2,10 +2,14 @@ sudo: required
 jdk:
   - openjdk11
 language: scala
+# this is necessary because otherwise travis runs gradlew assemble before out tasks
+# and if that is run, checkScalaFmtAll won't work
+install:
+  - true
 scala:
    - 2.12.7
 script:
-  - sudo ./gradlew provision && ./gradlew ci --info
+  - ./gradlew checkScalaFmtAll && sudo ./gradlew provision && ./gradlew ci --info
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
