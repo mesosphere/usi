@@ -22,13 +22,18 @@ import scala.util.{Failure, Success}
 
 class PodRecordRepository(val store: PersistenceStore) extends PodRecordRepositoryInterface {
 
+  /**
+    * Serialize a [[PodRecord]] to a Protobuf byte array.
+    * @param record The [[PodRecord]] that should be serialized.
+    * @return The serialized protobuf in a byte string.
+    */
   private def serialize(record: PodRecord): ByteString = {
     val launchedAt = Timestamp
       .newBuilder()
       .setSeconds(record.launchedAt.getEpochSecond)
       .setNanos(record.launchedAt.getNano)
       .build()
-    val data = ZooKeeperStorageModel.PodRecord
+    val data = StorageModel.PodRecord
       .newBuilder()
       .setId(record.podId.value)
       .setLaunchedAt(launchedAt)
@@ -39,8 +44,13 @@ class PodRecordRepository(val store: PersistenceStore) extends PodRecordReposito
     ByteString(data)
   }
 
+  /**
+    * Deseerializes a Protobuf byt array to a [[PodRecord]].
+    * @param bytes The protobuf bytes.
+    * @return The deserialized [[PodRecord]].
+    */
   private def deserialize(bytes: ByteString): PodRecord = {
-    val data = ZooKeeperStorageModel.PodRecord.parseFrom(new ByteArrayInputStream(bytes.toArray))
+    val data = StorageModel.PodRecord.parseFrom(new ByteArrayInputStream(bytes.toArray))
     val launchedAt = Instant.ofEpochSecond(data.getLaunchedAt().getSeconds(), data.getLaunchedAt().getNanos().toInt)
     PodRecord(PodId(data.getId()), launchedAt, AgentId(data.getAgentId()))
   }
