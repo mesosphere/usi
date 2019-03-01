@@ -93,13 +93,6 @@ scaladoc {
     }
 }
 
-task foo {
-    doLast {
-        println(Paths.get(project(':persistence-zookeeper').protobuf.generatedFilesBaseDir, "main", "java"))
-        println(project(':persistence-zookeeper').sourceSets.main.java.srcDirs)
-    }
-}
-
 idea {
   project {
     jdkName = '1.11'
