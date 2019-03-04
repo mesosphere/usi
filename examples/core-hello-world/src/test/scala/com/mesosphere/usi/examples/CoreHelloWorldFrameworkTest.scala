@@ -2,16 +2,17 @@ package com.mesosphere.usi.examples
 
 import java.util
 
+import com.mesosphere.usi.core.models.{PodStatus, PodStatusUpdated}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
 import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkID
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import org.apache.mesos.v1.Protos.TaskState.TASK_RUNNING
+import org.scalatest.Inside
 
-@RunWith(classOf[JUnitRunner])
-class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest {
+
+class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest with Inside {
 
   "CoreHelloWorldFramework should successfully connect to Mesos" in withFixture() { f =>
     Then("once example framework is connected, Mesos should return it's framework Id")
@@ -28,8 +29,19 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest {
     eventually {
       val framework = mesosFacade.frameworks().value.frameworks.head
       val task = framework.tasks.head
-      task.name shouldBe "hello-world" withClue (s"Task name was supposed to be 'hello-world' but was ${task.name}")
-      task.state.get shouldBe "TASK_RUNNING" withClue (s"Task state was supposed to be 'TASK_RUNNING' but was ${task.state.get}")
+      task.name should startWith("hello-world")
+      task.state.get shouldBe "TASK_RUNNING"
+    }
+
+    And("scheduler produces a PodStatusUpdated event with a running task")
+    eventually {
+      inside (f.framework.output.pull().futureValue) {
+        case Some(PodStatusUpdated(id, Some(PodStatus(_, taskStatuses)))) =>
+          id shouldBe f.framework.podId
+          taskStatuses.head match {
+            case (_, status) => status.getState shouldBe TASK_RUNNING
+          }
+      }
     }
   }
 

@@ -2,35 +2,22 @@ package com.mesosphere.usi.examples
 
 import java.util.UUID
 
-import akka.{Done, NotUsed}
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.stream.scaladsl.{Flow, Keep, Sink, SinkQueueWithCancel, Source}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
-import com.mesosphere.usi.core.matching.ScalarResourceRequirement
-import com.mesosphere.usi.core.models.{
-  Goal,
-  PodId,
-  PodSpec,
-  PodStatus,
-  PodStatusUpdated,
-  ResourceType,
-  RunSpec,
-  SpecUpdated,
-  SpecsSnapshot,
-  StateEvent,
-  StateSnapshot
-}
+import com.mesosphere.usi.core.matching.ScalarResource
+import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodStatus, PodStatusUpdated, RunSpec, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{FrameworkInfo, TaskState, TaskStatus}
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.sys.SystemProperties
-import scala.util.{Failure, Success}
 
 /**
   * Run the hello-world example framework that:
@@ -100,7 +87,7 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
   val podId = PodId(s"hello-world.${UUID.randomUUID()}")
   val runSpec = RunSpec(
     resourceRequirements =
-      List(ScalarResourceRequirement(ResourceType.CPUS, 0.1), ScalarResourceRequirement(ResourceType.MEM, 32)),
+      List(ScalarResource.cpus(0.1), ScalarResource.memory(32)),
     shellCommand = """echo "Hello, world" && sleep 3600"""
   )
   val podSpec = PodSpec(
@@ -114,11 +101,15 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
     reservationSpecs = Seq.empty
   )
 
-  val completed: Future[Done] = Source
+  val output: SinkQueueWithCancel[StateEvent] = Source
   // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
   // which emits a materialized promise which when completed with a Some, that value will be produced downstream,
   // followed by completion. To avoid stream completion we never complete the promise but prepend the stream with
   // our snapshot together with an empty source for subsequent SpecUpdates (which we're not going to send)
+  //
+  // Note: this is hardly realistic since an orchestrator will need to react to StateEvents by sending SpecUpdates
+  // to the scheduler. We're making our lives easier by ignoring this part for now - all we care about is to start
+  // a "hello-world" task once.
   .maybe
     .prepend(Source.single(specsSnapshot))
     .map(snapshot => (snapshot, Source.empty))
@@ -133,10 +124,7 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
     }
     .map {
       // Main state event handler. We log happy events and exit if something goes wrong
-      case s: StateSnapshot =>
-        logger.info(s"Initial state snapshot: $s")
-
-      case PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
+      case e @PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
         import TaskState._
         def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
 
@@ -145,24 +133,14 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
         assert(failedTasks.isEmpty, s"Found failed tasks: $failedTasks, can't handle them now so will terminate")
 
         logger.info(s"Task status updates for podId: $id: ${taskStatuses}")
+        e
 
       case e =>
         logger.error(s"Unhandled event: $e") // we ignore everything else for now
+        e
     }
-    .toMat(Sink.ignore)(Keep.right)
+    .toMat(Sink.queue())(Keep.right)
     .run()
-
-  completed.onComplete {
-    case Success(res) =>
-      logger.info(s"Stream completed: $res");
-      system.terminate()
-    case Failure(e) =>
-      logger.error(s"Error in stream: $e");
-      system.terminate()
-  }
-
-  // We let the framework run "forever" (or at least until our task completes/fails)
-  Await.result(completed, Duration.Inf)
 }
 
 object CoreHelloWorldFramework {
