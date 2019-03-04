@@ -11,7 +11,6 @@ import org.apache.mesos.v1.Protos.FrameworkID
 import org.apache.mesos.v1.Protos.TaskState.TASK_RUNNING
 import org.scalatest.Inside
 
-
 class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest with Inside {
 
   "CoreHelloWorldFramework should successfully connect to Mesos" in withFixture() { f =>
@@ -35,7 +34,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
 
     And("scheduler produces a PodStatusUpdated event with a running task")
     eventually {
-      inside (f.framework.output.pull().futureValue) {
+      inside(f.framework.output.pull().futureValue) {
         case Some(PodStatusUpdated(id, Some(PodStatus(_, taskStatuses)))) =>
           id shouldBe f.framework.podId
           taskStatuses.head match {

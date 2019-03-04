@@ -10,7 +10,18 @@ import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.matching.ScalarResource
-import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodStatus, PodStatusUpdated, RunSpec, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.{
+  Goal,
+  PodId,
+  PodSpec,
+  PodStatus,
+  PodStatusUpdated,
+  RunSpec,
+  SpecUpdated,
+  SpecsSnapshot,
+  StateEvent,
+  StateSnapshot
+}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{FrameworkInfo, TaskState, TaskStatus}
@@ -86,8 +97,7 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
   // - a snapshot containing our PodSpec
   val podId = PodId(s"hello-world.${UUID.randomUUID()}")
   val runSpec = RunSpec(
-    resourceRequirements =
-      List(ScalarResource.cpus(0.1), ScalarResource.memory(32)),
+    resourceRequirements = List(ScalarResource.cpus(0.1), ScalarResource.memory(32)),
     shellCommand = """echo "Hello, world" && sleep 3600"""
   )
   val podSpec = PodSpec(
@@ -124,7 +134,7 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
     }
     .map {
       // Main state event handler. We log happy events and exit if something goes wrong
-      case e @PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
+      case e @ PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
         import TaskState._
         def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
 
