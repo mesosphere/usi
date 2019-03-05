@@ -69,7 +69,7 @@ case class RangeResource(requestedValues: Seq[Int], resourceType: ResourceType, 
     }
 
     // non-dynamic values
-    val staticRequestedValues = values.collect { case v if v != 0 => v }.toSet
+    val staticRequestedValues = values.filter(v => v != 0).toSet
     val availableForDynamicAssignment: Iterator[Int] =
       lazyRandomValuesFromRanges(offeredRanges, random).filter(v => !staticRequestedValues(v))
 
