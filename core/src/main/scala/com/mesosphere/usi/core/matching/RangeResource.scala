@@ -10,10 +10,33 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.util.Random
 
-case class RangeResource(requestedValues: Seq[Int], resourceType: ResourceType, random: Random = Random) extends ResourceRequirement {
+/**
+  * Represents requirement for Mesos resource of type Range.
+  * You can either request static values (by providing concrete value) or dynamic values (by providing 0).
+  * Dynamic values are then selected from the offered ranges. If random implementation is passed in, these ranges are randomized.
+  * For more information about randomization see [[lazyRandomValuesFromRanges()]]
+  *
+  * @param requestedValues values pod wants to consume on the given ranges
+  * @param resourceType name of resource (e.g. ports)
+  * @param random when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized
+  */
+case class RangeResource(requestedValues: Seq[Int], resourceType: ResourceType, random: Random = Random)
+    extends ResourceRequirement {
   override def description: String = s"$resourceType:[${requestedValues.mkString(",")}]"
 
-  @tailrec private def findResourceToMatch(
+  override def matchAndConsume(resources: Seq[Protos.Resource]): Option[ResourceMatchResult] = {
+    matchAndConsumeIter(Nil, resources.toList)
+  }
+
+  /**
+    * Iterates over given resources keeping in track unmatched resources.
+    * In the end produces ResourceMatchResult if we were able to find a match on the given resources.
+    *
+    * @param unmatchedResources already processed resources that did not contain resources we are trying to match
+    * @param remainingResources resources we still need to process when looking for resource match
+    * @return None if no match was possible, ResourceMatchResult if we were able to consume requested resources
+    */
+  @tailrec private def matchAndConsumeIter(
       unmatchedResources: List[Protos.Resource],
       remainingResources: List[Protos.Resource]): Option[ResourceMatchResult] = {
 
@@ -21,9 +44,9 @@ case class RangeResource(requestedValues: Seq[Int], resourceType: ResourceType, 
       case Nil =>
         None
       case next :: rest =>
-        matchRangeResource(next) match {
+        tryConsumeValuesFromResource(requestedValues, next) match {
           case Nil =>
-            findResourceToMatch(next :: unmatchedResources, rest)
+            matchAndConsumeIter(next :: unmatchedResources, rest)
           case consumedResources =>
             Some(
               ResourceMatchResult(
@@ -33,7 +56,13 @@ case class RangeResource(requestedValues: Seq[Int], resourceType: ResourceType, 
     }
   }
 
-  private def matchRangeResource(resource: Protos.Resource): Seq[Protos.Resource] = {
+  /**
+    * Tries to match and consume values from a given resource
+    * @param values values we want to consume
+    * @param resource mesos resource to match agains
+    * @return final list of mesos resources created after consuming requested values, empty if match was not possible
+    */
+  private def tryConsumeValuesFromResource(values: Seq[Int], resource: Protos.Resource): Seq[Protos.Resource] = {
     val offeredRanges = parseResourceToRanges(resource)
     if (offeredRanges.isEmpty || requestedValues.isEmpty) {
       return Seq.empty
@@ -63,10 +92,6 @@ case class RangeResource(requestedValues: Seq[Int], resourceType: ResourceType, 
     } else {
       createMesosResource(resource, matchResult.collect { case ValueMatched(v) => v }.toSeq, resourceType)
     }
-  }
-
-  override def matchAndConsume(resources: Seq[Protos.Resource]): Option[ResourceMatchResult] = {
-    findResourceToMatch(Nil, resources.toList)
   }
 
   /**
@@ -173,9 +198,10 @@ object RangeResource {
     * Creates as few RangesResources as possible while
     * preserving the order of the values.
     */
-  def createMesosResource(originalResource: Protos.Resource,
-     requestedValues: Seq[Int],
-     resourceType: ResourceType): Seq[Protos.Resource] = {
+  def createMesosResource(
+      resourceFromOffer: Protos.Resource,
+      requestedValues: Seq[Int],
+      resourceType: ResourceType): Seq[Protos.Resource] = {
     /*
      * Create as few ranges as possible from the given values while preserving the order of the values.
      *
@@ -210,7 +236,7 @@ object RangeResource {
     val resource = ProtoBuilders.newResource(
       resourceType.name,
       Protos.Value.Type.RANGES,
-      originalResource.getAllocationInfo,
+      resourceFromOffer.getAllocationInfo,
       ranges = rangesProto)
 
     Seq(resource)
