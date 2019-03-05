@@ -42,10 +42,6 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     }
   }
 
-  "It should be false" in {
-    true should be(false)
-  }
-
   "It reports a running task when I provide " in {
     implicit val materializer = ActorMaterializer()
     val podId = PodId("running-pod-on-a-mocked-mesos")
