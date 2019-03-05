@@ -69,18 +69,9 @@ task ci {
     description = "The main target for CI builds."
     group = "CI"
 
-    doLast {
-        // fail build when test failed
-        File reportsDir = file("${rootProject.buildDir}/reports/tests")
-        if (!reportsDir.exists()) {
-            println("does not exist")
-        } else {
-            reportsDir.eachFile(FileType.FILES) {
-                def myMatcher = it.text =~ /<div class="infoBox" id="failures">\s*<div class="counter">0</
-                if (!myMatcher.find()) {
-                    throw new GradleException("There were failing tests in ${it}. See the report at: ${it.toURI()}")
-                }
-            }
-        }
+    if (TravisEnvironment.isMasterBuild()) {
+        dependsOn githubReport, gitPublishPush
+    } else if (TravisEnvironment.isSecureBuild())  {
+        dependsOn githubReport
     }
 }

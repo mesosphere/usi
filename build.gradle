@@ -70,7 +70,6 @@ allprojects {
 
     test {
         reports.html.enabled = false
-        ignoreFailures true
     }
     check {}
 }
