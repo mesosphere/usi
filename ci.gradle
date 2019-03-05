@@ -69,12 +69,6 @@ task ci {
     description = "The main target for CI builds."
     group = "CI"
 
-    if (TravisEnvironment.isMasterBuild()) {
-        dependsOn githubReport, gitPublishPush
-    } else if (TravisEnvironment.isSecureBuild())  {
-        dependsOn githubReport
-    }
-
     doLast {
         // fail build when test failed
         File reportsDir = file("${rootProject.buildDir}/reports/tests")
@@ -82,10 +76,8 @@ task ci {
             println("does not exist")
         } else {
             reportsDir.eachFile(FileType.FILES) {
-                String content = it.text
-                println("text results:" + it.text)
-                def myMatcher = content =~ /(?s)<div class="infoBox" id="failures">\s*<div class="counter">0</
-                if (!myMatcher.matches()) {
+                def myMatcher = it.text =~ /<div class="infoBox" id="failures">\s*<div class="counter">0</
+                if (!myMatcher.find()) {
                     throw new GradleException("There were failing tests in ${it}. See the report at: ${it.toURI()}")
                 }
             }
