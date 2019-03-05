@@ -16,7 +16,7 @@ class PortResourceTest extends UnitTestLike {
 
   "PortResource" should {
     "select dynamic port from a given range" in {
-      val resource = new PortResource(ports = Seq(0, 0))
+      val resource = new RangeResource(getRequestedValues = Seq(0, 0))
       val result = resource.matchAndConsume(Seq(resourceWithPortRange(Range(3100, 3200))))
 
       val matchedResources = result.get.matchedResources
@@ -32,7 +32,7 @@ class PortResourceTest extends UnitTestLike {
     }
 
     "produce no match when not given any port range resource" in {
-      val resource = new PortResource(ports = Seq(80))
+      val resource = new RangeResource(getRequestedValues = Seq(80))
       val result = resource.matchAndConsume(
         Seq(
           ProtoBuilders.newResource(
@@ -46,7 +46,7 @@ class PortResourceTest extends UnitTestLike {
     }
 
     "get ports from multiple ranges" in {
-      val resource = new PortResource(ports = Seq(0, 0, 0, 0, 0))
+      val resource = new RangeResource(getRequestedValues = Seq(0, 0, 0, 0, 0))
       val result = resource.matchAndConsume(Seq(resourceWithPortRange(Range(2000, 2002), Range(3100, 3200))))
 
       val matchedResources = result.get.matchedResources
@@ -54,7 +54,7 @@ class PortResourceTest extends UnitTestLike {
     }
 
     "get non-dynamic ports from multiple ranges" in {
-      val resource = new PortResource(ports = Seq(80, 81, 82, 83, 100))
+      val resource = new RangeResource(getRequestedValues = Seq(80, 81, 82, 83, 100))
       val result = resource.matchAndConsume(Seq(resourceWithPortRange(Range(80, 83), Range(100, 100))))
 
       val matchedResources = result.get.matchedResources
@@ -65,30 +65,30 @@ class PortResourceTest extends UnitTestLike {
     }
 
     "produce no match when more ports requested than available" in {
-      val resource = new PortResource(ports = Seq(0, 0, 0, 0, 0))
+      val resource = new RangeResource(getRequestedValues = Seq(0, 0, 0, 0, 0))
       val result = resource.matchAndConsume(Seq(resourceWithPortRange(Range(2000, 2002))))
 
       result.isDefined should be(false)
     }
 
     "produce no match if required ports are not available" in {
-      val resource = new PortResource(ports = Seq(80))
+      val resource = new RangeResource(getRequestedValues = Seq(80))
       val result = resource.matchAndConsume(Seq(resourceWithPortRange(Range(2000, 2002))))
 
       result.isDefined should be(false)
     }
 
     "select the ports in random ranges" in {
-      val resource1 = new PortResource(ports = Seq(0), new util.Random(0))
+      val resource1 = new RangeResource(getRequestedValues = Seq(0), new util.Random(0))
       val match1 = resource1.matchAndConsume(Seq(resourceWithPortRange(Range(2000, 2400))))
-      val resource2SameSeed = new PortResource(ports = Seq(0), new util.Random(0))
+      val resource2SameSeed = new RangeResource(getRequestedValues = Seq(0), new util.Random(0))
       val match2 = resource2SameSeed.matchAndConsume(Seq(resourceWithPortRange(Range(2000, 2400))))
 
       match1.get.matchedResources.head.getRanges.getRange(0) should be(
         match2.get.matchedResources.head.getRanges.getRange(0))
 
       val differentMatch = (1 to 100).find { seed =>
-        val resource2DifferentSeed = new PortResource(ports = Seq(0), new util.Random(seed))
+        val resource2DifferentSeed = new RangeResource(getRequestedValues = Seq(0), new util.Random(seed))
         val match3 = resource2DifferentSeed.matchAndConsume(Seq(resourceWithPortRange(Range(2000, 2400))))
         match1.get.matchedResources.head.getRanges.getRange(0).getBegin == match3.get.matchedResources.head.getRanges
           .getRange(0)

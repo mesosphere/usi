@@ -6,7 +6,7 @@ import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
-import com.mesosphere.usi.core.matching.{PortResource, ScalarResource}
+import com.mesosphere.usi.core.matching.{RangeResource, ScalarResource}
 import com.mesosphere.usi.core.models._
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
@@ -75,7 +75,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
           podId,
           Goal.Running,
           RunSpec(
-            resourceRequirements = List(ScalarResource.cpus(1), ScalarResource.memory(256), PortResource(Seq(0))),
+            resourceRequirements = List(ScalarResource.cpus(1), ScalarResource.memory(256), RangeResource.ports(Seq(0))),
             shellCommand = "sleep 3600")
         ))
       ))
