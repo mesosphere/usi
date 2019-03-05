@@ -2,6 +2,7 @@ package com.mesosphere.usi.core.protos
 import com.google.protobuf.ByteString
 
 import org.apache.mesos.v1.{Protos => Mesos}
+import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
 /**
   * Collection of helper ProtoBuilders for convenience
@@ -117,6 +118,7 @@ private[usi] object ProtoBuilders {
   def newTaskStatus(
       taskId: Mesos.TaskID,
       state: Mesos.TaskState,
+      uuid: ByteString, // UUID should be present, only e.g. TASK_ERROR does not have UUID
       agentId: Mesos.AgentID = null,
       checkStatus: Mesos.CheckStatusInfo = null,
       containerStatus: Mesos.ContainerStatus = null,
@@ -129,8 +131,7 @@ private[usi] object ProtoBuilders {
       reason: Mesos.TaskStatus.Reason = null,
       source: Mesos.TaskStatus.Source = null,
       timestamp: Double = 0,
-      unreachableTime: Mesos.TimeInfo = null,
-      uuid: ByteString = null): Mesos.TaskStatus = {
+      unreachableTime: Mesos.TimeInfo = null): Mesos.TaskStatus = {
 
     val b = Mesos.TaskStatus
       .newBuilder()
@@ -236,4 +237,12 @@ private[usi] object ProtoBuilders {
     ranges.foreach(b.addRange)
     b.build()
   }
+
+  def newTaskUpdateEvent(
+                       taskStatus: Mesos.TaskStatus
+                     ): MesosEvent =
+    MesosEvent
+      .newBuilder()
+      .setUpdate(MesosEvent.Update.newBuilder().setStatus(taskStatus))
+      .build()
 }
