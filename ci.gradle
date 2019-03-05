@@ -85,7 +85,7 @@ task ci {
                 String content = it.text
                 def myMatcher = content =~ /(?s)<div class="infoBox" id="failures">\s*<div class="counter">0<\\/div>/
                 if (!myMatcher.matches()) {
-                    throw new GradleException("There were failing tests. See the report at: ${it.toURI()}")
+                    throw new GradleException("There were failing tests in ${it}. See the report at: ${it.toURI()}")
                 }
             }
         }
