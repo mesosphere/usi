@@ -59,7 +59,8 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
             val taskInfos: List[Mesos.TaskInfo] = taskIdsFor(podSpec).map { taskId =>
               newTaskInfo(
                 taskId.asProto,
-                name = "hi",
+                // we use sanitized podId as the task name for now
+                name = podSpec.id.value.replaceAll("[^a-zA-Z0-9-]", ""),
                 agentId = offer.getAgentId,
                 command = Mesos.CommandInfo
                   .newBuilder()
