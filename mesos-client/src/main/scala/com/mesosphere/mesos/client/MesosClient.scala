@@ -17,6 +17,7 @@ import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 
 import scala.concurrent.Future
+import scala.collection.JavaConverters._
 
 trait MesosClient {
 
@@ -24,6 +25,11 @@ trait MesosClient {
     * The frameworkId as which this client is currently connected.
     */
   def frameworkId: FrameworkID
+
+  /**
+    * The frameworkInfo as which this client is currently subscribed with.
+    */
+  def frameworkInfo: FrameworkInfo
 
   /**
     * The information about the current Mesos Master to which this client is connected.
@@ -294,6 +300,11 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       system: ActorSystem,
       materializer: ActorMaterializer): Source[MesosClient, NotUsed] = {
 
+    if (!isMultiRoleFramework(frameworkInfo)) {
+      throw new RuntimeException(
+        "Mesos client supports only MULTI_ROLE frameworks. Please provide FrameworkInfo with capability MULTI_ROLE")
+    }
+
     val initialUrl =
       if (conf.master.toLowerCase().startsWith("http://"))
         new java.net.URI(conf.master)
@@ -321,18 +332,22 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           .map {
             case (Seq(subscribedEvent), events) if subscribedEvent.getType == Event.Type.SUBSCRIBED =>
               val subscribed = subscribedEvent.getSubscribed
-              new MesosClientImpl(sharedKillSwitch, subscribed, connectionInfo, events)
+              new MesosClientImpl(frameworkInfo, sharedKillSwitch, subscribed, connectionInfo, events)
             case (other, _) =>
               throw new RuntimeException(s"Expected subscribed event, got $other")
           }
     }
   }
+
+  private def isMultiRoleFramework(frameworkInfo: FrameworkInfo): Boolean =
+    frameworkInfo.getCapabilitiesList.asScala.exists(c => c.getType == FrameworkInfo.Capability.Type.MULTI_ROLE)
 }
 
 /**
   *
   */
 class MesosClientImpl(
+    val frameworkInfo: FrameworkInfo,
     sharedKillSwitch: SharedKillSwitch,
     val subscribed: Event.Subscribed,
     val connectionInfo: MesosClient.ConnectionInfo,
