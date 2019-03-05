@@ -239,8 +239,8 @@ private[usi] object ProtoBuilders {
   }
 
   def newTaskUpdateEvent(
-                       taskStatus: Mesos.TaskStatus
-                     ): MesosEvent =
+      taskStatus: Mesos.TaskStatus
+  ): MesosEvent =
     MesosEvent
       .newBuilder()
       .setUpdate(MesosEvent.Update.newBuilder().setStatus(taskStatus))

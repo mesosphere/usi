@@ -156,13 +156,12 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
 
           SchedulerEvents(
             stateEvents = List(PodStatusUpdated(podId, Some(newStatus))),
-            mesosCalls =
-              if (taskStatus.hasUuid) {
-                // frameworks should accept only status updates that have UUID set
-                List(mesosCallFactory.newAcknowledge(taskStatus.getAgentId, taskStatus.getTaskId, taskStatus.getUuid))
-              } else {
-                List.empty
-              }
+            mesosCalls = if (taskStatus.hasUuid) {
+              // frameworks should accept only status updates that have UUID set
+              List(mesosCallFactory.newAcknowledge(taskStatus.getAgentId, taskStatus.getTaskId, taskStatus.getUuid))
+            } else {
+              List.empty
+            }
           )
 
         } else {
