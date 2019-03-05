@@ -64,16 +64,16 @@ case class RangeResource(requestedValues: Seq[Int], resourceType: ResourceType, 
     */
   private def tryConsumeValuesFromResource(values: Seq[Int], resource: Protos.Resource): Seq[Protos.Resource] = {
     val offeredRanges = parseResourceToRanges(resource)
-    if (offeredRanges.isEmpty || requestedValues.isEmpty) {
+    if (offeredRanges.isEmpty || values.isEmpty) {
       return Seq.empty
     }
 
     // non-dynamic values
-    val staticRequestedValues = requestedValues.collect { case v if v != 0 => v }.toSet
+    val staticRequestedValues = values.collect { case v if v != 0 => v }.toSet
     val availableForDynamicAssignment: Iterator[Int] =
       lazyRandomValuesFromRanges(offeredRanges, random).filter(v => !staticRequestedValues(v))
 
-    val matchResult = requestedValues.iterator.map {
+    val matchResult = values.map {
       case v if v == RandomValue && !availableForDynamicAssignment.hasNext =>
         // need dynamic value but no more available
         ValueNotAvailable
