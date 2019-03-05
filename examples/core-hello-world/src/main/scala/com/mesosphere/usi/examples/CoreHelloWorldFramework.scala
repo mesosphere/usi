@@ -36,7 +36,7 @@ import scala.sys.SystemProperties
   *    opposed to the `simple-hello-world` framework which uses only the Mesos client and has to implement
   *    all of the above mentioned pieces itself
   *  - starts one `echo "Hello, world" && sleep N` task
-  *  - exits should the task fail (or fail to start)
+  *  - exits when the task fails (or finishes)
   *
   *  Good to test against local Mesos.
   *

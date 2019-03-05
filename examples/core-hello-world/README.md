@@ -5,4 +5,4 @@ Run the hello-world example framework that:
   opposed to the `simple-hello-world` example framework which uses only the Mesos client and has to 
   implement all of the above mentioned pieces itself
 - starts one `echo "Hello, world" && sleep N` task
-- exits should the task fail (or fail to start)
+- exits when the task fails (or finishes)
