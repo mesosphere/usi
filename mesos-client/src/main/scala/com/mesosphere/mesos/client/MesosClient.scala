@@ -300,11 +300,6 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       system: ActorSystem,
       materializer: ActorMaterializer): Source[MesosClient, NotUsed] = {
 
-    if (!isMultiRoleFramework(frameworkInfo)) {
-      throw new RuntimeException(
-        "Mesos client supports only MULTI_ROLE frameworks. Please provide FrameworkInfo with capability MULTI_ROLE")
-    }
-
     val initialUrl =
       if (conf.master.toLowerCase().startsWith("http://"))
         new java.net.URI(conf.master)
@@ -338,9 +333,6 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           }
     }
   }
-
-  private def isMultiRoleFramework(frameworkInfo: FrameworkInfo): Boolean =
-    frameworkInfo.getCapabilitiesList.asScala.exists(c => c.getType == FrameworkInfo.Capability.Type.MULTI_ROLE)
 }
 
 /**

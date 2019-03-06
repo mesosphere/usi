@@ -54,7 +54,7 @@ object Scheduler {
   def fromClient(client: MesosClient): Flow[SpecInput, StateOutput, NotUsed] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
-        "Mesos client supports only MULTI_ROLE frameworks. Please provide create MesosClient with FrameworkInfo that has capability MULTI_ROLE")
+        "USI scheduler provides support for MULTI_ROLE frameworks only. Please provide create MesosClient with FrameworkInfo that has capability MULTI_ROLE")
     }
     fromFlow(client.calls, Flow.fromSinkAndSource(client.mesosSink, client.mesosSource))
   }
