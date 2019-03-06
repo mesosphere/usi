@@ -69,12 +69,7 @@ task ci {
     description = "The main target for CI builds."
     group = "CI"
 
-    // subprojects*.test.each { it.ignoreFailures = true }
-
-    evaluationDependsOnChildren()
-    subprojects*.test.each { it.finalizedBy(testReport) }
-
-    dependsOn githubReport, gitPublishPush
+    subprojects*.test.each { it.ignoreFailures = true }
 
     if (TravisEnvironment.isMasterBuild()) {
         dependsOn githubReport, gitPublishPush
