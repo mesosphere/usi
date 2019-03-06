@@ -54,6 +54,8 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
         .get("user.name")
         .getOrElse(throw new IllegalArgumentException("A local user is needed to launch Mesos tasks")))
     .setName("CoreHelloWorldExample")
+    .addRoles("test")
+    .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .setFailoverTimeout(0d)
     .build()
 
