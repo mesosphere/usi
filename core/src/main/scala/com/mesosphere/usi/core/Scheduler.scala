@@ -60,7 +60,7 @@ object Scheduler {
   }
 
   private def isMultiRoleFramework(frameworkInfo: FrameworkInfo): Boolean =
-    frameworkInfo.getCapabilitiesList.asScala.exists(c => c.getType == FrameworkInfo.Capability.Type.MULTI_ROLE)
+    frameworkInfo.getCapabilitiesList.asScala.exists(_.getType == FrameworkInfo.Capability.Type.MULTI_ROLE)
 
   def fromFlow(
       mesosCallFactory: MesosCalls,
