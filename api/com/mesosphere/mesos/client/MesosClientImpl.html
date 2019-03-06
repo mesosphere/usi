@@ -232,9 +232,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.mesos.client.MesosClientImpl#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(sharedKillSwitch:akka.stream.SharedKillSwitch,subscribed:org.apache.mesos.v1.scheduler.Protos.Event.Subscribed,connectionInfo:com.mesosphere.mesos.client.MesosClient.ConnectionInfo,mesosSource:akka.stream.scaladsl.Source[org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed])(implicitas:akka.actor.ActorSystem,implicitm:akka.stream.Materializer):com.mesosphere.mesos.client.MesosClientImpl"></a><a id="&lt;init&gt;:MesosClientImpl"></a>
+      <a id="&lt;init&gt;(frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo,sharedKillSwitch:akka.stream.SharedKillSwitch,subscribed:org.apache.mesos.v1.scheduler.Protos.Event.Subscribed,connectionInfo:com.mesosphere.mesos.client.MesosClient.ConnectionInfo,mesosSource:akka.stream.scaladsl.Source[org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed])(implicitas:akka.actor.ActorSystem,implicitm:akka.stream.Materializer):com.mesosphere.mesos.client.MesosClientImpl"></a><a id="&lt;init&gt;:MesosClientImpl"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/MesosClientImpl.html#&lt;init&gt;(sharedKillSwitch:akka.stream.SharedKillSwitch,subscribed:org.apache.mesos.v1.scheduler.Protos.Event.Subscribed,connectionInfo:com.mesosphere.mesos.client.MesosClient.ConnectionInfo,mesosSource:akka.stream.scaladsl.Source[org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed])(implicitas:akka.actor.ActorSystem,implicitm:akka.stream.Materializer):com.mesosphere.mesos.client.MesosClientImpl" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/MesosClientImpl.html#&lt;init&gt;(frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo,sharedKillSwitch:akka.stream.SharedKillSwitch,subscribed:org.apache.mesos.v1.scheduler.Protos.Event.Subscribed,connectionInfo:com.mesosphere.mesos.client.MesosClient.ConnectionInfo,mesosSource:akka.stream.scaladsl.Source[org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed])(implicitas:akka.actor.ActorSystem,implicitm:akka.stream.Materializer):com.mesosphere.mesos.client.MesosClientImpl" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -243,7 +243,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">MesosClientImpl</span><span class="params">(<span name="sharedKillSwitch">sharedKillSwitch: <span class="extype" name="akka.stream.SharedKillSwitch">SharedKillSwitch</span></span>, <span name="subscribed">subscribed: <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event.Subscribed">Subscribed</span></span>, <span name="connectionInfo">connectionInfo: <a href="MesosClient$$ConnectionInfo.html" class="extype" name="com.mesosphere.mesos.client.MesosClient.ConnectionInfo">ConnectionInfo</a></span>, <span name="mesosSource">mesosSource: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="as">as: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="m">m: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span>
+        <span class="name">MesosClientImpl</span><span class="params">(<span name="frameworkInfo">frameworkInfo: <span class="extype" name="org.apache.mesos.v1.Protos.FrameworkInfo">FrameworkInfo</span></span>, <span name="sharedKillSwitch">sharedKillSwitch: <span class="extype" name="akka.stream.SharedKillSwitch">SharedKillSwitch</span></span>, <span name="subscribed">subscribed: <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event.Subscribed">Subscribed</span></span>, <span name="connectionInfo">connectionInfo: <a href="MesosClient$$ConnectionInfo.html" class="extype" name="com.mesosphere.mesos.client.MesosClient.ConnectionInfo">ConnectionInfo</a></span>, <span name="mesosSource">mesosSource: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="as">as: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="m">m: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span>
       </span>
       
       
@@ -465,6 +465,23 @@ reconnect to Mesos in such an event. As such, this information will be current, 
       </span>
       
       <p class="shortcomment cmt">The frameworkId as which this client is currently connected.</p><div class="fullcomment"><div class="comment cmt"><p>The frameworkId as which this client is currently connected.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.mesos.client.MesosClientImpl">MesosClientImpl</a> → <a href="MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></dd></dl></div>
+    </li><li name="com.mesosphere.mesos.client.MesosClientImpl#frameworkInfo" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo"></a><a id="frameworkInfo:FrameworkInfo"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/MesosClientImpl.html#frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">frameworkInfo</span><span class="result">: <span class="extype" name="org.apache.mesos.v1.Protos.FrameworkInfo">FrameworkInfo</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">The framework info this client is currently subscribed with.</p><div class="fullcomment"><div class="comment cmt"><p>The framework info this client is currently subscribed with.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.mesos.client.MesosClientImpl">MesosClientImpl</a> → <a href="MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
