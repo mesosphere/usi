@@ -27,7 +27,7 @@ trait MesosClient {
   def frameworkId: FrameworkID
 
   /**
-    * The frameworkInfo as which this client is currently subscribed with.
+    * The framework info this client is currently subscribed with.
     */
   def frameworkInfo: FrameworkInfo
 
