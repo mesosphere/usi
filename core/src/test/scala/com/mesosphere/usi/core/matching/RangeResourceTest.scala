@@ -10,7 +10,7 @@ import org.apache.mesos.v1.Protos.Value
 
 import scala.collection.JavaConverters._
 
-class PortResourceTest extends UnitTestLike {
+class RangeResourceTest extends UnitTestLike {
   private val mockRole = "mock-role"
   private val basicAllocationInfo = Protos.Resource.AllocationInfo.newBuilder().setRole(mockRole).build()
 

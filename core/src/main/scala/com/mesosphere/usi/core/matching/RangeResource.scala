@@ -20,7 +20,7 @@ import scala.util.Random
   * @param resourceType name of resource (e.g. ports)
   * @param random when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized
   */
-case class RangeResource(requestedValues: Seq[Int], resourceType: ResourceType, random: Random = Random)
+case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: ResourceType, random: Random = Random)
     extends ResourceRequirement {
   override def description: String = s"$resourceType:[${requestedValues.mkString(",")}]"
 
@@ -58,29 +58,29 @@ case class RangeResource(requestedValues: Seq[Int], resourceType: ResourceType, 
 
   /**
     * Tries to match and consume values from a given resource
-    * @param values values we want to consume
+    * @param requestedValues values we want to consume
     * @param resource mesos resource to match agains
     * @return final list of mesos resources created after consuming requested values, empty if match was not possible
     */
-  private def tryConsumeValuesFromResource(values: Seq[Int], resource: Protos.Resource): Seq[Protos.Resource] = {
+  private def tryConsumeValuesFromResource(requestedValues: Seq[RequestedValue], resource: Protos.Resource): Seq[Protos.Resource] = {
     val offeredRanges = parseResourceToRanges(resource)
-    if (offeredRanges.isEmpty || values.isEmpty) {
+    if (offeredRanges.isEmpty || requestedValues.isEmpty) {
       return Seq.empty
     }
 
     // non-dynamic values
-    val staticRequestedValues = values.filter(v => v != 0).toSet
+    val staticRequestedValues = requestedValues.collect { case ExactValue(v) => v }.toSet
     val availableForDynamicAssignment: Iterator[Int] =
       lazyRandomValuesFromRanges(offeredRanges, random).filter(v => !staticRequestedValues(v))
 
-    val matchResult = values.map {
-      case v if v == RandomValue && !availableForDynamicAssignment.hasNext =>
+    val matchResult = requestedValues.map {
+      case RandomValue if !availableForDynamicAssignment.hasNext =>
         // need dynamic value but no more available
         ValueNotAvailable
-      case v if v == RandomValue && availableForDynamicAssignment.hasNext =>
+      case RandomValue if availableForDynamicAssignment.hasNext =>
         // pick next available dynamic value
         ValueMatched(availableForDynamicAssignment.next())
-      case v if offeredRanges.exists(_.contains(v)) =>
+      case _ @ ExactValue(v) if offeredRanges.exists(_.contains(v)) =>
         // static value
         ValueMatched(v)
       case _ =>
@@ -185,11 +185,15 @@ sealed trait ValueMatchResult
 case object ValueNotAvailable extends ValueMatchResult
 case class ValueMatched(port: Int) extends ValueMatchResult
 
+sealed trait RequestedValue
+case class ExactValue(value: Int) extends RequestedValue
+case object RandomValue extends RequestedValue
+
 object RangeResource {
-  val RandomValue: Int = 0
+  val RandomPort: Int = 0
 
   def ports(requestedPorts: Seq[Int], random: Random = Random): RangeResource = {
-    new RangeResource(requestedPorts, ResourceType.PORTS, random)
+    new RangeResource(requestedPorts.map(p => if (p == RandomPort) RandomValue else ExactValue(p)), ResourceType.PORTS, random)
   }
 
   /**
@@ -202,28 +206,28 @@ object RangeResource {
       resourceFromOffer: Protos.Resource,
       requestedValues: Seq[Int],
       resourceType: ResourceType): Seq[Protos.Resource] = {
+
+    def overlaps(range: Range, nextVal: Int): Boolean = range.end.toInt == nextVal - 1
     /*
      * Create as few ranges as possible from the given values while preserving the order of the values.
      *
      * It does not check if the given values have different roles.
      */
-    def createRanges(ranges: Seq[Int]): Seq[Range] = {
-      val builder = Seq.newBuilder[Range]
+    def createRanges(values: Seq[Int]): Seq[Range] = {
+      val builder = Vector.newBuilder[Range]
 
-      @tailrec
-      def process(lastRangeOpt: Option[Range], next: Seq[Int]): Unit = {
-        (lastRangeOpt, next.headOption) match {
-          case (None, _) =>
-          case (Some(lastRange), None) =>
-            builder += lastRange
-          case (Some(lastRange), Some(nextVal)) if lastRange.end.toInt == nextVal - 1 =>
-            process(Some(Range(lastRange.start, nextVal)), next.tail)
-          case (Some(lastRange), Some(nextVal)) =>
-            builder += lastRange
-            process(Some(Range(nextVal, nextVal)), next.tail)
+      if (values.nonEmpty) {
+        var currentRange = Range(values.head, values.head)
+        values.tail.foreach { v =>
+          if (overlaps(currentRange, v)) {
+            currentRange = Range(currentRange.start, v)
+          } else {
+            builder += currentRange
+            currentRange = Range(v, v)
+          }
         }
+        builder += currentRange // append last range.
       }
-      process(ranges.headOption.map(v => Range(v, v)), ranges.tail)
 
       builder.result()
     }
