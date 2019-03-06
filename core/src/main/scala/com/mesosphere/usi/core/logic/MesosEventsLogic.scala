@@ -59,7 +59,8 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
             val taskInfos: List[Mesos.TaskInfo] = taskIdsFor(podSpec).map { taskId =>
               newTaskInfo(
                 taskId.asProto,
-                name = "hi",
+                // we use sanitized podId as the task name for now
+                name = podSpec.id.value.replaceAll("[^a-zA-Z0-9-]", ""),
                 agentId = offer.getAgentId,
                 command = Mesos.CommandInfo
                   .newBuilder()
@@ -156,8 +157,12 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
 
           SchedulerEvents(
             stateEvents = List(PodStatusUpdated(podId, Some(newStatus))),
-            mesosCalls =
+            mesosCalls = if (taskStatus.hasUuid) {
+              // frameworks should accept only status updates that have UUID set
               List(mesosCallFactory.newAcknowledge(taskStatus.getAgentId, taskStatus.getTaskId, taskStatus.getUuid))
+            } else {
+              Nil
+            }
           )
 
         } else {
