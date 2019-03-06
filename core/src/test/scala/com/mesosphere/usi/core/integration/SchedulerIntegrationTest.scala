@@ -11,14 +11,21 @@ import com.mesosphere.usi.core.models._
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import org.apache.mesos.v1.Protos
+import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.scalatest.Inside
 
 class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with Inside {
-  lazy val settings = MesosClientSettings(mesosFacade.url)
-  val frameworkInfo = Protos.FrameworkInfo.newBuilder().setUser("test").setName("SimpleHelloWorldExample").build()
-
   implicit val materializer = ActorMaterializer()
 
+  val settings = MesosClientSettings(mesosFacade.url)
+  val frameworkInfo = Protos.FrameworkInfo
+    .newBuilder()
+    .setUser("test")
+    .setName("SimpleHelloWorldExample")
+    .addRoles("test")
+    .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
+    .build()
+  
   lazy val mesosClient: MesosClient = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
   lazy val schedulerFlow = Scheduler.fromClient(mesosClient)
   lazy val (input, output) = specInputSource(SpecsSnapshot.empty)

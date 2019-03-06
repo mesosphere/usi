@@ -26,6 +26,11 @@ trait MesosClient {
   def frameworkId: FrameworkID
 
   /**
+    * The framework info this client is currently subscribed with.
+    */
+  def frameworkInfo: FrameworkInfo
+
+  /**
     * The information about the current Mesos Master to which this client is connected.
     *
     * Note: MesosClient will disconnect on Mesos Master failover. It is the resposibility of the consumer as such to
@@ -321,7 +326,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           .map {
             case (Seq(subscribedEvent), events) if subscribedEvent.getType == Event.Type.SUBSCRIBED =>
               val subscribed = subscribedEvent.getSubscribed
-              new MesosClientImpl(sharedKillSwitch, subscribed, connectionInfo, events)
+              new MesosClientImpl(frameworkInfo, sharedKillSwitch, subscribed, connectionInfo, events)
             case (other, _) =>
               throw new RuntimeException(s"Expected subscribed event, got $other")
           }
@@ -333,6 +338,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
   *
   */
 class MesosClientImpl(
+    val frameworkInfo: FrameworkInfo,
     sharedKillSwitch: SharedKillSwitch,
     val subscribed: Event.Subscribed,
     val connectionInfo: MesosClient.ConnectionInfo,
