@@ -9,7 +9,7 @@ install:
 scala:
    - 2.12.7
 script:
-  - ./gradlew checkScalaFmtAll && sudo ./gradlew provision && ./gradlew ci --info --continue
+  - ./gradlew checkScalaFmtAll && sudo ./gradlew provision && ./gradlew ci --info
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/

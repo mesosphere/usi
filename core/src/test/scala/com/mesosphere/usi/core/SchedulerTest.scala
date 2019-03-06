@@ -9,13 +9,10 @@ import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatten
 import com.mesosphere.usi.core.matching.ScalarResource
 import com.mesosphere.usi.core.models._
 import com.mesosphere.utils.AkkaUnitTest
-import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
-import org.junit.runner.RunWith
+import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest._
-import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
 class SchedulerTest extends AkkaUnitTest with Inside {
 
   val loggingMockMesosFlow: Flow[MesosCall, MesosEvent, NotUsed] = Flow[MesosCall].map { call =>
@@ -40,10 +37,6 @@ class SchedulerTest extends AkkaUnitTest with Inside {
         }
       }
     }
-  }
-
-  "It should be false" in {
-    true should be(false)
   }
 
   "It reports a running task when I provide " in {

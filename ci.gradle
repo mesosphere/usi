@@ -77,6 +77,10 @@ task ci {
         dependsOn githubReport
     }
 
+    // in CI we need to gather test results as a report. We use TestReport task for that
+    // TestReport task has dependsOn relation on test so when test task fails, there is no report created
+    // we can either break that dependsOn dependency and use something like finalizedBy
+    // or we can go this way of using 'it.ignoreFailures = true' in combination with determining whether the build is failure from the test report
     doLast {
         // fail build when test failed
         File reportsDir = file("${rootProject.buildDir}/reports/tests")
