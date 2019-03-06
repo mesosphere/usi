@@ -76,4 +76,19 @@ task ci {
     } else if (TravisEnvironment.isSecureBuild())  {
         dependsOn githubReport
     }
+
+    doLast {
+        // fail build when test failed
+        File reportsDir = file("${rootProject.buildDir}/reports/tests")
+        if (!reportsDir.exists()) {
+            throw new GradleException("Wanted to evaluate test report but that was not available on ${reportsDir}")
+        } else {
+            reportsDir.eachFile(FileType.FILES) {
+                def myMatcher = it.text =~ /<div class="infoBox" id="failures">\s*<div class="counter">0</
+                if (!myMatcher.find()) {
+                    throw new GradleException("There were failing tests. See the report at: ${it.toURI()}")
+                }
+            }
+        }
+    }
 }
