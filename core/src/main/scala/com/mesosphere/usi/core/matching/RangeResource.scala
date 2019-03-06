@@ -11,7 +11,8 @@ import scala.collection.JavaConverters._
 import scala.util.Random
 
 /**
-  * Represents requirement for Mesos resource of type Range.
+  * Represents requirement for Mesos resource of type Range. http://mesos.apache.org/documentation/attributes-resources/
+  *
   * You can either request static values (by providing concrete value) or dynamic values (by providing 0).
   * Dynamic values are then selected from the offered ranges. If random implementation is passed in, these ranges are randomized.
   * For more information about randomization see [[lazyRandomValuesFromRanges()]]
@@ -172,9 +173,9 @@ case class MesosRange(minValue: Int, maxValue: Int) {
   private[this] def range: Range.Inclusive = Range.inclusive(minValue, maxValue)
   def size: Int = range.size
 
-  def iterator: Iterator[Int] = range.iterator.map(v => v)
-  def drop(n: Int): Iterator[Int] = range.drop(n).iterator.map(v => v)
-  def take(n: Int): Iterator[Int] = range.take(n).iterator.map(v => v)
+  def iterator: Iterator[Int] = range.iterator
+  def drop(n: Int): Iterator[Int] = range.drop(n).iterator
+  def take(n: Int): Iterator[Int] = range.take(n).iterator
 
   /*
    * Attention! range exports _two_ contains methods, a generic inefficient one and an efficient one
