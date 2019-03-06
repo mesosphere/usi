@@ -62,7 +62,9 @@ case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: Res
     * @param resource mesos resource to match agains
     * @return final list of mesos resources created after consuming requested values, empty if match was not possible
     */
-  private def tryConsumeValuesFromResource(requestedValues: Seq[RequestedValue], resource: Protos.Resource): Seq[Protos.Resource] = {
+  private def tryConsumeValuesFromResource(
+      requestedValues: Seq[RequestedValue],
+      resource: Protos.Resource): Seq[Protos.Resource] = {
     val offeredRanges = parseResourceToRanges(resource)
     if (offeredRanges.isEmpty || requestedValues.isEmpty) {
       return Seq.empty
@@ -80,7 +82,7 @@ case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: Res
       case RandomValue if availableForDynamicAssignment.hasNext =>
         // pick next available dynamic value
         ValueMatched(availableForDynamicAssignment.next())
-      case _ @ ExactValue(v) if offeredRanges.exists(_.contains(v)) =>
+      case _ @ExactValue(v) if offeredRanges.exists(_.contains(v)) =>
         // static value
         ValueMatched(v)
       case _ =>
@@ -193,7 +195,10 @@ object RangeResource {
   val RandomPort: Int = 0
 
   def ports(requestedPorts: Seq[Int], random: Random = Random): RangeResource = {
-    new RangeResource(requestedPorts.map(p => if (p == RandomPort) RandomValue else ExactValue(p)), ResourceType.PORTS, random)
+    new RangeResource(
+      requestedPorts.map(p => if (p == RandomPort) RandomValue else ExactValue(p)),
+      ResourceType.PORTS,
+      random)
   }
 
   /**
