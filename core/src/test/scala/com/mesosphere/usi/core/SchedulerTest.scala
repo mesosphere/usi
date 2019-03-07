@@ -9,8 +9,8 @@ import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatten
 import com.mesosphere.usi.core.matching.ScalarResource
 import com.mesosphere.usi.core.models._
 import com.mesosphere.utils.AkkaUnitTest
-import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest._
 
 class SchedulerTest extends AkkaUnitTest with Inside {

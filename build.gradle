@@ -70,7 +70,6 @@ allprojects {
 
     test {
         reports.html.enabled = false
-        reports.junitXml.destination = file(Paths.get(rootProject.buildDir.toString(), "tests", project.name))
     }
     check {}
 }

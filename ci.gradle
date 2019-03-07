@@ -1,6 +1,10 @@
+import groovy.io.FileType
 import mesosphere.gradle.aws.S3Upload
 import mesosphere.gradle.github.GithubStatus
 import mesosphere.gradle.travis.TravisEnvironment
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 task testReport(type: TestReport) {
     description = "Aggregate all test results from subprojects into one test report."
@@ -9,7 +13,6 @@ task testReport(type: TestReport) {
     destinationDir = file("${rootProject.buildDir}/reports/tests")
     // Include the results from the `test` task in all subprojects
     reportOn subprojects*.test
-    dependsOn(subprojects.check)
 }
 
 task uploadTestReports(type: S3Upload) {
@@ -65,9 +68,31 @@ task provision(type: Exec) {
 task ci {
     description = "The main target for CI builds."
     group = "CI"
+
+    subprojects*.test.each { it.ignoreFailures = true }
+
     if (TravisEnvironment.isMasterBuild()) {
         dependsOn githubReport, gitPublishPush
     } else if (TravisEnvironment.isSecureBuild())  {
         dependsOn githubReport
+    }
+
+    // in CI we need to gather test results as a report. We use TestReport task for that
+    // TestReport task has dependsOn relation on test so when test task fails, there is no report created
+    // we can either break that dependsOn dependency and use something like finalizedBy
+    // or we can go this way of using 'it.ignoreFailures = true' in combination with determining whether the build is failure from the test report
+    doLast {
+        // fail build when test failed
+        File reportsDir = file("${rootProject.buildDir}/reports/tests")
+        if (!reportsDir.exists()) {
+            throw new GradleException("Wanted to evaluate test report but that was not available on ${reportsDir}")
+        } else {
+            reportsDir.eachFile(FileType.FILES) {
+                def myMatcher = it.text =~ /<div class="infoBox" id="failures">\s*<div class="counter">0</
+                if (!myMatcher.find()) {
+                    throw new GradleException("There were failing tests. See the report at: ${it.toURI()}")
+                }
+            }
+        }
     }
 }
