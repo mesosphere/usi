@@ -25,7 +25,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     .addRoles("test")
     .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .build()
-  
+
   lazy val mesosClient: MesosClient = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
   lazy val schedulerFlow = Scheduler.fromClient(mesosClient)
   lazy val (input, output) = specInputSource(SpecsSnapshot.empty)
