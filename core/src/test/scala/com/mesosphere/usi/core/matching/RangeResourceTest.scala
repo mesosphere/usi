@@ -79,16 +79,16 @@ class RangeResourceTest extends UnitTestLike {
     }
 
     "select the ports in random ranges" in {
-      val resource1 = RangeResource.ports(Seq(0), new util.Random(0))
+      val resource1 = RangeResource.ports(Seq(0), Some(new util.Random(0)))
       val match1 = resource1.matchAndConsume(Seq(resourceWithPortRange(Range(2000, 2400))))
-      val resource2SameSeed = RangeResource.ports(Seq(0), new util.Random(0))
+      val resource2SameSeed = RangeResource.ports(Seq(0), Some(new util.Random(0)))
       val match2 = resource2SameSeed.matchAndConsume(Seq(resourceWithPortRange(Range(2000, 2400))))
 
       match1.get.matchedResources.head.getRanges.getRange(0) should be(
         match2.get.matchedResources.head.getRanges.getRange(0))
 
       val differentMatch = (1 to 100).find { seed =>
-        val resource2DifferentSeed = RangeResource.ports(Seq(0), new util.Random(seed))
+        val resource2DifferentSeed = RangeResource.ports(Seq(0), Some(new util.Random(seed)))
         val match3 = resource2DifferentSeed.matchAndConsume(Seq(resourceWithPortRange(Range(2000, 2400))))
         match1.get.matchedResources.head.getRanges.getRange(0).getBegin == match3.get.matchedResources.head.getRanges
           .getRange(0)
@@ -98,6 +98,17 @@ class RangeResourceTest extends UnitTestLike {
       }
 
       differentMatch.isDefined should be(true) withClue "Expecting ports to be selected at random"
+    }
+
+    "not select ports random when random not provided" in {
+      val resource = RangeResource.ports(Seq(0), None)
+      val alwaysSameMatch = (1 to 10).find { _ =>
+        val matchResource = resource.matchAndConsume(Seq(resourceWithPortRange(Range(2000, 2400))))
+        matchResource.get.matchedResources.head.getRanges.getRange(0).getBegin != 2000 ||
+          matchResource.get.matchedResources.head.getRanges.getRange(0).getEnd != 2000
+      }
+
+      alwaysSameMatch.isEmpty should be(true) withClue "when no random shuffling is requested, selected port should always be the same"
     }
   }
 
