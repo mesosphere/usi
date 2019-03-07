@@ -105,7 +105,7 @@ class RangeResourceTest extends UnitTestLike {
       val alwaysSameMatch = (1 to 10).find { _ =>
         val matchResource = resource.matchAndConsume(Seq(resourceWithPortRange(Range(2000, 2400))))
         matchResource.get.matchedResources.head.getRanges.getRange(0).getBegin != 2000 ||
-          matchResource.get.matchedResources.head.getRanges.getRange(0).getEnd != 2000
+        matchResource.get.matchedResources.head.getRanges.getRange(0).getEnd != 2000
       }
 
       alwaysSameMatch.isEmpty should be(true) withClue "when no random shuffling is requested, selected port should always be the same"

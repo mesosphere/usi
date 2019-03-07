@@ -21,7 +21,10 @@ import scala.util.Random
   * @param resourceType name of resource (e.g. ports)
   * @param random when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized
   */
-case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: ResourceType, random: Option[Random] = Some(Random))
+case class RangeResource(
+    requestedValues: Seq[RequestedValue],
+    resourceType: ResourceType,
+    random: Option[Random] = Some(Random))
     extends ResourceRequirement {
   override def description: String = s"$resourceType:[${requestedValues.mkString(",")}]"
 
@@ -74,12 +77,14 @@ case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: Res
     // non-dynamic values
     val staticRequestedValues = requestedValues.collect { case ExactValue(v) => v }.toSet
     val availableForDynamicAssignment: Iterator[Int] = random match {
-      case Some(r) => lazyRandomValuesFromRanges(offeredRanges, r)
-        .filter(v => !staticRequestedValues(v))
-      case None => offeredRanges
-        .map(_.iterator)
-        .foldLeft(Iterator[Int]())(_ ++ _)
-        .filter(v => !staticRequestedValues(v))
+      case Some(r) =>
+        lazyRandomValuesFromRanges(offeredRanges, r)
+          .filter(v => !staticRequestedValues(v))
+      case None =>
+        offeredRanges
+          .map(_.iterator)
+          .foldLeft(Iterator[Int]())(_ ++ _)
+          .filter(v => !staticRequestedValues(v))
     }
 
     val matchResult = requestedValues.map {
