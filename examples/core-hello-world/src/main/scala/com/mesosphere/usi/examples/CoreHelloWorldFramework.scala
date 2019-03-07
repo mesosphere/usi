@@ -9,7 +9,7 @@ import akka.stream.scaladsl.{Flow, Keep, Sink, SinkQueueWithCancel, Source}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
-import com.mesosphere.usi.core.matching.ScalarResource
+import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.usi.core.models.{
   Goal,
   PodId,
@@ -99,7 +99,7 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
   // - a snapshot containing our PodSpec
   val podId = PodId(s"hello-world.${UUID.randomUUID()}")
   val runSpec = RunSpec(
-    resourceRequirements = List(ScalarResource.cpus(0.1), ScalarResource.memory(32)),
+    resourceRequirements = List(ScalarRequirement.cpus(0.1), ScalarRequirement.memory(32)),
     shellCommand = """echo "Hello, world" && sleep 3600"""
   )
   val podSpec = PodSpec(

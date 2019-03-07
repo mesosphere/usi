@@ -2,21 +2,12 @@ package com.mesosphere.usi.core.logic
 
 import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
-import com.mesosphere.usi.core.SchedulerState
-import com.mesosphere.usi.core.SpecState
+import com.mesosphere.usi.core.{SchedulerState, SpecState}
 import com.mesosphere.usi.core.helpers.MesosMock
-import com.mesosphere.usi.core.matching.ScalarResource
-import com.mesosphere.usi.core.models.Goal
-import com.mesosphere.usi.core.models.PodId
-import com.mesosphere.usi.core.models.PodSpec
-import com.mesosphere.usi.core.models.PodStatus
-import com.mesosphere.usi.core.models.PodStatusUpdated
-import com.mesosphere.usi.core.models.ResourceType
-import com.mesosphere.usi.core.models.RunSpec
-import com.mesosphere.usi.core.models.TaskId
-import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskId, newTaskStatus, newTaskUpdateEvent}
+import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodStatus, PodStatusUpdated, RunSpec, TaskId}
+import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
+import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskStatus}
 import com.mesosphere.utils.UnitTest
-import org.apache.mesos.v1.Protos
 import org.apache.mesos.v1.{Protos => Mesos}
 
 class MesosEventsLogicTest extends UnitTest {
@@ -27,7 +18,7 @@ class MesosEventsLogicTest extends UnitTest {
     PodId("mock-podId"),
     Goal.Running,
     RunSpec(
-      List(ScalarResource(ResourceType.CPUS, 1), ScalarResource(ResourceType.MEM, 256)),
+      List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
       shellCommand = "sleep 3600")
   )
 
@@ -51,7 +42,7 @@ class MesosEventsLogicTest extends UnitTest {
         Seq(
           podWith1Cpu256Mem.copy(
             runSpec = podWith1Cpu256Mem.runSpec.copy(
-              resourceRequirements = Seq(ScalarResource(ResourceType.CPUS, Integer.MAX_VALUE))
+              resourceRequirements = Seq(ScalarRequirement(ResourceType.CPUS, Integer.MAX_VALUE))
             )))
       )
       schedulerEventsBuilder.result.mesosCalls.size shouldBe 1
@@ -159,7 +150,7 @@ class MesosEventsLogicTest extends UnitTest {
       state: Mesos.TaskState = Mesos.TaskState.TASK_RUNNING,
       agentId: Mesos.AgentID = newAgentId("some-agent-id"),
       uuid: ByteString = ByteString.copyFromUtf8("uuid")
-  ): Protos.TaskStatus = newTaskStatus(
+  ): Mesos.TaskStatus = newTaskStatus(
     taskId = taskId,
     state = state,
     agentId = agentId,

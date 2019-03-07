@@ -38,10 +38,11 @@ case class ZookeeperServer(autoStart: Boolean = true, val port: Int = PortAlloca
       -1, // default serverId
       -1, // default tickTime
       -1,
-      util.Map.of[String, Object]( // custom properties
-        "admin.enableServer",
-        Boolean.box(false) // disable the admin server
-      )
+      util.Map
+        .of[String, Object]( // custom properties
+          "admin.enableServer",
+          Boolean.box(false) // disable the admin server
+        )
     )
   }
   private var running = autoStart

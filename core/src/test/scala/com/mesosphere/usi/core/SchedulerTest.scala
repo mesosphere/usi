@@ -6,8 +6,8 @@ import akka.stream.{ActorMaterializer, FlowShape}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
-import com.mesosphere.usi.core.matching.ScalarResource
 import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.utils.AkkaUnitTest
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
@@ -55,7 +55,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
             podId,
             Goal.Running,
             RunSpec(
-              resourceRequirements = List(ScalarResource.cpus(1), ScalarResource.memory(256)),
+              resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
               shellCommand = "sleep 3600")
           ))
       ))

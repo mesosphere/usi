@@ -1,5 +1,7 @@
 package com.mesosphere.usi.core.models
 
+import com.mesosphere.usi.core.models.resources.ResourceRequirement
+
 /**
   * Specification used to launch a [[PodSpec]]
   *
