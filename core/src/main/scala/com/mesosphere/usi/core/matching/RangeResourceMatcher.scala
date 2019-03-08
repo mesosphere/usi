@@ -81,8 +81,16 @@ object RangeResourceMatcher {
 
     // non-dynamic values
     val staticRequestedValues = rangeRequirment.requestedValues.collect { case ExactValue(v) => v }.toSet
-    val availableForDynamicAssignment: Iterator[Int] =
-      lazyRandomValuesFromRanges(offeredRanges, rangeRequirment.random).filter(v => !staticRequestedValues(v))
+    val availableForDynamicAssignment: Iterator[Int] = rangeRequirment.random match {
+      case Some(r) =>
+        lazyRandomValuesFromRanges(offeredRanges, r)
+          .filter(v => !staticRequestedValues(v))
+      case None =>
+        offeredRanges
+          .map(_.iterator)
+          .foldLeft(Iterator[Int]())(_ ++ _)
+          .filter(v => !staticRequestedValues(v))
+    }
 
     val matchResult = rangeRequirment.requestedValues.map {
       case RandomValue if !availableForDynamicAssignment.hasNext =>

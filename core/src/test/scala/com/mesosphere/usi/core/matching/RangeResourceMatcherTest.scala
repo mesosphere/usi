@@ -84,16 +84,16 @@ class RangeResourceMatcherTest extends UnitTestLike {
     }
 
     "select the ports in random ranges" in {
-      val requirement1 = RangeRequirement.ports(Seq(0), new util.Random(0))
+      val requirement1 = RangeRequirement.ports(Seq(0), Some(new util.Random(0)))
       val match1 = RangeResourceMatcher.matchAndConsume(requirement1, Seq(resourceWithPortRange(Range(2000, 2400))))
-      val requirement2 = RangeRequirement.ports(Seq(0), new util.Random(0))
+      val requirement2 = RangeRequirement.ports(Seq(0), Some(new util.Random(0)))
       val match2 = RangeResourceMatcher.matchAndConsume(requirement2, Seq(resourceWithPortRange(Range(2000, 2400))))
 
       match1.get.matchedResources.head.getRanges.getRange(0) should be(
         match2.get.matchedResources.head.getRanges.getRange(0))
 
       val differentMatch = (1 to 100).find { seed =>
-        val requirement2DifferentSeed = RangeRequirement.ports(Seq(0), new util.Random(seed))
+        val requirement2DifferentSeed = RangeRequirement.ports(Seq(0), Some(new util.Random(seed)))
         val match3 =
           RangeResourceMatcher.matchAndConsume(requirement2DifferentSeed, Seq(resourceWithPortRange(Range(2000, 2400))))
         match1.get.matchedResources.head.getRanges.getRange(0).getBegin == match3.get.matchedResources.head.getRanges
@@ -104,6 +104,17 @@ class RangeResourceMatcherTest extends UnitTestLike {
       }
 
       differentMatch.isDefined should be(true) withClue "Expecting ports to be selected at random"
+    }
+
+    "not select ports random when random not provided" in {
+      val requirement = RangeRequirement.ports(Seq(0), None)
+      val alwaysSameMatch = (1 to 10).find { _ =>
+        val matchResource = RangeResourceMatcher.matchAndConsume(requirement, Seq(resourceWithPortRange(Range(2000, 2400))))
+        matchResource.get.matchedResources.head.getRanges.getRange(0).getBegin != 2000 ||
+          matchResource.get.matchedResources.head.getRanges.getRange(0).getEnd != 2000
+      }
+
+      alwaysSameMatch.isEmpty should be(true) withClue "when no random shuffling is requested, selected port should always be the same"
     }
   }
 
