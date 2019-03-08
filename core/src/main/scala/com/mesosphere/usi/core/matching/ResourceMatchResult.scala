@@ -1,4 +1,4 @@
-package com.mesosphere.usi.core.models
+package com.mesosphere.usi.core.matching
 
 import org.apache.mesos.v1.{Protos => Mesos}
 
