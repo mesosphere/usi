@@ -16,7 +16,7 @@ class MesosEventsLogicTest extends UnitTest {
 
   def podWith1Cpu256Mem(id: String = "mock-podId"): PodSpec =
     PodSpec(
-      PodId("mock-podId"),
+      PodId(id),
       Goal.Running,
       RunSpec(
         Seq(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
