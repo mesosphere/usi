@@ -28,7 +28,10 @@ sealed trait ResourceRequirement {
   * @param resourceType name of resource (e.g. ports)
   * @param random when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized
   */
-case class RangeRequirement(requestedValues: Seq[RequestedValue], resourceType: ResourceType, random: Option[Random] = Some(Random))
+case class RangeRequirement(
+    requestedValues: Seq[RequestedValue],
+    resourceType: ResourceType,
+    random: Option[Random] = Some(Random))
     extends ResourceRequirement {
   override def description: String = s"$resourceType:[${requestedValues.mkString(",")}]"
 }
