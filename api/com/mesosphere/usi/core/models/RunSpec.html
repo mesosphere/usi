@@ -149,6 +149,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.resources" visbl="pub" class="indented6 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="resources"></a><a id="resources:resources"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#resources" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="resources/index.html"><span class="name">resources</span></a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.mesosphere.usi.core.models">models</a></dd></dl></div>
     </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="class" href="AgentId.html" title="Unique identifier of a Mesos agent"></a>
@@ -227,18 +243,6 @@
                         <a href="ReservationStatusUpdated.html" title="">ReservationStatusUpdated</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="ResourceMatchResult.html" title=""></a>
-                        <a href="ResourceMatchResult.html" title="">ResourceMatchResult</a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
-                        <a class="trait" href="ResourceRequirement.html" title="Used for resource matching."></a>
-                        <a href="ResourceRequirement.html" title="Used for resource matching.">ResourceRequirement</a>
-                      </li><li class="current-entities indented5">
-                        <a class="object" href="ResourceType$.html" title=""></a>
-                        <a class="trait" href="ResourceType.html" title=""></a>
-                        <a href="ResourceType.html" title="">ResourceType</a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
                         <a class="class" href="" title="Specification used to launch a PodSpec"></a>
                         <a href="" title="Specification used to launch a PodSpec">RunSpec</a>
                       </li><li class="current-entities indented5">
@@ -292,7 +296,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">RunSpec</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">RunSpec</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -350,9 +354,9 @@ TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.core.models.RunSpec#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.ResourceRequirement],shellCommand:String):com.mesosphere.usi.core.models.RunSpec"></a><a id="&lt;init&gt;:RunSpec"></a>
+      <a id="&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement],shellCommand:String):com.mesosphere.usi.core.models.RunSpec"></a><a id="&lt;init&gt;:RunSpec"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.ResourceRequirement],shellCommand:String):com.mesosphere.usi.core.models.RunSpec" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement],shellCommand:String):com.mesosphere.usi.core.models.RunSpec" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -361,7 +365,7 @@ TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">RunSpec</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
+        <span class="name">RunSpec</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
       </span>
       
       
@@ -577,9 +581,9 @@ TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
               
         </dd></dl></div>
     </li><li name="com.mesosphere.usi.core.models.RunSpec#resourceRequirements" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="resourceRequirements:Seq[com.mesosphere.usi.core.models.ResourceRequirement]"></a><a id="resourceRequirements:Seq[ResourceRequirement]"></a>
+      <a id="resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement]"></a><a id="resourceRequirements:Seq[ResourceRequirement]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#resourceRequirements:Seq[com.mesosphere.usi.core.models.ResourceRequirement]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -588,7 +592,7 @@ TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">resourceRequirements</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.ResourceRequirement">ResourceRequirement</a>]</span>
+        <span class="name">resourceRequirements</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>
       </span>
       
       

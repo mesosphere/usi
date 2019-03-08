@@ -167,28 +167,24 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
     </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="ExactValue.html" title=""></a>
-                        <a href="ExactValue.html" title="">ExactValue</a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
                         <a class="class" href="MesosRange.html" title=""></a>
                         <a href="MesosRange.html" title="">MesosRange</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="object" href="RandomValue$.html" title=""></a>
-                        <a href="RandomValue$.html" title="">RandomValue</a>
-                      </li><li class="current-entities indented5">
-                        <a class="object" href="RangeResource$.html" title=""></a>
-                        <a class="class" href="RangeResource.html" title="Represents requirement for Mesos resource of type Range."></a>
-                        <a href="RangeResource.html" title="Represents requirement for Mesos resource of type Range.">RangeResource</a>
+                        <a class="object" href="RangeResourceMatcher$.html" title=""></a>
+                        <a href="RangeResourceMatcher$.html" title="">RangeResourceMatcher</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="trait" href="RequestedValue.html" title=""></a>
-                        <a href="RequestedValue.html" title="">RequestedValue</a>
+                        <a class="class" href="ResourceMatchResult.html" title=""></a>
+                        <a href="ResourceMatchResult.html" title="">ResourceMatchResult</a>
                       </li><li class="current-entities indented5">
-                        <a class="object" href="ScalarResource$.html" title=""></a>
-                        <a class="class" href="ScalarResource.html" title=""></a>
-                        <a href="ScalarResource.html" title="">ScalarResource</a>
+                        <span class="separator"></span>
+                        <a class="object" href="ResourceMatcher$.html" title=""></a>
+                        <a href="ResourceMatcher$.html" title="">ResourceMatcher</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="object" href="ScalarResourceMatcher$.html" title=""></a>
+                        <a href="ScalarResourceMatcher$.html" title="">ScalarResourceMatcher</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="trait" href="ValueMatchResult.html" title=""></a>
@@ -280,23 +276,7 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.mesosphere.usi.core.matching.ExactValue" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ExactValueextendsRequestedValuewithProductwithSerializable"></a><a id="ExactValue:ExactValue"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/index.html#ExactValueextendsRequestedValuewithProductwithSerializable" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="ExactValue.html"><span class="name">ExactValue</span></a><span class="params">(<span name="value">value: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <a href="RequestedValue.html" class="extype" name="com.mesosphere.usi.core.matching.RequestedValue">RequestedValue</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.matching.MesosRange" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+              <ol><li name="com.mesosphere.usi.core.matching.MesosRange" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="MesosRangeextendsProductwithSerializable"></a><a id="MesosRange:MesosRange"></a>
       <span class="permalink">
       <a href="../../../../../com/mesosphere/usi/core/matching/index.html#MesosRangeextendsProductwithSerializable" title="Permalink">
@@ -312,10 +292,10 @@
       </span>
       
       
-    </li><li name="com.mesosphere.usi.core.matching.RangeResource" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="RangeResourceextendsResourceRequirementwithProductwithSerializable"></a><a id="RangeResource:RangeResource"></a>
+    </li><li name="com.mesosphere.usi.core.matching.ResourceMatchResult" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ResourceMatchResultextendsProductwithSerializable"></a><a id="ResourceMatchResult:ResourceMatchResult"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/index.html#RangeResourceextendsResourceRequirementwithProductwithSerializable" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/index.html#ResourceMatchResultextendsProductwithSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -324,42 +304,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Represents requirement for Mesos resource of type Range." href="RangeResource.html"><span class="name">RangeResource</span></a><span class="params">(<span name="requestedValues">requestedValues: <span class="extype" name="scala.Seq">Seq</span>[<a href="RequestedValue.html" class="extype" name="com.mesosphere.usi.core.matching.RequestedValue">RequestedValue</a>]</span>, <span name="resourceType">resourceType: <a href="../models/ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.ResourceType">ResourceType</a></span>, <span name="random">random: <span class="extype" name="scala.util.Random">Random</span> = <span class="symbol">Random</span></span>)</span><span class="result"> extends <a href="../models/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.ResourceRequirement">ResourceRequirement</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Represents requirement for Mesos resource of type Range.</p><div class="fullcomment"><div class="comment cmt"><p>Represents requirement for Mesos resource of type Range. http://mesos.apache.org/documentation/attributes-resources/</p><p>You can either request static values (by providing concrete value) or dynamic values (by providing 0).
-Dynamic values are then selected from the offered ranges. If random implementation is passed in, these ranges are randomized.
-For more information about randomization see <span class="extype" name="lazyRandomValuesFromRanges()">lazyRandomValuesFromRanges()</span>
-</p></div><dl class="paramcmts block"><dt class="param">requestedValues</dt><dd class="cmt"><p>values pod wants to consume on the given ranges</p></dd><dt class="param">resourceType</dt><dd class="cmt"><p>name of resource (e.g. ports)</p></dd><dt class="param">random</dt><dd class="cmt"><p>when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized</p></dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.matching.RequestedValue" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="RequestedValueextendsAnyRef"></a><a id="RequestedValue:RequestedValue"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/index.html#RequestedValueextendsAnyRef" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">sealed </span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="RequestedValue.html"><span class="name">RequestedValue</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.matching.ScalarResource" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ScalarResourceextendsResourceRequirementwithProductwithSerializable"></a><a id="ScalarResource:ScalarResource"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/index.html#ScalarResourceextendsResourceRequirementwithProductwithSerializable" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="ScalarResource.html"><span class="name">ScalarResource</span></a><span class="params">(<span name="resourceType">resourceType: <a href="../models/ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.ResourceType">ResourceType</a></span>, <span name="amount">amount: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result"> extends <a href="../models/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.ResourceRequirement">ResourceRequirement</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="" href="ResourceMatchResult.html"><span class="name">ResourceMatchResult</span></a><span class="params">(<span name="matchedResources">matchedResources: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="org.apache.mesos.v1.Protos.Resource">Resource</span>]</span>, <span name="remainingResource">remainingResource: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="org.apache.mesos.v1.Protos.Resource">Resource</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
@@ -403,10 +348,10 @@ For more information about randomization see <span class="extype" name="lazyRand
         <div class="values members">
               <h3>Value Members</h3>
               <ol>
-                <li name="com.mesosphere.usi.core.matching.RandomValue" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="RandomValue"></a><a id="RandomValue:RandomValue"></a>
+                <li name="com.mesosphere.usi.core.matching.RangeResourceMatcher" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RangeResourceMatcher"></a><a id="RangeResourceMatcher:RangeResourceMatcher"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/index.html#RandomValue" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/index.html#RangeResourceMatcher" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -415,14 +360,14 @@ For more information about randomization see <span class="extype" name="lazyRand
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a title="" href="RandomValue$.html"><span class="name">RandomValue</span></a><span class="result"> extends <a href="RequestedValue.html" class="extype" name="com.mesosphere.usi.core.matching.RequestedValue">RequestedValue</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="" href="RangeResourceMatcher$.html"><span class="name">RangeResourceMatcher</span></a>
       </span>
       
       
-    </li><li name="com.mesosphere.usi.core.matching.RangeResource" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="RangeResource"></a><a id="RangeResource:RangeResource"></a>
+    </li><li name="com.mesosphere.usi.core.matching.ResourceMatcher" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ResourceMatcher"></a><a id="ResourceMatcher:ResourceMatcher"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/index.html#RangeResource" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/index.html#ResourceMatcher" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -431,14 +376,14 @@ For more information about randomization see <span class="extype" name="lazyRand
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a title="" href="RangeResource$.html"><span class="name">RangeResource</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="" href="ResourceMatcher$.html"><span class="name">ResourceMatcher</span></a>
       </span>
       
       
-    </li><li name="com.mesosphere.usi.core.matching.ScalarResource" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ScalarResource"></a><a id="ScalarResource:ScalarResource"></a>
+    </li><li name="com.mesosphere.usi.core.matching.ScalarResourceMatcher" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ScalarResourceMatcher"></a><a id="ScalarResourceMatcher:ScalarResourceMatcher"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/index.html#ScalarResource" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/index.html#ScalarResourceMatcher" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -447,7 +392,7 @@ For more information about randomization see <span class="extype" name="lazyRand
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a title="" href="ScalarResource$.html"><span class="name">ScalarResource</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="" href="ScalarResourceMatcher$.html"><span class="name">ScalarResourceMatcher</span></a>
       </span>
       
       
