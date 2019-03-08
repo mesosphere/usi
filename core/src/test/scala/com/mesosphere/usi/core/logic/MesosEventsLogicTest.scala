@@ -14,13 +14,14 @@ class MesosEventsLogicTest extends UnitTest {
 
   private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId))
 
-  val podWith1Cpu256Mem: PodSpec = PodSpec(
-    PodId("mock-podId"),
-    Goal.Running,
-    RunSpec(
-      List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
-      shellCommand = "sleep 3600")
-  )
+  def podWith1Cpu256Mem(id: String = "mock-podId"): PodSpec =
+    PodSpec(
+      PodId("mock-podId"),
+      Goal.Running,
+      RunSpec(
+        Seq(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
+        shellCommand = "sleep 3600")
+    ).get
 
   "MesosEventsLogic" should {
     "decline an offer when there is no PodSpec to launch" in {
@@ -40,10 +41,12 @@ class MesosEventsLogicTest extends UnitTest {
       val (_, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
         insufficientOffer,
         Seq(
-          podWith1Cpu256Mem.copy(
-            runSpec = podWith1Cpu256Mem.runSpec.copy(
-              resourceRequirements = Seq(ScalarRequirement(ResourceType.CPUS, Integer.MAX_VALUE))
-            )))
+          PodSpec(
+            PodId("mock-podId"),
+            Goal.Running,
+            RunSpec(Seq(ScalarRequirement(ResourceType.CPUS, Integer.MAX_VALUE)), shellCommand = "sleep 3600")
+          ).get
+        )
       )
       schedulerEventsBuilder.result.mesosCalls.size shouldBe 1
       val declines = schedulerEventsBuilder.result.mesosCalls.head.getDecline.getOfferIdsList
@@ -56,11 +59,11 @@ class MesosEventsLogicTest extends UnitTest {
       val (matchedPodIds, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
         offerFor4Pods,
         Seq(
-          podWith1Cpu256Mem.copy(id = PodId("podid-1")),
-          podWith1Cpu256Mem.copy(id = PodId("podid-2")),
-          podWith1Cpu256Mem.copy(id = PodId("podid-3")),
-          podWith1Cpu256Mem.copy(id = PodId("podid-4")),
-          podWith1Cpu256Mem.copy(id = PodId("podid-5")),
+          podWith1Cpu256Mem("podid-1"),
+          podWith1Cpu256Mem("podid-2"),
+          podWith1Cpu256Mem("podid-3"),
+          podWith1Cpu256Mem("podid-4"),
+          podWith1Cpu256Mem("podid-5"),
         )
       )
       schedulerEventsBuilder.result.mesosCalls.size shouldBe 1
@@ -73,9 +76,10 @@ class MesosEventsLogicTest extends UnitTest {
     "acknowledge status updates for new pods (first task update)" in {
       import com.mesosphere.usi.core.protos.ProtoBuilders._
 
-      val taskId = newTaskId(podWith1Cpu256Mem.id.value)
+      val pod = podWith1Cpu256Mem()
+      val taskId = newTaskId(pod.id.value)
       val taskUpdate = newTaskUpdateEvent(taskStatus(taskId))
-      val specs = SpecState(Map(podWith1Cpu256Mem.id -> podWith1Cpu256Mem))
+      val specs = SpecState(Map(pod.id -> pod))
 
       val events = mesosEventLogic.processEvent(specs, SchedulerState.empty, Set.empty)(taskUpdate)
 
@@ -94,14 +98,15 @@ class MesosEventsLogicTest extends UnitTest {
     "acknowledge status updates for old pods (new task update)" in {
       import com.mesosphere.usi.core.protos.ProtoBuilders._
 
-      val taskId = newTaskId(podWith1Cpu256Mem.id.value)
+      val pod = podWith1Cpu256Mem()
+      val taskId = newTaskId(pod.id.value)
       val taskUpdate = newTaskUpdateEvent(taskStatus(taskId))
-      val specs = SpecState(Map(podWith1Cpu256Mem.id -> podWith1Cpu256Mem))
+      val specs = SpecState(Map(pod.id -> pod))
       val podStatus = Map(
-        podWith1Cpu256Mem.id -> PodStatus(
-          podWith1Cpu256Mem.id,
+        pod.id -> PodStatus(
+          pod.id,
           Map(
-            TaskId(podWith1Cpu256Mem.id.value) -> taskUpdate.getUpdate.getStatus
+            TaskId(pod.id.value) -> taskUpdate.getUpdate.getStatus
           )))
 
       val events = mesosEventLogic.processEvent(
@@ -125,14 +130,15 @@ class MesosEventsLogicTest extends UnitTest {
     "do not ACK status update when no UUID is set" in {
       import com.mesosphere.usi.core.protos.ProtoBuilders._
 
-      val taskId = newTaskId(podWith1Cpu256Mem.id.value)
+      val pod = podWith1Cpu256Mem()
+      val taskId = newTaskId(pod.id.value)
       val taskUpdateWithoutUuid = newTaskUpdateEvent(taskStatus(taskId, uuid = null))
-      val specs = SpecState(Map(podWith1Cpu256Mem.id -> podWith1Cpu256Mem))
+      val specs = SpecState(Map(pod.id -> pod))
       val podStatus = Map(
-        podWith1Cpu256Mem.id -> PodStatus(
-          podWith1Cpu256Mem.id,
+        pod.id -> PodStatus(
+          pod.id,
           Map(
-            TaskId(podWith1Cpu256Mem.id.value) -> taskUpdateWithoutUuid.getUpdate.getStatus
+            TaskId(pod.id.value) -> taskUpdateWithoutUuid.getUpdate.getStatus
           )))
 
       val events = mesosEventLogic.processEvent(

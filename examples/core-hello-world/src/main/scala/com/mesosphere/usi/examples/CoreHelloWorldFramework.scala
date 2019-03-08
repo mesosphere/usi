@@ -29,6 +29,7 @@ import org.apache.mesos.v1.Protos.{FrameworkInfo, TaskState, TaskStatus}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.sys.SystemProperties
+import scala.util.{Failure, Success}
 
 /**
   * Run the hello-world example framework that:
@@ -106,7 +107,10 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
     id = podId,
     goal = Goal.Running,
     runSpec = runSpec
-  )
+  ) match {
+    case Success(value) => value
+    case Failure(exception) => throw exception
+  }
 
   val specsSnapshot = SpecsSnapshot(
     podSpecs = Seq(podSpec),
