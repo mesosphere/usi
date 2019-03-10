@@ -66,11 +66,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
                 // we use sanitized podId as the task name for now
                 name = podSpec.id.value.replaceAll("[^a-zA-Z0-9-]", ""),
                 agentId = offer.getAgentId,
-                command = Mesos.CommandInfo
-                  .newBuilder()
-                  .setShell(true)
-                  .setValue(podSpec.runSpec.shellCommand)
-                  .build,
+                command = newCommandInfo(podSpec.runSpec.shellCommand, podSpec.runSpec.fetch),
                 resources = matchedResources
               )
             }(collection.breakOut)
