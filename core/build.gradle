@@ -1,5 +1,6 @@
 dependencies {
     compile project(':core-models')
     compile project(':mesos-client')
+
     testCompile project(':test-utils')
 }
