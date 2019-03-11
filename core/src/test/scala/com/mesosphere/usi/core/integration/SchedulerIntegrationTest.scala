@@ -60,7 +60,6 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     inside(output.pull().futureValue) {
       case Some(podRecord: PodRecordUpdated) =>
         podRecord.id shouldBe podId
-        println(s"agentId = ${podRecord.newRecord.get.agentId}")
     }
     eventually {
       inside(output.pull().futureValue) {
