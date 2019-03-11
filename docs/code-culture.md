@@ -144,7 +144,7 @@ Debugging distributed system is hard. To make this at least a bit easier we favo
 
 For introduction to structured logging read [this article](https://stackify.com/what-is-structured-logging-and-why-developers-need-it/).
 
-What should always be part of the logging message:
+All relevant ids should be part of the logging message e.g.:
 - pod ID ("podId")
 - mesos task ID ("taskId")
 - mesos offer ID ("offerId")
