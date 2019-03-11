@@ -161,6 +161,6 @@ Example of good framework log messages (a little bit simplified) can look like e
   "level": "INFO",
   "podId": "my-pod",
   "taskId": "mesos-task-my-pod-1",
-  "message": "Pod 'my-pod' was killed"
+  "message": "Task $taskId of Pod $podId was killed"
 }
 ```
