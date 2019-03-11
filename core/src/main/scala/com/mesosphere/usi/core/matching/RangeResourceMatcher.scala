@@ -1,7 +1,14 @@
 package com.mesosphere.usi.core.matching
 
 import com.mesosphere.usi.core.ResourceUtil
-import com.mesosphere.usi.core.models.resources.{ExactValue, RandomValue, RangeRequirement, ResourceType}
+import com.mesosphere.usi.core.models.resources.{
+  ExactValue,
+  OrderedSelection,
+  RandomSelection,
+  RandomValue,
+  RangeRequirement,
+  ResourceType
+}
 import com.mesosphere.usi.core.protos.ProtoBuilders
 import org.apache.mesos.v1.Protos
 
@@ -81,15 +88,14 @@ object RangeResourceMatcher {
 
     // non-dynamic values
     val staticRequestedValues = rangeRequirment.requestedValues.collect { case ExactValue(v) => v }.toSet
-    val availableForDynamicAssignment: Iterator[Int] = rangeRequirment.random match {
-      case Some(r) =>
+    val availableForDynamicAssignment: Iterator[Int] = rangeRequirment.valueSelectionPolicy match {
+      case RandomSelection(r) =>
         lazyRandomValuesFromRanges(offeredRanges, r)
           .filter(v => !staticRequestedValues(v))
-      case None =>
-        offeredRanges
-          .map(_.iterator)
-          .foldLeft(Iterator[Int]())(_ ++ _)
-          .filter(v => !staticRequestedValues(v))
+      case OrderedSelection =>
+        offeredRanges.iterator
+          .flatMap(_.iterator)
+          .filterNot(staticRequestedValues)
     }
 
     val matchResult = rangeRequirment.requestedValues.map {
