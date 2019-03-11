@@ -27,7 +27,6 @@ Prefer:
 * Explicit conversion over implicit
 * Explicit passing over implicit
 
-
 For our case, if implicits don't help improve the design of code, we don't use them. We avoid implicit conversions. We also avoid multi-priority implicits. When type classes help improve the design of code, we use implicits for type classes (IE serialization logic).
 
 We prefer implicits to be used for contextual values such as execution contexts or the actor system. However, we prefer to be conservative, and pass the value explicitly for things like validators, authenticators, and normalizers.
@@ -38,7 +37,7 @@ If you are writing some function chain that has multiple levels of inferred func
 
 Prefer:
 
-```
+```scala
 groups.map { group: Group =>
   group.apps
     .groupBy(_.container.image)
@@ -50,7 +49,7 @@ groups.map { group: Group =>
 
 Over:
 
-```
+```scala
 groups.map { group =>
   group.apps.groupBy(_.container.image).map { case(k, v) =>
     k -> v.length
@@ -70,7 +69,7 @@ We prefer, almost always, that imports go at the top of the file. Additionally, 
 
 Prefer:
 
-```
+```scala
 import org.company.{
   Stringifier,
   Demuxer
@@ -79,7 +78,7 @@ import org.company.{
 
 Over:
 
-```
+```scala
 import org.company._
 ```
 
@@ -114,7 +113,7 @@ It is better to do nothing, than to do the wrong thing.
 
 One of my favorite non-examples of this is found in PHP 5:
 
-```
+```bash
 $ echo '<? print(strftime("%Y-%m-%d",strtotime("lol"))) ?>' | php
 1970-01-01
 ```
@@ -145,9 +144,10 @@ Debugging distributed system is hard. To make this at least a bit easier we favo
 For introduction to structured logging read [this article](https://stackify.com/what-is-structured-logging-and-why-developers-need-it/).
 
 All relevant ids should be part of the logging message e.g.:
-- pod ID ("podId")
-- mesos task ID ("taskId")
-- mesos offer ID ("offerId")
+
+* pod ID ("podId")
+* mesos task ID ("taskId")
+* mesos offer ID ("offerId")
 
 It's important to keep the naming of keys consistent so that one can use them for log pre-selection.
 
@@ -164,3 +164,66 @@ Example of good framework log messages (a little bit simplified) can look like e
   "message": "Task $taskId of Pod $podId was killed"
 }
 ```
+
+## Testing
+
+Tests are executable documentation and should be **written, read and maintained** as such. A test tells it's reader a short story about how some part of the system should behave given a certain input. Hundreeds of excelent books and articles are dedicated to writing proper tests so we'll try to avoid repeating them here.
+
+### On Libraries and Styles
+
+We heavily utilize [ScalaTest](http://www.scalatest.org/) as our primary test library. When it comes to the test style we prefer [WordSpec](http://www.scalatest.org/at_a_glance/WordSpec)
+
+```scala
+  // Describe a scope for a subject, in this case: "A Set"
+  "A Set" can { // All tests within these curly braces are about "A Set"
+
+    // Can describe nested scopes that "narrow" its outer scopes
+    "empty" should { // All tests within these curly braces are about "A Set (when empty)"
+
+      "have size 0" in {    // Here, 'it' refers to "A Set (when empty)". The full name
+        Set.empty.size shouldBe 0 // of this test is: "A Set (when empty) should have size 0"
+      }
+      ...
+```
+
+combined with [Given, When, And Then](http://www.scalatest.org/getting_started_with_feature_spec) and scala [matchers](http://www.scalatest.org/user_guide/using_matchers):
+
+```scala
+  "A mutable Set" should "allow an element to be added" in {
+    Given("an empty mutable Set")
+    val set = mutable.Set.empty[String]
+
+    When("an element is added")
+    set += "clarity"
+
+    Then("the Set should have size 1")
+    set.size shouldBe 1
+
+    And("the Set should contain the added element")
+    set should contain theSameElementsAs Set("clarity")
+  }
+```
+
+which give us an opportunity to write a test as a short story documenting part of the system behaviour.
+
+### On Testing Granularity
+
+In USI we define following granularity levels:
+
+* **Unit tests**: the lowest test level possible. Unit test are cheap, can be run fast and give the developer an immediate feedback on when something is obviously broken
+* **Integration tests**: an integration test starts a minimal Mesos cluster consisting of Mesos master, Mesos agent, in-memory Zookeeper server and a framework. These are more expensive tests that typically require more resources and time to run. Tests that require back and forth communication with Mesos are best placed here because we don't want to mock Mesos responses.
+* **System integraiton test**: here we start a full-blown DC/OS cluster testing all aspects of framework interacting with the DC/OS ecosystem. These are the most expensive tests (in terms of time and money) that would typically reqire a DC/OS cluster running on e.g. AWS utilizing multiple EC2 nodes, volumes, ELB etc. A system integration test would typically cover some coarse-grained USI feature or a feature that relies on other DC/OS components like the secret store.
+
+**As a rule of thumb a broken behavior should fail at the lowest possible level**. Most features will be covered on more than one level but the coverage is different. Let's consider support for [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) as an example. The Mesos fetcher is a mechanism to download resources into the sandbox directory of a task in preparation of running the task. So how do the tests look like?
+
+* **Unit test**: makes sure that given a `PodSpec` with a defined fetch URI it is converted to a Mesos protobuf message, where correspoding [URI](https://github.com/apache/mesos/blob/master/include/mesos/mesos.proto#L658) fields are initialized properly
+* **Integration test**: makes sure that when a task from a `PodSpec` is started, the fetched artifact is actually part of it's sandbox
+* **System integration test**: this is a tricky one - do we need full DC/OS cluster to test this? How is this different from the integration test from the fetchers perspective? The simple answer is - it's not and an integration test might be sufficient enough
+
+However consider following aspects (which are all taken from prior experience building Mesos frameworks):
+
+* while an integration test usually starts a some stable Mesos version that USI officially depends on, DC/OS frequently integrates latest Mesos changes into its master branch. Testing a framework against the latest DC/OS master might expose a bug sooner rather then later
+* an integration test runs against a local Mesos cluster where communication is typically fast and reliable. A system integration test runs against a cluster somewhere in the cloud and has different communications profile. In the past we saw bugs that would only manifest themselves in the later case but not in the former. Admited, it seems unlikely that such a bug is triggered in the Mesos fetcher but we've seen unlikely things happen before
+* even a simple request to the framework running on a DC/OS cluster touches many components on it's way e.g. ELB, Admin Router, Monitoring service which themselves rely on other components (e.g. Admin Router relies on the CockroachDB) so there is always potential for things to go wrong
+
+It makes sense to have a system integration test for every user facing coarse-grained API feature including the example above.
