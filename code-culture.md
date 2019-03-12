@@ -12,6 +12,7 @@ Our defaults are:
 * Fail loud and proud
 * Let it crash
 * Don't panic
+* Structured logging
 
 ## Code is Legible on GitHub
 
@@ -136,3 +137,30 @@ For example:
 
 * A validation function should return validation errors, not throw them.
 * A storage module will throw an exception if a connection is unavailable.
+
+## Structured logging
+
+Debugging distributed system is hard. To make this at least a bit easier we favor log messages including logging context (using structured logging). Core USI is providing all necessary tooling for framework developer to log in structured way.
+
+For introduction to structured logging read [this article](https://stackify.com/what-is-structured-logging-and-why-developers-need-it/).
+
+All relevant ids should be part of the logging message e.g.:
+- pod ID ("podId")
+- mesos task ID ("taskId")
+- mesos offer ID ("offerId")
+
+It's important to keep the naming of keys consistent so that one can use them for log pre-selection.
+
+Even though structured logging is strongly recommended to every framework developer, including context into the final log message is always optional. We should aim for keeping our messages meaningful even without the context provided (it's ok to duplicate e.g. podId both in messaage and context).
+
+Example of good framework log messages (a little bit simplified) can look like example below:
+
+```json
+{
+  "time": "1.1.1970",
+  "level": "INFO",
+  "podId": "my-pod",
+  "taskId": "mesos-task-my-pod-1",
+  "message": "Task $taskId of Pod $podId was killed"
+}
+```

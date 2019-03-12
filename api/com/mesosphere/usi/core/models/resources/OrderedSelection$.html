@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1 API  - com.mesosphere.usi.core.models.resources.RangeRequirement</title>
-          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.models.resources.RangeRequirement" />
-          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.models.resources.RangeRequirement" />
+          <title>usi 0.1 API  - com.mesosphere.usi.core.models.resources.OrderedSelection</title>
+          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.models.resources.OrderedSelection" />
+          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.models.resources.OrderedSelection" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -171,8 +171,8 @@
                         <a href="ExactValue.html" title="">ExactValue</a>
                       </li><li class="current-entities indented6">
                         <span class="separator"></span>
-                        <a class="object" href="OrderedSelection$.html" title=""></a>
-                        <a href="OrderedSelection$.html" title="">OrderedSelection</a>
+                        <a class="object" href="" title=""></a>
+                        <a href="" title="">OrderedSelection</a>
                       </li><li class="current-entities indented6">
                         <span class="separator"></span>
                         <a class="class" href="RandomSelection.html" title=""></a>
@@ -183,8 +183,8 @@
                         <a href="RandomValue$.html" title="">RandomValue</a>
                       </li><li class="current-entities indented6">
                         <a class="object" href="RangeRequirement$.html" title=""></a>
-                        <a class="class" href="" title="Represents requirement for Mesos resource of type Range."></a>
-                        <a href="" title="Represents requirement for Mesos resource of type Range.">RangeRequirement</a>
+                        <a class="class" href="RangeRequirement.html" title="Represents requirement for Mesos resource of type Range."></a>
+                        <a href="RangeRequirement.html" title="Represents requirement for Mesos resource of type Range.">RangeRequirement</a>
                       </li><li class="current-entities indented6">
                         <span class="separator"></span>
                         <a class="trait" href="RequestedValue.html" title=""></a>
@@ -210,38 +210,34 @@
             </div>
           </div>
           <div id="content">
-            <body class="class type">
+            <body class="object value">
       <div id="definition">
-        <a href="RangeRequirement$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
+        <div class="big-circle object">o</div>
         <p id="owner"><a href="../../../../../index.html" class="extype" name="com">com</a>.<a href="../../../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../../../index.html" class="extype" name="com.mesosphere.usi">usi</a>.<a href="../../index.html" class="extype" name="com.mesosphere.usi.core">core</a>.<a href="../index.html" class="extype" name="com.mesosphere.usi.core.models">models</a>.<a href="index.html" class="extype" name="com.mesosphere.usi.core.models.resources">resources</a></p>
-        <h1><a href="RangeRequirement$.html" title="See companion object">RangeRequirement</a><span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html" title="Permalink">
+        <h1>OrderedSelection<span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"><div>
-            Companion <a href="RangeRequirement$.html" title="See companion object">object RangeRequirement</a>
-          </div></span></h3>
+        <h3><span class="morelinks"></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">case class</span>
+        <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">RangeRequirement</span><span class="params">(<span name="requestedValues">requestedValues: <span class="extype" name="scala.Seq">Seq</span>[<a href="RequestedValue.html" class="extype" name="com.mesosphere.usi.core.models.resources.RequestedValue">RequestedValue</a>]</span>, <span name="resourceType">resourceType: <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceType">ResourceType</a></span>, <span name="valueSelectionPolicy">valueSelectionPolicy: <a href="ValueSelectionPolicy.html" class="extype" name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy">ValueSelectionPolicy</a> = <span class="symbol">RandomSelection(Random)</span></span>)</span><span class="result"> extends <a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">OrderedSelection</span><span class="result"> extends <a href="ValueSelectionPolicy.html" class="extype" name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy">ValueSelectionPolicy</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Represents requirement for Mesos resource of type Range. http://mesos.apache.org/documentation/attributes-resources/</p><p>You can either request static values (by providing concrete value) or dynamic values (by providing 0).
-Dynamic values are then selected from the offered ranges. If random implementation is passed in, these ranges are randomized.
-</p></div><dl class="paramcmts block"><dt class="param">requestedValues</dt><dd class="cmt"><p>values pod wants to consume on the given ranges</p></dd><dt class="param">resourceType</dt><dd class="cmt"><p>name of resource (e.g. ports)</p></dd><dt class="param">valueSelectionPolicy</dt><dd class="cmt"><p>when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized</p></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="ValueSelectionPolicy.html" class="extype" name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy">ValueSelectionPolicy</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -267,7 +263,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.usi.core.models.resources.RangeRequirement"><span>RangeRequirement</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="com.mesosphere.usi.core.models.resources.ResourceRequirement"><span>ResourceRequirement</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.usi.core.models.resources.OrderedSelection"><span>OrderedSelection</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy"><span>ValueSelectionPolicy</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -285,26 +281,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
 
       <div id="template">
         <div id="allMembers">
-        <div id="constructors" class="members">
-              <h3>Instance Constructors</h3>
-              <ol><li name="com.mesosphere.usi.core.models.resources.RangeRequirement#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(requestedValues:Seq[com.mesosphere.usi.core.models.resources.RequestedValue],resourceType:com.mesosphere.usi.core.models.resources.ResourceType,valueSelectionPolicy:com.mesosphere.usi.core.models.resources.ValueSelectionPolicy):com.mesosphere.usi.core.models.resources.RangeRequirement"></a><a id="&lt;init&gt;:RangeRequirement"></a>
-      <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#&lt;init&gt;(requestedValues:Seq[com.mesosphere.usi.core.models.resources.RequestedValue],resourceType:com.mesosphere.usi.core.models.resources.ResourceType,valueSelectionPolicy:com.mesosphere.usi.core.models.resources.ValueSelectionPolicy):com.mesosphere.usi.core.models.resources.RangeRequirement" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">RangeRequirement</span><span class="params">(<span name="requestedValues">requestedValues: <span class="extype" name="scala.Seq">Seq</span>[<a href="RequestedValue.html" class="extype" name="com.mesosphere.usi.core.models.resources.RequestedValue">RequestedValue</a>]</span>, <span name="resourceType">resourceType: <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceType">ResourceType</a></span>, <span name="valueSelectionPolicy">valueSelectionPolicy: <a href="ValueSelectionPolicy.html" class="extype" name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy">ValueSelectionPolicy</a> = <span class="symbol">RandomSelection(Random)</span></span>)</span>
-      </span>
-      
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">requestedValues</dt><dd class="cmt"><p>values pod wants to consume on the given ranges</p></dd><dt class="param">resourceType</dt><dd class="cmt"><p>name of resource (e.g. ports)</p></dd><dt class="param">valueSelectionPolicy</dt><dd class="cmt"><p>when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized</p></dd></dl></div>
-    </li></ol>
-            </div>
+        
 
         
 
@@ -316,7 +293,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -332,7 +309,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html###():Int" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -348,7 +325,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -364,7 +341,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -380,7 +357,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#clone():Object" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -403,28 +380,10 @@ Dynamic values are then selected from the offered ranges. If random implementati
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.models.resources.RangeRequirement#description" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="description:String"></a>
-      <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#description:String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">description</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">A human readable description for this resource requirement
-</p><div class="fullcomment"><div class="comment cmt"><p>A human readable description for this resource requirement
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.usi.core.models.resources.RangeRequirement">RangeRequirement</a> → <a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -437,10 +396,26 @@ Dynamic values are then selected from the offered ranges. If random implementati
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#equals(x$1:Any):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -461,7 +436,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -477,7 +452,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -493,7 +468,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#notify():Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -514,7 +489,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -532,44 +507,10 @@ Dynamic values are then selected from the offered ranges. If random implementati
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.models.resources.RangeRequirement#requestedValues" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="requestedValues:Seq[com.mesosphere.usi.core.models.resources.RequestedValue]"></a><a id="requestedValues:Seq[RequestedValue]"></a>
-      <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#requestedValues:Seq[com.mesosphere.usi.core.models.resources.RequestedValue]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">requestedValues</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="RequestedValue.html" class="extype" name="com.mesosphere.usi.core.models.resources.RequestedValue">RequestedValue</a>]</span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.models.resources.RangeRequirement#resourceType" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="resourceType:com.mesosphere.usi.core.models.resources.ResourceType"></a><a id="resourceType:ResourceType"></a>
-      <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#resourceType:com.mesosphere.usi.core.models.resources.ResourceType" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">resourceType</span><span class="result">: <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceType">ResourceType</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">The ResourceType this requirement describes
-</p><div class="fullcomment"><div class="comment cmt"><p>The ResourceType this requirement describes
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.usi.core.models.resources.RangeRequirement">RangeRequirement</a> → <a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -582,26 +523,10 @@ Dynamic values are then selected from the offered ranges. If random implementati
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.models.resources.RangeRequirement#valueSelectionPolicy" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="valueSelectionPolicy:com.mesosphere.usi.core.models.resources.ValueSelectionPolicy"></a><a id="valueSelectionPolicy:ValueSelectionPolicy"></a>
-      <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#valueSelectionPolicy:com.mesosphere.usi.core.models.resources.ValueSelectionPolicy" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">valueSelectionPolicy</span><span class="result">: <a href="ValueSelectionPolicy.html" class="extype" name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy">ValueSelectionPolicy</a></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -623,7 +548,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -647,7 +572,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#wait():Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -677,7 +602,7 @@ Dynamic values are then selected from the offered ranges. If random implementati
               <ol><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/resources/RangeRequirement.html#finalize():Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/OrderedSelection$.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -713,8 +638,8 @@ Dynamic values are then selected from the offered ranges. If random implementati
               <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
             </div><div class="parent" name="scala.Equals">
               <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
-            </div><div class="parent" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">
-              <h3>Inherited from <a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a></h3>
+            </div><div class="parent" name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy">
+              <h3>Inherited from <a href="ValueSelectionPolicy.html" class="extype" name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy">ValueSelectionPolicy</a></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">

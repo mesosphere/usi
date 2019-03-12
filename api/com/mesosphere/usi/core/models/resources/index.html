@@ -171,6 +171,14 @@
                         <a href="ExactValue.html" title="">ExactValue</a>
                       </li><li class="current-entities indented6">
                         <span class="separator"></span>
+                        <a class="object" href="OrderedSelection$.html" title=""></a>
+                        <a href="OrderedSelection$.html" title="">OrderedSelection</a>
+                      </li><li class="current-entities indented6">
+                        <span class="separator"></span>
+                        <a class="class" href="RandomSelection.html" title=""></a>
+                        <a href="RandomSelection.html" title="">RandomSelection</a>
+                      </li><li class="current-entities indented6">
+                        <span class="separator"></span>
                         <a class="object" href="RandomValue$.html" title=""></a>
                         <a href="RandomValue$.html" title="">RandomValue</a>
                       </li><li class="current-entities indented6">
@@ -193,6 +201,10 @@
                         <a class="object" href="ScalarRequirement$.html" title=""></a>
                         <a class="class" href="ScalarRequirement.html" title=""></a>
                         <a href="ScalarRequirement.html" title="">ScalarRequirement</a>
+                      </li><li class="current-entities indented6">
+                        <span class="separator"></span>
+                        <a class="trait" href="ValueSelectionPolicy.html" title=""></a>
+                        <a href="ValueSelectionPolicy.html" title="">ValueSelectionPolicy</a>
                       </li>
               </ul>
             </div>
@@ -272,6 +284,22 @@
       </span>
       
       
+    </li><li name="com.mesosphere.usi.core.models.resources.RandomSelection" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RandomSelectionextendsValueSelectionPolicywithProductwithSerializable"></a><a id="RandomSelection:RandomSelection"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/index.html#RandomSelectionextendsValueSelectionPolicywithProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="RandomSelection.html"><span class="name">RandomSelection</span></a><span class="params">(<span name="randomGenerator">randomGenerator: <span class="extype" name="scala.util.Random">Random</span></span>)</span><span class="result"> extends <a href="ValueSelectionPolicy.html" class="extype" name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy">ValueSelectionPolicy</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
     </li><li name="com.mesosphere.usi.core.models.resources.RangeRequirement" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="RangeRequirementextendsResourceRequirementwithProductwithSerializable"></a><a id="RangeRequirement:RangeRequirement"></a>
       <span class="permalink">
@@ -284,12 +312,12 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Represents requirement for Mesos resource of type Range." href="RangeRequirement.html"><span class="name">RangeRequirement</span></a><span class="params">(<span name="requestedValues">requestedValues: <span class="extype" name="scala.Seq">Seq</span>[<a href="RequestedValue.html" class="extype" name="com.mesosphere.usi.core.models.resources.RequestedValue">RequestedValue</a>]</span>, <span name="resourceType">resourceType: <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceType">ResourceType</a></span>, <span name="random">random: <span class="extype" name="scala.util.Random">Random</span> = <span class="symbol">Random</span></span>)</span><span class="result"> extends <a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Represents requirement for Mesos resource of type Range." href="RangeRequirement.html"><span class="name">RangeRequirement</span></a><span class="params">(<span name="requestedValues">requestedValues: <span class="extype" name="scala.Seq">Seq</span>[<a href="RequestedValue.html" class="extype" name="com.mesosphere.usi.core.models.resources.RequestedValue">RequestedValue</a>]</span>, <span name="resourceType">resourceType: <a href="ResourceType.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceType">ResourceType</a></span>, <span name="valueSelectionPolicy">valueSelectionPolicy: <a href="ValueSelectionPolicy.html" class="extype" name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy">ValueSelectionPolicy</a> = <span class="symbol">RandomSelection(Random)</span></span>)</span><span class="result"> extends <a href="ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Represents requirement for Mesos resource of type Range.</p><div class="fullcomment"><div class="comment cmt"><p>Represents requirement for Mesos resource of type Range. http://mesos.apache.org/documentation/attributes-resources/</p><p>You can either request static values (by providing concrete value) or dynamic values (by providing 0).
 Dynamic values are then selected from the offered ranges. If random implementation is passed in, these ranges are randomized.
-</p></div><dl class="paramcmts block"><dt class="param">requestedValues</dt><dd class="cmt"><p>values pod wants to consume on the given ranges</p></dd><dt class="param">resourceType</dt><dd class="cmt"><p>name of resource (e.g. ports)</p></dd><dt class="param">random</dt><dd class="cmt"><p>when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized</p></dd></dl></div>
+</p></div><dl class="paramcmts block"><dt class="param">requestedValues</dt><dd class="cmt"><p>values pod wants to consume on the given ranges</p></dd><dt class="param">resourceType</dt><dd class="cmt"><p>name of resource (e.g. ports)</p></dd><dt class="param">valueSelectionPolicy</dt><dd class="cmt"><p>when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized</p></dd></dl></div>
     </li><li name="com.mesosphere.usi.core.models.resources.RequestedValue" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="RequestedValueextendsAnyRef"></a><a id="RequestedValue:RequestedValue"></a>
       <span class="permalink">
@@ -354,6 +382,22 @@ Dynamic values are then selected from the offered ranges. If random implementati
       </span>
       
       
+    </li><li name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ValueSelectionPolicyextendsAnyRef"></a><a id="ValueSelectionPolicy:ValueSelectionPolicy"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/index.html#ValueSelectionPolicyextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="ValueSelectionPolicy.html"><span class="name">ValueSelectionPolicy</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      
     </li></ol>
             </div>
 
@@ -362,7 +406,23 @@ Dynamic values are then selected from the offered ranges. If random implementati
         <div class="values members">
               <h3>Value Members</h3>
               <ol>
-                <li name="com.mesosphere.usi.core.models.resources.RandomValue" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+                <li name="com.mesosphere.usi.core.models.resources.OrderedSelection" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="OrderedSelection"></a><a id="OrderedSelection:OrderedSelection"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/resources/index.html#OrderedSelection" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="OrderedSelection$.html"><span class="name">OrderedSelection</span></a><span class="result"> extends <a href="ValueSelectionPolicy.html" class="extype" name="com.mesosphere.usi.core.models.resources.ValueSelectionPolicy">ValueSelectionPolicy</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.resources.RandomValue" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="RandomValue"></a><a id="RandomValue:RandomValue"></a>
       <span class="permalink">
       <a href="../../../../../../com/mesosphere/usi/core/models/resources/index.html#RandomValue" title="Permalink">
