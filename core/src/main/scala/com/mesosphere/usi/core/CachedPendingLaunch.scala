@@ -1,7 +1,10 @@
 package com.mesosphere.usi.core
 import com.mesosphere.usi.core.models.{Goal, PodId, PodRecord}
 
-case class UpdateResult(newCachedPendingLaunch: CachedPendingLaunch, newToBeLaunched: Set[PodId], newLaunched: Set[PodId])
+case class UpdateResult(
+    newCachedPendingLaunch: CachedPendingLaunch,
+    newToBeLaunched: Set[PodId],
+    newLaunched: Set[PodId])
 
 case class CachedPendingLaunch(pendingLaunch: Set[PodId] = Set.empty) {
 

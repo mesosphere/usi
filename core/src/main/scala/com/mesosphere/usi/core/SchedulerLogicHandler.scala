@@ -143,7 +143,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
       .collect { case Some(p) => p.runSpec.roles }
       .flatten
       .map(r => mesosCallFactory.newRevive(Some(r)))
-        .toList
+      .toList
 
     val suppressCalls = generateSuppressCalls(cachedPendingLaunch.pendingLaunch, updateResult.newLaunched)
 
