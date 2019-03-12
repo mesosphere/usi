@@ -26,12 +26,19 @@ sealed trait ResourceRequirement {
   *
   * @param requestedValues values pod wants to consume on the given ranges
   * @param resourceType name of resource (e.g. ports)
-  * @param random when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized
+  * @param valueSelectionPolicy when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized
   */
-case class RangeRequirement(requestedValues: Seq[RequestedValue], resourceType: ResourceType, random: Random = Random)
+case class RangeRequirement(
+    requestedValues: Seq[RequestedValue],
+    resourceType: ResourceType,
+    valueSelectionPolicy: ValueSelectionPolicy = RandomSelection(Random))
     extends ResourceRequirement {
   override def description: String = s"$resourceType:[${requestedValues.mkString(",")}]"
 }
+
+sealed trait ValueSelectionPolicy
+case object OrderedSelection extends ValueSelectionPolicy
+case class RandomSelection(randomGenerator: Random) extends ValueSelectionPolicy
 
 sealed trait RequestedValue
 case class ExactValue(value: Int) extends RequestedValue
@@ -40,11 +47,13 @@ case object RandomValue extends RequestedValue
 object RangeRequirement {
   val RandomPort: Int = 0
 
-  def ports(requestedPorts: Seq[Int], random: Random = Random): RangeRequirement = {
+  def ports(
+      requestedPorts: Seq[Int],
+      valueSelectionPolicy: ValueSelectionPolicy = RandomSelection(Random)): RangeRequirement = {
     new RangeRequirement(
       requestedPorts.map(p => if (p == RandomPort) RandomValue else ExactValue(p)),
       ResourceType.PORTS,
-      random)
+      valueSelectionPolicy)
   }
 }
 
