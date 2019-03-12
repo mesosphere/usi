@@ -3,7 +3,7 @@ package com.mesosphere.usi.core
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
 import com.mesosphere.usi.core.models.{PodId, SpecEvent}
-import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
+import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
 
 /**
   * Container class responsible for keeping track of the state and cache.
@@ -118,15 +118,36 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     frameResultBuilder.result
   }
 
+  def generateSuppressCalls(pendingLaunch: Set[PodId], newLaunched: Set[PodId]): List[Call] = {
+    val alreadyLaunchedRoles = newLaunched
+      .map(id => specs.podSpecs.get(id))
+      .collect { case Some(p) => p.runSpec.roles }
+      .flatten
+
+    val rolesBeingLaunched = pendingLaunch
+      .map(id => specs.podSpecs.get(id))
+      .collect { case Some(p) => p.runSpec.roles }
+      .flatten
+
+    alreadyLaunchedRoles.diff(rolesBeingLaunched).map(r => mesosCallFactory.newSuppress(Some(r))).toList
+  }
+
   private def updateCachesAndRevive(
       specs: SpecState,
       state: SchedulerState,
       dirtyPodIds: Set[PodId]): SchedulerEvents = {
-    this.cachedPendingLaunch = this.cachedPendingLaunch.update(specs, state, dirtyPodIds)
-    if (cachedPendingLaunch.pendingLaunch.nonEmpty)
-      SchedulerEvents(mesosCalls = List(mesosCallFactory.newRevive(None)))
-    else
-      SchedulerEvents.empty
+    val updateResult = this.cachedPendingLaunch.update(specs, state, dirtyPodIds)
+    this.cachedPendingLaunch = updateResult.newCachedPendingLaunch
+    val reviveCalls = updateResult.newToBeLaunched
+      .map(id => specs.podSpecs.get(id))
+      .collect { case Some(p) => p.runSpec.roles }
+      .flatten
+      .map(r => mesosCallFactory.newRevive(Some(r)))
+        .toList
+
+    val suppressCalls = generateSuppressCalls(cachedPendingLaunch.pendingLaunch, updateResult.newLaunched)
+
+    SchedulerEvents(mesosCalls = reviveCalls ++ suppressCalls)
   }
 
   /**
