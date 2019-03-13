@@ -167,7 +167,10 @@ Example of good framework log messages (a little bit simplified) can look like e
 
 ## Testing
 
-Tests are executable documentation and should be **written, read and maintained** as such. A test tells its reader a short story about how some part of the system should behave given a certain input. Hundreds of excellent books and articles are dedicated to writing proper tests, so we'll try to avoid repeating them here.
+Tests are executable documentation and should be **written, read and maintained** as such. A test tells its reader a short story about how some part of the system should behave given a certain input. Hundreds of excellent books and articles are dedicated to writing proper tests, so we'll try to avoid repeating them here, however:
+
+* Choose the lightest testing mechanism that suits the need; if something can be tested well at a unit level, then test there first. IE: An integration test might check that a validation error is properly returned via the API, but a unit test should check the 20 different ways a validation fails.
+* Avoid mocks/stubbing. Mocks are often a code smell that happens when effects are coupled with business logic, and the tests often look too much like the implementation. If we separate our effects then we don't need mocks. Preference for fake implementations of interfaces (IE MockMesos flow) over "method X should be invoked once with param Y and return Z".
 
 ### On Libraries and Styles
 
