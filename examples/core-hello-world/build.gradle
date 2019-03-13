@@ -1,3 +1,11 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClassName = 'com.mesosphere.usi.examples.CoreHelloWorldFramework'
+}
+
 dependencies {
     implementation project(':core')
     testCompile project(':test-utils')
