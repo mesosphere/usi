@@ -167,11 +167,11 @@ Example of good framework log messages (a little bit simplified) can look like e
 
 ## Testing
 
-Tests are executable documentation and should be **written, read and maintained** as such. A test tells it's reader a short story about how some part of the system should behave given a certain input. Hundreeds of excelent books and articles are dedicated to writing proper tests so we'll try to avoid repeating them here.
+Tests are executable documentation and should be **written, read and maintained** as such. A test tells its reader a short story about how some part of the system should behave given a certain input. Hundreds of excellent books and articles are dedicated to writing proper tests, so we'll try to avoid repeating them here.
 
 ### On Libraries and Styles
 
-We heavily utilize [ScalaTest](http://www.scalatest.org/) as our primary test library. When it comes to the test style we prefer [WordSpec](http://www.scalatest.org/at_a_glance/WordSpec)
+We heavily utilize [ScalaTest](http://www.scalatest.org/) as our primary test library. All tests should implement the UnitTest class in test-utils, which uses [WordSpec](http://www.scalatest.org/at_a_glance/WordSpec).
 
 ```scala
   // Describe a scope for a subject, in this case: "A Set"
@@ -214,16 +214,16 @@ In USI we define following granularity levels:
 * **Integration tests**: an integration test starts a minimal Mesos cluster consisting of Mesos master, Mesos agent, in-memory Zookeeper server and a framework. These are more expensive tests that typically require more resources and time to run. Tests that require back and forth communication with Mesos are best placed here because we don't want to mock Mesos responses.
 * **System integraiton test**: here we start a full-blown DC/OS cluster testing all aspects of framework interacting with the DC/OS ecosystem. These are the most expensive tests (in terms of time and money) that would typically reqire a DC/OS cluster running on e.g. AWS utilizing multiple EC2 nodes, volumes, ELB etc. A system integration test would typically cover some coarse-grained USI feature or a feature that relies on other DC/OS components like the secret store.
 
-**As a rule of thumb a broken behavior should fail at the lowest possible level**. Most features will be covered on more than one level but the coverage is different. Let's consider support for [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) as an example. The Mesos fetcher is a mechanism to download resources into the sandbox directory of a task in preparation of running the task. So how do the tests look like?
+**As a rule of thumb, a broken behavior should fail at the lowest possible level**. Most features will be covered on more than one level but the coverage is different. Let's consider support for [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) as an example. In preparation to run a task, the Mesos fetcher downloads resources into the task's sandbox directory. So how do the tests look like?
 
 * **Unit test**: makes sure that given a `PodSpec` with a defined fetch URI it is converted to a Mesos protobuf message, where correspoding [URI](https://github.com/apache/mesos/blob/master/include/mesos/mesos.proto#L658) fields are initialized properly
-* **Integration test**: makes sure that when a task from a `PodSpec` is started, the fetched artifact is actually part of it's sandbox
-* **System integration test**: this is a tricky one - do we need full DC/OS cluster to test this? How is this different from the integration test from the fetchers perspective? The simple answer is - it's not and an integration test might be sufficient enough
+* **Integration test**: makes sure that when a task from a `PodSpec` is started, the fetched artifact is actually part of its sandbox
+* **System integration test**: this is a tricky one; do we need full DC/OS cluster to test this? How is this different from the integration test from the fetchers perspective? The simple answer is that it's not, and an integration test might be sufficient enough.
 
-However consider following aspects (which are all taken from prior experience building Mesos frameworks):
+However consider the following aspects (which are all taken from prior experience building Mesos frameworks):
 
-* while an integration test usually starts a some stable Mesos version that USI officially depends on, DC/OS frequently integrates latest Mesos changes into its master branch. Testing a framework against the latest DC/OS master might expose a bug sooner rather then later
-* an integration test runs against a local Mesos cluster where communication is typically fast and reliable. A system integration test runs against a cluster somewhere in the cloud and has different communications profile. In the past we saw bugs that would only manifest themselves in the later case but not in the former. Admited, it seems unlikely that such a bug is triggered in the Mesos fetcher but we've seen unlikely things happen before
-* even a simple request to the framework running on a DC/OS cluster touches many components on it's way e.g. ELB, Admin Router, Monitoring service which themselves rely on other components (e.g. Admin Router relies on the CockroachDB) so there is always potential for things to go wrong
+* While an integration test usually starts some stable Mesos version on which USI officially depends, DC/OS frequently integrates the latest Mesos changes into its master branch. Testing a framework against the latest DC/OS master might expose a bug sooner rather than later.
+* An integration test runs against a local Mesos cluster where communication is typically fast and reliable. A system integration test runs against a cluster somewhere in the cloud, and has a different communications profile. In the past, we've seen bugs that would only manifest themselves in the latter case, but not in the former. Admittedly, it seems unlikely that such a bug is triggered in the Mesos fetcher; however, we've seen unlikely things happen before.
+* Even a simple request to the framework running on a DC/OS cluster touches many components on its way (e.g. ELB, Admin Router, Monitoring service which themselves rely on other components, such as Admin Router relying on CockroachDB), so there is always potential for things to go wrong.
 
-It makes sense to have a system integration test for every user facing coarse-grained API feature including the example above.
+It makes sense to have a system integration test for every user-facing coarse-grained API feature, including the example above.
