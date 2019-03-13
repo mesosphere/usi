@@ -121,13 +121,11 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
   def generateSuppressCalls(pendingLaunch: Set[PodId], newLaunched: Set[PodId]): List[Call] = {
     val alreadyLaunchedRoles = newLaunched
       .map(id => specs.podSpecs.get(id))
-      .collect { case Some(p) => p.runSpec.roles }
-      .flatten
+      .collect { case Some(p) => p.runSpec.role }
 
     val rolesBeingLaunched = pendingLaunch
       .map(id => specs.podSpecs.get(id))
-      .collect { case Some(p) => p.runSpec.roles }
-      .flatten
+      .collect { case Some(p) => p.runSpec.role }
 
     alreadyLaunchedRoles.diff(rolesBeingLaunched).map(r => mesosCallFactory.newSuppress(Some(r))).toList
   }
@@ -140,8 +138,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     this.cachedPendingLaunch = updateResult.newCachedPendingLaunch
     val reviveCalls = updateResult.newToBeLaunched
       .map(id => specs.podSpecs.get(id))
-      .collect { case Some(p) => p.runSpec.roles }
-      .flatten
+      .collect { case Some(p) => p.runSpec.role }
       .map(r => mesosCallFactory.newRevive(Some(r)))
       .toList
 

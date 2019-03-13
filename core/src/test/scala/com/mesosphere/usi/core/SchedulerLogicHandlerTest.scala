@@ -10,7 +10,7 @@ class SchedulerLogicHandlerTest extends UnitTest {
     val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId))
     val podId = PodId("pod")
     val result = handler.handleSpecEvent(
-      PodSpecUpdated(podId, Some(PodSpec(podId, Goal.Running, RunSpec(Seq.empty, "", Seq("test-role"))))))
+      PodSpecUpdated(podId, Some(PodSpec(podId, Goal.Running, RunSpec(Seq.empty, "", "test-role")))))
     result.mesosCalls.exists(c => c.hasRevive && c.getRevive.getRoles(0) == "test-role") should be(true) withClue s"Expecting revive call with role 'test-role' but got ${result.mesosCalls}"
   }
 }
