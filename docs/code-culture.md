@@ -167,21 +167,20 @@ Example of good framework log messages (a little bit simplified) can look like e
 
 ## Testing
 
-Tests are executable documentation and should be **written, read and maintained** as such. A test tells it's reader a short story about how some part of the system should behave given a certain input. Hundreeds of excelent books and articles are dedicated to writing proper tests so we'll try to avoid repeating them here.
+Tests are executable documentation and should be **written, read and maintained** as such. A test tells it's reader a short story about how some part of the system should behave given a certain input. Hundreds of excelent books and articles are dedicated to writing proper tests so we'll try to avoid repeating them here.
 
 ### On Libraries and Styles
 
 We heavily utilize [ScalaTest](http://www.scalatest.org/) as our primary test library. When it comes to the test style we prefer [WordSpec](http://www.scalatest.org/at_a_glance/WordSpec)
 
 ```scala
-  // Describe a scope for a subject, in this case: "A Set"
-  "A Set" can { // All tests within these curly braces are about "A Set"
+  // The number of nested levels is dependent on your test case.
+  // For most tests one or two are levels are enough.
+  // Describe a scope for a subject, in this case: "An empty Set"
+  "An empty Set" should { // All tests within these curly braces are about "A Set"
 
-    // Can describe nested scopes that "narrow" its outer scopes
-    "empty" should { // All tests within these curly braces are about "A Set (when empty)"
-
-      "have size 0" in {    // Here, 'it' refers to "A Set (when empty)". The full name
-        Set.empty.size shouldBe 0 // of this test is: "A Set (when empty) should have size 0"
+        "have size 0" in {    // Here, 'it' refers to "A Set (when empty)". The full name
+          Set.empty.size shouldBe 0 // of this test is: "A Set (when empty) should have size 0
       }
       ...
 ```
@@ -189,18 +188,21 @@ We heavily utilize [ScalaTest](http://www.scalatest.org/) as our primary test li
 combined with [Given, When, And Then](http://www.scalatest.org/getting_started_with_feature_spec) and scala [matchers](http://www.scalatest.org/user_guide/using_matchers):
 
 ```scala
-  "A mutable Set" should "allow an element to be added" in {
-    Given("an empty mutable Set")
-    val set = mutable.Set.empty[String]
+  "A mutable Set" should
 
-    When("an element is added")
-    set += "clarity"
+    "allow an element to be added" in {
+      Given("an empty mutable Set")
+      val set = mutable.Set.empty[String]
 
-    Then("the Set should have size 1")
-    set.size shouldBe 1
+      When("an element is added")
+      set += "clarity"
 
-    And("the Set should contain the added element")
-    set should contain theSameElementsAs Set("clarity")
+      Then("the Set should have size 1")
+      set.size shouldBe 1
+
+      And("the Set should contain the added element")
+      set should contain theSameElementsAs Set("clarity")
+    }
   }
 ```
 
