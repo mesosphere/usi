@@ -1,6 +1,6 @@
 package com.mesosphere.usi.core.models
 
-import com.mesosphere.usi.core.models.resources.{ExactValue, RangeRequirement}
+import com.mesosphere.usi.core.models.resources.{ExactValue, RangeRequirement, ResourceRequirement, ScalarRequirement}
 
 import scala.util.{Failure, Success, Try}
 
@@ -24,7 +24,7 @@ trait PodSpec {
 
 object PodSpec {
 
-  type ErrorMessage = String
+  type ValidationError = String
 
   /**
     * Verifies that every value in range is requested only once. Requesting same value multiple times would yield pod that will never be scheduled.
@@ -32,24 +32,44 @@ object PodSpec {
     * @param runSpec runSpec we are validating
     * @return true if provided range requirements are valid
     */
-  private def validateRunSpec(runSpec: RunSpec): Option[ErrorMessage] = {
+  private def validateStaticRangeRequirementsUnique(runSpec: RunSpec): Seq[ValidationError] = {
     val staticPorts = runSpec.resourceRequirements.collect {
       case RangeRequirement(requestedValues, _, _) => requestedValues
     }.flatten.collect { case ExactValue(value) => value }
 
     if (staticPorts.distinct.length != staticPorts.length) {
-      Some(s"Every value inside RangeResource can be requested only once. Requirement: ${staticPorts.mkString(",")}")
+      Seq(s"Every value inside RangeResource can be requested only once. Requirement: ${staticPorts.mkString(",")}")
+    } else {
+      Seq.empty
     }
-
-    None
   }
 
-  def apply(id: PodId, goal: Goal, runSpec: RunSpec): Try[PodSpec] = {
-    val validationError = validateRunSpec(runSpec)
+  private def validateScalarRequirements(resourceRequirements: Seq[ResourceRequirement]): Seq[ValidationError] = {
+    val invalidScalar = resourceRequirements.collect {
+      case s: ScalarRequirement => s
+    }.filter(s => s.amount < 0)
+    if (invalidScalar.nonEmpty) {
+      Seq(s"Scalar values cannot be smaller than 0. Invalid requirements: ${invalidScalar
+        .map(s => s"${s.resourceType}:${s.amount}")
+        .mkString(",")}")
+    } else {
+      Seq.empty
+    }
+  }
 
-    validationError match {
-      case Some(error) => Failure(new IllegalArgumentException(error))
-      case None => Success(PodSpecImpl(id, goal, runSpec))
+  def apply(id: PodId, goal: Goal, runSpec: RunSpec): Either[Seq[ValidationError], PodSpec] = {
+    val uniqueRangeRequirements = validateStaticRangeRequirementsUnique(runSpec)
+    val scalarRequirements = validateScalarRequirements(runSpec.resourceRequirements)
+
+    validationErrorOrResult(uniqueRangeRequirements, scalarRequirements)(() => PodSpecImpl(id, goal, runSpec))
+  }
+
+  private def validationErrorOrResult(validationResults: Seq[ValidationError]*)(createFunc: () => PodSpec): Either[Seq[ValidationError], PodSpec] = {
+    val validationErrors = validationResults.flatten
+    if (validationErrors.nonEmpty) {
+      Left(validationErrors)
+    } else {
+      Right(createFunc())
     }
   }
 
