@@ -2,6 +2,4 @@ dependencies {
     implementation project(':core')
     testCompile project(':test-utils')
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '5.3'
-    implementation 'org.codehaus.groovy:groovy:2.5.6'
 }
