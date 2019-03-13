@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1 API  - com.mesosphere.usi.core.models.PodId</title>
-          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.models.PodId" />
-          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.models.PodId" />
+          <title>usi 0.1 API  - com.mesosphere.usi.core.models.FetchUri</title>
+          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.models.FetchUri" />
+          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.models.FetchUri" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -179,16 +179,16 @@
                         <a href="AgentRecordUpdated.html" title="">AgentRecordUpdated</a>
                       </li><li class="current-entities indented5">
                         <a class="object" href="FetchUri$.html" title=""></a>
-                        <a class="class" href="FetchUri.html" title="Specification used by the [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) to download resources into the sandbox directory of a task in preparation of running the task."></a>
-                        <a href="FetchUri.html" title="Specification used by the [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) to download resources into the sandbox directory of a task in preparation of running the task.">FetchUri</a>
+                        <a class="class" href="" title="Specification used by the [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) to download resources into the sandbox directory of a task in preparation of running the task."></a>
+                        <a href="" title="Specification used by the [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) to download resources into the sandbox directory of a task in preparation of running the task.">FetchUri</a>
                       </li><li class="current-entities indented5">
                         <a class="object" href="Goal$.html" title=""></a>
                         <a class="trait" href="Goal.html" title="Target state of PodSpec."></a>
                         <a href="Goal.html" title="Target state of PodSpec.">Goal</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="" title="Unique identifier of a pod"></a>
-                        <a href="" title="Unique identifier of a pod">PodId</a>
+                        <a class="class" href="PodId.html" title="Unique identifier of a pod"></a>
+                        <a href="PodId.html" title="Unique identifier of a pod">PodId</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="class" href="PodRecord.html" title="Describes facts about the result of a launched PodSpec from the perspective of USI."></a>
@@ -284,14 +284,16 @@
           <div id="content">
             <body class="class type">
       <div id="definition">
-        <div class="big-circle class">c</div>
+        <a href="FetchUri$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
         <p id="owner"><a href="../../../../index.html" class="extype" name="com">com</a>.<a href="../../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../../index.html" class="extype" name="com.mesosphere.usi">usi</a>.<a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a>.<a href="index.html" class="extype" name="com.mesosphere.usi.core.models">models</a></p>
-        <h1>PodId<span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html" title="Permalink">
+        <h1><a href="FetchUri$.html" title="See companion object">FetchUri</a><span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"></span></h3>
+        <h3><span class="morelinks"><div>
+            Companion <a href="FetchUri$.html" title="See companion object">object FetchUri</a>
+          </div></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
@@ -300,12 +302,16 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">PodId</span><span class="params">(<span name="value">value: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">FetchUri</span><span class="params">(<span name="uri">uri: <span class="extype" name="java.net.URI">URI</span></span>, <span name="extract">extract: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">true</span></span>, <span name="executable">executable: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="cache">cache: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="outputFile">outputFile: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Unique identifier of a pod</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Specification used by the [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) to download
+resources into the sandbox directory of a task in preparation of running the task. Defaults taken from Mesos
+proto files.
+</p></div><dl class="paramcmts block"><dt class="param">uri</dt><dd class="cmt"><p>artifact URI to download</p></dd><dt class="param">extract</dt><dd class="cmt"><p>if true, the artifact will be treated as an archive an extracted to the sandbox. See the list
+               of the supported archive types below</p></dd><dt class="param">executable</dt><dd class="cmt"><p>if true, the fetch result will be changed to be executable (by “chmod”) for every user</p></dd><dt class="param">cache</dt><dd class="cmt"><p>if true, the fetcher cache is to be used for the URI</p></dd><dt class="param">outputFile</dt><dd class="cmt"><p>if set, the fetcher will use that name for the copy stored in the sandbox directory</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -335,7 +341,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.usi.core.models.PodId"><span>PodId</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.usi.core.models.FetchUri"><span>FetchUri</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -355,10 +361,10 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.mesosphere.usi.core.models.PodId#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(value:String):com.mesosphere.usi.core.models.PodId"></a><a id="&lt;init&gt;:PodId"></a>
+              <ol><li name="com.mesosphere.usi.core.models.FetchUri#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(uri:java.net.URI,extract:Boolean,executable:Boolean,cache:Boolean,outputFile:Option[String]):com.mesosphere.usi.core.models.FetchUri"></a><a id="&lt;init&gt;:FetchUri"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#&lt;init&gt;(value:String):com.mesosphere.usi.core.models.PodId" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#&lt;init&gt;(uri:java.net.URI,extract:Boolean,executable:Boolean,cache:Boolean,outputFile:Option[String]):com.mesosphere.usi.core.models.FetchUri" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -367,10 +373,11 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">PodId</span><span class="params">(<span name="value">value: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
+        <span class="name">FetchUri</span><span class="params">(<span name="uri">uri: <span class="extype" name="java.net.URI">URI</span></span>, <span name="extract">extract: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">true</span></span>, <span name="executable">executable: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="cache">cache: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="outputFile">outputFile: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>)</span>
       </span>
       
-      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">uri</dt><dd class="cmt"><p>artifact URI to download</p></dd><dt class="param">extract</dt><dd class="cmt"><p>if true, the artifact will be treated as an archive an extracted to the sandbox. See the list
+               of the supported archive types below</p></dd><dt class="param">executable</dt><dd class="cmt"><p>if true, the fetch result will be changed to be executable (by “chmod”) for every user</p></dd><dt class="param">cache</dt><dd class="cmt"><p>if true, the fetcher cache is to be used for the URI</p></dd><dt class="param">outputFile</dt><dd class="cmt"><p>if set, the fetcher will use that name for the copy stored in the sandbox directory</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -384,7 +391,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -400,7 +407,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html###():Int" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -416,7 +423,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -432,7 +439,7 @@
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -445,10 +452,26 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.FetchUri#cache" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="cache:Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#cache:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cache</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#clone():Object" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -474,7 +497,7 @@
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -487,10 +510,42 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.FetchUri#executable" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="executable:Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#executable:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">executable</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.FetchUri#extract" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="extract:Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#extract:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">extract</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -511,7 +566,7 @@
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -527,7 +582,7 @@
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -543,7 +598,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#notify():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -564,7 +619,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -582,10 +637,26 @@
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.FetchUri#outputFile" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="outputFile:Option[String]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#outputFile:Option[String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">outputFile</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -598,10 +669,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.models.PodId#value" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="value:String"></a>
+    </li><li name="com.mesosphere.usi.core.models.FetchUri#uri" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="uri:java.net.URI"></a><a id="uri:URI"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#value:String" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#uri:java.net.URI" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -610,14 +681,14 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">value</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">uri</span><span class="result">: <span class="extype" name="java.net.URI">URI</span></span>
       </span>
       
       
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -639,7 +710,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -663,7 +734,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#wait():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -693,7 +764,7 @@
               <ol><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/PodId.html#finalize():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/FetchUri.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>

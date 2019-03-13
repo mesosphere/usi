@@ -178,6 +178,10 @@
                         <a class="class" href="AgentRecordUpdated.html" title=""></a>
                         <a href="AgentRecordUpdated.html" title="">AgentRecordUpdated</a>
                       </li><li class="current-entities indented5">
+                        <a class="object" href="FetchUri$.html" title=""></a>
+                        <a class="class" href="FetchUri.html" title="Specification used by the [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) to download resources into the sandbox directory of a task in preparation of running the task."></a>
+                        <a href="FetchUri.html" title="Specification used by the [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) to download resources into the sandbox directory of a task in preparation of running the task.">FetchUri</a>
+                      </li><li class="current-entities indented5">
                         <a class="object" href="Goal$.html" title=""></a>
                         <a class="trait" href="Goal.html" title="Target state of PodSpec."></a>
                         <a href="Goal.html" title="Target state of PodSpec.">Goal</a>
@@ -296,14 +300,15 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">RunSpec</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">RunSpec</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="fetch">fetch: <span class="extype" name="scala.Seq">Seq</span>[<a href="FetchUri.html" class="extype" name="com.mesosphere.usi.core.models.FetchUri">FetchUri</a>] = <span class="symbol">Seq.empty</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Specification used to launch a <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a></p><p>We currently only support a shellCommand. This is primitive. We will add richer support for TaskInfo and
 TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
-</p></div><div class="toggleContainer block">
+</p></div><dl class="paramcmts block"><dt class="param">resourceRequirements</dt><dd class="cmt"><p>a list of resource requirements for the <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>. See <span class="extype" name="ResourceRequirement">ResourceRequirement</span>
+                            class for more information</p></dd><dt class="param">shellCommand</dt><dd class="cmt"><p>tasks' shell command</p></dd><dt class="param">fetch</dt><dd class="cmt"><p>a list of artifact URIs that are passed to Mesos fetcher module and resolved at runtime</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -353,10 +358,10 @@ TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.mesosphere.usi.core.models.RunSpec#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement],shellCommand:String):com.mesosphere.usi.core.models.RunSpec"></a><a id="&lt;init&gt;:RunSpec"></a>
+              <ol><li name="com.mesosphere.usi.core.models.RunSpec#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement],shellCommand:String,fetch:Seq[com.mesosphere.usi.core.models.FetchUri]):com.mesosphere.usi.core.models.RunSpec"></a><a id="&lt;init&gt;:RunSpec"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement],shellCommand:String):com.mesosphere.usi.core.models.RunSpec" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement],shellCommand:String,fetch:Seq[com.mesosphere.usi.core.models.FetchUri]):com.mesosphere.usi.core.models.RunSpec" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -365,10 +370,11 @@ TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">RunSpec</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
+        <span class="name">RunSpec</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="fetch">fetch: <span class="extype" name="scala.Seq">Seq</span>[<a href="FetchUri.html" class="extype" name="com.mesosphere.usi.core.models.FetchUri">FetchUri</a>] = <span class="symbol">Seq.empty</span></span>)</span>
       </span>
       
-      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">resourceRequirements</dt><dd class="cmt"><p>a list of resource requirements for the <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>. See <span class="extype" name="ResourceRequirement">ResourceRequirement</span>
+                            class for more information</p></dd><dt class="param">shellCommand</dt><dd class="cmt"><p>tasks' shell command</p></dd><dt class="param">fetch</dt><dd class="cmt"><p>a list of artifact URIs that are passed to Mesos fetcher module and resolved at runtime</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -485,6 +491,22 @@ TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.RunSpec#fetch" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="fetch:Seq[com.mesosphere.usi.core.models.FetchUri]"></a><a id="fetch:Seq[FetchUri]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/RunSpec.html#fetch:Seq[com.mesosphere.usi.core.models.FetchUri]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fetch</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="FetchUri.html" class="extype" name="com.mesosphere.usi.core.models.FetchUri">FetchUri</a>]</span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
