@@ -57,7 +57,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
             RunSpec(
               resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
               shellCommand = "sleep 3600")
-          ).get)
+          ).right.get)
       ))
 
     inside(output.pull().futureValue) {

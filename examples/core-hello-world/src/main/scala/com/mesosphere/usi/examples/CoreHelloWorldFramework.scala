@@ -108,8 +108,8 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
     goal = Goal.Running,
     runSpec = runSpec
   ) match {
-    case Success(value) => value
-    case Failure(exception) => throw exception
+    case Right(value) => value
+    case Left(errors) => throw new RuntimeException(errors.mkString(","))
   }
 
   val specsSnapshot = SpecsSnapshot(

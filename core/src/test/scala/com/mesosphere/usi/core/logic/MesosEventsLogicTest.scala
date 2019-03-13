@@ -21,7 +21,7 @@ class MesosEventsLogicTest extends UnitTest {
       RunSpec(
         Seq(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
         shellCommand = "sleep 3600")
-    ).get
+    ).right.get
 
   "MesosEventsLogic" should {
     "decline an offer when there is no PodSpec to launch" in {
@@ -45,7 +45,7 @@ class MesosEventsLogicTest extends UnitTest {
             PodId("mock-podId"),
             Goal.Running,
             RunSpec(Seq(ScalarRequirement(ResourceType.CPUS, Integer.MAX_VALUE)), shellCommand = "sleep 3600")
-          ).get
+          ).right.get
         )
       )
       schedulerEventsBuilder.result.mesosCalls.size shouldBe 1
