@@ -5,7 +5,7 @@ import java.util.UUID
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
+import akka.stream.ActorMaterializer
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
@@ -44,7 +44,7 @@ import scala.util.{Failure, Success}
   */
 class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
   implicit val system = ActorSystem()
-  implicit val mat = ActorMaterializer(ActorMaterializerSettings(system).withDebugLogging(true))
+  implicit val mat = ActorMaterializer()
   implicit val ec = system.dispatcher
 
   val settings = MesosClientSettings(conf.getString("master-url"))
