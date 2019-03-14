@@ -4,13 +4,24 @@ import java.util.UUID
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
-import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodStatus, PodStatusUpdated, RunSpec, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.{
+  Goal,
+  PodId,
+  PodSpec,
+  PodStatus,
+  PodStatusUpdated,
+  RunSpec,
+  SpecUpdated,
+  SpecsSnapshot,
+  StateEvent,
+  StateSnapshot
+}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{FrameworkInfo, TaskState, TaskStatus}
@@ -90,7 +101,7 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
   val podId = PodId(s"hello-world.${UUID.randomUUID()}")
   val runSpec = RunSpec(
     resourceRequirements = List(ScalarRequirement.cpus(0.1), ScalarRequirement.memory(32)),
-    shellCommand = """echo "Hello, world" && sleep 3600"""
+    shellCommand = """echo "Hello, world" && sleep 123456789"""
   )
   val podSpec = PodSpec(
     id = podId,
@@ -141,6 +152,14 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
     }
     .toMat(Sink.ignore)(Keep.right)
     .run()
+    .onComplete {
+      case Success(res) =>
+        logger.info(s"Stream completed: $res");
+        system.terminate()
+      case Failure(e) =>
+        logger.error(s"Error in stream: $e");
+        system.terminate()
+    }
 }
 
 object CoreHelloWorldFramework {
