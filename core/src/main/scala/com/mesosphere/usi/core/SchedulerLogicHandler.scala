@@ -119,15 +119,19 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
   }
 
   def generateSuppressCalls(pendingLaunch: Set[PodId], newLaunched: Set[PodId]): List[Call] = {
-    val alreadyLaunchedRoles = newLaunched
-      .map(id => specs.podSpecs.get(id))
-      .collect { case Some(p) => p.runSpec.role }
+    val alreadyLaunchedRoles = newLaunched.iterator
+      .collect { case id if specs.podSpecs.contains(id) => specs.podSpecs(id).runSpec.role }
 
     val rolesBeingLaunched = pendingLaunch
       .map(id => specs.podSpecs.get(id))
       .collect { case Some(p) => p.runSpec.role }
 
-    alreadyLaunchedRoles.diff(rolesBeingLaunched).map(r => mesosCallFactory.newSuppress(Some(r))).toList
+    alreadyLaunchedRoles
+      .filterNot(rolesBeingLaunched)
+      .map { r =>
+        mesosCallFactory.newSuppress(Some(r))
+      }
+      .toList
   }
 
   private def updateCachesAndRevive(
@@ -136,7 +140,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
       dirtyPodIds: Set[PodId]): SchedulerEvents = {
     val updateResult = this.cachedPendingLaunch.update(specs, state, dirtyPodIds)
     this.cachedPendingLaunch = updateResult.newCachedPendingLaunch
-    val reviveCalls = updateResult.newToBeLaunched
+    val reviveCalls = updateResult.newToBeLaunched.iterator
       .map(id => specs.podSpecs.get(id))
       .collect { case Some(p) => p.runSpec.role }
       .map(r => mesosCallFactory.newRevive(Some(r)))
