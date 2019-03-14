@@ -1,8 +1,14 @@
 package com.mesosphere.usi.core.matching
 
 import com.mesosphere.usi.core.ResourceUtil
-import com.mesosphere.usi.core.matching.RangeResource._
-import com.mesosphere.usi.core.models.{ResourceMatchResult, ResourceRequirement, ResourceType}
+import com.mesosphere.usi.core.models.resources.{
+  ExactValue,
+  OrderedSelection,
+  RandomSelection,
+  RandomValue,
+  RangeRequirement,
+  ResourceType
+}
 import com.mesosphere.usi.core.protos.ProtoBuilders
 import org.apache.mesos.v1.Protos
 
@@ -10,23 +16,31 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.util.Random
 
-/**
-  * Represents requirement for Mesos resource of type Range. http://mesos.apache.org/documentation/attributes-resources/
-  *
-  * You can either request static values (by providing concrete value) or dynamic values (by providing 0).
-  * Dynamic values are then selected from the offered ranges. If random implementation is passed in, these ranges are randomized.
-  * For more information about randomization see [[lazyRandomValuesFromRanges()]]
-  *
-  * @param requestedValues values pod wants to consume on the given ranges
-  * @param resourceType name of resource (e.g. ports)
-  * @param random when requesting dynamic values, you can provide Random implementation if you want dynamic values to be randomized
-  */
-case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: ResourceType, random: Random = Random)
-    extends ResourceRequirement {
-  override def description: String = s"$resourceType:[${requestedValues.mkString(",")}]"
+case class MesosRange(minValue: Int, maxValue: Int) {
+  private[this] def range: Range.Inclusive = Range.inclusive(minValue, maxValue)
+  def size: Int = range.size
 
-  override def matchAndConsume(resources: Seq[Protos.Resource]): Option[ResourceMatchResult] = {
-    matchAndConsumeIter(Nil, resources.toList)
+  def iterator: Iterator[Int] = range.iterator
+  def drop(n: Int): Iterator[Int] = range.drop(n).iterator
+  def take(n: Int): Iterator[Int] = range.take(n).iterator
+
+  /*
+   * Attention! range exports _two_ contains methods, a generic inefficient one and an efficient one
+   * that only gets used with Int (and not java.lang.Integer and similar)
+   */
+  def contains(v: Int): Boolean = range.contains(v)
+}
+
+sealed trait ValueMatchResult
+case object ValueNotAvailable extends ValueMatchResult
+case class ValueMatched(port: Int) extends ValueMatchResult
+
+object RangeResourceMatcher {
+
+  def matchAndConsume(
+      rangeRequirment: RangeRequirement,
+      resources: Seq[Protos.Resource]): Option[ResourceMatchResult] = {
+    matchAndConsumeIter(rangeRequirment, Nil, resources.toList)
   }
 
   /**
@@ -38,6 +52,7 @@ case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: Res
     * @return None if no match was possible, ResourceMatchResult if we were able to consume requested resources
     */
   @tailrec private def matchAndConsumeIter(
+      rangeRequirment: RangeRequirement,
       unmatchedResources: List[Protos.Resource],
       remainingResources: List[Protos.Resource]): Option[ResourceMatchResult] = {
 
@@ -45,9 +60,9 @@ case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: Res
       case Nil =>
         None
       case next :: rest =>
-        tryConsumeValuesFromResource(requestedValues, next) match {
+        tryConsumeValuesFromResource(rangeRequirment, next) match {
           case Nil =>
-            matchAndConsumeIter(next :: unmatchedResources, rest)
+            matchAndConsumeIter(rangeRequirment, next :: unmatchedResources, rest)
           case consumedResources =>
             Some(
               ResourceMatchResult(
@@ -64,19 +79,26 @@ case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: Res
     * @return final list of mesos resources created after consuming requested values, empty if match was not possible
     */
   private def tryConsumeValuesFromResource(
-      requestedValues: Seq[RequestedValue],
+      rangeRequirment: RangeRequirement,
       resource: Protos.Resource): Seq[Protos.Resource] = {
-    val offeredRanges = parseResourceToRanges(resource)
-    if (offeredRanges.isEmpty || requestedValues.isEmpty) {
+    val offeredRanges = parseResourceToRanges(rangeRequirment, resource)
+    if (offeredRanges.isEmpty || rangeRequirment.requestedValues.isEmpty) {
       return Seq.empty
     }
 
     // non-dynamic values
-    val staticRequestedValues = requestedValues.collect { case ExactValue(v) => v }.toSet
-    val availableForDynamicAssignment: Iterator[Int] =
-      lazyRandomValuesFromRanges(offeredRanges, random).filter(v => !staticRequestedValues(v))
+    val staticRequestedValues = rangeRequirment.requestedValues.collect { case ExactValue(v) => v }.toSet
+    val availableForDynamicAssignment: Iterator[Int] = rangeRequirment.valueSelectionPolicy match {
+      case RandomSelection(r) =>
+        lazyRandomValuesFromRanges(offeredRanges, r)
+          .filter(v => !staticRequestedValues(v))
+      case OrderedSelection =>
+        offeredRanges.iterator
+          .flatMap(_.iterator)
+          .filterNot(staticRequestedValues)
+    }
 
-    val matchResult = requestedValues.map {
+    val matchResult = rangeRequirment.requestedValues.map {
       case RandomValue if !availableForDynamicAssignment.hasNext =>
         // need dynamic value but no more available
         ValueNotAvailable
@@ -93,7 +115,10 @@ case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: Res
     if (matchResult.contains(ValueNotAvailable)) {
       Seq.empty
     } else {
-      createMesosResource(resource, matchResult.collect { case ValueMatched(v) => v }.toSeq, resourceType)
+      createMesosResource(
+        resource,
+        matchResult.collect { case ValueMatched(v) => v }.toSeq,
+        rangeRequirment.resourceType)
     }
   }
 
@@ -103,8 +128,8 @@ case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: Res
     * @param resource mesos resource definition
     * @return list of parsed ranges in that resource
     */
-  private def parseResourceToRanges(resource: Protos.Resource): Seq[MesosRange] = {
-    if (resource.getName != resourceType.name) {
+  private def parseResourceToRanges(rangeResource: RangeRequirement, resource: Protos.Resource): Seq[MesosRange] = {
+    if (resource.getName != rangeResource.resourceType.name) {
       Seq.empty
     } else {
       val rangeInResource = resource.getRanges.getRangeList.asScala
@@ -166,40 +191,6 @@ case class RangeResource(requestedValues: Seq[RequestedValue], resourceType: Res
     def endRange: Iterator[Int] = startRangeOrig.take(valueInRangeIdx)
 
     startRange ++ afterStartRange ++ beforeStartRange ++ endRange
-  }
-}
-
-case class MesosRange(minValue: Int, maxValue: Int) {
-  private[this] def range: Range.Inclusive = Range.inclusive(minValue, maxValue)
-  def size: Int = range.size
-
-  def iterator: Iterator[Int] = range.iterator
-  def drop(n: Int): Iterator[Int] = range.drop(n).iterator
-  def take(n: Int): Iterator[Int] = range.take(n).iterator
-
-  /*
-   * Attention! range exports _two_ contains methods, a generic inefficient one and an efficient one
-   * that only gets used with Int (and not java.lang.Integer and similar)
-   */
-  def contains(v: Int): Boolean = range.contains(v)
-}
-
-sealed trait ValueMatchResult
-case object ValueNotAvailable extends ValueMatchResult
-case class ValueMatched(port: Int) extends ValueMatchResult
-
-sealed trait RequestedValue
-case class ExactValue(value: Int) extends RequestedValue
-case object RandomValue extends RequestedValue
-
-object RangeResource {
-  val RandomPort: Int = 0
-
-  def ports(requestedPorts: Seq[Int], random: Random = Random): RangeResource = {
-    new RangeResource(
-      requestedPorts.map(p => if (p == RandomPort) RandomValue else ExactValue(p)),
-      ResourceType.PORTS,
-      random)
   }
 
   /**

@@ -17,6 +17,7 @@ ext {
 
 allprojects {
 
+    group = 'com.mesosphere.usi'
     version = '0.1'
 
     apply plugin: "scala"

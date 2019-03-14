@@ -3,11 +3,15 @@ package com.mesosphere.usi.core.logic
 import com.mesosphere.ImplicitStrictLogging
 import com.mesosphere.LoggingArgs
 import java.time.Instant
+
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
+import com.mesosphere.usi.core.matching.ResourceMatcher
 import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.core.models.resources.{ResourceRequirement, ResourceType}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
+
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
@@ -26,7 +30,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
       case Nil =>
         Some((matchedResources, remainingResources))
       case req :: rest =>
-        req.matchAndConsume(remainingResources.getOrElse(req.resourceType, Nil)) match {
+        ResourceMatcher.matchAndConsume(req, remainingResources.getOrElse(req.resourceType, Nil)) match {
           case Some(matchResult) =>
             maybeMatchPodSpec(
               remainingResources.updated(req.resourceType, matchResult.remainingResource),
@@ -62,11 +66,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
                 // we use sanitized podId as the task name for now
                 name = podSpec.id.value.replaceAll("[^a-zA-Z0-9-]", ""),
                 agentId = offer.getAgentId,
-                command = Mesos.CommandInfo
-                  .newBuilder()
-                  .setShell(true)
-                  .setValue(podSpec.runSpec.shellCommand)
-                  .build,
+                command = newCommandInfo(podSpec.runSpec.shellCommand, podSpec.runSpec.fetch),
                 resources = matchedResources
               )
             }(collection.breakOut)

@@ -6,8 +6,8 @@ import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
-import com.mesosphere.usi.core.matching.{RangeResource, ScalarResource}
 import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.core.models.resources.{RangeRequirement, ScalarRequirement}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import org.apache.mesos.v1.Protos
@@ -48,7 +48,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
             podId,
             Goal.Running,
             RunSpec(
-              resourceRequirements = List(ScalarResource.cpus(1), ScalarResource.memory(256)),
+              resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
               shellCommand = "sleep 3600")
           ))
       ))
@@ -60,7 +60,6 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     inside(output.pull().futureValue) {
       case Some(podRecord: PodRecordUpdated) =>
         podRecord.id shouldBe podId
-        println(s"agentId = ${podRecord.newRecord.get.agentId}")
     }
     eventually {
       inside(output.pull().futureValue) {
@@ -82,7 +81,8 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
           podId,
           Goal.Running,
           RunSpec(
-            resourceRequirements = List(ScalarResource.cpus(1), ScalarResource.memory(256), RangeResource.ports(Seq(0))),
+            resourceRequirements =
+              List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256), RangeRequirement.ports(Seq(0))),
             shellCommand = "sleep 3600")
         ))
       ))
