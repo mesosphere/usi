@@ -24,7 +24,7 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(imp
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
   def asSourceAndSink(specsSnapshot: SpecsSnapshot = SpecsSnapshot.empty)
-    : (Future[StateSnapshot], Source[StateEvent, Any], Sink[SpecUpdated, Any]) = {
+    : (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]) = {
 
     val (stateQueue, stateSource) = Source.queue[StateEvent](1, OverflowStrategy.backpressure).preMaterialize()
 
@@ -57,9 +57,7 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(imp
   }
 
   /**
-    *
     * Represents the scheduler as a Flow.
-    *
     *
     * This method will materialize the scheduler first, then Flow can be materialized independently.
     * @param specsSnapshot Snapshot of the current specs
@@ -72,7 +70,6 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(imp
   }
 
   /**
-    *
     * Represents the scheduler as a SourceQueue and a SinkQueue.
     *
     * This method will materialize the scheduler first, then queues can be used independently.

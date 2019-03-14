@@ -29,15 +29,13 @@ class SchedulerAdapter(schedulerFlow: scaladsl.Flow[SpecInput, StateOutput, NotU
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
   def asSourceAndSink(specsSnapshot: SpecsSnapshot = SpecsSnapshot.empty)
-    : Tuple3[CompletableFuture[StateSnapshot], Source[StateEvent, Any], Sink[SpecUpdated, Any]] = {
+    : Tuple3[CompletableFuture[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]] = {
     val (snap, source, sink) = delegate.asSourceAndSink(specsSnapshot)
     Tuple3(snap.toJava.toCompletableFuture, source.asJava, sink.asJava)
   }
 
   /**
-    *
     * Represents the scheduler as a Flow.
-    *
     *
     * This method will materialize the scheduler first, then Flow can be materialized independently.
     * @param specsSnapshot Snapshot of the current specs
@@ -50,7 +48,6 @@ class SchedulerAdapter(schedulerFlow: scaladsl.Flow[SpecInput, StateOutput, NotU
   }
 
   /**
-    *
     * Represents the scheduler as a SourceQueue and a SinkQueue.
     *
     * This method will materialize the scheduler first, then queues can be used independently.
