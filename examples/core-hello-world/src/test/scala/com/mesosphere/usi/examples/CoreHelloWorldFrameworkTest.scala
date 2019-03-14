@@ -2,13 +2,11 @@ package com.mesosphere.usi.examples
 
 import java.util
 
-import com.mesosphere.usi.core.models.{PodStatus, PodStatusUpdated}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
 import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkID
-import org.apache.mesos.v1.Protos.TaskState.TASK_RUNNING
 import org.scalatest.Inside
 
 class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest with Inside {
@@ -30,17 +28,6 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
       val task = framework.tasks.head
       task.name should startWith("hello-world")
       task.state.get shouldBe "TASK_RUNNING"
-    }
-
-    And("scheduler produces a PodStatusUpdated event with a running task")
-    eventually {
-      inside(f.framework.output.pull().futureValue) {
-        case Some(PodStatusUpdated(id, Some(PodStatus(_, taskStatuses)))) =>
-          id shouldBe f.framework.podId
-          taskStatuses.head match {
-            case (_, status) => status.getState shouldBe TASK_RUNNING
-          }
-      }
     }
   }
 
