@@ -92,7 +92,7 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
       *
       */
     val schedulerFlow
-    : Flow[(SpecsSnapshot, Source[SpecUpdated, Any]), (StateSnapshot, Source[StateEvent, Any]), NotUsed] =
+      : Flow[(SpecsSnapshot, Source[SpecUpdated, Any]), (StateSnapshot, Source[StateEvent, Any]), NotUsed] =
       Scheduler.fromClient(client)
 
     // Lets construct the initial specs snapshot which will contain our hello-world PodSpec. For that we generate
@@ -116,15 +116,15 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
     )
 
     Source
-      // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
-      // which emits a materialized promise which when completed with a Some, that value will be produced downstream,
-      // followed by completion. To avoid stream completion we never complete the promise but prepend the stream with
-      // our snapshot together with an empty source for subsequent SpecUpdates (which we're not going to send)
-      //
-      // Note: this is hardly realistic since an orchestrator will need to react to StateEvents by sending SpecUpdates
-      // to the scheduler. We're making our lives easier by ignoring this part for now - all we care about is to start
-      // a "hello-world" task once.
-      .maybe
+    // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
+    // which emits a materialized promise which when completed with a Some, that value will be produced downstream,
+    // followed by completion. To avoid stream completion we never complete the promise but prepend the stream with
+    // our snapshot together with an empty source for subsequent SpecUpdates (which we're not going to send)
+    //
+    // Note: this is hardly realistic since an orchestrator will need to react to StateEvents by sending SpecUpdates
+    // to the scheduler. We're making our lives easier by ignoring this part for now - all we care about is to start
+    // a "hello-world" task once.
+    .maybe
       .prepend(Source.single(specsSnapshot))
       .map(snapshot => (snapshot, Source.empty))
       // Here our initial snapshot is going to the scheduler flow
@@ -133,9 +133,9 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
       // later updates, into one stream where the first element is the snapshot and all later elements are single
       // state events. This makes the event handling a simple match-case
       .flatMapConcat {
-      case (snapshot, updates) =>
-        updates.prepend(Source.single(snapshot))
-    }
+        case (snapshot, updates) =>
+          updates.prepend(Source.single(snapshot))
+      }
       .map {
         // Main state event handler. We log happy events and exit if something goes wrong
         case PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
