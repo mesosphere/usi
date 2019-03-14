@@ -161,7 +161,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
   def handleMesosEvent(event: MesosEvent): SchedulerEvents = {
     handleFrame { builder =>
       builder.process { (specs, state, _) =>
-        mesosEventsLogic.processEvent(specs, state, cachedPendingLaunch.pendingLaunch)(event)
+        mesosEventsLogic.process Event(specs, state, cachedPendingLaunch.pendingLaunch)(event)
       }
     }
   }
