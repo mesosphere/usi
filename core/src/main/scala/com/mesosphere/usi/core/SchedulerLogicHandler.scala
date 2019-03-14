@@ -119,8 +119,9 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
   }
 
   def generateSuppressCalls(pendingLaunch: Set[PodId], newLaunched: Set[PodId]): List[Call] = {
-    val alreadyLaunchedRoles = newLaunched.iterator
-      .collect { case id if specs.podSpecs.contains(id) => specs.podSpecs(id).runSpec.role }
+    val alreadyLaunchedRoles = newLaunched.iterator.collect {
+      case id if specs.podSpecs.contains(id) => specs.podSpecs(id).runSpec.role
+    }
 
     val rolesBeingLaunched = pendingLaunch
       .map(id => specs.podSpecs.get(id))

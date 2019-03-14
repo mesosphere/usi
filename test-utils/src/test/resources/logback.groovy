@@ -124,4 +124,4 @@ appender("ASYNC", LoggingEventAsyncDisruptorAppender) {
     ringBufferSize = 8192
 }
 
-root(TRACE, ["ASYNC"])
+root(ch.qos.logback.classic.Level.TRACE, ["ASYNC"])
