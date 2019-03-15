@@ -5,7 +5,7 @@ import java.util.UUID
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, KillSwitch}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
@@ -24,7 +24,7 @@ import com.mesosphere.usi.core.models.{
 }
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
-import org.apache.mesos.v1.Protos.{FrameworkInfo, TaskState, TaskStatus}
+import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo, TaskState, TaskStatus}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -42,25 +42,41 @@ import scala.util.{Failure, Success}
   *  Good to test against local Mesos.
   *
   */
-class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
-  implicit val system = ActorSystem()
-  implicit val mat = ActorMaterializer()
-  implicit val ec = system.dispatcher
+case class CoreHelloWorldFramework(frameworkId: FrameworkID, killSwitch: KillSwitch)
 
-  val settings = MesosClientSettings(conf.getString("master-url"))
-  val frameworkInfo = FrameworkInfo
-    .newBuilder()
-    .setUser(
-      new SystemProperties()
-        .get("user.name")
-        .getOrElse(throw new IllegalArgumentException("A local user is needed to launch Mesos tasks")))
-    .setName("CoreHelloWorldExample")
-    .addRoles("test")
-    .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
-    .setFailoverTimeout(0d)
-    .build()
+object CoreHelloWorldFramework extends StrictLogging {
 
-  def run(): Unit = {
+  def main(args: Array[String]): Unit = {
+    implicit val actorSystem = ActorSystem()
+    val conf = ConfigFactory.load().getConfig("mesos-client")
+    try {
+      run(conf)
+    } catch {
+      case ex: Throwable =>
+        System.err.println(s"Exception while starting framework! ${ex}")
+        ex.printStackTrace(System.err)
+        actorSystem.terminate()
+        System.exit(1)
+    }
+  }
+
+  def run(conf: Config)(implicit system: ActorSystem): CoreHelloWorldFramework = {
+    implicit val mat = ActorMaterializer()
+    implicit val ec = system.dispatcher
+
+    val settings = MesosClientSettings(conf.getString("master-url"))
+    val frameworkInfo = FrameworkInfo
+      .newBuilder()
+      .setUser(
+        new SystemProperties()
+          .get("user.name")
+          .getOrElse(throw new IllegalArgumentException("A local user is needed to launch Mesos tasks")))
+      .setName("CoreHelloWorldExample")
+      .addRoles("test")
+      .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
+      .setFailoverTimeout(0d)
+      .build()
+
     val client: MesosClient = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
 
     /**
@@ -115,7 +131,6 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
       reservationSpecs = Seq.empty
     )
 
-    Source
     // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
     // which emits a materialized promise which when completed with a Some, that value will be produced downstream,
     // followed by completion. To avoid stream completion we never complete the promise but prepend the stream with
@@ -124,7 +139,7 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
     // Note: this is hardly realistic since an orchestrator will need to react to StateEvents by sending SpecUpdates
     // to the scheduler. We're making our lives easier by ignoring this part for now - all we care about is to start
     // a "hello-world" task once.
-    .maybe
+    Source.maybe
       .prepend(Source.single(specsSnapshot))
       .map(snapshot => (snapshot, Source.empty))
       // Here our initial snapshot is going to the scheduler flow
@@ -161,24 +176,8 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
           logger.error(s"Error in stream: $e");
           system.terminate()
       }
+
+    client.frameworkId
+    CoreHelloWorldFramework(frameworkId = client.frameworkId, killSwitch = client.killSwitch)
   }
-}
-
-object CoreHelloWorldFramework {
-
-  def main(args: Array[String]): Unit = {
-    val conf = ConfigFactory.load().getConfig("mesos-client")
-    val framework = CoreHelloWorldFramework(conf)
-    try {
-      framework.run()
-    } catch {
-      case ex: Throwable =>
-        System.err.println(s"Exception while starting framework! ${ex}")
-        ex.printStackTrace(System.err)
-        framework.system.terminate()
-        System.exit(1)
-    }
-  }
-
-  def apply(conf: Config): CoreHelloWorldFramework = new CoreHelloWorldFramework(conf)
 }
