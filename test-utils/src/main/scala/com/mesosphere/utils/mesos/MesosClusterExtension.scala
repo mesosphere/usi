@@ -59,6 +59,7 @@ object MesosClusterExtension {
 
   class Builder {
 
+    private[mesos] var suiteName: String = "unknown"
     private[mesos] var mesosMasterZkUrl: String = null
     private[mesos] var mesosNumMasters = 1
     private[mesos] var mesosNumAgents = 1
@@ -111,6 +112,12 @@ object MesosClusterExtension {
       this
     }
 
+    /** @return the build updated with a {{{prefix}}} as the log prefix. */
+    def withName(prefix: String): Builder = {
+      this.suiteName = prefix
+      this
+    }
+
     /**
       * Builds the Mesos cluster and the extensions.
       *
@@ -120,8 +127,8 @@ object MesosClusterExtension {
       */
     def build(system: ActorSystem, materializer: Materializer): MesosClusterExtension = {
       val mesosCluster = new MesosCluster(
-        "connection-test", // Use extension context
-        this.mesosNumMasters,
+        suiteName,
+        mesosNumMasters,
         mesosNumAgents,
         mesosMasterZkUrl,
         mesosQuorumSize,
