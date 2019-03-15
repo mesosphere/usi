@@ -65,7 +65,8 @@ case class MesosCluster(
     agentsFaultDomains: Seq[Option[FaultDomain]],
     agentsGpus: Option[Int] = None)(implicit system: ActorSystem, mat: Materializer)
     extends AutoCloseable
-    with Eventually {
+    with Eventually
+    with StrictLogging {
   require(quorumSize > 0 && quorumSize <= numMasters)
   require(agentsFaultDomains.isEmpty || agentsFaultDomains.size == numSlaves)
 
@@ -150,6 +151,7 @@ case class MesosCluster(
     agents.foreach(_.start())
     val masterUrl = waitForLeader()
     waitForAgents(masterUrl)
+    logger.info(s"Started Mesos cluster with master on $masterUrl")
     masterUrl
   }
 
@@ -234,6 +236,7 @@ case class MesosCluster(
   }
 
   override def close(): Unit = {
+    logger.info("Stopping Mesos cluster.")
     Try(teardown())
     agents.foreach(_.close())
     masters.foreach(_.close())
