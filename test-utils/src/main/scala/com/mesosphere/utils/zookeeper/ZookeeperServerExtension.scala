@@ -4,6 +4,8 @@ import org.junit.jupiter.api.extension.{AfterAllCallback, BeforeAllCallback, Ext
 class ZookeeperServerExtension extends BeforeAllCallback with AfterAllCallback {
   val zkserver = ZookeeperServer(autoStart = false)
 
+  def getConnectionUrl(): String = zkserver.connectUrl
+
   override def beforeAll(context: ExtensionContext): Unit = {
     zkserver.start()
   }
