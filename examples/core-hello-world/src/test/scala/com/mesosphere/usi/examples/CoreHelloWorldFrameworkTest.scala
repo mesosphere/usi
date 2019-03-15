@@ -16,7 +16,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     val frameworks: Seq[ITFramework] = mesosFacade.frameworks().value.frameworks
 
     val exampleFramework: ITFramework = frameworks.head
-    exampleFramework.id shouldBe f.framework.client.frameworkId.getValue
+    exampleFramework.id shouldBe f.framework.frameworkId.getValue
 
     And("example framework should be active and connected")
     exampleFramework.active shouldBe true
@@ -35,7 +35,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     val f = new Fixture(frameworkId)
     try fn(f)
     finally {
-      f.framework.client.killSwitch.shutdown()
+      f.framework.killSwitch.shutdown()
     }
   }
 
@@ -46,6 +46,6 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
       .parseMap(util.Map.of("mesos-client.master-url", s"${mesosUrl.getHost}:${mesosUrl.getPort}"))
       .withFallback(ConfigFactory.load())
 
-    val framework = CoreHelloWorldFramework(conf.getConfig("mesos-client"))
+    val framework = CoreHelloWorldFramework.run(conf.getConfig("mesos-client"))
   }
 }
