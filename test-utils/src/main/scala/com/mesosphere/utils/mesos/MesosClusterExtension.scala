@@ -113,7 +113,7 @@ object MesosClusterExtension {
     }
 
     /** @return the build updated with a {{{prefix}}} as the log prefix. */
-    def withName(prefix: String): Builder = {
+    def withLogPrefix(prefix: String): Builder = {
       this.suiteName = prefix
       this
     }
