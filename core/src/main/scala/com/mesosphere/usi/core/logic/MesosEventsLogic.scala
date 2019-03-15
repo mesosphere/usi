@@ -1,90 +1,33 @@
 package com.mesosphere.usi.core.logic
 
-import com.mesosphere.ImplicitStrictLogging
-import com.mesosphere.LoggingArgs
 import java.time.Instant
 
+import com.mesosphere.{ImplicitStrictLogging, LoggingArgs}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
-import com.mesosphere.usi.core.matching.ResourceMatcher
+import com.mesosphere.usi.core.matching.{FCFSOfferMatcher, OfferMatcher}
 import com.mesosphere.usi.core.models._
-import com.mesosphere.usi.core.models.resources.{ResourceRequirement, ResourceType}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
+import SchedulerLogicHelpers._
 
-import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
 /**
   * The current home for USI Mesos event related logic
   */
-private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends ImplicitStrictLogging {
-  import SchedulerLogicHelpers._
-  private case class ResourceMatch(podSpec: PodSpec, resources: Seq[Mesos.Resource])
-  @tailrec private def maybeMatchPodSpec(
-      remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
-      matchedResources: List[Mesos.Resource],
-      resourceRequirements: List[ResourceRequirement])
-    : Option[(List[Mesos.Resource], Map[ResourceType, Seq[Mesos.Resource]])] = {
-    resourceRequirements match {
-      case Nil =>
-        Some((matchedResources, remainingResources))
-      case req :: rest =>
-        ResourceMatcher.matchAndConsume(req, remainingResources.getOrElse(req.resourceType, Nil)) match {
-          case Some(matchResult) =>
-            maybeMatchPodSpec(
-              remainingResources.updated(req.resourceType, matchResult.remainingResource),
-              matchResult.matchedResources.toList ++ matchedResources,
-              rest)
-          case None =>
-            // we didn't match
-            None
-        }
-    }
-  }
-
-  @tailrec private def matchPodSpecsTaskRecords(
-      offer: Mesos.Offer,
-      remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
-      result: Map[PodId, List[Mesos.TaskInfo]],
-      pendingLaunchPodSpecs: List[PodSpec]): Map[PodId, List[Mesos.TaskInfo]] = {
-
-    import com.mesosphere.usi.core.protos.ProtoBuilders._
-    import com.mesosphere.usi.core.protos.ProtoConversions._
-
-    pendingLaunchPodSpecs match {
-      case Nil =>
-        result
-
-      case podSpec :: rest =>
-        maybeMatchPodSpec(remainingResources, Nil, podSpec.runSpec.resourceRequirements.toList) match {
-          case Some((matchedResources, newRemainingResources)) =>
-            // Note - right now, runSpec only describes a single task. This needs to be improved in the future.
-            val taskInfos: List[Mesos.TaskInfo] = taskIdsFor(podSpec).map { taskId =>
-              newTaskInfo(
-                taskId.asProto,
-                // we use sanitized podId as the task name for now
-                name = podSpec.id.value.replaceAll("[^a-zA-Z0-9-]", ""),
-                agentId = offer.getAgentId,
-                command = newCommandInfo(podSpec.runSpec.shellCommand, podSpec.runSpec.fetch),
-                resources = matchedResources
-              )
-            }(collection.breakOut)
-
-            matchPodSpecsTaskRecords(offer, newRemainingResources, result.updated(podSpec.id, taskInfos), rest)
-          case None =>
-            matchPodSpecsTaskRecords(offer, remainingResources, result, rest)
-        }
-    }
-  }
+private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher: OfferMatcher = new FCFSOfferMatcher())
+    extends ImplicitStrictLogging {
 
   private[core] def matchOffer(offer: Mesos.Offer, specs: Iterable[PodSpec]): (Set[PodId], SchedulerEventsBuilder) = {
     import com.mesosphere.usi.core.protos.ProtoBuilders._
     import com.mesosphere.usi.core.protos.ProtoConversions._
-    val groupedResources = offer.getResourcesList.asScala.groupBy { r =>
-      ResourceType.fromName(r.getName)
+
+    val matchedSpecs: Map[PodSpec, scala.List[Mesos.Resource]] = offerMatcher.matchOffer(offer, specs)
+    val taskInfos = matchedSpecs.map {
+      case (spec, resources) => spec.id -> buildTaskInfos(spec, offer.getAgentId, resources)
     }
-    val taskInfos = matchPodSpecsTaskRecords(offer, groupedResources, Map.empty, specs.toList)
+
     val eventsBuilder = taskInfos.keys.foldLeft(SchedulerEventsBuilder.empty) { (events, podId) =>
       events.withPodRecord(podId, Some(PodRecord(podId, Instant.now(), offer.getAgentId.asModel)))
     }
@@ -121,6 +64,34 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls) extends Impli
     }
 
     (taskInfos.keySet, eventsBuilder.withMesosCall(offerEvent))
+  }
+
+  /**
+    * Given a [[PodSpec]], an [[Mesos.AgentID]] and a list of matched resources return a list of [[Mesos.TaskInfo]]s
+    *
+    * @param podSpec podSpec
+    * @param agentId agentId from the offer
+    * @param resources list of matched resources
+    * @return
+    */
+  def buildTaskInfos(
+      podSpec: PodSpec,
+      agentId: Mesos.AgentID,
+      resources: List[Mesos.Resource]): List[Mesos.TaskInfo] = {
+    import com.mesosphere.usi.core.protos.ProtoBuilders._
+    import com.mesosphere.usi.core.protos.ProtoConversions._
+
+    // Note - right now, runSpec only describes a single task. This needs to be improved in the future.
+    taskIdsFor(podSpec).map { taskId =>
+      newTaskInfo(
+        taskId.asProto,
+        // we use sanitized podId as the task name for now
+        name = podSpec.id.value.replaceAll("[^a-zA-Z0-9-]", ""),
+        agentId = agentId,
+        command = newCommandInfo(podSpec.runSpec.shellCommand, podSpec.runSpec.fetch),
+        resources = resources
+      )
+    }(collection.breakOut)
   }
 
   def processEvent(specs: SpecState, state: SchedulerState, pendingLaunch: Set[PodId])(
