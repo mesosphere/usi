@@ -45,7 +45,6 @@ allprojects {
         implementation 'org.scala-lang:scala-library:2.12.7'
 
         // Use Scalatest for testing our library
-        testImplementation 'junit:junit:4.12'
         testImplementation "org.scalatest:scalatest_$scalaVersion:3.0.5"
 
         // Need scala-xml at test runtime
@@ -53,8 +52,8 @@ allprojects {
 
         // Logging
         testRuntime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
-
-	// Transitive dependencies
+        
+        // Transitive dependencies
         compile "com.typesafe.scala-logging:scala-logging_$scalaVersion:3.9.2"
 
         // Akka and akka-http
