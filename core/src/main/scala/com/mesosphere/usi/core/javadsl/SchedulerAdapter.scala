@@ -14,9 +14,15 @@ import scala.compat.java8.FutureConverters._
 import akka.japi.tuple.Tuple3
 import akka.japi.Pair
 
-class SchedulerAdapter(schedulerFlow: scaladsl.Flow[SpecInput, StateOutput, NotUsed], mat: Materializer) {
+import scala.concurrent.ExecutionContext
+
+class SchedulerAdapter(
+    schedulerFlow: scaladsl.Flow[SpecInput, StateOutput, NotUsed],
+    mat: Materializer,
+    ec: ExecutionContext) {
 
   private implicit val materializer: Materializer = mat
+  private implicit val executionContext: ExecutionContext = ec
 
   private val delegate = new ScalaSchedulerAdapter(schedulerFlow)
 

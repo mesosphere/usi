@@ -1,24 +1,27 @@
 package com.mesosphere.usi.core.scaladsl
 
 import akka.stream.scaladsl.{Flow, Sink, SinkQueueWithCancel, Source, SourceQueueWithComplete}
-import akka.stream.{Materializer, OverflowStrategy}
+import akka.stream._
 import akka.{Done, NotUsed}
 import com.mesosphere.usi.core.Scheduler.{SpecInput, StateOutput}
 import com.mesosphere.usi.core.models._
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.{Failure, Success}
 
 /**
   * SchedulerAdapter provides a set of simple interfaces to the scheduler flow.
   * @param schedulerFlow
   * @param mat
   */
-class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(implicit mat: Materializer) {
+class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
+    implicit mat: Materializer,
+    ec: ExecutionContext) {
 
   /**
     * Represents the scheduler as a Sink and Source.
     *
-    * This method will materialize the scheduler first, then Sink and Source can be materialized independently.
+    * This method will materialize the scheduler first, then Sink and Source can be materialized independently, but only once.
     *
     * @param specsSnapshot Snapshot of the current specs
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
@@ -32,27 +35,94 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(imp
 
     val stateSnapshotPromise = Promise[StateSnapshot]()
 
+    val killSwitch = KillSwitches.shared("SchedulerAdapter.asSourceAndSink")
+
+    // We need to handle the case when source is cancelled or failed
+    stateQueue.watchCompletion().onComplete {
+      case Success(_) =>
+        killSwitch.shutdown()
+      case Failure(cause) =>
+        killSwitch.abort(cause)
+    }
+
     Source.maybe.prepend {
-      val events = Source.unfoldResourceAsync[SpecUpdated, SinkQueueWithCancel[SpecUpdated]](
-        create = () => Future.successful(specQueue),
-        read = q => q.pull(),
-        close = q =>
-          Future.successful {
-            q.cancel()
-            Done
-        })
+      val events = Source
+        .unfoldResourceAsync[SpecUpdated, SinkQueueWithCancel[SpecUpdated]](
+          create = () => Future.successful(specQueue),
+          read = q => q.pull(),
+          close = q =>
+            Future.successful {
+              killSwitch.shutdown()
+              q.cancel()
+              Done
+          })
+        .watchTermination() {
+          case (_, completionSignal) =>
+            completionSignal.onComplete {
+              case Success(_) =>
+                killSwitch.shutdown()
+              case Failure(cause) =>
+                killSwitch.abort(cause)
+            }
+        }
 
       Source.single(specsSnapshot -> events)
-    }.via(schedulerFlow)
+    }.via(killSwitch.flow)
+      .via(schedulerFlow)
       .flatMapConcat {
         case (snapshot, updates) =>
           stateSnapshotPromise.trySuccess(snapshot)
-          updates
+          updates.watchTermination() {
+            case (_, cancellationSignal) =>
+              cancellationSignal.onComplete {
+                case Success(_) =>
+                  killSwitch.shutdown()
+                case Failure(cause) =>
+                  killSwitch.abort(cause)
+              }
+          }
       }
+      .via(killSwitch.flow)
       .mapAsync(1)(stateQueue.offer)
+      .map {
+        case QueueOfferResult.Enqueued =>
+        case QueueOfferResult.QueueClosed =>
+          killSwitch.shutdown()
+        case QueueOfferResult.Failure(cause) =>
+          killSwitch.abort(cause)
+        case QueueOfferResult.Dropped => // we shouldn't receive that at all because OverflowStrategy.backpressure
+          throw new RuntimeException("Unexpected QueueOfferResult.Dropped element")
+      }
       .runWith(Sink.ignore)
 
-    (stateSnapshotPromise.future, stateSource, specSink)
+    val sourceWithKillSwitch = stateSource
+      .watchTermination() {
+        case (m, cancellationSignal) =>
+          cancellationSignal.onComplete {
+            case Success(_) =>
+              killSwitch.shutdown()
+            case Failure(cause) =>
+              killSwitch.abort(cause)
+          }
+          m
+      }
+      .via(killSwitch.flow)
+
+    val sinkWithKillSwitch = Flow[SpecUpdated]
+      .watchTermination() {
+        case (m, cancellationSignal) =>
+          cancellationSignal.onComplete {
+            case Success(_) =>
+              killSwitch.shutdown()
+            case Failure(cause) =>
+              killSwitch.abort(cause)
+          }
+          m
+      }
+      .via(killSwitch.flow)
+      .to(specSink)
+
+    (stateSnapshotPromise.future, sourceWithKillSwitch, sinkWithKillSwitch)
 
   }
 
@@ -78,27 +148,20 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(imp
     */
   def asAkkaQueues(
       specsSnapshot: SpecsSnapshot = SpecsSnapshot.empty,
-      overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure)
+      overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure,
+      bufferSize: Int = 1)
     : (Future[StateSnapshot], SourceQueueWithComplete[SpecUpdated], SinkQueueWithCancel[StateEvent]) = {
 
-    val (specQueue, specSource) = Source.queue[SpecUpdated](1, overflowStrategy).preMaterialize()
+    val (specQueue, specSource) = Source.queue[SpecUpdated](bufferSize, overflowStrategy).preMaterialize()
 
     val (stateQueue, stateSink) = Sink.queue[StateEvent]().preMaterialize()
 
-    val stateSnapshotPromise = Promise[StateSnapshot]()
+    val (snapshot, source, sink) = asSourceAndSink(specsSnapshot)
 
-    Source.maybe.prepend {
-      Source.single(specsSnapshot -> specSource)
-    }.via(schedulerFlow)
-      .flatMapConcat {
-        case (snapshot, updates) =>
-          stateSnapshotPromise.trySuccess(snapshot)
-          updates
-      }
-      .runWith(stateSink)
+    specSource.runWith(sink)
+    source.runWith(stateSink)
 
-    (stateSnapshotPromise.future, specQueue, stateQueue)
-
+    (snapshot, specQueue, stateQueue)
   }
 
 }
