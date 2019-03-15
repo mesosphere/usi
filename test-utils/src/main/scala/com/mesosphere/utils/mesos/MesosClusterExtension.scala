@@ -14,8 +14,7 @@ class MesosClusterExtension(val mesosCluster: MesosCluster) extends BeforeAllCal
   def getMesosUrl: String = mesosUrl
 
   override def beforeAll(context: ExtensionContext): Unit = {
-    // this.mesosCluster.suiteName = context.getDisplayName()
-    this.mesosUrl = mesosCluster.start
+    this.mesosUrl = mesosCluster.start(Some(context.getDisplayName))
   }
 
   override def afterAll(context: ExtensionContext): Unit = { mesosCluster.close() }
