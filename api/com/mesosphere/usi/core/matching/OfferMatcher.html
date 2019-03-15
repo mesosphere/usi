@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1 API  - com.mesosphere.usi.core.matching.ValueMatched</title>
-          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.matching.ValueMatched" />
-          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.matching.ValueMatched" />
+          <title>usi 0.1 API  - com.mesosphere.usi.core.matching.OfferMatcher</title>
+          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.matching.OfferMatcher" />
+          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.matching.OfferMatcher" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -159,8 +159,8 @@
                         <a href="MesosRange.html" title="">MesosRange</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="trait" href="OfferMatcher.html" title="Interface for the offer matcher implementations."></a>
-                        <a href="OfferMatcher.html" title="Interface for the offer matcher implementations.">OfferMatcher</a>
+                        <a class="trait" href="" title="Interface for the offer matcher implementations."></a>
+                        <a href="" title="Interface for the offer matcher implementations.">OfferMatcher</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="object" href="RangeResourceMatcher$.html" title=""></a>
@@ -183,8 +183,8 @@
                         <a href="ValueMatchResult.html" title="">ValueMatchResult</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="" title=""></a>
-                        <a href="" title="">ValueMatched</a>
+                        <a class="class" href="ValueMatched.html" title=""></a>
+                        <a href="ValueMatched.html" title="">ValueMatched</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="object" href="ValueNotAvailable$.html" title=""></a>
@@ -194,12 +194,12 @@
             </div>
           </div>
           <div id="content">
-            <body class="class type">
+            <body class="trait type">
       <div id="definition">
-        <div class="big-circle class">c</div>
+        <div class="big-circle trait">t</div>
         <p id="owner"><a href="../../../../index.html" class="extype" name="com">com</a>.<a href="../../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../../index.html" class="extype" name="com.mesosphere.usi">usi</a>.<a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a>.<a href="index.html" class="extype" name="com.mesosphere.usi.core.matching">matching</a></p>
-        <h1>ValueMatched<span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html" title="Permalink">
+        <h1>OfferMatcher<span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -209,20 +209,27 @@
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">case class</span>
+        <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">ValueMatched</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <a href="ValueMatchResult.html" class="extype" name="com.mesosphere.usi.core.matching.ValueMatchResult">ValueMatchResult</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">OfferMatcher</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Interface for the offer matcher implementations. Given a Mesos <span class="extype" name="Mesos.Offer">Mesos.Offer</span> and a set of <span class="extype" name="PodSpec">PodSpec</span>s
+return a map of all matched PodSpecs with the list of matched Mesos resources.
+</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="ValueMatchResult.html" class="extype" name="com.mesosphere.usi.core.matching.ValueMatchResult">ValueMatchResult</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
-        </div></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block">
+            <span class="toggle">
+              Known Subclasses
+            </span>
+            <div class="subClasses hiddenContent"><a href="FCFSOfferMatcher.html" class="extype" name="com.mesosphere.usi.core.matching.FCFSOfferMatcher">FCFSOfferMatcher</a></div>
+          </div></div>
         
 
       <div id="mbrsel">
@@ -247,7 +254,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.usi.core.matching.ValueMatched"><span>ValueMatched</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="com.mesosphere.usi.core.matching.ValueMatchResult"><span>ValueMatchResult</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.usi.core.matching.OfferMatcher"><span>OfferMatcher</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -265,38 +272,41 @@
 
       <div id="template">
         <div id="allMembers">
-        <div id="constructors" class="members">
-              <h3>Instance Constructors</h3>
-              <ol><li name="com.mesosphere.usi.core.matching.ValueMatched#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(port:Int):com.mesosphere.usi.core.matching.ValueMatched"></a><a id="&lt;init&gt;:ValueMatched"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#&lt;init&gt;(port:Int):com.mesosphere.usi.core.matching.ValueMatched" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">ValueMatched</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Int">Int</span></span>)</span>
-      </span>
-      
-      
-    </li></ol>
-            </div>
-
         
 
         
 
         <div class="values members">
-              <h3>Value Members</h3>
+              <h3>Abstract Value Members</h3>
+              <ol><li name="com.mesosphere.usi.core.matching.OfferMatcher#matchOffer" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="matchOffer(offer:org.apache.mesos.v1.Protos.Offer,podSpecs:Iterable[com.mesosphere.usi.core.models.PodSpec]):Map[com.mesosphere.usi.core.models.PodSpec,List[org.apache.mesos.v1.Protos.Resource]]"></a><a id="matchOffer(Offer,Iterable[PodSpec]):Map[PodSpec,List[Resource]]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#matchOffer(offer:org.apache.mesos.v1.Protos.Offer,podSpecs:Iterable[com.mesosphere.usi.core.models.PodSpec]):Map[com.mesosphere.usi.core.models.PodSpec,List[org.apache.mesos.v1.Protos.Resource]]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">matchOffer</span><span class="params">(<span name="offer">offer: <span class="extype" name="org.apache.mesos.v1.Protos.Offer">Offer</span></span>, <span name="podSpecs">podSpecs: <span class="extype" name="scala.Iterable">Iterable</span>[<a href="../models/PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../models/PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>, <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.Protos.Resource">Resource</span>]]</span>
+      </span>
+      
+      <p class="shortcomment cmt">Given a Mesos <span class="extype" name="Mesos.Offer">Mesos.Offer</span> and a set of <span class="extype" name="PodSpec">PodSpec</span>s return a map of all matched <a href="../models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">com.mesosphere.usi.core.models.PodId</a>s
+along with their corresponding resources.</p><div class="fullcomment"><div class="comment cmt"><p>Given a Mesos <span class="extype" name="Mesos.Offer">Mesos.Offer</span> and a set of <span class="extype" name="PodSpec">PodSpec</span>s return a map of all matched <a href="../models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">com.mesosphere.usi.core.models.PodId</a>s
+along with their corresponding resources.
+</p></div><dl class="paramcmts block"><dt class="param">offer</dt><dd class="cmt"><p>Mesos offer</p></dd><dt class="param">podSpecs</dt><dd class="cmt"><p>a collection of PodSpecs</p></dd><dt>returns</dt><dd class="cmt"><p>a map of PodSpecs that matched the offer with the list of matched Mesos resouces</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div class="values members">
+              <h3>Concrete Value Members</h3>
               <ol>
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -312,7 +322,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html###():Int" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -328,7 +338,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -344,7 +354,7 @@
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -360,7 +370,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#clone():Object" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -386,7 +396,7 @@
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -399,10 +409,26 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#equals(x$1:Any):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -420,10 +446,31 @@
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#hashCode():Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd><dt>Annotations</dt><dd>
+                <span class="name">@native</span><span class="args">()</span>
+              
+                <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
+              
+        </dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -439,7 +486,7 @@
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -455,7 +502,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#notify():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -476,7 +523,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -494,26 +541,10 @@
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.matching.ValueMatched#port" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="port:Int"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#port:Int" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">port</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -526,10 +557,26 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#toString():String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -551,7 +598,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -575,7 +622,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#wait():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -605,7 +652,7 @@
               <ol><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/ValueMatched.html#finalize():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -633,17 +680,7 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.Serializable">
-              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="java.io.Serializable">
-              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="scala.Product">
-              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
-            </div><div class="parent" name="scala.Equals">
-              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
-            </div><div class="parent" name="com.mesosphere.usi.core.matching.ValueMatchResult">
-              <h3>Inherited from <a href="ValueMatchResult.html" class="extype" name="com.mesosphere.usi.core.matching.ValueMatchResult">ValueMatchResult</a></h3>
-            </div><div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
