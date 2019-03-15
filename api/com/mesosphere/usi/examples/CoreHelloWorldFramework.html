@@ -159,10 +159,10 @@
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">class</span>
+        <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">CoreHelloWorldFramework</span><span class="result"> extends <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></span>
+        <span class="name">CoreHelloWorldFramework</span><span class="params">(<span name="frameworkId">frameworkId: <span class="extype" name="org.apache.mesos.v1.Protos.FrameworkID">FrameworkID</span></span>, <span name="killSwitch">killSwitch: <span class="extype" name="akka.stream.KillSwitch">KillSwitch</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -173,7 +173,7 @@
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -199,7 +199,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.usi.examples.CoreHelloWorldFramework"><span>CoreHelloWorldFramework</span></li><li class="in" name="com.typesafe.scalalogging.StrictLogging"><span>StrictLogging</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.usi.examples.CoreHelloWorldFramework"><span>CoreHelloWorldFramework</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -220,9 +220,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(conf:com.typesafe.config.Config):com.mesosphere.usi.examples.CoreHelloWorldFramework"></a><a id="&lt;init&gt;:CoreHelloWorldFramework"></a>
+      <a id="&lt;init&gt;(frameworkId:org.apache.mesos.v1.Protos.FrameworkID,killSwitch:akka.stream.KillSwitch):com.mesosphere.usi.examples.CoreHelloWorldFramework"></a><a id="&lt;init&gt;:CoreHelloWorldFramework"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#&lt;init&gt;(conf:com.typesafe.config.Config):com.mesosphere.usi.examples.CoreHelloWorldFramework" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#&lt;init&gt;(frameworkId:org.apache.mesos.v1.Protos.FrameworkID,killSwitch:akka.stream.KillSwitch):com.mesosphere.usi.examples.CoreHelloWorldFramework" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -231,7 +231,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">CoreHelloWorldFramework</span><span class="params">(<span name="conf">conf: <span class="extype" name="com.typesafe.config.Config">Config</span></span>)</span>
+        <span class="name">CoreHelloWorldFramework</span><span class="params">(<span name="frameworkId">frameworkId: <span class="extype" name="org.apache.mesos.v1.Protos.FrameworkID">FrameworkID</span></span>, <span name="killSwitch">killSwitch: <span class="extype" name="akka.stream.KillSwitch">KillSwitch</span></span>)</span>
       </span>
       
       
@@ -309,22 +309,6 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#client" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="client:com.mesosphere.mesos.client.MesosClient"></a><a id="client:MesosClient"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#client:com.mesosphere.mesos.client.MesosClient" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">client</span><span class="result">: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
@@ -351,22 +335,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#ec" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ec:scala.concurrent.ExecutionContextExecutor"></a><a id="ec:ExecutionContextExecutor"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#ec:scala.concurrent.ExecutionContextExecutor" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">ec</span><span class="result">: <span class="extype" name="scala.concurrent.ExecutionContextExecutor">ExecutionContextExecutor</span></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -383,26 +351,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
+    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#frameworkId" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="frameworkId:org.apache.mesos.v1.Protos.FrameworkID"></a><a id="frameworkId:FrameworkID"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#equals(x$1:Any):Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#frameworkInfo" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo"></a><a id="frameworkInfo:FrameworkInfo"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#frameworkId:org.apache.mesos.v1.Protos.FrameworkID" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -411,7 +363,7 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">frameworkInfo</span><span class="result">: <span class="extype" name="org.apache.mesos.v1.Protos.FrameworkInfo">FrameworkInfo</span></span>
+        <span class="name">frameworkId</span><span class="result">: <span class="extype" name="org.apache.mesos.v1.Protos.FrameworkID">FrameworkID</span></span>
       </span>
       
       
@@ -436,27 +388,6 @@
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="hashCode():Int"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#hashCode():Int" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd><dt>Annotations</dt><dd>
-                <span class="name">@native</span><span class="args">()</span>
-              
-                <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
-              
-        </dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
@@ -473,10 +404,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.typesafe.scalalogging.StrictLogging#logger" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="logger:com.typesafe.scalalogging.Logger"></a><a id="logger:Logger"></a>
+    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#killSwitch" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="killSwitch:akka.stream.KillSwitch"></a><a id="killSwitch:KillSwitch"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#logger:com.typesafe.scalalogging.Logger" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#killSwitch:akka.stream.KillSwitch" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -485,23 +416,7 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">logger</span><span class="result">: <span class="extype" name="com.typesafe.scalalogging.Logger">Logger</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>StrictLogging</dd></dl></div>
-    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#mat" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="mat:akka.stream.ActorMaterializer"></a><a id="mat:ActorMaterializer"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#mat:akka.stream.ActorMaterializer" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">mat</span><span class="result">: <span class="extype" name="akka.stream.ActorMaterializer">ActorMaterializer</span></span>
+        <span class="name">killSwitch</span><span class="result">: <span class="extype" name="akka.stream.KillSwitch">KillSwitch</span></span>
       </span>
       
       
@@ -563,118 +478,6 @@
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#podId" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="podId:com.mesosphere.usi.core.models.PodId"></a><a id="podId:PodId"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#podId:com.mesosphere.usi.core.models.PodId" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">podId</span><span class="result">: <a href="../core/models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#podSpec" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="podSpec:com.mesosphere.usi.core.models.PodSpec"></a><a id="podSpec:PodSpec"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#podSpec:com.mesosphere.usi.core.models.PodSpec" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">podSpec</span><span class="result">: <a href="../core/models/PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#runSpec" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="runSpec:com.mesosphere.usi.core.models.RunSpec"></a><a id="runSpec:RunSpec"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#runSpec:com.mesosphere.usi.core.models.RunSpec" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">runSpec</span><span class="result">: <a href="../core/models/RunSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunSpec">RunSpec</a></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#schedulerFlow" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="schedulerFlow:akka.stream.scaladsl.Flow[(com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any]),(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any]),akka.NotUsed]"></a><a id="schedulerFlow:Flow[(SpecsSnapshot,Source[SpecUpdated,Any]),(StateSnapshot,Source[StateEvent,Any]),NotUsed]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#schedulerFlow:akka.stream.scaladsl.Flow[(com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any]),(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any]),akka.NotUsed]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">schedulerFlow</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[(<a href="../core/models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a>, <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<a href="../core/models/SpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.SpecUpdated">SpecUpdated</a>, <span class="extype" name="scala.Any">Any</span>]), (<a href="../core/models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a>, <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<a href="../core/models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>, <span class="extype" name="scala.Any">Any</span>]), <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">The signature of the <a href="#schedulerFlow:akka.stream.scaladsl.Flow[(com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any]),(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any]),akka.NotUsed]" class="extmbr" name="com.mesosphere.usi.examples.CoreHelloWorldFramework#schedulerFlow">schedulerFlow</a> might look scary at the first glance (and sometimes even at second) but it is
-at the core (!) of any framework.</p><div class="fullcomment"><div class="comment cmt"><p>The signature of the <a href="#schedulerFlow:akka.stream.scaladsl.Flow[(com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any]),(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any]),akka.NotUsed]" class="extmbr" name="com.mesosphere.usi.examples.CoreHelloWorldFramework#schedulerFlow">schedulerFlow</a> might look scary at the first glance (and sometimes even at second) but it is
-at the core (!) of any framework. Basically it is a Flow that <span class="extype" name="SpecUpdated">SpecUpdated</span> events as input and produces
-<span class="extype" name="StateEvent">StateEvent</span> as an output.</p><p>+--------------------+         +-----------------------+        +-----------------------+</p><table class="doctbl">
-      <thead>
-        <tr><th class="doctbl-right"><p>                    </p></th><th class="doctbl-right"><p>         </p></th><th class="doctbl-right"><p>                       </p></th><th class="doctbl-right"><p>        </p></th><th class="doctbl-right"><p>                       </p></th></tr>
-      </thead>
-      <tbody><tr><td class="doctbl-right"><p>                    +---------&gt;  Core SchedulerFlow   +--------&gt;                       </p></td><td class="doctbl-right"></td><td class="doctbl-right"></td><td class="doctbl-right"></td><td class="doctbl-right"></td></tr><tr><td class="doctbl-right"><p>   new and updated  </p></td><td class="doctbl-right"><p>         </p></td><td class="doctbl-right"><p>                       </p></td><td class="doctbl-right"><p>        </p></td><td class="doctbl-right"><p> replicated Pod, Agent </p></td></tr><tr><td class="doctbl-right"><p>       PodSpecs     </p></td><td class="doctbl-right"><p>         </p></td><td class="doctbl-right"><p>                       </p></td><td class="doctbl-right"><p>        </p></td><td class="doctbl-right"><p> and Reservations state</p></td></tr>
-          </tbody>
-    </table><p>+--------------------+         +-----------------------+        +-----------------------+</p><p>In a nutshell: frameworks sends <span class="extype" name="PodSpec">PodSpec</span> updates down the flow and receives <span class="extype" name="StateEvent">StateEvent</span>s when things
-change. So why is the input parameter of that Flow not simply a <span class="extype" name="SpecUpdated">SpecUpdated</span> but a tuple of
-<span class="extype" name="SpecsSnapshot">SpecsSnapshot</span> and Source<span class="extype" name="SpecUpdated">SpecUpdated</span>? This is because the first message sent to the scheduler
-by the framework should be a snapshot of all PodSpecs known to the framework - a <span class="extype" name="SpecsSnapshot">SpecsSnapshot</span>. Internally
-this will trigger [task reconciliation](http://mesos.apache.org/documentation/latest/reconciliation/) by the
-scheduler.</p><p>The same logic applies for the output parameter of the scheduler Flow - it's a tuple of <span class="extype" name="StateSnapshot">StateSnapshot</span> and a
-Source of <span class="extype" name="StateEvent">StateEvent</span>, which means that the first state event received by the framework will be a
-snapshot of all reconciled tasks states, followed by a individual updates.</p><p>For more about the scheduler flow see <span class="extype" name="Scheduler">Scheduler</span> class documentation.</p></div></div>
-    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#settings" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="settings:com.mesosphere.mesos.conf.MesosClientSettings"></a><a id="settings:MesosClientSettings"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#settings:com.mesosphere.mesos.conf.MesosClientSettings" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">settings</span><span class="result">: <a href="../../mesos/conf/MesosClientSettings.html" class="extype" name="com.mesosphere.mesos.conf.MesosClientSettings">MesosClientSettings</a></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#specsSnapshot" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot"></a><a id="specsSnapshot:SpecsSnapshot"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">specsSnapshot</span><span class="result">: <a href="../core/models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
@@ -691,38 +494,6 @@ snapshot of all reconciled tasks states, followed by a individual updates.</p><p
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.mesosphere.usi.examples.CoreHelloWorldFramework#system" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="system:akka.actor.ActorSystem"></a><a id="system:ActorSystem"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#system:akka.actor.ActorSystem" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">system</span><span class="result">: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>
-      </span>
-      
-      
-    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="toString():String"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/examples/CoreHelloWorldFramework.html#toString():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
@@ -830,8 +601,14 @@ snapshot of all reconciled tasks states, followed by a individual updates.</p><p
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.typesafe.scalalogging.StrictLogging">
-              <h3>Inherited from <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></h3>
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.Product">
+              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
+            </div><div class="parent" name="scala.Equals">
+              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
