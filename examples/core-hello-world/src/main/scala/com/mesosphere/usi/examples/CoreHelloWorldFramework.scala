@@ -4,8 +4,8 @@ import java.util.UUID
 
 import akka.NotUsed
 import akka.actor.ActorSystem
+import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Keep, Sink, SinkQueueWithCancel, Source}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
@@ -29,6 +29,7 @@ import org.apache.mesos.v1.Protos.{FrameworkInfo, TaskState, TaskStatus}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.sys.SystemProperties
+import scala.util.{Failure, Success}
 
 /**
   * Run the hello-world example framework that:
@@ -100,7 +101,7 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
   val podId = PodId(s"hello-world.${UUID.randomUUID()}")
   val runSpec = RunSpec(
     resourceRequirements = List(ScalarRequirement.cpus(0.1), ScalarRequirement.memory(32)),
-    shellCommand = """echo "Hello, world" && sleep 3600"""
+    shellCommand = """echo "Hello, world" && sleep 123456789"""
   )
   val podSpec = PodSpec(
     id = podId,
@@ -113,7 +114,7 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
     reservationSpecs = Seq.empty
   )
 
-  val output: SinkQueueWithCancel[StateEvent] = Source
+  Source
   // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
   // which emits a materialized promise which when completed with a Some, that value will be produced downstream,
   // followed by completion. To avoid stream completion we never complete the promise but prepend the stream with
@@ -136,7 +137,7 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
     }
     .map {
       // Main state event handler. We log happy events and exit if something goes wrong
-      case e @ PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
+      case PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
         import TaskState._
         def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
 
@@ -145,14 +146,20 @@ class CoreHelloWorldFramework(conf: Config) extends StrictLogging {
         assert(failedTasks.isEmpty, s"Found failed tasks: $failedTasks, can't handle them now so will terminate")
 
         logger.info(s"Task status updates for podId: $id: ${taskStatuses}")
-        e
 
       case e =>
-        logger.error(s"Unhandled event: $e") // we ignore everything else for now
-        e
+        logger.warn(s"Unhandled event: $e") // we ignore everything else for now
     }
-    .toMat(Sink.queue())(Keep.right)
+    .toMat(Sink.ignore)(Keep.right)
     .run()
+    .onComplete {
+      case Success(res) =>
+        logger.info(s"Stream completed: $res");
+        system.terminate()
+      case Failure(e) =>
+        logger.error(s"Error in stream: $e");
+        system.terminate()
+    }
 }
 
 object CoreHelloWorldFramework {
