@@ -1,4 +1,4 @@
-package com.mesosphere.usi.core.javadsl
+package com.mesosphere.usi.core.javaapi
 
 import java.util.Optional
 import java.util.concurrent.{CompletableFuture, CompletionStage}
@@ -7,7 +7,7 @@ import akka.{Done, NotUsed}
 import akka.stream.{Materializer, OverflowStrategy, QueueOfferResult, scaladsl}
 import akka.stream.javadsl.{Flow, Sink, SinkQueueWithCancel, Source, SourceQueueWithComplete}
 import com.mesosphere.usi.core.Scheduler.{SpecInput, StateOutput}
-import com.mesosphere.usi.core.scaladsl.{SchedulerAdapter => ScalaSchedulerAdapter}
+import com.mesosphere.usi.core.scalaapi.{SchedulerAdapter => ScalaSchedulerAdapter}
 import com.mesosphere.usi.core.models.{SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
 
 import scala.compat.java8.FutureConverters._

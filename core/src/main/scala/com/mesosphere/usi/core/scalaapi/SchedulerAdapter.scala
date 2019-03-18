@@ -1,4 +1,4 @@
-package com.mesosphere.usi.core.scaladsl
+package com.mesosphere.usi.core.scalaapi
 
 import akka.stream.scaladsl.{Flow, Sink, SinkQueueWithCancel, Source, SourceQueueWithComplete}
 import akka.stream._
@@ -49,11 +49,11 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
       val events = Source
         .unfoldResourceAsync[SpecUpdated, SinkQueueWithCancel[SpecUpdated]](
           create = () => Future.successful(specQueue),
-          read = q => q.pull(),
-          close = q =>
+          read = queue => queue.pull(),
+          close = queue =>
             Future.successful {
               killSwitch.shutdown()
-              q.cancel()
+              queue.cancel()
               Done
           })
         .watchTermination() {
@@ -97,27 +97,27 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
 
     val sourceWithKillSwitch = stateSource
       .watchTermination() {
-        case (m, cancellationSignal) =>
+        case (materializedValue, cancellationSignal) =>
           cancellationSignal.onComplete {
             case Success(_) =>
               killSwitch.shutdown()
             case Failure(cause) =>
               killSwitch.abort(cause)
           }
-          m
+          materializedValue
       }
       .via(killSwitch.flow)
 
     val sinkWithKillSwitch = Flow[SpecUpdated]
       .watchTermination() {
-        case (m, cancellationSignal) =>
+        case (materializedValue, cancellationSignal) =>
           cancellationSignal.onComplete {
             case Success(_) =>
               killSwitch.shutdown()
             case Failure(cause) =>
               killSwitch.abort(cause)
           }
-          m
+          materializedValue
       }
       .via(killSwitch.flow)
       .to(specSink)
@@ -141,6 +141,9 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
 
   /**
     * Represents the scheduler as a SourceQueue and a SinkQueue.
+    *
+    * @see https://doc.akka.io/api/akka/current/akka/stream/scaladsl/SourceQueue.html
+    *      https://doc.akka.io/api/akka/current/akka/stream/scaladsl/SinkQueue.html
     *
     * This method will materialize the scheduler first, then queues can be used independently.
     * @param specsSnapshot Snapshot of the current specs

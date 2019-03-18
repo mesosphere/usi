@@ -1,4 +1,4 @@
-package com.mesosphere.usi.core.scaladsl
+package com.mesosphere.usi.core.scalaapi
 
 import akka.NotUsed
 import akka.stream.scaladsl.{SinkQueueWithCancel, SourceQueueWithComplete}
@@ -90,10 +90,12 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
 
         Source
           .repeat(specEvent)
-          .watchTermination()((_, f) => f.map(_ => specStreamCompletionPromise.trySuccess("completed")))
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.map(_ => specStreamCompletionPromise.trySuccess("completed")))
           .runWith(sink)
         source
-          .watchTermination()((_, f) => f.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
           .runWith(Sink.ignore)
 
         innerSource.runWith(Sink.cancelled) // cancel incoming updates on scheduler size
@@ -112,10 +114,12 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
 
         Source
           .single(specEvent) // issue single spec update and then cancel the stream
-          .watchTermination()((_, f) => f.map(_ => specStreamCompletionPromise.trySuccess("completed")))
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.map(_ => specStreamCompletionPromise.trySuccess("completed")))
           .runWith(sink)
         source
-          .watchTermination()((_, f) => f.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
           .runWith(Sink.ignore)
 
         specStreamCompletionPromise.future.futureValue shouldEqual "completed"
@@ -132,11 +136,13 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
 
         Source
           .repeat(specEvent)
-          .watchTermination()((_, f) => f.map(_ => specStreamCompletionPromise.trySuccess("completed")))
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.map(_ => specStreamCompletionPromise.trySuccess("completed")))
           .runWith(sink)
 
         source
-          .watchTermination()((_, f) => f.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
           .runWith(Sink.ignore)
 
         stateOutputQueue.offer(StateSnapshot.empty -> Source.single(stateEvent)).futureValue
@@ -155,11 +161,13 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
 
         Source
           .repeat(specEvent)
-          .watchTermination()((_, f) => f.map(_ => specStreamCompletionPromise.trySuccess("completed")))
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.map(_ => specStreamCompletionPromise.trySuccess("completed")))
           .runWith(sink)
 
         source
-          .watchTermination()((_, f) => f.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
           .runWith(Sink.head)
 
         stateOutputQueue.offer(StateSnapshot.empty -> Source.repeat(stateEvent)).futureValue
@@ -183,8 +191,8 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
           .runWith(sink)
 
         source
-          .watchTermination()((_, f) =>
-            f.onComplete {
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.onComplete {
               case Success(_) =>
                 stateStreamCompletionPromise.trySuccess("success")
 
@@ -207,8 +215,8 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
 
         Source
           .repeat(specEvent)
-          .watchTermination()((_, f) =>
-            f.onComplete {
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.onComplete {
               case Success(_) =>
                 stateStreamCompletionPromise.trySuccess("stopped")
 
@@ -237,8 +245,8 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
 
         Source
           .repeat(specEvent)
-          .watchTermination()((_, f) =>
-            f.onComplete {
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.onComplete {
               case Success(_) =>
                 specStreamCompletionPromise.trySuccess("stopped")
 
@@ -248,8 +256,8 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
           .runWith(sink)
 
         source
-          .watchTermination()((_, f) =>
-            f.onComplete {
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.onComplete {
               case Success(_) =>
                 stateStreamCompletionPromise.trySuccess("stopped")
 
@@ -276,8 +284,8 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
 
         Source
           .repeat(specEvent)
-          .watchTermination()((_, f) =>
-            f.onComplete {
+          .watchTermination()((_, terminationSignal) =>
+            terminationSignal.onComplete {
               case Success(_) =>
                 specStreamCompletionPromise.trySuccess("stopped")
 
@@ -288,8 +296,8 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
 
         source.map { e =>
           println(e)
-        }.watchTermination()((_, f) =>
-            f.onComplete {
+        }.watchTermination()((_, terminationSignal) =>
+            terminationSignal.onComplete {
               case Success(_) =>
                 stateStreamCompletionPromise.trySuccess("stopped")
 
