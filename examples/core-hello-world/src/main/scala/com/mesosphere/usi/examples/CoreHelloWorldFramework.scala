@@ -108,7 +108,7 @@ object CoreHelloWorldFramework extends StrictLogging {
       *
       */
     val schedulerFlow
-    : Flow[(SpecsSnapshot, Source[SpecUpdated, Any]), (StateSnapshot, Source[StateEvent, Any]), NotUsed] =
+      : Flow[(SpecsSnapshot, Source[SpecUpdated, Any]), (StateSnapshot, Source[StateEvent, Any]), NotUsed] =
       Scheduler.fromClient(client)
 
     // Lets construct the initial specs snapshot which will contain our hello-world PodSpec. For that we generate
@@ -149,9 +149,9 @@ object CoreHelloWorldFramework extends StrictLogging {
       // later updates, into one stream where the first element is the snapshot and all later elements are single
       // state events. This makes the event handling a simple match-case
       .flatMapConcat {
-      case (snapshot, updates) =>
-        updates.prepend(Source.single(snapshot))
-    }
+        case (snapshot, updates) =>
+          updates.prepend(Source.single(snapshot))
+      }
       .map {
         // Main state event handler. We log happy events and exit if something goes wrong
         case PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
