@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1 API  - com.mesosphere.utils.zookeeper.ZookeeperServerTest</title>
-          <meta name="description" content="usi 0.1 API - com.mesosphere.utils.zookeeper.ZookeeperServerTest" />
-          <meta name="keywords" content="usi 0.1 API com.mesosphere.utils.zookeeper.ZookeeperServerTest" />
+          <title>usi 0.1 API  - com.mesosphere.utils.zookeeper.ZookeeperServerExtension</title>
+          <meta name="description" content="usi 0.1 API - com.mesosphere.utils.zookeeper.ZookeeperServerExtension" />
+          <meta name="keywords" content="usi 0.1 API com.mesosphere.utils.zookeeper.ZookeeperServerExtension" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -143,23 +143,23 @@
                         <a href="ZookeeperServer.html" title="Runs ZooKeeper server in memory at the given port.">ZookeeperServer</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="class" href="ZookeeperServerExtension.html" title="Provides a JUnit 5 extension for booting a Zookeeper server for tests."></a>
-                        <a href="ZookeeperServerExtension.html" title="Provides a JUnit 5 extension for booting a Zookeeper server for tests.">ZookeeperServerExtension</a>
+                        <a class="class" href="" title="Provides a JUnit 5 extension for booting a Zookeeper server for tests."></a>
+                        <a href="" title="Provides a JUnit 5 extension for booting a Zookeeper server for tests.">ZookeeperServerExtension</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="trait" href="" title="A trait that can be mixed in to run integration tests with a in-memory Zookeeper server."></a>
-                        <a href="" title="A trait that can be mixed in to run integration tests with a in-memory Zookeeper server.">ZookeeperServerTest</a>
+                        <a class="trait" href="ZookeeperServerTest.html" title="A trait that can be mixed in to run integration tests with a in-memory Zookeeper server."></a>
+                        <a href="ZookeeperServerTest.html" title="A trait that can be mixed in to run integration tests with a in-memory Zookeeper server.">ZookeeperServerTest</a>
                       </li>
               </ul>
             </div>
           </div>
           <div id="content">
-            <body class="trait type">
+            <body class="class type">
       <div id="definition">
-        <div class="big-circle trait">t</div>
+        <div class="big-circle class">c</div>
         <p id="owner"><a href="../../../index.html" class="extype" name="com">com</a>.<a href="../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../index.html" class="extype" name="com.mesosphere.utils">utils</a>.<a href="index.html" class="extype" name="com.mesosphere.utils.zookeeper">zookeeper</a></p>
-        <h1>ZookeeperServerTest<span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html" title="Permalink">
+        <h1>ZookeeperServerExtension<span class="permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -169,28 +169,21 @@
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">trait</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">ZookeeperServerTest</span><span class="result"> extends <span class="extype" name="org.scalatest.BeforeAndAfterAll">BeforeAndAfterAll</span> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></span>
+        <span class="name">ZookeeperServerExtension</span><span class="result"> extends <span class="extype" name="org.junit.jupiter.api.extension.BeforeAllCallback">BeforeAllCallback</span> with <span class="extype" name="org.junit.jupiter.api.extension.AfterAllCallback">AfterAllCallback</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A trait that can be mixed in to run integration tests with a in-memory Zookeeper server. Note that
-because this trait uses <span class="extype" name="BeforeAndAfterAll">BeforeAndAfterAll</span> which invokes super.run to run the suite, you may need
-to mix this trait in last to get the desired behavior.
-</p></div><dl class="attributes block"> <dt>Self Type</dt><dd><a href="" class="extype" name="com.mesosphere.utils.zookeeper.ZookeeperServerTest">ZookeeperServerTest</a> with <span class="extype" name="org.scalatest.Suite">Suite</span></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides a JUnit 5 extension for booting a Zookeeper server for tests.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../mesos/MesosClusterExtension.html" class="extype" name="com.mesosphere.utils.mesos.MesosClusterExtension">com.mesosphere.utils.mesos.MesosClusterExtension</a> for an example.</p></span></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span>, <span class="extype" name="org.scalatest.BeforeAndAfterAll">BeforeAndAfterAll</span>, <span class="extype" name="org.scalatest.SuiteMixin">SuiteMixin</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
-        </div><div class="toggleContainer block">
-            <span class="toggle">
-              Known Subclasses
-            </span>
-            <div class="subClasses hiddenContent"><a href="../mesos/MesosClusterTest.html" class="extype" name="com.mesosphere.utils.mesos.MesosClusterTest">MesosClusterTest</a></div>
-          </div></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="org.junit.jupiter.api.extension.AfterAllCallback">AfterAllCallback</span>, <span class="extype" name="org.junit.jupiter.api.extension.BeforeAllCallback">BeforeAllCallback</span>, <span class="extype" name="org.junit.jupiter.api.extension.Extension">Extension</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
         
 
       <div id="mbrsel">
@@ -215,7 +208,7 @@ to mix this trait in last to get the desired behavior.
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.utils.zookeeper.ZookeeperServerTest"><span>ZookeeperServerTest</span></li><li class="in" name="com.typesafe.scalalogging.StrictLogging"><span>StrictLogging</span></li><li class="in" name="org.scalatest.BeforeAndAfterAll"><span>BeforeAndAfterAll</span></li><li class="in" name="org.scalatest.SuiteMixin"><span>SuiteMixin</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.utils.zookeeper.ZookeeperServerExtension"><span>ZookeeperServerExtension</span></li><li class="in" name="org.junit.jupiter.api.extension.AfterAllCallback"><span>AfterAllCallback</span></li><li class="in" name="org.junit.jupiter.api.extension.BeforeAllCallback"><span>BeforeAllCallback</span></li><li class="in" name="org.junit.jupiter.api.extension.Extension"><span>Extension</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -233,214 +226,38 @@ to mix this trait in last to get the desired behavior.
 
       <div id="template">
         <div id="allMembers">
-        
-
-        
-
-        <div class="values members">
-              <h3>Abstract Value Members</h3>
-              <ol><li name="org.scalatest.SuiteMixin#expectedTestCount" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="expectedTestCount(filter:org.scalatest.Filter):Int"></a><a id="expectedTestCount(Filter):Int"></a>
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="com.mesosphere.utils.zookeeper.ZookeeperServerExtension#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;():com.mesosphere.utils.zookeeper.ZookeeperServerExtension"></a><a id="&lt;init&gt;:ZookeeperServerExtension"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#expectedTestCount(filter:org.scalatest.Filter):Int" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#&lt;init&gt;():com.mesosphere.utils.zookeeper.ZookeeperServerExtension" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
+        <span class="modifier"></span>
+        <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">expectedTestCount</span><span class="params">(<span name="filter">filter: <span class="extype" name="org.scalatest.Filter">Filter</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+        <span class="name">ZookeeperServerExtension</span><span class="params">()</span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
-    </li><li name="org.scalatest.SuiteMixin#nestedSuites" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="nestedSuites:scala.collection.immutable.IndexedSeq[org.scalatest.Suite]"></a><a id="nestedSuites:IndexedSeq[Suite]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#nestedSuites:scala.collection.immutable.IndexedSeq[org.scalatest.Suite]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">nestedSuites</span><span class="result">: <span class="extype" name="scala.collection.immutable.IndexedSeq">IndexedSeq</span>[<span class="extype" name="org.scalatest.Suite">Suite</span>]</span>
-      </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
-    </li><li name="org.scalatest.SuiteMixin#rerunner" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="rerunner:Option[String]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#rerunner:Option[String]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">rerunner</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
-    </li><li name="org.scalatest.SuiteMixin#runNestedSuites" visbl="prt" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="runNestedSuites(args:org.scalatest.Args):org.scalatest.Status"></a><a id="runNestedSuites(Args):Status"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#runNestedSuites(args:org.scalatest.Args):org.scalatest.Status" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">runNestedSuites</span><span class="params">(<span name="args">args: <span class="extype" name="org.scalatest.Args">Args</span></span>)</span><span class="result">: <span class="extype" name="org.scalatest.Status">Status</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
-    </li><li name="org.scalatest.SuiteMixin#runTest" visbl="prt" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="runTest(testName:String,args:org.scalatest.Args):org.scalatest.Status"></a><a id="runTest(String,Args):Status"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#runTest(testName:String,args:org.scalatest.Args):org.scalatest.Status" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">runTest</span><span class="params">(<span name="testName">testName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="args">args: <span class="extype" name="org.scalatest.Args">Args</span></span>)</span><span class="result">: <span class="extype" name="org.scalatest.Status">Status</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
-    </li><li name="org.scalatest.SuiteMixin#runTests" visbl="prt" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="runTests(testName:Option[String],args:org.scalatest.Args):org.scalatest.Status"></a><a id="runTests(Option[String],Args):Status"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#runTests(testName:Option[String],args:org.scalatest.Args):org.scalatest.Status" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">runTests</span><span class="params">(<span name="testName">testName: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="args">args: <span class="extype" name="org.scalatest.Args">Args</span></span>)</span><span class="result">: <span class="extype" name="org.scalatest.Status">Status</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
-    </li><li name="org.scalatest.SuiteMixin#styleName" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="styleName:String"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#styleName:String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">styleName</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
-    </li><li name="org.scalatest.SuiteMixin#suiteId" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="suiteId:String"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#suiteId:String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">suiteId</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
-    </li><li name="org.scalatest.SuiteMixin#suiteName" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="suiteName:String"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#suiteName:String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">suiteName</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
-    </li><li name="org.scalatest.SuiteMixin#tags" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="tags:Map[String,Set[String]]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#tags:Map[String,Set[String]]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">tags</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scala.Predef.String">String</span>]]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
-    </li><li name="org.scalatest.SuiteMixin#testDataFor" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="testDataFor(testName:String,theConfigMap:org.scalatest.ConfigMap):org.scalatest.TestData"></a><a id="testDataFor(String,ConfigMap):TestData"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#testDataFor(testName:String,theConfigMap:org.scalatest.ConfigMap):org.scalatest.TestData" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">testDataFor</span><span class="params">(<span name="testName">testName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="theConfigMap">theConfigMap: <span class="extype" name="org.scalatest.ConfigMap">ConfigMap</span></span>)</span><span class="result">: <span class="extype" name="org.scalatest.TestData">TestData</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
-    </li><li name="org.scalatest.SuiteMixin#testNames" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="testNames:Set[String]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#testNames:Set[String]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">testNames</span><span class="result">: <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SuiteMixin</dd></dl></div>
     </li></ol>
             </div>
 
+        
+
+        
+
         <div class="values members">
-              <h3>Concrete Value Members</h3>
+              <h3>Value Members</h3>
               <ol>
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -456,7 +273,7 @@ to mix this trait in last to get the desired behavior.
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html###():Int" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -472,7 +289,7 @@ to mix this trait in last to get the desired behavior.
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -485,10 +302,10 @@ to mix this trait in last to get the desired behavior.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.mesosphere.utils.zookeeper.ZookeeperServerTest#afterAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="afterAll():Unit"></a>
+    </li><li name="com.mesosphere.utils.zookeeper.ZookeeperServerExtension#afterAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="afterAll(context:org.junit.jupiter.api.extension.ExtensionContext):Unit"></a><a id="afterAll(ExtensionContext):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#afterAll():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#afterAll(context:org.junit.jupiter.api.extension.ExtensionContext):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -497,14 +314,14 @@ to mix this trait in last to get the desired behavior.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">afterAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">afterAll</span><span class="params">(<span name="context">context: <span class="extype" name="org.junit.jupiter.api.extension.ExtensionContext">ExtensionContext</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.utils.zookeeper.ZookeeperServerTest">ZookeeperServerTest</a> → BeforeAndAfterAll</dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.utils.zookeeper.ZookeeperServerExtension">ZookeeperServerExtension</a> → AfterAllCallback</dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -517,10 +334,10 @@ to mix this trait in last to get the desired behavior.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.mesosphere.utils.zookeeper.ZookeeperServerTest#beforeAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="beforeAll():Unit"></a>
+    </li><li name="com.mesosphere.utils.zookeeper.ZookeeperServerExtension#beforeAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="beforeAll(context:org.junit.jupiter.api.extension.ExtensionContext):Unit"></a><a id="beforeAll(ExtensionContext):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#beforeAll():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#beforeAll(context:org.junit.jupiter.api.extension.ExtensionContext):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -529,14 +346,14 @@ to mix this trait in last to get the desired behavior.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">beforeAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">beforeAll</span><span class="params">(<span name="context">context: <span class="extype" name="org.junit.jupiter.api.extension.ExtensionContext">ExtensionContext</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.utils.zookeeper.ZookeeperServerTest">ZookeeperServerTest</a> → BeforeAndAfterAll</dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.utils.zookeeper.ZookeeperServerExtension">ZookeeperServerExtension</a> → BeforeAllCallback</dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#clone():Object" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -562,7 +379,7 @@ to mix this trait in last to get the desired behavior.
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -578,7 +395,7 @@ to mix this trait in last to get the desired behavior.
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -594,7 +411,7 @@ to mix this trait in last to get the desired behavior.
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -612,10 +429,26 @@ to mix this trait in last to get the desired behavior.
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.utils.zookeeper.ZookeeperServerExtension#getConnectionUrl" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getConnectionUrl():String"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#getConnectionUrl():String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getConnectionUrl</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>the URL of the started Zookeeper server.</p></dd></dl></div>
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#hashCode():Int" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -633,26 +466,10 @@ to mix this trait in last to get the desired behavior.
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="org.scalatest.BeforeAndAfterAll#invokeBeforeAllAndAfterAllEvenIfNoTestsAreExpected" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="invokeBeforeAllAndAfterAllEvenIfNoTestsAreExpected:Boolean"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#invokeBeforeAllAndAfterAllEvenIfNoTestsAreExpected:Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">invokeBeforeAllAndAfterAllEvenIfNoTestsAreExpected</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>BeforeAndAfterAll</dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -665,26 +482,10 @@ to mix this trait in last to get the desired behavior.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.typesafe.scalalogging.StrictLogging#logger" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="logger:com.typesafe.scalalogging.Logger"></a><a id="logger:Logger"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#logger:com.typesafe.scalalogging.Logger" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">logger</span><span class="result">: <span class="extype" name="com.typesafe.scalalogging.Logger">Logger</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>StrictLogging</dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -700,7 +501,7 @@ to mix this trait in last to get the desired behavior.
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#notify():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -721,7 +522,7 @@ to mix this trait in last to get the desired behavior.
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -739,26 +540,10 @@ to mix this trait in last to get the desired behavior.
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="org.scalatest.BeforeAndAfterAll#run" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="run(testName:Option[String],args:org.scalatest.Args):org.scalatest.Status"></a><a id="run(Option[String],Args):Status"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#run(testName:Option[String],args:org.scalatest.Args):org.scalatest.Status" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">run</span><span class="params">(<span name="testName">testName: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="args">args: <span class="extype" name="org.scalatest.Args">Args</span></span>)</span><span class="result">: <span class="extype" name="org.scalatest.Status">Status</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>BeforeAndAfterAll → SuiteMixin</dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -774,7 +559,7 @@ to mix this trait in last to get the desired behavior.
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#toString():String" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -790,7 +575,7 @@ to mix this trait in last to get the desired behavior.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -812,7 +597,7 @@ to mix this trait in last to get the desired behavior.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -836,7 +621,7 @@ to mix this trait in last to get the desired behavior.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#wait():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -855,26 +640,10 @@ to mix this trait in last to get the desired behavior.
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.utils.zookeeper.ZookeeperServerTest#zkClient" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="zkClient(retryPolicy:org.apache.curator.RetryPolicy,namespace:Option[String]):org.apache.curator.framework.CuratorFramework"></a><a id="zkClient(RetryPolicy,Option[String]):CuratorFramework"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#zkClient(retryPolicy:org.apache.curator.RetryPolicy,namespace:Option[String]):org.apache.curator.framework.CuratorFramework" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">zkClient</span><span class="params">(<span name="retryPolicy">retryPolicy: <span class="extype" name="org.apache.curator.RetryPolicy">RetryPolicy</span> = <span class="symbol"><span class="name"><a href="NoRetryPolicy$.html">NoRetryPolicy</a></span></span></span>, <span name="namespace">namespace: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>)</span><span class="result">: <span class="extype" name="org.apache.curator.framework.CuratorFramework">CuratorFramework</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.utils.zookeeper.ZookeeperServerTest#zkserver" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.mesosphere.utils.zookeeper.ZookeeperServerExtension#zkserver" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="zkserver:com.mesosphere.utils.zookeeper.ZookeeperServer"></a><a id="zkserver:ZookeeperServer"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#zkserver:com.mesosphere.utils.zookeeper.ZookeeperServer" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#zkserver:com.mesosphere.utils.zookeeper.ZookeeperServer" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -898,7 +667,7 @@ to mix this trait in last to get the desired behavior.
               <ol><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerTest.html#finalize():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/ZookeeperServerExtension.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -926,12 +695,12 @@ to mix this trait in last to get the desired behavior.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.typesafe.scalalogging.StrictLogging">
-              <h3>Inherited from <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></h3>
-            </div><div class="parent" name="org.scalatest.BeforeAndAfterAll">
-              <h3>Inherited from <span class="extype" name="org.scalatest.BeforeAndAfterAll">BeforeAndAfterAll</span></h3>
-            </div><div class="parent" name="org.scalatest.SuiteMixin">
-              <h3>Inherited from <span class="extype" name="org.scalatest.SuiteMixin">SuiteMixin</span></h3>
+        <div class="parent" name="org.junit.jupiter.api.extension.AfterAllCallback">
+              <h3>Inherited from <span class="extype" name="org.junit.jupiter.api.extension.AfterAllCallback">AfterAllCallback</span></h3>
+            </div><div class="parent" name="org.junit.jupiter.api.extension.BeforeAllCallback">
+              <h3>Inherited from <span class="extype" name="org.junit.jupiter.api.extension.BeforeAllCallback">BeforeAllCallback</span></h3>
+            </div><div class="parent" name="org.junit.jupiter.api.extension.Extension">
+              <h3>Inherited from <span class="extype" name="org.junit.jupiter.api.extension.Extension">Extension</span></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">

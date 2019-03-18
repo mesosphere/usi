@@ -150,6 +150,10 @@
                         <a class="class" href="" title="Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable number of masters/agents."></a>
                         <a href="" title="Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable number of masters/agents.">MesosCluster</a>
                       </li><li class="current-entities indented4">
+                        <a class="object" href="MesosClusterExtension$.html" title="Provides a JUnit 5 extension for booting a Mesos cluster for tests."></a>
+                        <a class="class" href="MesosClusterExtension.html" title=""></a>
+                        <a href="MesosClusterExtension.html" title="">MesosClusterExtension</a>
+                      </li><li class="current-entities indented4">
                         <span class="separator"></span>
                         <a class="trait" href="MesosClusterTest.html" title="Basic trait to include in tests."></a>
                         <a href="MesosClusterTest.html" title="Basic trait to include in tests.">MesosClusterTest</a>
@@ -196,7 +200,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">MesosCluster</span><span class="params">(<span name="suiteName">suiteName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="numMasters">numMasters: <span class="extype" name="scala.Int">Int</span></span>, <span name="numSlaves">numSlaves: <span class="extype" name="scala.Int">Int</span></span>, <span name="masterUrl">masterUrl: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="quorumSize">quorumSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="autoStart">autoStart: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="agentsConfig">agentsConfig: <a href="MesosAgentConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosAgentConfig">MesosAgentConfig</a> = <span class="symbol">MesosAgentConfig()</span></span>, <span name="waitForMesosTimeout">waitForMesosTimeout: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span> = <span class="symbol">5.minutes</span></span>, <span name="mastersFaultDomains">mastersFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsFaultDomains">agentsFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsGpus">agentsGpus: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>] = <span class="symbol">None</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result"> extends <span class="extype" name="java.lang.AutoCloseable">AutoCloseable</span> with <span class="extype" name="org.scalatest.concurrent.Eventually">Eventually</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">MesosCluster</span><span class="params">(<span name="suiteName">suiteName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="numMasters">numMasters: <span class="extype" name="scala.Int">Int</span></span>, <span name="numSlaves">numSlaves: <span class="extype" name="scala.Int">Int</span></span>, <span name="masterUrl">masterUrl: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="quorumSize">quorumSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="autoStart">autoStart: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="agentsConfig">agentsConfig: <a href="MesosAgentConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosAgentConfig">MesosAgentConfig</a> = <span class="symbol">MesosAgentConfig()</span></span>, <span name="waitForMesosTimeout">waitForMesosTimeout: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span> = <span class="symbol">5.minutes</span></span>, <span name="mastersFaultDomains">mastersFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsFaultDomains">agentsFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsGpus">agentsGpus: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>] = <span class="symbol">None</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result"> extends <span class="extype" name="java.lang.AutoCloseable">AutoCloseable</span> with <span class="extype" name="org.scalatest.concurrent.Eventually">Eventually</span> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -207,7 +211,7 @@ number of masters/agents.
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="org.scalatest.concurrent.Eventually">Eventually</span>, <span class="extype" name="org.scalatest.concurrent.PatienceConfiguration">PatienceConfiguration</span>, <span class="extype" name="org.scalatest.concurrent.AbstractPatienceConfiguration">AbstractPatienceConfiguration</span>, <span class="extype" name="org.scalatest.concurrent.ScaledTimeSpans">ScaledTimeSpans</span>, <span class="extype" name="java.lang.AutoCloseable">AutoCloseable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span>, <span class="extype" name="org.scalatest.concurrent.Eventually">Eventually</span>, <span class="extype" name="org.scalatest.concurrent.PatienceConfiguration">PatienceConfiguration</span>, <span class="extype" name="org.scalatest.concurrent.AbstractPatienceConfiguration">AbstractPatienceConfiguration</span>, <span class="extype" name="org.scalatest.concurrent.ScaledTimeSpans">ScaledTimeSpans</span>, <span class="extype" name="java.lang.AutoCloseable">AutoCloseable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -233,7 +237,7 @@ number of masters/agents.
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.utils.mesos.MesosCluster"><span>MesosCluster</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="org.scalatest.concurrent.Eventually"><span>Eventually</span></li><li class="in" name="org.scalatest.concurrent.PatienceConfiguration"><span>PatienceConfiguration</span></li><li class="in" name="org.scalatest.concurrent.AbstractPatienceConfiguration"><span>AbstractPatienceConfiguration</span></li><li class="in" name="org.scalatest.concurrent.ScaledTimeSpans"><span>ScaledTimeSpans</span></li><li class="in" name="java.lang.AutoCloseable"><span>AutoCloseable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.utils.mesos.MesosCluster"><span>MesosCluster</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="com.typesafe.scalalogging.StrictLogging"><span>StrictLogging</span></li><li class="in" name="org.scalatest.concurrent.Eventually"><span>Eventually</span></li><li class="in" name="org.scalatest.concurrent.PatienceConfiguration"><span>PatienceConfiguration</span></li><li class="in" name="org.scalatest.concurrent.AbstractPatienceConfiguration"><span>AbstractPatienceConfiguration</span></li><li class="in" name="org.scalatest.concurrent.ScaledTimeSpans"><span>ScaledTimeSpans</span></li><li class="in" name="java.lang.AutoCloseable"><span>AutoCloseable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -683,6 +687,22 @@ up after the execution which included collecting agent sandboxes.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.typesafe.scalalogging.StrictLogging#logger" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="logger:com.typesafe.scalalogging.Logger"></a><a id="logger:Logger"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#logger:com.typesafe.scalalogging.Logger" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">logger</span><span class="result">: <span class="extype" name="com.typesafe.scalalogging.Logger">Logger</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>StrictLogging</dd></dl></div>
     </li><li name="com.mesosphere.utils.mesos.MesosCluster#masterUrl" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="masterUrl:String"></a>
       <span class="permalink">
@@ -902,9 +922,9 @@ up after the execution which included collecting agent sandboxes.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ScaledTimeSpans</dd></dl></div>
     </li><li name="com.mesosphere.utils.mesos.MesosCluster#start" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="start():String"></a>
+      <a id="start(prefix:Option[String]):String"></a><a id="start(Option[String]):String"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#start():String" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#start(prefix:Option[String]):String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -913,7 +933,7 @@ up after the execution which included collecting agent sandboxes.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">start</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">start</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
       
@@ -1144,6 +1164,8 @@ up after the execution which included collecting agent sandboxes.
               <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
             </div><div class="parent" name="scala.Equals">
               <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+            </div><div class="parent" name="com.typesafe.scalalogging.StrictLogging">
+              <h3>Inherited from <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></h3>
             </div><div class="parent" name="org.scalatest.concurrent.Eventually">
               <h3>Inherited from <span class="extype" name="org.scalatest.concurrent.Eventually">Eventually</span></h3>
             </div><div class="parent" name="org.scalatest.concurrent.PatienceConfiguration">

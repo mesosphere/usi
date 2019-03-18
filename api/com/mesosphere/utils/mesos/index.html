@@ -166,6 +166,10 @@
                         <a class="class" href="MesosCluster.html" title="Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable number of masters/agents."></a>
                         <a href="MesosCluster.html" title="Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable number of masters/agents.">MesosCluster</a>
                       </li><li class="current-entities indented4">
+                        <a class="object" href="MesosClusterExtension$.html" title="Provides a JUnit 5 extension for booting a Mesos cluster for tests."></a>
+                        <a class="class" href="MesosClusterExtension.html" title=""></a>
+                        <a href="MesosClusterExtension.html" title="">MesosClusterExtension</a>
+                      </li><li class="current-entities indented4">
                         <span class="separator"></span>
                         <a class="trait" href="MesosClusterTest.html" title="Basic trait to include in tests."></a>
                         <a href="MesosClusterTest.html" title="Basic trait to include in tests.">MesosClusterTest</a>
@@ -320,9 +324,9 @@
 </p></div><dl class="paramcmts block"><dt class="param">launcher</dt><dd class="cmt"><p>The launcher to be used for Mesos containerizer. It could either be linux or posix</p></dd><dt class="param">containerizers</dt><dd class="cmt"><p>Comma-separated list of containerizer implementations to compose in order to provide containerization.
                       Available options are mesos and docker (on Linux).</p></dd><dt class="param">isolation</dt><dd class="cmt"><p>isolation mechanisms to use, e.g., posix/cpu,posix/mem</p></dd><dt class="param">imageProviders</dt><dd class="cmt"><p>Comma-separated list of supported image providers, e.g., APPC,DOCKER.</p></dd></dl></div>
     </li><li name="com.mesosphere.utils.mesos.MesosCluster" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="MesosClusterextendsAutoCloseablewithEventuallywithProductwithSerializable"></a><a id="MesosCluster:MesosCluster"></a>
+      <a id="MesosClusterextendsAutoCloseablewithEventuallywithStrictLoggingwithProductwithSerializable"></a><a id="MesosCluster:MesosCluster"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/index.html#MesosClusterextendsAutoCloseablewithEventuallywithProductwithSerializable" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/index.html#MesosClusterextendsAutoCloseablewithEventuallywithStrictLoggingwithProductwithSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -331,13 +335,29 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable number of masters/agents." href="MesosCluster.html"><span class="name">MesosCluster</span></a><span class="params">(<span name="suiteName">suiteName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="numMasters">numMasters: <span class="extype" name="scala.Int">Int</span></span>, <span name="numSlaves">numSlaves: <span class="extype" name="scala.Int">Int</span></span>, <span name="masterUrl">masterUrl: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="quorumSize">quorumSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="autoStart">autoStart: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="agentsConfig">agentsConfig: <a href="MesosAgentConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosAgentConfig">MesosAgentConfig</a> = <span class="symbol">MesosAgentConfig()</span></span>, <span name="waitForMesosTimeout">waitForMesosTimeout: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span> = <span class="symbol">5.minutes</span></span>, <span name="mastersFaultDomains">mastersFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsFaultDomains">agentsFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsGpus">agentsGpus: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>] = <span class="symbol">None</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result"> extends <span class="extype" name="java.lang.AutoCloseable">AutoCloseable</span> with <span class="extype" name="org.scalatest.concurrent.Eventually">Eventually</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable number of masters/agents." href="MesosCluster.html"><span class="name">MesosCluster</span></a><span class="params">(<span name="suiteName">suiteName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="numMasters">numMasters: <span class="extype" name="scala.Int">Int</span></span>, <span name="numSlaves">numSlaves: <span class="extype" name="scala.Int">Int</span></span>, <span name="masterUrl">masterUrl: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="quorumSize">quorumSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="autoStart">autoStart: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="agentsConfig">agentsConfig: <a href="MesosAgentConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosAgentConfig">MesosAgentConfig</a> = <span class="symbol">MesosAgentConfig()</span></span>, <span name="waitForMesosTimeout">waitForMesosTimeout: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span> = <span class="symbol">5.minutes</span></span>, <span name="mastersFaultDomains">mastersFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsFaultDomains">agentsFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsGpus">agentsGpus: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>] = <span class="symbol">None</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result"> extends <span class="extype" name="java.lang.AutoCloseable">AutoCloseable</span> with <span class="extype" name="org.scalatest.concurrent.Eventually">Eventually</span> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable
 number of masters/agents.</p><div class="fullcomment"><div class="comment cmt"><p>Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable
 number of masters/agents.
 </p></div><dl class="paramcmts block"><dt class="param">suiteName</dt><dd class="cmt"><p>suite name that uses the cluster. will be included into logging messages</p></dd><dt class="param">numMasters</dt><dd class="cmt"><p>number of Mesos master</p></dd><dt class="param">numSlaves</dt><dd class="cmt"><p>number of Mesos slaves</p></dd><dt class="param">masterUrl</dt><dd class="cmt"><p>Mesos master ZK url in the form of zk://zk-1/mesos</p></dd><dt class="param">quorumSize</dt><dd class="cmt"><p>Mesos master quorum size</p></dd><dt class="param">autoStart</dt><dd class="cmt"><p>if true, the cluster will be started automatically</p></dd><dt class="param">agentsConfig</dt><dd class="cmt"><p>Mesos agent configuration</p></dd><dt class="param">waitForMesosTimeout</dt><dd class="cmt"><p>time to wait for Mesos master/agent to start</p></dd><dt class="param">mastersFaultDomains</dt><dd class="cmt"><p>Mesos master fault domain configuration</p></dd><dt class="param">agentsFaultDomains</dt><dd class="cmt"><p>Mesos agents fault domain configuration</p></dd><dt class="param">agentsGpus</dt><dd class="cmt"><p>number of GPUs per agent</p></dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosClusterExtension" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MesosClusterExtensionextendsBeforeAllCallbackwithAfterAllCallback"></a><a id="MesosClusterExtension:MesosClusterExtension"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/index.html#MesosClusterExtensionextendsBeforeAllCallbackwithAfterAllCallback" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="MesosClusterExtension.html"><span class="name">MesosClusterExtension</span></a><span class="result"> extends <span class="extype" name="org.junit.jupiter.api.extension.BeforeAllCallback">BeforeAllCallback</span> with <span class="extype" name="org.junit.jupiter.api.extension.AfterAllCallback">AfterAllCallback</span></span>
+      </span>
+      
+      
     </li><li name="com.mesosphere.utils.mesos.MesosClusterTest" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="MesosClusterTestextendsSuitewithZookeeperServerTestwithMesosTestwithScalaFutures"></a><a id="MesosClusterTest:MesosClusterTest"></a>
       <span class="permalink">
@@ -444,6 +464,46 @@ agent with default configuration parameters. To use, simply extend your test cla
       </span>
       
       
+    </li><li name="com.mesosphere.utils.mesos.MesosClusterExtension" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MesosClusterExtension"></a><a id="MesosClusterExtension:MesosClusterExtension"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/index.html#MesosClusterExtension" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="Provides a JUnit 5 extension for booting a Mesos cluster for tests." href="MesosClusterExtension$.html"><span class="name">MesosClusterExtension</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">Provides a JUnit 5 extension for booting a Mesos cluster for tests.</p><div class="fullcomment"><div class="comment cmt"><p>Provides a JUnit 5 extension for booting a Mesos cluster for tests.</p><p>A minimal configuration is</p><pre><span class="kw">import</span> akka.actor.ActorSystem;
+<span class="kw">import</span> akka.stream.ActorMaterializer;
+<span class="kw">import</span> com.mesosphere.utils.mesos.MesosClusterExtension;
+<span class="kw">import</span> com.mesosphere.utils.zookeeper.ZookeeperServerExtension;
+<span class="kw">import</span> org.junit.jupiter.api.Test;
+<span class="kw">import</span> org.junit.jupiter.api.extension.RegisterExtension;
+
+<span class="kw">class</span> ConnectionTest {
+
+  @RegisterExtension static ZookeeperServerExtension zkServer = <span class="kw">new</span> ZookeeperServerExtension();
+
+  static ActorSystem system = ActorSystem.create(<span class="lit">"mesos-scheduler-test"</span>);
+  static ActorMaterializer materializer = ActorMaterializer.create(system);
+
+  @RegisterExtension
+  static MesosClusterExtension mesosCluster =
+      MesosClusterExtension.builder()
+          .withMesosMasterUrl(<span class="std">String</span>.format(<span class="lit">"zk://%s/mesos"</span>, zkServer.getConnectionUrl()))
+          .build(system, materializer);
+
+  @Test
+  public void connectMesosApi() throws InterruptedException, ExecutionException {
+    System.out.println(<span class="lit">"Started Mesos cluster at "</span> + mesosCluster.getMesosUrl());
+  }
+}</pre></div></div>
     </li><li name="com.mesosphere.utils.mesos.MesosFacade" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="MesosFacade"></a><a id="MesosFacade:MesosFacade"></a>
       <span class="permalink">

@@ -191,6 +191,10 @@
                         <a href="ZookeeperServer.html" title="Runs ZooKeeper server in memory at the given port.">ZookeeperServer</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="class" href="ZookeeperServerExtension.html" title="Provides a JUnit 5 extension for booting a Zookeeper server for tests."></a>
+                        <a href="ZookeeperServerExtension.html" title="Provides a JUnit 5 extension for booting a Zookeeper server for tests.">ZookeeperServerExtension</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="trait" href="ZookeeperServerTest.html" title="A trait that can be mixed in to run integration tests with a in-memory Zookeeper server."></a>
                         <a href="ZookeeperServerTest.html" title="A trait that can be mixed in to run integration tests with a in-memory Zookeeper server.">ZookeeperServerTest</a>
                       </li>
@@ -274,6 +278,23 @@
       <p class="shortcomment cmt">Runs ZooKeeper server in memory at the given port.</p><div class="fullcomment"><div class="comment cmt"><p>Runs ZooKeeper server in memory at the given port.
 The server can be started and stopped at will.</p><p>We wrap ZookeeperServer to give it an interface more consistent with how we start Mesos and frameworks.</p><p>close() should be called when the server is no longer necessary (e.g. try-with-resources)
 </p></div><dl class="paramcmts block"><dt class="param">autoStart</dt><dd class="cmt"><p>Start zookeeper in the background</p></dd><dt class="param">port</dt><dd class="cmt"><p>The port to run ZK on</p></dd></dl></div>
+    </li><li name="com.mesosphere.utils.zookeeper.ZookeeperServerExtension" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ZookeeperServerExtensionextendsBeforeAllCallbackwithAfterAllCallback"></a><a id="ZookeeperServerExtension:ZookeeperServerExtension"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/zookeeper/index.html#ZookeeperServerExtensionextendsBeforeAllCallbackwithAfterAllCallback" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="Provides a JUnit 5 extension for booting a Zookeeper server for tests." href="ZookeeperServerExtension.html"><span class="name">ZookeeperServerExtension</span></a><span class="result"> extends <span class="extype" name="org.junit.jupiter.api.extension.BeforeAllCallback">BeforeAllCallback</span> with <span class="extype" name="org.junit.jupiter.api.extension.AfterAllCallback">AfterAllCallback</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Provides a JUnit 5 extension for booting a Zookeeper server for tests.</p><div class="fullcomment"><div class="comment cmt"><p>Provides a JUnit 5 extension for booting a Zookeeper server for tests.
+</p></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../mesos/MesosClusterExtension.html" class="extype" name="com.mesosphere.utils.mesos.MesosClusterExtension">com.mesosphere.utils.mesos.MesosClusterExtension</a> for an example.</p></span></dd></dl></div>
     </li><li name="com.mesosphere.utils.zookeeper.ZookeeperServerTest" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="ZookeeperServerTestextendsBeforeAndAfterAllwithStrictLogging"></a><a id="ZookeeperServerTest:ZookeeperServerTest"></a>
       <span class="permalink">
