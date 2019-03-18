@@ -65,7 +65,8 @@ case class MesosCluster(
     agentsFaultDomains: Seq[Option[FaultDomain]],
     agentsGpus: Option[Int] = None)(implicit system: ActorSystem, mat: Materializer)
     extends AutoCloseable
-    with Eventually {
+    with Eventually
+    with StrictLogging {
   require(quorumSize > 0 && quorumSize <= numMasters)
   require(agentsFaultDomains.isEmpty || agentsFaultDomains.size == numSlaves)
 
@@ -145,11 +146,12 @@ case class MesosCluster(
     start()
   }
 
-  def start(): String = {
-    masters.foreach(_.start())
-    agents.foreach(_.start())
+  def start(prefix: Option[String] = None): String = {
+    masters.foreach(_.start(prefix))
+    agents.foreach(_.start(prefix))
     val masterUrl = waitForLeader()
     waitForAgents(masterUrl)
+    logger.info(s"Started Mesos cluster with master on $masterUrl")
     masterUrl
   }
 
@@ -201,8 +203,13 @@ case class MesosCluster(
       start()
     }
 
-    def start(): Unit = if (process.isEmpty) {
-      process = Some(processBuilder.run(ProcessOutputToLogStream(s"$suiteName-Mesos$processName-$port")))
+    /**
+      * Starts a Mesos master or agent.
+      * @param prefix May be defined to override the log prefix. It defaults to [[suiteName]].
+      */
+    def start(prefix: Option[String] = None): Unit = if (process.isEmpty) {
+      val name = prefix.getOrElse(suiteName)
+      process = Some(processBuilder.run(ProcessOutputToLogStream(s"$name-Mesos$processName-$port")))
     }
 
     def stop(): Unit = {
@@ -234,6 +241,7 @@ case class MesosCluster(
   }
 
   override def close(): Unit = {
+    logger.info("Stopping Mesos cluster.")
     Try(teardown())
     agents.foreach(_.close())
     masters.foreach(_.close())
