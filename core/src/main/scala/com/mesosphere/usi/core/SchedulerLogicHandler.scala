@@ -88,12 +88,14 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
 
   def validateEvent(msg: SpecEvent): Seq[PodInvalid] = msg match {
     case SpecsSnapshot(podSpecs, _) =>
-      podSpecs.map(p => {
-        PodSpec.isValid(p) match {
-          case Nil => None
-          case err => Some(PodInvalid(p.id, err))
-        }
-      }).collect { case Some (p) => p }
+      podSpecs
+        .map(p => {
+          PodSpec.isValid(p) match {
+            case Nil => None
+            case err => Some(PodInvalid(p.id, err))
+          }
+        })
+        .collect { case Some(p) => p }
     case PodSpecUpdated(_, Some(podSpec)) =>
       PodSpec.isValid(podSpec) match {
         case Nil => Seq.empty
