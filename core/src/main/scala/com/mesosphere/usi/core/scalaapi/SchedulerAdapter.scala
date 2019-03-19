@@ -37,7 +37,7 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
 
     val killSwitch = KillSwitches.shared("SchedulerAdapter.asSourceAndSink")
 
-    // We need to handle the case when source is cancelled or failed
+    // We need to handle the case when the source is canceled or failed
     stateQueue.watchCompletion().onComplete {
       case Success(_) =>
         killSwitch.shutdown()
