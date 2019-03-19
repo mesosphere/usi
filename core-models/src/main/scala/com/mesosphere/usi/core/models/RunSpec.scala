@@ -1,6 +1,7 @@
 package com.mesosphere.usi.core.models
 
 import com.mesosphere.usi.core.models.resources.ResourceRequirement
+import scala.collection.JavaConverters._
 
 /**
   * Specification used to launch a [[PodSpec]]
@@ -16,4 +17,11 @@ import com.mesosphere.usi.core.models.resources.ResourceRequirement
 case class RunSpec(
     resourceRequirements: Seq[ResourceRequirement],
     shellCommand: String,
-    fetch: Seq[FetchUri] = Seq.empty)
+    fetch: Seq[FetchUri] = Seq.empty) {
+
+  def this(
+      resourceRequirementsList: java.util.List[ResourceRequirement],
+      shellCommand: String,
+      fetchList: java.util.List[FetchUri]) =
+    this(resourceRequirementsList.asScala, shellCommand, fetchList.asScala)
+}
