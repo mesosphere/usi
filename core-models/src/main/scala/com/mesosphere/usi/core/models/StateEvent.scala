@@ -27,6 +27,7 @@ object StateSnapshot {
   */
 sealed trait StateUpdated extends StateEvent
 
+case class PodInvalid(id: PodId, errors: Seq[String]) extends StateUpdated with PodStateEvent
 case class PodStatusUpdated(id: PodId, newStatus: Option[PodStatus]) extends StateUpdated with PodStateEvent
 case class PodRecordUpdated(id: PodId, newRecord: Option[PodRecord]) extends StateUpdated with PodStateEvent
 case class AgentRecordUpdated(id: PodId, newRecord: Option[AgentRecord]) extends StateUpdated with PodStateEvent
