@@ -109,7 +109,7 @@ object Scheduler {
         {
           import GraphDSL.Implicits._
 
-          val broadcast = builder.add(Broadcast[SchedulerEvents](2))
+          val broadcast = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true))
           val specInputFlattening = builder.add(specInputFlatteningFlow)
           val stateOutputBreakout = builder.add(stateOutputBreakoutFlow)
 
