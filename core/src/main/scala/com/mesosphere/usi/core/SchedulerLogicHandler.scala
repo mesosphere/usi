@@ -119,16 +119,18 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
   }
 
   def generateSuppressCalls(pendingLaunch: Set[PodId], newLaunched: Set[PodId]): List[Call] = {
-    val alreadyLaunchedRoles = newLaunched.iterator.collect {
+    val alreadyLaunchedRoles: Iterator[String] = newLaunched.iterator.collect {
       case id if specs.podSpecs.contains(id) => specs.podSpecs(id).runSpec.role
     }
 
-    val rolesBeingLaunched = pendingLaunch
+    val rolesBeingLaunched: Set[String] = pendingLaunch
       .map(id => specs.podSpecs.get(id))
       .collect { case Some(p) => p.runSpec.role }
 
     alreadyLaunchedRoles
       .filterNot(rolesBeingLaunched)
+      .toSeq
+      .distinct
       .map { r =>
         mesosCallFactory.newSuppress(Some(r))
       }
@@ -144,6 +146,8 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     val reviveCalls = updateResult.newToBeLaunched.iterator
       .map(id => specs.podSpecs.get(id))
       .collect { case Some(p) => p.runSpec.role }
+      .toSeq
+      .distinct
       .map(r => mesosCallFactory.newRevive(Some(r)))
       .toList
 

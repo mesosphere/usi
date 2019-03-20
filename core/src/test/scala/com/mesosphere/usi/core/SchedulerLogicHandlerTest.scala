@@ -7,7 +7,7 @@ import com.mesosphere.usi.core.protos.ProtoBuilders
 import com.mesosphere.utils.UnitTest
 
 class SchedulerLogicHandlerTest extends UnitTest {
-  "produce a mesos call with revive for new podspec role" in {
+  "produce a Mesos call with revive for new podspec role" in {
     Given("Scheduler logic handler with empty state")
     val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId))
     val podId = PodId("pod")
@@ -40,6 +40,5 @@ class SchedulerLogicHandlerTest extends UnitTest {
 
     Then("suppress call is generated for that role")
     result.mesosCalls.exists(c => c.hasSuppress && c.getSuppress.getRoles(0) == "test-role") should be(true) withClue s"Expecting suppress call with role 'test-role' but got ${result.mesosCalls}"
-
   }
 }

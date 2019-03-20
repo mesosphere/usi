@@ -25,11 +25,13 @@ case class CachedPendingLaunch(pendingLaunch: Set[PodId] = Set.empty) {
       }
       if (shouldBeLaunched) {
         if (!pendingLaunch.contains(podId)) {
+          // this is new pod that is waiting to be launched but was not present in previous frame
           newToBeLaunched += podId
         }
         newPendingLaunch += podId
       } else {
         if (pendingLaunch.contains(podId)) {
+          // this pod was pending launch but has already been launched in this frame
           newLaunched += podId
         }
         newPendingLaunch -= podId
