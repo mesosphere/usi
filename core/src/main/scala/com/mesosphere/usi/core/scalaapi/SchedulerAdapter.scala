@@ -87,7 +87,6 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
               }
           }
       }
-      .via(killSwitch.flow)
       .mapAsync(1)(stateQueue.offer)
       .map {
         case QueueOfferResult.Enqueued =>
