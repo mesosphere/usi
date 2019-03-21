@@ -5,7 +5,9 @@ import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Source}
 import akka.stream.{BidiShape, FlowShape}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.models.{SpecEvent, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot, StateUpdated}
+import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+import scala.collection.JavaConverters._
 
 /*
  * Provides the scheduler graph component. The component has two inputs, and two outputs:
@@ -50,8 +52,15 @@ object Scheduler {
   type StateOutput = (StateSnapshot, Source[StateEvent, Any])
 
   def fromClient(client: MesosClient): Flow[SpecInput, StateOutput, NotUsed] = {
+    if (!isMultiRoleFramework(client.frameworkInfo)) {
+      throw new IllegalArgumentException(
+        "USI scheduler provides support for MULTI_ROLE frameworks only. Please provide create MesosClient with FrameworkInfo that has capability MULTI_ROLE")
+    }
     fromFlow(client.calls, Flow.fromSinkAndSource(client.mesosSink, client.mesosSource))
   }
+
+  private def isMultiRoleFramework(frameworkInfo: FrameworkInfo): Boolean =
+    frameworkInfo.getCapabilitiesList.asScala.exists(_.getType == FrameworkInfo.Capability.Type.MULTI_ROLE)
 
   def fromFlow(
       mesosCallFactory: MesosCalls,
@@ -100,7 +109,7 @@ object Scheduler {
         {
           import GraphDSL.Implicits._
 
-          val broadcast = builder.add(Broadcast[SchedulerEvents](2))
+          val broadcast = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true))
           val specInputFlattening = builder.add(specInputFlatteningFlow)
           val stateOutputBreakout = builder.add(stateOutputBreakoutFlow)
 

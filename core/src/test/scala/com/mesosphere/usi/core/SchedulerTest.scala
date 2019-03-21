@@ -1,32 +1,38 @@
 package com.mesosphere.usi.core
 
-import akka.NotUsed
+import akka.Done
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep}
 import akka.stream.{ActorMaterializer, FlowShape}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
-import com.mesosphere.usi.core.matching.ScalarResource
 import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.utils.AkkaUnitTest
-import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest._
+
+import scala.concurrent.Future
 
 class SchedulerTest extends AkkaUnitTest with Inside {
 
-  val loggingMockMesosFlow: Flow[MesosCall, MesosEvent, NotUsed] = Flow[MesosCall].map { call =>
-    logger.info(s"Mesos call: ${call}")
-    call
-  }.via(MesosMock.flow).map { event =>
-    logger.info(s"Mesos event: ${event}")
-    event
-  }
+  val loggingMockMesosFlow: Flow[MesosCall, MesosEvent, Future[Done]] = Flow[MesosCall]
+    .watchTermination()(Keep.right)
+    .map { call =>
+      logger.info(s"Mesos call: ${call}")
+      call
+    }
+    .via(MesosMock.flow)
+    .map { event =>
+      logger.info(s"Mesos event: ${event}")
+      event
+    }
 
-  val mockedScheduler: Flow[Scheduler.SpecInput, Scheduler.StateOutput, NotUsed] = {
+  def mockedScheduler: Flow[Scheduler.SpecInput, Scheduler.StateOutput, Future[Done]] = {
     Flow.fromGraph {
       GraphDSL.create(Scheduler.unconnectedGraph(new MesosCalls(MesosMock.mockFrameworkId)), loggingMockMesosFlow)(
-        (_, _) => NotUsed) { implicit builder =>
+        (_, materializedValue) => materializedValue) { implicit builder =>
         { (graph, mockMesos) =>
           import GraphDSL.Implicits._
 
@@ -55,7 +61,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
             podId,
             Goal.Running,
             RunSpec(
-              resourceRequirements = List(ScalarResource.cpus(1), ScalarResource.memory(256)),
+              resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
               shellCommand = "sleep 3600")
           ))
       ))
@@ -73,5 +79,25 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       case Some(podStatusChange: PodStatusUpdated) =>
         podStatusChange.newStatus.get.taskStatuses(TaskId(podId.value)).getState shouldBe Mesos.TaskState.TASK_RUNNING
     }
+  }
+
+  "It closes the Mesos client when the specs input stream terminates" in {
+    val ((input, mesosCompleted), _) = specInputSource(SpecsSnapshot.empty)
+      .viaMat(mockedScheduler)(Keep.both)
+      .toMat(outputFlatteningSink)(Keep.both)
+      .run
+
+    input.complete()
+    mesosCompleted.futureValue shouldBe Done
+  }
+
+  "It closes the Mesos client when the scheduler state events are closed" in {
+    val ((_, mesosCompleted), output) = specInputSource(SpecsSnapshot.empty)
+      .viaMat(mockedScheduler)(Keep.both)
+      .toMat(outputFlatteningSink)(Keep.both)
+      .run
+
+    output.cancel()
+    mesosCompleted.futureValue shouldBe Done
   }
 }

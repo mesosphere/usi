@@ -21,7 +21,7 @@ object ResourceUtil extends ImplicitStrictLogging {
 
   private[this] object ResourceMatchKey {
     def apply(resource: Mesos.Resource): ResourceMatchKey = {
-      require(resource.hasAllocationInfo, "AllocationInfo is expected to be set")
+      require(resource.hasAllocationInfo, s"AllocationInfo is expected to be set on resource '$resource'")
       val allocationRole = resource.getAllocationInfo.getRole
       val reservations = resource.getReservationsList.asScala
       val disk = if (resource.hasDisk) Some(resource.getDisk) else None

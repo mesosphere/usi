@@ -10,10 +10,12 @@ include 'persistence-zookeeper'
 include 'test-utils'
 
 /* example projects*/
-include 'hello-world'
-project(':hello-world').projectDir = new File('examples/hello-world')
+include 'core-hello-world'
+project(':core-hello-world').projectDir = new File('examples/core-hello-world')
+
 include 'mesos-client-example'
 project(':mesos-client-example').projectDir = new File('examples/mesos-client-example')
+
 include 'simple-hello-world'
 project(':simple-hello-world')?.projectDir = new File('examples/simple-hello-world')
 

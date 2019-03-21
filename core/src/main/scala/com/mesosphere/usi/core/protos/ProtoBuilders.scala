@@ -1,7 +1,8 @@
 package com.mesosphere.usi.core.protos
 import com.google.protobuf.ByteString
-
+import com.mesosphere.usi.core.models.FetchUri
 import org.apache.mesos.v1.{Protos => Mesos}
+import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
 /**
   * Collection of helper ProtoBuilders for convenience
@@ -117,6 +118,7 @@ private[usi] object ProtoBuilders {
   def newTaskStatus(
       taskId: Mesos.TaskID,
       state: Mesos.TaskState,
+      uuid: ByteString, // UUID should be present, only e.g. TASK_ERROR does not have UUID
       agentId: Mesos.AgentID = null,
       checkStatus: Mesos.CheckStatusInfo = null,
       containerStatus: Mesos.ContainerStatus = null,
@@ -129,8 +131,7 @@ private[usi] object ProtoBuilders {
       reason: Mesos.TaskStatus.Reason = null,
       source: Mesos.TaskStatus.Source = null,
       timestamp: Double = 0,
-      unreachableTime: Mesos.TimeInfo = null,
-      uuid: ByteString = null): Mesos.TaskStatus = {
+      unreachableTime: Mesos.TimeInfo = null): Mesos.TaskStatus = {
 
     val b = Mesos.TaskStatus
       .newBuilder()
@@ -231,9 +232,38 @@ private[usi] object ProtoBuilders {
     b.build()
   }
 
+  def newCommandInfo(shellCommand: String, fetchUri: Seq[FetchUri]): Mesos.CommandInfo = {
+    val b = Mesos.CommandInfo
+      .newBuilder()
+      .setShell(true)
+      .setValue(shellCommand)
+    fetchUri.map(u => b.addUris(newURI(u)))
+    b.build()
+  }
+
+  def newURI(fetch: FetchUri): Mesos.CommandInfo.URI = {
+    val b = Mesos.CommandInfo.URI
+      .newBuilder()
+      .setValue(fetch.uri.toString)
+      .setExecutable(fetch.executable)
+      .setExtract(fetch.extract)
+      .setCache(fetch.cache)
+    fetch.outputFile.foreach { name =>
+      b.setOutputFile(name)
+    }
+    b.build()
+  }
+
   def newValueRanges(ranges: Iterable[Mesos.Value.Range]): Mesos.Value.Ranges = {
     val b = Mesos.Value.Ranges.newBuilder()
     ranges.foreach(b.addRange)
     b.build()
+  }
+
+  def newTaskUpdateEvent(taskStatus: Mesos.TaskStatus): MesosEvent = {
+    MesosEvent
+      .newBuilder()
+      .setUpdate(MesosEvent.Update.newBuilder().setStatus(taskStatus))
+      .build()
   }
 }

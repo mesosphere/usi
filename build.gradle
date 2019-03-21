@@ -18,6 +18,7 @@ ext {
 
 allprojects {
 
+    group = 'com.mesosphere.usi'
     version = '0.1'
 
     apply plugin: "scala"
@@ -44,10 +45,8 @@ allprojects {
     dependencies {
         // Use Scala 2.12 in our library project
         implementation 'org.scala-lang:scala-library:2.12.7'
-        implementation "com.typesafe.scala-logging:scala-logging_$scalaVersion:3.9.2"
 
         // Use Scalatest for testing our library
-        testImplementation 'junit:junit:4.12'
         testImplementation "org.scalatest:scalatest_$scalaVersion:3.0.5"
 
         // Need scala-xml at test runtime
@@ -55,6 +54,9 @@ allprojects {
 
         // Logging
         testRuntime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
+        
+        // Transitive dependencies
+        compile "com.typesafe.scala-logging:scala-logging_$scalaVersion:3.9.2"
 
         // Akka and akka-http
         compile group: 'com.typesafe.akka', name: "akka-http_$scalaVersion", version: '10.0.11'
@@ -72,7 +74,6 @@ allprojects {
 
     test {
         reports.html.enabled = false
-        reports.junitXml.destination = file(Paths.get(rootProject.buildDir.toString(), "tests", project.name))
     }
     check {}
     protobuf {
