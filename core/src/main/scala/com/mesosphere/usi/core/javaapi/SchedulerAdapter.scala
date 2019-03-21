@@ -34,23 +34,14 @@ class SchedulerAdapter(
     * @param specsSnapshot Snapshot of the current specs
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
-  def asSourceAndSink(specsSnapshot: SpecsSnapshot = SpecsSnapshot.empty)
+  def asSourceAndSink(specsSnapshot: SpecsSnapshot)
     : Tuple3[CompletableFuture[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]] = {
     val (snap, source, sink) = delegate.asSourceAndSink(specsSnapshot)
     Tuple3(snap.toJava.toCompletableFuture, source.asJava, sink.asJava)
   }
 
-  /**
-    * Represents the scheduler as a Flow.
-    *
-    * This method will materialize the scheduler first, then Flow can be materialized independently.
-    * @param specsSnapshot Snapshot of the current specs
-    * @return
-    */
-  def asFlow(specsSnapshot: SpecsSnapshot = SpecsSnapshot.empty)
-    : Pair[CompletableFuture[StateSnapshot], Flow[SpecUpdated, StateEvent, NotUsed]] = {
-    val (snap, flow) = delegate.asFlow(specsSnapshot)
-    Pair(snap.toJava.toCompletableFuture, flow.asJava)
+  def asSourceAndSink(): Tuple3[CompletableFuture[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]] = {
+    asSourceAndSink(SpecsSnapshot.empty)
   }
 
   /**
@@ -61,8 +52,8 @@ class SchedulerAdapter(
     * @return
     */
   def asAkkaQueues(
-      specsSnapshot: SpecsSnapshot = SpecsSnapshot.empty,
-      overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure): Tuple3[
+      specsSnapshot: SpecsSnapshot,
+      overflowStrategy: OverflowStrategy): Tuple3[
     CompletableFuture[StateSnapshot],
     SourceQueueWithComplete[SpecUpdated],
     SinkQueueWithCancel[StateEvent]] = {
@@ -82,6 +73,13 @@ class SchedulerAdapter(
           .toJava
     }
     Tuple3(snap.toJava.toCompletableFuture, javaSpecQueue, javaStateQueue)
+  }
+
+  def asAkkaQueues(): Tuple3[
+    CompletableFuture[StateSnapshot],
+    SourceQueueWithComplete[SpecUpdated],
+    SinkQueueWithCancel[StateEvent]] = {
+    asAkkaQueues(SpecsSnapshot.empty, OverflowStrategy.backpressure)
   }
 
 }

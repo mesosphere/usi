@@ -45,17 +45,22 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
         killSwitch.abort(cause)
     }
 
-    Source.maybe.prepend {
-      val events = Source
-        .unfoldResourceAsync[SpecUpdated, SinkQueueWithCancel[SpecUpdated]](
-          create = () => Future.successful(specQueue),
-          read = queue => queue.pull(),
-          close = queue =>
-            Future.successful {
-              killSwitch.shutdown()
-              queue.cancel()
-              Done
+
+    def sourceFromSinkQueue[T](queue: SinkQueueWithCancel[T]): Source[T, NotUsed] = {
+      Source
+        .unfoldResourceAsync[T, SinkQueueWithCancel[T]](
+        create = () => Future.successful(queue),
+        read = queue => queue.pull(),
+        close = queue =>
+          Future.successful {
+            killSwitch.shutdown()
+            queue.cancel()
+            Done
           })
+    }
+
+    Source.maybe.prepend {
+      val events = sourceFromSinkQueue(specQueue)
         .watchTermination() {
           case (_, completionSignal) =>
             completionSignal.onComplete {
@@ -67,7 +72,7 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
         }
 
       Source.single(specsSnapshot -> events)
-    }.via(killSwitch.flow)
+    }
       .via(schedulerFlow)
       .flatMapConcat {
         case (snapshot, updates) =>
@@ -124,19 +129,6 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
 
     (stateSnapshotPromise.future, sourceWithKillSwitch, sinkWithKillSwitch)
 
-  }
-
-  /**
-    * Represents the scheduler as a Flow.
-    *
-    * This method will materialize the scheduler first, then Flow can be materialized independently.
-    * @param specsSnapshot Snapshot of the current specs
-    * @return
-    */
-  def asFlow(specsSnapshot: SpecsSnapshot = SpecsSnapshot.empty)
-    : (Future[StateSnapshot], Flow[SpecUpdated, StateEvent, NotUsed]) = {
-    val (snapshot, source, sink) = asSourceAndSink(specsSnapshot)
-    snapshot -> Flow.fromSinkAndSourceCoupled(sink, source)
   }
 
   /**
