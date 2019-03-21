@@ -5,14 +5,13 @@ import java.util.concurrent.{CompletableFuture, CompletionStage}
 
 import akka.{Done, NotUsed}
 import akka.stream.{Materializer, OverflowStrategy, QueueOfferResult, scaladsl}
-import akka.stream.javadsl.{Flow, Sink, SinkQueueWithCancel, Source, SourceQueueWithComplete}
+import akka.stream.javadsl.{Sink, SinkQueueWithCancel, Source, SourceQueueWithComplete}
 import com.mesosphere.usi.core.Scheduler.{SpecInput, StateOutput}
 import com.mesosphere.usi.core.scalaapi.{SchedulerAdapter => ScalaSchedulerAdapter}
 import com.mesosphere.usi.core.models.{SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
 
 import scala.compat.java8.FutureConverters._
 import akka.japi.tuple.Tuple3
-import akka.japi.Pair
 
 import scala.concurrent.ExecutionContext
 
@@ -40,7 +39,8 @@ class SchedulerAdapter(
     Tuple3(snap.toJava.toCompletableFuture, source.asJava, sink.asJava)
   }
 
-  def asSourceAndSink(): Tuple3[CompletableFuture[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]] = {
+  def asSourceAndSink()
+    : Tuple3[CompletableFuture[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]] = {
     asSourceAndSink(SpecsSnapshot.empty)
   }
 
@@ -51,9 +51,7 @@ class SchedulerAdapter(
     * @param specsSnapshot Snapshot of the current specs
     * @return
     */
-  def asAkkaQueues(
-      specsSnapshot: SpecsSnapshot,
-      overflowStrategy: OverflowStrategy): Tuple3[
+  def asAkkaQueues(specsSnapshot: SpecsSnapshot, overflowStrategy: OverflowStrategy): Tuple3[
     CompletableFuture[StateSnapshot],
     SourceQueueWithComplete[SpecUpdated],
     SinkQueueWithCancel[StateEvent]] = {

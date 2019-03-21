@@ -45,17 +45,16 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
         killSwitch.abort(cause)
     }
 
-
     def sourceFromSinkQueue[T](queue: SinkQueueWithCancel[T]): Source[T, NotUsed] = {
       Source
         .unfoldResourceAsync[T, SinkQueueWithCancel[T]](
-        create = () => Future.successful(queue),
-        read = queue => queue.pull(),
-        close = queue =>
-          Future.successful {
-            killSwitch.shutdown()
-            queue.cancel()
-            Done
+          create = () => Future.successful(queue),
+          read = queue => queue.pull(),
+          close = queue =>
+            Future.successful {
+              killSwitch.shutdown()
+              queue.cancel()
+              Done
           })
     }
 
@@ -72,8 +71,7 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
         }
 
       Source.single(specsSnapshot -> events)
-    }
-      .via(schedulerFlow)
+    }.via(schedulerFlow)
       .flatMapConcat {
         case (snapshot, updates) =>
           stateSnapshotPromise.trySuccess(snapshot)
