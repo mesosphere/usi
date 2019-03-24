@@ -1,7 +1,6 @@
 package com.mesosphere.usi.examples
 
 import java.util.UUID
-
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
@@ -22,10 +21,10 @@ import com.mesosphere.usi.core.models.{
   StateEvent,
   StateSnapshot
 }
+import com.mesosphere.usi.repository.InMemoryPodRecordRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo, TaskState, TaskStatus}
-
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.sys.SystemProperties
@@ -77,6 +76,8 @@ object CoreHelloWorldFramework extends StrictLogging {
       .setFailoverTimeout(0d)
       .build()
 
+    val inMemoryPodRecordRepository = InMemoryPodRecordRepository()
+
     val client: MesosClient = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
 
     /**
@@ -109,7 +110,7 @@ object CoreHelloWorldFramework extends StrictLogging {
       */
     val schedulerFlow
       : Flow[(SpecsSnapshot, Source[SpecUpdated, Any]), (StateSnapshot, Source[StateEvent, Any]), NotUsed] =
-      Scheduler.fromClient(client)
+      Scheduler.fromClient(client, inMemoryPodRecordRepository)
 
     // Lets construct the initial specs snapshot which will contain our hello-world PodSpec. For that we generate
     // - a unique PodId

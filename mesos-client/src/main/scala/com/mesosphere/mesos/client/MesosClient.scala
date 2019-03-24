@@ -385,12 +385,13 @@ class MesosClientImpl(
   def httpConnection: Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] =
     Http().outgoingConnection(host = connectionInfo.url.getHost, port = connectionInfo.url.getPort)
 
-  override val mesosSink: Sink[Call, Future[Done]] =
-    Flow[Call]
+  override val mesosSink: Sink[Call, Future[Done]] = {
+    val r: Flow[Call, HttpResponse, NotUsed] = Flow[Call]
       .via(sharedKillSwitch.flow[Call])
       .via(debug("Sending "))
       .via(callSerializer)
       .via(requestBuilder)
       .via(httpConnection)
-      .toMat(responseHandler)(Keep.right)
+    r.toMat(responseHandler)(Keep.right)
+  }
 }

@@ -18,15 +18,15 @@ case class InMemoryPodRecordRepository() extends PodRecordRepository with Strict
       logger.warn(s"${record.podId.value} already exists.")
       Future.failed(RecordAlreadyExistsException(record.podId.value))
     } else {
-      logger.info("Create record.")
+      logger.info(s"Create record ${record.podId}")
       data += record.podId -> record
       Future.successful(record.podId)
     }
   }
 
-  override def delete(podId: PodId): Future[PodId] = synchronized {
+  override def delete(podId: PodId): Future[Unit] = synchronized {
     data -= podId
-    Future.successful(podId)
+    Future.unit
   }
 
   override def read(recordId: PodId): Future[Option[PodRecord]] = synchronized {

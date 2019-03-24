@@ -78,11 +78,11 @@ class PodRecordRepository(val store: PersistenceStore) extends PodRecordReposito
     }
   }
 
-  override def delete(podId: PodId): Future[PodId] = {
+  override def delete(podId: PodId): Future[Unit] = {
     val path = s"/${podId.value}"
     store.delete(path).transform {
-      case Success(_) => Success(podId)
-      case Failure(_: KeeperException.NoNodeException) => Failure(RecordNotFoundException(podId.value))
+      case Success(_) => Success(())
+      case Failure(_: KeeperException.NoNodeException) => Success(())
       case Failure(other) => Failure(other)
     }
   }

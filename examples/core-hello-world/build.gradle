@@ -8,6 +8,8 @@ application {
 
 dependencies {
     implementation project(':core')
+    implementation project(':persistence')
+    implementation project(':metrics')
     testCompile project(':test-utils')
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 }

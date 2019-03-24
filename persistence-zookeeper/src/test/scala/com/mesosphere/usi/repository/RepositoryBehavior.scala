@@ -2,7 +2,6 @@ package com.mesosphere.usi.repository
 
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
-
 import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord}
 import com.mesosphere.utils.UnitTest
 
@@ -107,11 +106,11 @@ trait RepositoryBehavior { this: UnitTest =>
       val repo = newRepo()
       val unknownPodId = PodId("unknown")
 
-      When("the unknown record is  deleted")
-      val podId = repo.delete(unknownPodId).futureValue
+      When("the unknown record is deleted")
+      val result = repo.delete(unknownPodId)
 
       Then("no error is returned")
-      podId should be(unknownPodId)
+      result.futureValue
 
       And("the record should not exist")
       repo.read(unknownPodId).futureValue should be(None)
