@@ -9,7 +9,7 @@ import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import scala.collection.JavaConverters._
 
-/*
+/**
  * Provides the scheduler graph component. The component has two inputs, and two outputs:
  *
  * Input:
