@@ -10,42 +10,42 @@ import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEv
 import scala.collection.JavaConverters._
 
 /**
- * Provides the scheduler graph component. The component has two inputs, and two outputs:
- *
- * Input:
- * 1) SpecInput - Used to replicate the specification state from the framework implementation to the USI SchedulerLogic;
- *    First, a spec snapshot, followed by spec updates.
- * 2) MesosEvents - Events from Mesos; offers, task status updates, etc.
- *
- * Output:
- * 1) StateEvents - Used to replicate the state of pods, agents, and reservations to the framework
- *    First, a scheduler state snapshot, followed by state updates.
- * 2) MesosCalls - Actions, such as revive, kill, accept offer, etc., used to realize the specification.
- *
- * Fully wired, the graph looks like this at a high-level view:
- *
- *                                                 *** SCHEDULER ***
- *                    +------------------------------------------------------------------------+
- *                    |                                                                        |
- *                    |  +------------------+           +-------------+        StateOutput     |
- *        SpecInput   |  |                  |           |             |     /------------------>----> (framework)
- * (framework) >------>-->                  | Scheduler |             |    /                   |
- *                    |  |                  |  Events   |             |   /                    |
- *                    |  |  SchedulerLogic  o-----------> Persistence o--+                     |
- *                    |  |                  |           |             |   \                    |
- *       MesosEvents  |  |                  |           |             |    \   MesosCalls      |
- *       /------------>-->                  |           |             |     \------------------>
- *      /             |  |                  |           |             |                        |\
- *     /              |  +------------------+           +-------------+                        | \
- *    /               |                                                                        |  \
- *   |                +------------------------------------------------------------------------+  |
- *    \                                                                                           |
- *     \                               +----------------------+                                  /
- *      \                              |                      |                                 /
- *       \-----------------------------<        Mesos         <---------------------------------
- *                                     |                      |
- *                                     +----------------------+
- */
+  * Provides the scheduler graph component. The component has two inputs, and two outputs:
+  *
+  * Input:
+  * 1) SpecInput - Used to replicate the specification state from the framework implementation to the USI SchedulerLogic;
+  *    First, a spec snapshot, followed by spec updates.
+  * 2) MesosEvents - Events from Mesos; offers, task status updates, etc.
+  *
+  * Output:
+  * 1) StateEvents - Used to replicate the state of pods, agents, and reservations to the framework
+  *    First, a scheduler state snapshot, followed by state updates.
+  * 2) MesosCalls - Actions, such as revive, kill, accept offer, etc., used to realize the specification.
+  *
+  * Fully wired, the graph looks like this at a high-level view:
+  *
+  *                                                 *** SCHEDULER ***
+  *                    +------------------------------------------------------------------------+
+  *                    |                                                                        |
+  *                    |  +------------------+           +-------------+        StateOutput     |
+  *        SpecInput   |  |                  |           |             |     /------------------>----> (framework)
+  * (framework) >------>-->                  | Scheduler |             |    /                   |
+  *                    |  |                  |  Events   |             |   /                    |
+  *                    |  |  SchedulerLogic  o-----------> Persistence o--+                     |
+  *                    |  |                  |           |             |   \                    |
+  *       MesosEvents  |  |                  |           |             |    \   MesosCalls      |
+  *       /------------>-->                  |           |             |     \------------------>
+  *      /             |  |                  |           |             |                        |\
+  *     /              |  +------------------+           +-------------+                        | \
+  *    /               |                                                                        |  \
+  *   |                +------------------------------------------------------------------------+  |
+  *    \                                                                                           |
+  *     \                               +----------------------+                                  /
+  *      \                              |                      |                                 /
+  *       \-----------------------------<        Mesos         <---------------------------------
+  *                                     |                      |
+  *                                     +----------------------+
+  */
 object Scheduler {
   type SpecInput = (SpecsSnapshot, Source[SpecUpdated, Any])
 
