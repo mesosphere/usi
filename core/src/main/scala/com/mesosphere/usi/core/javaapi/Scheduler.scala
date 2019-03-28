@@ -8,7 +8,7 @@ import com.mesosphere.usi.core.models.{SpecUpdated, SpecsSnapshot, StateEvent, S
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
 /**
- *
+ * Java friendly factory methods of [[com.mesosphere.usi.core.Scheduler]].
  */
 object Scheduler {
 
