@@ -39,23 +39,22 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
     val stateEvent = PodStatusUpdated(podSpec.id, None)
 
     val (scheduler, specInputQueue, stateOutputQueue) = createMockedScheduler
-    val adapter = new SchedulerAdapter(scheduler)
   }
 
   "SchedulerAdapter" when {
     "materialized as Source and Sink" should {
       "Propagate a snapshot to the underlying scheduler" in new SchedulerFixture {
-        adapter.asSourceAndSink(SpecsSnapshot(List(podSpec), Nil))
+        SchedulerAdapter.asSourceAndSink(SpecsSnapshot(List(podSpec), Nil), scheduler)
         specInputQueue.pull().futureValue.value._1.podSpecs.head shouldEqual podSpec
       }
 
       "If snapshot is not provided push an empty snapshot" in new SchedulerFixture {
-        adapter.asSourceAndSink()
+        SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
         specInputQueue.pull().futureValue.value._1 shouldEqual SpecsSnapshot.empty
       }
 
       "Complete the snapshot promise once it's available" in new SchedulerFixture {
-        val (snapshotF, _, _) = adapter.asSourceAndSink()
+        val (snapshotF, _, _) = SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
         specInputQueue.pull().futureValue
 
         val stateSnapshot = StateSnapshot(List(PodStatus(podSpec.id, Map.empty)), Nil, Nil, Nil)
@@ -66,7 +65,7 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
       }
 
       "Push the SpecUpdatedEvents downstream" in new SchedulerFixture {
-        val (_, _, sink) = adapter.asSourceAndSink()
+        val (_, _, sink) = SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
 
         Source.repeat(specEvent).runWith(sink)
 
@@ -79,7 +78,7 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
       }
 
       "Push the events from scheduler to the provided Source" in new SchedulerFixture {
-        val (_, source, _) = adapter.asSourceAndSink()
+        val (_, source, _) = SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
 
         stateOutputQueue.offer(StateSnapshot.empty -> Source.repeat(stateEvent))
 
@@ -87,7 +86,7 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
       }
 
       "Complete both sink and source when the event stream coming to scheduler is cancelled by the scheduler" in new SchedulerFixture {
-        val (_, source, sink) = adapter.asSourceAndSink()
+        val (_, source, sink) = SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
         val (_, innerSource) = specInputQueue.pull().futureValue.value
 
         val stateStreamCompletionPromise = Promise[String]()
@@ -110,7 +109,7 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
       }
 
       "Complete both sink and source when the event stream coming to scheduler is cancelled by the client" in new SchedulerFixture {
-        val (_, source, sink) = adapter.asSourceAndSink()
+        val (_, source, sink) = SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
 
         inside(specInputQueue.pull().futureValue) {
           case Some((_, innerSource)) => innerSource.runWith(Sink.ignore)
@@ -134,7 +133,7 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
       }
 
       "Complete both sink and source when the event stream outgoing from scheduler is cancelled by the scheduler" in new SchedulerFixture {
-        val (_, source, sink) = adapter.asSourceAndSink()
+        val (_, source, sink) = SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
         val (_, innerSource) = specInputQueue.pull().futureValue.value
         innerSource.runWith(Sink.ignore) // consume all incoming spec updates
 
@@ -159,7 +158,7 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
       }
 
       "Complete both sink and source when the event stream outgoing from scheduler is cancelled by the client" in new SchedulerFixture {
-        val (_, source, sink) = adapter.asSourceAndSink()
+        val (_, source, sink) = SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
         val (_, innerSource) = specInputQueue.pull().futureValue.value
         innerSource.runWith(Sink.ignore) // consume all incoming spec updates
 
@@ -184,7 +183,7 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
       }
 
       "Fail both sink and source when the failure occurred in the upstream" in new SchedulerFixture {
-        val (_, source, sink) = adapter.asSourceAndSink()
+        val (_, source, sink) = SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
         val (_, innerSource) = specInputQueue.pull().futureValue.value
         innerSource.runWith(Sink.ignore) // consume all incoming spec updates
 
@@ -212,7 +211,7 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
       }
 
       "Stop the sink when the failure occurred in the downstream" in new SchedulerFixture {
-        val (_, source, sink) = adapter.asSourceAndSink()
+        val (_, source, sink) = SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
         val (_, innerSource) = specInputQueue.pull().futureValue.value
         innerSource.runWith(Sink.ignore) // consume all incoming spec updates
 
@@ -241,7 +240,7 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
       }
 
       "Stop both sink and source when the failure occurred in the scheduler input" in new SchedulerFixture {
-        val (_, source, sink) = adapter.asSourceAndSink()
+        val (_, source, sink) = SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
         val (_, innerSource) = specInputQueue.pull().futureValue.value
         innerSource.map(_ => throw new Exception("Boom!")).runWith(Sink.ignore) // explosion in the scheduler
 
@@ -278,7 +277,7 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
       }
 
       "Stop sink and fail source when the failure occurred in the scheduler output" in new SchedulerFixture {
-        val (_, source, sink) = adapter.asSourceAndSink()
+        val (_, source, sink) = SchedulerAdapter.asSourceAndSink(SpecsSnapshot.empty, scheduler)
         val (_, innerSource) = specInputQueue.pull().futureValue.value
         innerSource.runWith(Sink.ignore)
 

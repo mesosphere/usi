@@ -5,25 +5,19 @@ import java.util.concurrent.{CompletableFuture, CompletionStage}
 
 import akka.{Done, NotUsed}
 import akka.stream.{Materializer, OverflowStrategy, QueueOfferResult, scaladsl}
-import akka.stream.javadsl.{Sink, SinkQueueWithCancel, Source, SourceQueueWithComplete}
+import akka.stream.javadsl._
 import com.mesosphere.usi.core.Scheduler.{SpecInput, StateOutput}
 import com.mesosphere.usi.core.scalaapi.{SchedulerAdapter => ScalaSchedulerAdapter}
 import com.mesosphere.usi.core.models.{SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
 
 import scala.compat.java8.FutureConverters._
-import akka.japi.tuple.Tuple3
 
 import scala.concurrent.ExecutionContext
 
-class SchedulerAdapter(
-    schedulerFlow: scaladsl.Flow[SpecInput, StateOutput, NotUsed],
-    mat: Materializer,
-    ec: ExecutionContext) {
+class SchedulerAdapter(mat: Materializer, ec: ExecutionContext) {
 
   private implicit val materializer: Materializer = mat
   private implicit val executionContext: ExecutionContext = ec
-
-  private val delegate = new ScalaSchedulerAdapter(schedulerFlow)
 
   /**
     * Represents the scheduler as a Sink and Source.
@@ -33,15 +27,18 @@ class SchedulerAdapter(
     * @param specsSnapshot Snapshot of the current specs
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
-  def asSourceAndSink(specsSnapshot: SpecsSnapshot)
-    : Tuple3[CompletableFuture[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]] = {
-    val (snap, source, sink) = delegate.asSourceAndSink(specsSnapshot)
-    Tuple3(snap.toJava.toCompletableFuture, source.asJava, sink.asJava)
+  def asSourceAndSink(
+      specsSnapshot: SpecsSnapshot,
+      schedulerFlow: scaladsl.Flow[SpecInput, StateOutput, NotUsed]): SourceAndSinkResult = {
+    val (snap, source, sink) = ScalaSchedulerAdapter.asSourceAndSink(specsSnapshot, schedulerFlow)
+    new SourceAndSinkResult(snap.toJava.toCompletableFuture, source.asJava, sink.asJava)
   }
 
-  def asSourceAndSink()
-    : Tuple3[CompletableFuture[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]] = {
-    asSourceAndSink(SpecsSnapshot.empty)
+  def asFlow(
+      specsSnapshot: SpecsSnapshot,
+      schedulerFlow: scaladsl.Flow[SpecInput, StateOutput, NotUsed]): FlowResult = {
+    val (snap, flow) = ScalaSchedulerAdapter.asFlow(specsSnapshot, schedulerFlow)
+    new FlowResult(snap.toJava.toCompletableFuture, flow.asJava)
   }
 
   /**
@@ -51,11 +48,12 @@ class SchedulerAdapter(
     * @param specsSnapshot Snapshot of the current specs
     * @return
     */
-  def asAkkaQueues(specsSnapshot: SpecsSnapshot, overflowStrategy: OverflowStrategy): Tuple3[
-    CompletableFuture[StateSnapshot],
-    SourceQueueWithComplete[SpecUpdated],
-    SinkQueueWithCancel[StateEvent]] = {
-    val (snap, specQueue, stateQueue) = delegate.asAkkaQueues(specsSnapshot, overflowStrategy)
+  def asAkkaQueues(
+      specsSnapshot: SpecsSnapshot,
+      overflowStrategy: OverflowStrategy,
+      schedulerFlow: scaladsl.Flow[SpecInput, StateOutput, NotUsed]): QueuesResult = {
+    val (snap, specQueue, stateQueue) =
+      ScalaSchedulerAdapter.asAkkaQueues(specsSnapshot, schedulerFlow, overflowStrategy)
     val javaSpecQueue = new SourceQueueWithComplete[SpecUpdated] {
       override def complete(): Unit = specQueue.complete()
       override def fail(ex: Throwable): Unit = specQueue.fail(ex)
@@ -70,14 +68,51 @@ class SchedulerAdapter(
           .map(scalaOpt => Optional.ofNullable(scalaOpt.orNull))(concurrent.ExecutionContext.Implicits.global)
           .toJava
     }
-    Tuple3(snap.toJava.toCompletableFuture, javaSpecQueue, javaStateQueue)
+    new QueuesResult(snap.toJava.toCompletableFuture, javaSpecQueue, javaStateQueue)
   }
 
-  def asAkkaQueues(): Tuple3[
-    CompletableFuture[StateSnapshot],
-    SourceQueueWithComplete[SpecUpdated],
-    SinkQueueWithCancel[StateEvent]] = {
-    asAkkaQueues(SpecsSnapshot.empty, OverflowStrategy.backpressure)
+  class SourceAndSinkResult(
+      snap: CompletableFuture[StateSnapshot],
+      source: Source[StateEvent, NotUsed],
+      sink: Sink[SpecUpdated, NotUsed]) {
+    def getSource: Source[StateEvent, NotUsed] = {
+      source
+    }
+
+    def getSink: Sink[SpecUpdated, NotUsed] = {
+      sink
+    }
+
+    def getSnapshot: CompletableFuture[StateSnapshot] = {
+      snap
+    }
+  }
+
+  class FlowResult(snap: CompletableFuture[StateSnapshot], flow: Flow[SpecUpdated, StateEvent, NotUsed]) {
+    def getFlow: Flow[SpecUpdated, StateEvent, NotUsed] = {
+      flow
+    }
+
+    def getSnapshot: CompletableFuture[StateSnapshot] = {
+      snap
+    }
+  }
+
+  class QueuesResult(
+      snap: CompletableFuture[StateSnapshot],
+      sourceQueue: SourceQueueWithComplete[SpecUpdated],
+      sinkQueue: SinkQueueWithCancel[StateEvent]) {
+    def getSourceQueue: SourceQueueWithComplete[SpecUpdated] = {
+      sourceQueue
+    }
+
+    def getSinkQueue: SinkQueueWithCancel[StateEvent] = {
+      sinkQueue
+    }
+
+    def getSnapshot: CompletableFuture[StateSnapshot] = {
+      snap
+    }
   }
 
 }

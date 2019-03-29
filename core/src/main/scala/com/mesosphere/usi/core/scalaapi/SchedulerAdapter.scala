@@ -11,12 +11,11 @@ import scala.util.{Failure, Success}
 
 /**
   * SchedulerAdapter provides a set of simple interfaces to the scheduler flow.
+  *
   * @param schedulerFlow
   * @param mat
   */
-class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
-    implicit mat: Materializer,
-    ec: ExecutionContext) {
+object SchedulerAdapter {
 
   /**
     * Represents the scheduler as a Sink and Source.
@@ -26,8 +25,9 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
     * @param specsSnapshot Snapshot of the current specs
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
-  def asSourceAndSink(specsSnapshot: SpecsSnapshot = SpecsSnapshot.empty)
-    : (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]) = {
+  def asSourceAndSink(specsSnapshot: SpecsSnapshot, schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
+      implicit mat: Materializer,
+      ec: ExecutionContext): (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]) = {
 
     val (stateQueue, stateSource) = Source.queue[StateEvent](1, OverflowStrategy.backpressure).preMaterialize()
 
@@ -128,6 +128,13 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
 
   }
 
+  def asFlow(specsSnapshot: SpecsSnapshot, schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
+      implicit mat: Materializer,
+      ec: ExecutionContext): (Future[StateSnapshot], Flow[SpecUpdated, StateEvent, NotUsed]) = {
+    val (snap, source, sink) = asSourceAndSink(specsSnapshot, schedulerFlow)
+    snap -> Flow.fromSinkAndSourceCoupled(sink, source)
+  }
+
   /**
     * Represents the scheduler as a SourceQueue and a SinkQueue.
     *
@@ -139,16 +146,17 @@ class SchedulerAdapter(schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
     * @return
     */
   def asAkkaQueues(
-      specsSnapshot: SpecsSnapshot = SpecsSnapshot.empty,
+      specsSnapshot: SpecsSnapshot,
+      schedulerFlow: Flow[SpecInput, StateOutput, NotUsed],
       overflowStrategy: OverflowStrategy = OverflowStrategy.backpressure,
-      bufferSize: Int = 1)
+      bufferSize: Int = 1)(implicit mat: Materializer, ec: ExecutionContext)
     : (Future[StateSnapshot], SourceQueueWithComplete[SpecUpdated], SinkQueueWithCancel[StateEvent]) = {
 
     val (specQueue, specSource) = Source.queue[SpecUpdated](bufferSize, overflowStrategy).preMaterialize()
 
     val (stateQueue, stateSink) = Sink.queue[StateEvent]().preMaterialize()
 
-    val (snapshot, source, sink) = asSourceAndSink(specsSnapshot)
+    val (snapshot, source, sink) = asSourceAndSink(specsSnapshot, schedulerFlow)
 
     specSource.runWith(sink)
     source.runWith(stateSink)
