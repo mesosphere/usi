@@ -1,12 +1,19 @@
 package com.mesosphere.usi.core
 
+import akka.stream.FanInShape2
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
-import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
+import akka.stream.{Attributes, Inlet, Outlet}
 import com.mesosphere.mesos.client.MesosCalls
+import com.mesosphere.usi.core.models.PodId
+import com.mesosphere.usi.core.models.PodRecord
 import com.mesosphere.usi.core.models.SpecEvent
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
-
 import scala.collection.mutable
+import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 object SchedulerLogicGraph {
   val BUFFER_SIZE = 32
@@ -41,13 +48,17 @@ object SchedulerLogicGraph {
   * It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
   * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
-class SchedulerLogicGraph(mesosCallFactory: MesosCalls)
-    extends GraphStage[FanInShape2[SpecEvent, MesosEvent, SchedulerEvents]] {
+private[core] class SchedulerLogicGraph(
+    mesosCallFactory: MesosCalls,
+    initialPodRecords: => Future[Map[PodId, PodRecord]])
+    extends GraphStage[FanInShape2[SpecEvent, MesosEvent, SchedulerEvents]]
+    with StrictLogging {
   import SchedulerLogicGraph.BUFFER_SIZE
 
-  val mesosEventsInlet = Inlet[MesosEvent]("mesos-events")
-  val specEventsInlet = Inlet[SpecEvent]("specs")
-  val frameResultOutlet = Outlet[SchedulerEvents]("effects")
+  private val mesosEventsInlet = Inlet[MesosEvent]("mesos-events")
+  private val specEventsInlet = Inlet[SpecEvent]("specs")
+  private val frameResultOutlet = Outlet[SchedulerEvents]("effects")
+
   // Define the shape of this stage, which is SourceShape with the port we defined above
   override val shape: FanInShape2[SpecEvent, MesosEvent, SchedulerEvents] =
     new FanInShape2(specEventsInlet, mesosEventsInlet, frameResultOutlet)
@@ -82,11 +93,16 @@ class SchedulerLogicGraph(mesosCallFactory: MesosCalls)
         }
       })
 
-      override def preStart(): Unit = {
-        // Start the stream
-        pull(specEventsInlet)
-        pull(mesosEventsInlet)
+      val startGraph = this.getAsyncCallback[Try[Map[PodId, PodRecord]]] {
+        case Success(initialSnapshot) =>
+          handler.loadInitialPodRecords(initialSnapshot)
+          maybePull()
+        case Failure(ex) =>
+          this.failStage(ex)
       }
+
+      override def preStart(): Unit =
+        initialPodRecords.onComplete(startGraph.invoke)(CallerThreadExecutionContext.context)
 
       def pushOrQueueIntents(effects: SchedulerEvents): Unit = {
         if (isAvailable(frameResultOutlet)) {

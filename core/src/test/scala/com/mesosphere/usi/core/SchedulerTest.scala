@@ -8,11 +8,11 @@ import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
+import com.mesosphere.usi.repository.InMemoryPodRecordRepository
 import com.mesosphere.utils.AkkaUnitTest
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest._
-
 import scala.concurrent.Future
 
 class SchedulerTest extends AkkaUnitTest with Inside {
@@ -31,8 +31,9 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   def mockedScheduler: Flow[Scheduler.SpecInput, Scheduler.StateOutput, Future[Done]] = {
     Flow.fromGraph {
-      GraphDSL.create(Scheduler.unconnectedGraph(new MesosCalls(MesosMock.mockFrameworkId)), loggingMockMesosFlow)(
-        (_, materializedValue) => materializedValue) { implicit builder =>
+      GraphDSL.create(
+        Scheduler.unconnectedGraph(new MesosCalls(MesosMock.mockFrameworkId), new InMemoryPodRecordRepository),
+        loggingMockMesosFlow)((_, materializedValue) => materializedValue) { implicit builder =>
         { (graph, mockMesos) =>
           import GraphDSL.Implicits._
 

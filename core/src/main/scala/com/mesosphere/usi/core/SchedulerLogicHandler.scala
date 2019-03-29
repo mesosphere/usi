@@ -2,6 +2,7 @@ package com.mesosphere.usi.core
 
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
+import com.mesosphere.usi.core.models.PodRecord
 import com.mesosphere.usi.core.models.{PodId, SpecEvent}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
@@ -84,6 +85,15 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     * frame based on podIds becoming dirty.
     */
   private var cachedPendingLaunch = CachedPendingLaunch(Set.empty)
+
+  def loadInitialPodRecords(podRecords: Map[PodId, PodRecord]): Unit = {
+    if (state.podStatuses.nonEmpty) {
+      throw new IllegalStateException(
+        s"Expected initial Scheduler state to be empty." +
+          s" Found ${state.podRecords.size} records and ${state.podStatuses.size} statuses")
+    }
+    state = state.copy(podRecords)
+  }
 
   def handleSpecEvent(msg: SpecEvent): SchedulerEvents = {
     handleFrame { builder =>
