@@ -14,33 +14,23 @@ trait RecordRepository {
     * @param record
     * @return id of the provided record
     */
-  def create(record: Record): Future[RecordId]
+  def store(record: Record): Future[RecordId]
 
   /**
-    * Retrieves the record if it exists.
-    * @param recordId
-    * @return Option(record) if it exists, None otherwise
+    * Retrieves all the existing records (if any).
+    * @return Map containing all the current pod records. Can be empty if there are no pod records.
     */
-  def read(recordId: RecordId): Future[Option[Record]]
-
-  /**
-    * Updates the record if it exists. If the record is missing,
-    * the future will be failed with an [[RecordNotFoundException]].
-    *
-    * @param record
-    * @return id of the updated record
-    */
-  def update(record: Record): Future[RecordId]
+  def readAll(): Future[Map[RecordId, Record]]
 
   /**
     * Deletes the record if it exists. If the record is missing,
     * * the future will be failed with an [[RecordNotFoundException]].
     *
-    * @param record
-    * @return id of the deleted record
+    * @param recordId
+    * @return Unit either if the node delete was successful OR if the node did not exist.
     */
-  def delete(record: Record): Future[RecordId]
+  def delete(recordId: RecordId): Future[Unit]
 }
 
-class RecordAlreadyExistsException(id: String) extends RuntimeException(s"record with id $id already exists.")
-class RecordNotFoundException(id: String) extends RuntimeException(s"record with id $id doesn't exist.")
+case class RecordAlreadyExistsException(id: String) extends RuntimeException(s"record with id $id already exists.")
+case class RecordNotFoundException(id: String) extends RuntimeException(s"record with id $id doesn't exist.")
