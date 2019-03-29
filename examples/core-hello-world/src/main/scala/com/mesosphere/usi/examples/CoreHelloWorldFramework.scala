@@ -110,7 +110,7 @@ object CoreHelloWorldFramework extends StrictLogging {
       .setName("CoreHelloWorldExample")
       .addRoles("test")
       .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
-      .setFailoverTimeout(1d)
+      .setFailoverTimeout(0d)
       .build()
   }
 

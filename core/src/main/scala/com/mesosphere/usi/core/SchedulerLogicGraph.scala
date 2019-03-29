@@ -1,19 +1,13 @@
 package com.mesosphere.usi.core
 
-import akka.stream.FanInShape2
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
-import akka.stream.{Attributes, Inlet, Outlet}
+import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
 import com.mesosphere.mesos.client.MesosCalls
-import com.mesosphere.usi.core.models.PodId
-import com.mesosphere.usi.core.models.PodRecord
-import com.mesosphere.usi.core.models.SpecEvent
-import com.typesafe.scalalogging.StrictLogging
+import com.mesosphere.usi.core.models.{PodId, PodRecord, SpecEvent}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 import scala.collection.mutable
 import scala.concurrent.Future
-import scala.util.Failure
-import scala.util.Success
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 object SchedulerLogicGraph {
   val BUFFER_SIZE = 32
@@ -51,8 +45,7 @@ object SchedulerLogicGraph {
 private[core] class SchedulerLogicGraph(
     mesosCallFactory: MesosCalls,
     initialPodRecords: => Future[Map[PodId, PodRecord]])
-    extends GraphStage[FanInShape2[SpecEvent, MesosEvent, SchedulerEvents]]
-    with StrictLogging {
+    extends GraphStage[FanInShape2[SpecEvent, MesosEvent, SchedulerEvents]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
   private val mesosEventsInlet = Inlet[MesosEvent]("mesos-events")

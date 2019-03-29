@@ -64,8 +64,7 @@ object Scheduler {
 
   def fromClient(
       client: MesosClient,
-      podRecordRepository: PodRecordRepository
-  ): Flow[SpecInput, StateOutput, NotUsed] = {
+      podRecordRepository: PodRecordRepository): Flow[SpecInput, StateOutput, NotUsed] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
@@ -118,8 +117,7 @@ object Scheduler {
 
   private[core] def unconnectedGraph(
       mesosCallFactory: MesosCalls,
-      podRecordRepository: PodRecordRepository
-  ): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
+      podRecordRepository: PodRecordRepository): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
     BidiFlow.fromGraph {
       GraphDSL.create(
         new SchedulerLogicGraph(mesosCallFactory, podRecordRepository.readAll()),
