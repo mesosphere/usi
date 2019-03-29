@@ -51,6 +51,9 @@ object Scheduler {
 
   type StateOutput = (StateSnapshot, Source[StateEvent, Any])
 
+  def fromSnapshot(specsSnapshot: SpecsSnapshot, client: MesosClient): Flow[SpecUpdated, StateOutput, NotUsed] =
+    Flow[SpecUpdated].prefixAndTail(0).map { case (_, rest) => specsSnapshot -> rest }.via(fromClient(client))
+
   def fromClient(client: MesosClient): Flow[SpecInput, StateOutput, NotUsed] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(

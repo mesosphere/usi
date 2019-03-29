@@ -1,4 +1,4 @@
-package com.mesosphere.usi.core.javaapi
+package com.mesosphere.usi.core.japi
 
 import akka.NotUsed
 import akka.stream.javadsl
@@ -15,6 +15,22 @@ object Scheduler {
   type SpecInput = akka.japi.Pair[SpecsSnapshot, javadsl.Source[SpecUpdated, Any]]
 
   type StateOutput = akka.japi.Pair[StateSnapshot, javadsl.Source[StateEvent, Any]]
+
+  /**
+    * Constructs a USI scheduler given an initial pod specs snapshot.
+    *
+    * @param specsSnapshot The initial snapshot of pod specs.
+    * @param client The [[MesosClient]] used to interact with Mesos.
+    * @return A [[javadsl]] flow from pod spec updates to state events.
+    */
+  def fromSnapshot(
+      specsSnapshot: SpecsSnapshot,
+      client: MesosClient): javadsl.Flow[SpecUpdated, StateOutput, NotUsed] = {
+    javadsl.Flow
+      .create[SpecUpdated]()
+      .via(ScalaScheduler.fromSnapshot(specsSnapshot, client))
+      .map { case (taken, tail) => akka.japi.Pair(taken, tail.asJava) }
+  }
 
   /**
     * Constructs a USI scheduler flow to managing pods.
