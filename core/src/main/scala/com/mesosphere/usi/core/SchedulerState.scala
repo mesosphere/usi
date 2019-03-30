@@ -37,7 +37,11 @@ case class SchedulerState(podRecords: Map[PodId, PodRecord], podStatuses: Map[Po
         }
       case agentRecordChange: AgentRecordUpdated => ???
       case reservationStatusChange: ReservationStatusUpdated => ???
-      case statusSnapshot: StateSnapshot => ???
+      case statusSnapshot: StateSnapshot =>
+        if (statusSnapshot.podRecords.nonEmpty) {
+          newPodRecords = statusSnapshot.podRecords
+            .foldLeft(newPodRecords)((acc, record) => acc.updated(record.podId, record))
+        }
     }
 
     copy(podRecords = newPodRecords, podStatuses = newPodStatuses)

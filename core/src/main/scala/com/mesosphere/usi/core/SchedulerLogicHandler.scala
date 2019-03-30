@@ -3,6 +3,7 @@ package com.mesosphere.usi.core
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
 import com.mesosphere.usi.core.models.PodRecord
+import com.mesosphere.usi.core.models.StateSnapshot
 import com.mesosphere.usi.core.models.{PodId, SpecEvent}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
@@ -86,15 +87,6 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     */
   private var cachedPendingLaunch = CachedPendingLaunch(Set.empty)
 
-  def loadInitialPodRecords(podRecords: Map[PodId, PodRecord]): Unit = {
-    if (state.podStatuses.nonEmpty) {
-      throw new IllegalStateException(
-        s"Expected initial Scheduler state to be empty." +
-          s" Found ${state.podRecords.size} records and ${state.podStatuses.size} statuses")
-    }
-    state = state.copy(podRecords)
-  }
-
   def handleSpecEvent(msg: SpecEvent): SchedulerEvents = {
     handleFrame { builder =>
       builder
@@ -102,6 +94,33 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
         .process { (specs, state, dirtyPodIds) =>
           schedulerLogic.computeNextStateForPods(specs, state)(dirtyPodIds)
         }
+    }
+  }
+
+  /**
+    * Process a Mesos event and update internal state.
+    *
+    * @param event
+    * @return The events describing state changes as Mesos call intents
+    */
+  def handleMesosEvent(event: MesosEvent): SchedulerEvents = {
+    handleFrame { builder =>
+      builder.process { (specs, state, _) =>
+        mesosEventsLogic.processEvent(specs, state, cachedPendingLaunch.pendingLaunch)(event)
+      }
+    }
+  }
+
+  def handlePodRecordSnapshot(podRecords: Map[PodId, PodRecord]): SchedulerEvents = {
+    handleFrame { builder =>
+      builder.process { (specs, state, _) =>
+        if (state.podRecords.nonEmpty || specs.podSpecs.nonEmpty) {
+          throw new IllegalStateException(
+            s"Expected initial Scheduler state to be empty." +
+              s" Found ${state.podRecords.size} records and ${specs.podSpecs.size} statuses")
+        }
+        SchedulerEvents(stateEvents = List(StateSnapshot.empty.copy(podRecords = podRecords.values.toSeq)))
+      }
     }
   }
 
@@ -137,20 +156,6 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
       SchedulerEvents(mesosCalls = List(mesosCallFactory.newRevive(None)))
     else
       SchedulerEvents.empty
-  }
-
-  /**
-    * Process a Mesos event and update internal state.
-    *
-    * @param event
-    * @return The events describing state changes as Mesos call intents
-    */
-  def handleMesosEvent(event: MesosEvent): SchedulerEvents = {
-    handleFrame { builder =>
-      builder.process { (specs, state, _) =>
-        mesosEventsLogic.processEvent(specs, state, cachedPendingLaunch.pendingLaunch)(event)
-      }
-    }
   }
 
   /**

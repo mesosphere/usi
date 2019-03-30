@@ -4,6 +4,8 @@ import akka.stream.scaladsl.Sink
 import akka.stream.scaladsl.Source
 import com.mesosphere.usi.core.models.PodStatusUpdated
 import com.mesosphere.usi.core.models.SpecsSnapshot
+import com.mesosphere.usi.core.models.StateEvent
+import com.mesosphere.usi.core.models.StateSnapshot
 import com.mesosphere.usi.repository.InMemoryPodRecordRepository
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
@@ -11,10 +13,11 @@ import com.mesosphere.utils.mesos.MesosFacade.ITFramework
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import java.util
-import java.util.concurrent.atomic.AtomicInteger
 import org.apache.mesos.v1.Protos.FrameworkID
 import org.apache.mesos.v1.Protos.TaskState.TASK_RUNNING
 import org.scalatest.Inside
+import org.scalatest.exceptions.TestFailedDueToTimeoutException
+import scala.collection.mutable.ListBuffer
 
 class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest with Inside {
 
@@ -39,53 +42,67 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
   }
 
   "CoreHelloWorldFramework should adhere to at most once launch guarantee during a crash-recovery" in {
-
-    When("an scheduler graph is generated")
+    Given("a scheduler graph that uses a persistence layer")
     val conf = loadConfig
     val frameworkInfo = CoreHelloWorldFramework.buildFrameworkInfo
     val customPersistenceStore = InMemoryPodRecordRepository()
     customPersistenceStore.readAll().futureValue.size shouldBe 0
     val (mesosClient, scheduler) = CoreHelloWorldFramework.buildGraph(conf, customPersistenceStore, frameworkInfo)
 
-    And("an initial pod spec is successfully launched")
+    And("an initial pod spec is launched")
     val specsSnapshot = CoreHelloWorldFramework.generateSpecSnapshot
-    val activeTasks = new AtomicInteger(0)
-    runAndGetTaskCount(scheduler, specsSnapshot, activeTasks)
+    val mutableEventList = ListBuffer[StateEvent]()
+    runAndGetTaskCount(scheduler, specsSnapshot, mutableEventList)
 
-    And("the persistence storage has non-zero records")
+    Then("the first ever snapshot is empty and our tasks have been launched")
     eventually {
-      activeTasks.get() shouldBe 1
-      customPersistenceStore.readAll().futureValue.size shouldBe 1
+      mutableEventList.collect {
+        case PodStatusUpdated(_, Some(status)) => status.taskStatuses.count(_._2.getState == TASK_RUNNING)
+      }.sum shouldBe 1
+      val stateSnapshots = mutableEventList.collect { case x: StateSnapshot => x }
+      stateSnapshots.size shouldBe 1
+      stateSnapshots.head.podRecords.size shouldBe 0
     }
 
-    And("if the scheduler is crashed")
-    mesosClient.killSwitch.abort(new RuntimeException)
+    And("persistence storage has correct set of records")
+    val podRecords = customPersistenceStore.readAll().futureValue.values
+    podRecords.size shouldBe 1
+    podRecords.head.podId shouldEqual specsSnapshot.podSpecs.head.id
 
-    Then("upon recovery, the same task should not be relaunched")
+    When("the scheduler is crashed")
+    mesosClient.killSwitch.abort(new RuntimeException("an intentional crash"))
+
+    Then("upon recovery, emitted snapshot should have valid information")
     val (newClient, newScheduler) = CoreHelloWorldFramework.buildGraph(conf, customPersistenceStore, frameworkInfo)
-    activeTasks.set(0)
-    runAndGetTaskCount(newScheduler, specsSnapshot, activeTasks)
-    intercept[Exception](eventually {
-      activeTasks.get() should be > 0
+    mutableEventList.clear()
+    runAndGetTaskCount(newScheduler, specsSnapshot, mutableEventList)
+    eventually {
+      val stateSnapshots = mutableEventList.collect { case x: StateSnapshot => x }
+      stateSnapshots.size shouldBe 1
+      stateSnapshots.head.podRecords.size shouldBe 1
+      stateSnapshots.head.podRecords.head shouldEqual podRecords.head
+    }
+
+    And("no new pod records have been created")
+    val newPodRecords = customPersistenceStore.readAll().futureValue.values
+    newPodRecords.size shouldBe 1
+    newPodRecords.head shouldEqual podRecords.head
+
+    And(s"a ${PodStatusUpdated.getClass.getSimpleName} should never be emitted")
+    intercept[TestFailedDueToTimeoutException](eventually {
+      mutableEventList.count(_.isInstanceOf[PodStatusUpdated]) should be > 0
     })
     newClient.killSwitch.shutdown()
   }
 
   private val runAndGetTaskCount =
-    (graph: CoreHelloWorldFramework.SchedulerFlow, specs: SpecsSnapshot, taskCounter: AtomicInteger) => {
+    (graph: CoreHelloWorldFramework.SchedulerFlow, specs: SpecsSnapshot, eventCapturer: ListBuffer[StateEvent]) => {
       Source.maybe
         .prepend(Source.single(specs))
         .map(snapshot => (snapshot, Source.empty))
         .via(graph)
         .flatMapConcat { case (snapshot, updates) => updates.prepend(Source.single(snapshot)) }
-        .map {
-          case PodStatusUpdated(_, status) if status.exists(_.taskStatuses.exists(_._2.getState == TASK_RUNNING)) => 1
-          case event => {
-            logger.info(s"--------> $event")
-            0
-          }
-        }
-        .runWith(Sink.foreach[Int](taskCounter.addAndGet))
+        .runWith(Sink.foreach[StateEvent](eventCapturer.append(_)))
     }
 
   def withFixture(frameworkId: Option[FrameworkID.Builder] = None)(fn: Fixture => Unit): Unit = {

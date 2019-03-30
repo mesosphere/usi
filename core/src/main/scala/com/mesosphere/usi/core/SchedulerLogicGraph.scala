@@ -88,7 +88,7 @@ private[core] class SchedulerLogicGraph(
 
       val startGraph = this.getAsyncCallback[Try[Map[PodId, PodRecord]]] {
         case Success(initialSnapshot) =>
-          handler.loadInitialPodRecords(initialSnapshot)
+          pushOrQueueIntents(handler.handlePodRecordSnapshot(initialSnapshot))
           maybePull()
         case Failure(ex) =>
           this.failStage(ex)

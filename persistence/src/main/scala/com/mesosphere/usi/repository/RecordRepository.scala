@@ -9,8 +9,7 @@ trait RecordRepository {
   type RecordId
 
   /**
-    * Stores the provided record in the repository if it doesn't exist.
-    * If the record is already there, resulting future will be failed with a [[RecordAlreadyExistsException]].
+    * Create/update the provided record in the repository.
     * @param record
     * @return id of the provided record
     */
@@ -23,14 +22,9 @@ trait RecordRepository {
   def readAll(): Future[Map[RecordId, Record]]
 
   /**
-    * Deletes the record if it exists. If the record is missing,
-    * * the future will be failed with an [[RecordNotFoundException]].
-    *
+    * Deletes the record if it exists. If the record is missing, this is a no-op.
     * @param recordId
     * @return Unit either if the node delete was successful OR if the node did not exist.
     */
   def delete(recordId: RecordId): Future[Unit]
 }
-
-case class RecordAlreadyExistsException(id: String) extends RuntimeException(s"record with id $id already exists.")
-case class RecordNotFoundException(id: String) extends RuntimeException(s"record with id $id doesn't exist.")
