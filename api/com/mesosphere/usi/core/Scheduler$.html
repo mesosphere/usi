@@ -133,6 +133,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi">usi</a></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.japi" visbl="pub" class="indented5 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="japi"></a><a id="japi:japi"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#japi" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="japi/index.html"><span class="name">japi</span></a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
     </li><li name="com.mesosphere.usi.core.logic" visbl="pub" class="indented5 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="logic"></a><a id="logic:logic"></a>
       <span class="permalink">
@@ -195,8 +211,8 @@
                         <a href="ResourceUtil$.html" title="">ResourceUtil</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="object" href="" title=""></a>
-                        <a href="" title="">Scheduler</a>
+                        <a class="object" href="" title="Provides the scheduler graph component."></a>
+                        <a href="" title="Provides the scheduler graph component.">Scheduler</a>
                       </li><li class="current-entities indented4">
                         <a class="object" href="SchedulerEvents$.html" title=""></a>
                         <a class="class" href="SchedulerEvents.html" title=""></a>
@@ -245,7 +261,34 @@
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides the scheduler graph component. The component has two inputs, and two outputs:</p><p>Input:
+1) SpecInput - Used to replicate the specification state from the framework implementation to the USI SchedulerLogic;
+   First, a spec snapshot, followed by spec updates.
+2) MesosEvents - Events from Mesos; offers, task status updates, etc.</p><p>Output:
+1) StateEvents - Used to replicate the state of pods, agents, and reservations to the framework
+   First, a scheduler state snapshot, followed by state updates.
+2) MesosCalls - Actions, such as revive, kill, accept offer, etc., used to realize the specification.</p><p>Fully wired, the graph looks like this at a high-level view:</p><p>                                                *** SCHEDULER ***
+                   +------------------------------------------------------------------------+
+                   |                                                                        |
+                   |  +------------------+           +-------------+        StateOutput     |
+       SpecInput   |  |                  |           |             |     /------------------&gt;----&gt; (framework)
+(framework) &gt;------&gt;--&gt;                  | Scheduler |             |    /                   |
+                   |  |                  |  Events   |             |   /                    |
+                   |  |  SchedulerLogic  o-----------&gt; Persistence o--+                     |
+                   |  |                  |           |             |   \                    |
+      MesosEvents  |  |                  |           |             |    \   MesosCalls      |
+      /------------&gt;--&gt;                  |           |             |     \------------------&gt;
+     /             |  |                  |           |             |                        |\
+    /              |  +------------------+           +-------------+                        | \
+   /               |                                                                        |  \
+  |                +------------------------------------------------------------------------+  |
+   \                                                                                           |
+    \                               +----------------------+                                  /
+     \                              |                      |                                 /
+      \-----------------------------&lt;        Mesos         &lt;---------------------------------
+                                    |                      |
+                                    +----------------------+
+</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -488,6 +531,22 @@
       </span>
       <span class="symbol">
         <span class="name">fromFlow</span><span class="params">(<span name="mesosCallFactory">mesosCallFactory: <a href="../../mesos/client/MesosCalls.html" class="extype" name="com.mesosphere.mesos.client.MesosCalls">MesosCalls</a></span>, <span name="mesosFlow">mesosFlow: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>, <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<a href="#SpecInput=(com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.SpecInput">SpecInput</a>, <a href="#StateOutput=(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.Scheduler#fromSnapshot" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="fromSnapshot(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.SpecUpdated,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]"></a><a id="fromSnapshot(SpecsSnapshot,MesosClient):Flow[SpecUpdated,StateOutput,NotUsed]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/Scheduler$.html#fromSnapshot(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.SpecUpdated,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fromSnapshot</span><span class="params">(<span name="specsSnapshot">specsSnapshot: <a href="models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a></span>, <span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<a href="models/SpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.SpecUpdated">SpecUpdated</a>, <a href="#StateOutput=(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
       </span>
       
       
