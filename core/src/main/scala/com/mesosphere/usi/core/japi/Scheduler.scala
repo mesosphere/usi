@@ -36,7 +36,7 @@ object Scheduler {
     * Constructs a USI scheduler flow to managing pods.
     *
     * The input is a [[akka.japi.Pair]] of [[SpecsSnapshot]] and [[javadsl.Source]]. The output is a [[akka.japi.Pair]]
-    * of [[StateSnapshot]] and [[javadsl.Source]].
+    * of [[StateSnapshot]] and [[javadsl.Source]] of [[StateOutput]].
     *
     * @param client The [[MesosClient]] used to interact with Mesos.
     * @return A [[javadsl]] flow from pod specs to state events.
