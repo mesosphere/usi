@@ -23,6 +23,7 @@ import scala.collection.JavaConverters._
   * 2) MesosCalls - Actions, such as revive, kill, accept offer, etc., used to realize the specification.
   *
   * Fully wired, the graph looks like this at a high-level view:
+  * {{{
   *
   *                                                 *** SCHEDULER ***
   *                    +------------------------------------------------------------------------+
@@ -45,6 +46,7 @@ import scala.collection.JavaConverters._
   *       \-----------------------------<        Mesos         <---------------------------------
   *                                     |                      |
   *                                     +----------------------+
+  * }}}
   */
 object Scheduler {
   type SpecInput = (SpecsSnapshot, Source[SpecUpdated, Any])
