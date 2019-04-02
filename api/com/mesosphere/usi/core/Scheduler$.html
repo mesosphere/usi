@@ -267,7 +267,7 @@
 2) MesosEvents - Events from Mesos; offers, task status updates, etc.</p><p>Output:
 1) StateEvents - Used to replicate the state of pods, agents, and reservations to the framework
    First, a scheduler state snapshot, followed by state updates.
-2) MesosCalls - Actions, such as revive, kill, accept offer, etc., used to realize the specification.</p><p>Fully wired, the graph looks like this at a high-level view:</p><p>                                                *** SCHEDULER ***
+2) MesosCalls - Actions, such as revive, kill, accept offer, etc., used to realize the specification.</p><p>Fully wired, the graph looks like this at a high-level view:</p><pre>                                                *** SCHEDULER ***
                    +------------------------------------------------------------------------+
                    |                                                                        |
                    |  +------------------+           +-------------+        StateOutput     |
@@ -285,10 +285,9 @@
    \                                                                                           |
     \                               +----------------------+                                  /
      \                              |                      |                                 /
-      \-----------------------------&lt;        Mesos         &lt;---------------------------------
+      \-----------------------------&lt;        Mesos         <span class="kw">&lt;-</span>--------------------------------
                                     |                      |
-                                    +----------------------+
-</p></div><div class="toggleContainer block">
+                                    +----------------------+</pre></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
