@@ -18,6 +18,7 @@ case class PodSpec(id: PodId, goal: Goal, runSpec: RunSpec)
 
 object PodSpec {
   type ValidationMessage = String
+  val Valid = Seq.empty
 
   /**
     * Verifies that every value in range is requested only once. Requesting same value multiple times would yield pod that will never be scheduled.
@@ -33,7 +34,7 @@ object PodSpec {
     if (staticPorts.distinct.length != staticPorts.length) {
       Seq(s"Every value inside RangeResource can be requested only once. Requirement: ${staticPorts.mkString(",")}")
     } else {
-      Seq.empty
+      Valid
     }
   }
 
@@ -46,7 +47,7 @@ object PodSpec {
         .map(s => s"${s.resourceType}:${s.amount}")
         .mkString(",")}")
     } else {
-      Seq.empty
+      Valid
     }
   }
 
