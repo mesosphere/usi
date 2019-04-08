@@ -168,7 +168,7 @@ object Scheduler {
           private[this] var nextElement: Option[SchedulerEvents] = None
           val eventCounter = new AtomicInteger(0)
 
-          def maybePushToPull(): Unit = {
+          val maybePushToPull = this.getAsyncCallback[Unit] { _ =>
             if (nextElement.isDefined && isAvailable(outlet)) {
               push(outlet, nextElement.get)
               nextElement = None
@@ -190,20 +190,19 @@ object Scheduler {
                   eventCounter.addAndGet(storeRecords.size + deleteRecords.size)
                   nextElement = Some(schedulerEvents)
                   if (eventCounter.get() == 0) {
-                    maybePushToPull()
+                    maybePushToPull.invoke(())
                   } else {
-                    // TODO : batch transactions
                     Source(storeRecords)
                       .map(_.newRecord.get)
                       .via(podRecordRepository.storeFlow)
                       .runWith(Sink.foreach(_ => {
-                        if (eventCounter.decrementAndGet() == 0) maybePushToPull()
+                        if (eventCounter.decrementAndGet() == 0) maybePushToPull.invoke(())
                       }))(materializer)
                     Source(deleteRecords)
                       .map(_.id)
                       .via(podRecordRepository.deleteFlow)
                       .runWith(Sink.foreach(_ => {
-                        if (eventCounter.decrementAndGet() == 0) maybePushToPull()
+                        if (eventCounter.decrementAndGet() == 0) maybePushToPull.invoke(())
                       }))(materializer)
                   }
                 }
@@ -214,7 +213,7 @@ object Scheduler {
           setHandler(
             outlet,
             new OutHandler {
-              override def onPull(): Unit = if (eventCounter.get() == 0) maybePushToPull()
+              override def onPull(): Unit = if (eventCounter.get() == 0) maybePushToPull.invoke(())
             }
           )
 
