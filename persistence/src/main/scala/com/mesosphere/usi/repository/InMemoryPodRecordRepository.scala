@@ -1,5 +1,7 @@
 package com.mesosphere.usi.repository
 
+import akka.NotUsed
+import akka.stream.scaladsl.Flow
 import com.mesosphere.usi.core.models.{PodId, PodRecord}
 import com.typesafe.scalalogging.StrictLogging
 import scala.collection.mutable
@@ -18,10 +20,16 @@ case class InMemoryPodRecordRepository() extends PodRecordRepository with Strict
     Future.successful(record.podId)
   }
 
+  override def storeFlow: Flow[PodRecord, PodId, NotUsed] =
+    Flow[PodRecord].mapAsync(1)(store)
+
   override def delete(podId: PodId): Future[Unit] = synchronized {
     data -= podId
     Future.unit
   }
+
+  override def deleteFlow: Flow[PodId, Unit, NotUsed] =
+    Flow[PodId].mapAsync(1)(delete)
 
   override def readAll(): Future[Map[PodId, PodRecord]] = {
     Future.successful(data.toMap)

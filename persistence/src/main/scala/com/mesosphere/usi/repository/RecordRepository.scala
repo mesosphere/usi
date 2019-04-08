@@ -1,5 +1,7 @@
 package com.mesosphere.usi.repository
 
+import akka.NotUsed
+import akka.stream.scaladsl.Flow
 import scala.concurrent.Future
 
 trait RecordRepository {
@@ -14,6 +16,7 @@ trait RecordRepository {
     * @return id of the provided record
     */
   def store(record: Record): Future[RecordId]
+  def storeFlow: Flow[Record, RecordId, NotUsed]
 
   /**
     * Retrieves all the existing records (if any).
@@ -27,4 +30,5 @@ trait RecordRepository {
     * @return Unit either if the node delete was successful OR if the node did not exist.
     */
   def delete(recordId: RecordId): Future[Unit]
+  def deleteFlow: Flow[RecordId, Unit, NotUsed]
 }

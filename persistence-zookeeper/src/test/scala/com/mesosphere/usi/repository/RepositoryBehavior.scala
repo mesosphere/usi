@@ -97,7 +97,7 @@ trait RepositoryBehavior { this: UnitTest =>
       repo.readAll().futureValue should not contain f.podId -> f.record
     }
 
-    "delete an unknown record" in {
+    "delete is idempotent" in {
       Given(s"an unknown record id")
       val repo = newRepo()
       val unknownPodId = PodId("unknown")

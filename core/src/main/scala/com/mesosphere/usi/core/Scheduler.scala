@@ -1,9 +1,10 @@
 package com.mesosphere.usi.core
 
-import akka.Done
 import akka.NotUsed
-import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Source}
-import akka.stream.{BidiShape, FlowShape}
+import akka.stream.Attributes
+import akka.stream.{BidiShape, FlowShape, Inlet, Outlet}
+import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
+import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, Source}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.models.{
   PodRecordUpdated,
@@ -15,10 +16,10 @@ import com.mesosphere.usi.core.models.{
   StateUpdated
 }
 import com.mesosphere.usi.repository.PodRecordRepository
+import java.util.concurrent.atomic.AtomicInteger
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import scala.collection.JavaConverters._
-import scala.concurrent.Future
 
 /*
  * Provides the scheduler graph component. The component has two inputs, and two outputs:
@@ -68,7 +69,7 @@ object Scheduler {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
-          "Please provide create MesosClient with FrameworkInfo that has capability MULTI_ROLE")
+          "Please provide a MesosClient with FrameworkInfo that has capability MULTI_ROLE")
     }
     fromFlow(client.calls, podRecordRepository, Flow.fromSinkAndSource(client.mesosSink, client.mesosSource))
   }
@@ -104,7 +105,6 @@ object Scheduler {
       rest.prepend(Source.single(snapshot))
   }
 
-  // TODO (DCOS-47476) use actual prefixAndTail and expect first event to be a Snapshot; change the prefixAndTail param from 0 value to 1, let fail, etc.
   private val stateOutputBreakoutFlow: Flow[StateEvent, StateOutput, NotUsed] = Flow[StateEvent].prefixAndTail(1).map {
     case (Seq(snapshot), stateEvents) =>
       val stateSnapshot = snapshot match {
@@ -153,22 +153,78 @@ object Scheduler {
   }
 
   private def persistenceFlow(
-      podRecordRepository: PodRecordRepository): Flow[SchedulerEvents, SchedulerEvents, NotUsed] =
-    Flow[SchedulerEvents].mapAsync(1) { events =>
-      import CallerThreadExecutionContext.context
-      Future
-        .sequence(events.stateEvents.map {
-          case _ @PodRecordUpdated(podId, maybePodRecord) =>
-            maybePodRecord match {
-              case Some(podRecord) =>
-                podRecordRepository.store(podRecord)
-              case None =>
-                podRecordRepository.delete(podId)
+      podRecordRepository: PodRecordRepository
+  ): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
+    Flow.fromGraph(new GraphStage[FlowShape[SchedulerEvents, SchedulerEvents]] {
+
+      private val inlet = Inlet[SchedulerEvents]("scheduler-events-inlet")
+      private val outlet = Outlet[SchedulerEvents]("scheduler-events-outlet")
+
+      override def shape: FlowShape[SchedulerEvents, SchedulerEvents] =
+        new FlowShape[SchedulerEvents, SchedulerEvents](inlet, outlet)
+
+      override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
+        new GraphStageLogic(shape) {
+          private[this] var nextElement: Option[SchedulerEvents] = None
+          val eventCounter = new AtomicInteger(0)
+
+          def maybePushToPull(): Unit = {
+            if (nextElement.isDefined && isAvailable(outlet)) {
+              push(outlet, nextElement.get)
+              nextElement = None
             }
-          case _ => Future.successful(Done)
-        })
-        .map(_ => events)
-    }
+            if (nextElement.isEmpty && !hasBeenPulled(inlet)) {
+              pull(inlet)
+            }
+          }
+
+          setHandler(
+            inlet,
+            new InHandler {
+              override def onPush(): Unit = {
+                if (nextElement.isEmpty) {
+                  val schedulerEvents = grab(inlet)
+                  val (storeRecords, deleteRecords) = schedulerEvents.stateEvents.collect {
+                    case x: PodRecordUpdated => x
+                  }.partition(_.newRecord.isDefined)
+                  eventCounter.addAndGet(storeRecords.size + deleteRecords.size)
+                  nextElement = Some(schedulerEvents)
+                  if (eventCounter.get() == 0) {
+                    maybePushToPull()
+                  } else {
+                    // TODO : batch transactions
+                    Source(storeRecords)
+                      .map(_.newRecord.get)
+                      .via(podRecordRepository.storeFlow)
+                      .runWith(Sink.foreach(_ => {
+                        if (eventCounter.decrementAndGet() == 0) maybePushToPull()
+                      }))(materializer)
+                    Source(deleteRecords)
+                      .map(_.id)
+                      .via(podRecordRepository.deleteFlow)
+                      .runWith(Sink.foreach(_ => {
+                        if (eventCounter.decrementAndGet() == 0) maybePushToPull()
+                      }))(materializer)
+                  }
+                }
+              }
+            }
+          )
+
+          setHandler(
+            outlet,
+            new OutHandler {
+              override def onPull(): Unit = if (eventCounter.get() == 0) maybePushToPull()
+            }
+          )
+
+          override def preStart(): Unit = {
+            pull(inlet)
+          }
+        }
+      }
+    })
+  }
 
   private def isMultiRoleFramework(frameworkInfo: FrameworkInfo): Boolean =
     frameworkInfo.getCapabilitiesList.asScala.exists(_.getType == FrameworkInfo.Capability.Type.MULTI_ROLE)
