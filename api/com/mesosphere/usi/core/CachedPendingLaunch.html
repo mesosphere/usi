@@ -233,6 +233,10 @@
                         <a class="object" href="SpecState$.html" title=""></a>
                         <a class="class" href="SpecState.html" title=""></a>
                         <a href="SpecState.html" title="">SpecState</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="UpdateResult.html" title=""></a>
+                        <a href="UpdateResult.html" title="">UpdateResult</a>
                       </li>
               </ul>
             </div>
@@ -571,9 +575,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="com.mesosphere.usi.core.CachedPendingLaunch#update" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="update(specs:com.mesosphere.usi.core.SpecState,state:com.mesosphere.usi.core.SchedulerState,podIds:Set[com.mesosphere.usi.core.models.PodId]):com.mesosphere.usi.core.CachedPendingLaunch"></a><a id="update(SpecState,SchedulerState,Set[PodId]):CachedPendingLaunch"></a>
+      <a id="update(specs:com.mesosphere.usi.core.SpecState,state:com.mesosphere.usi.core.SchedulerState,podIds:Set[com.mesosphere.usi.core.models.PodId]):com.mesosphere.usi.core.UpdateResult"></a><a id="update(SpecState,SchedulerState,Set[PodId]):UpdateResult"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/CachedPendingLaunch.html#update(specs:com.mesosphere.usi.core.SpecState,state:com.mesosphere.usi.core.SchedulerState,podIds:Set[com.mesosphere.usi.core.models.PodId]):com.mesosphere.usi.core.CachedPendingLaunch" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/CachedPendingLaunch.html#update(specs:com.mesosphere.usi.core.SpecState,state:com.mesosphere.usi.core.SchedulerState,podIds:Set[com.mesosphere.usi.core.models.PodId]):com.mesosphere.usi.core.UpdateResult" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -582,7 +586,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">update</span><span class="params">(<span name="specs">specs: <a href="SpecState.html" class="extype" name="com.mesosphere.usi.core.SpecState">SpecState</a></span>, <span name="state">state: <a href="SchedulerState.html" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a></span>, <span name="podIds">podIds: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]</span>)</span><span class="result">: <a href="" class="extype" name="com.mesosphere.usi.core.CachedPendingLaunch">CachedPendingLaunch</a></span>
+        <span class="name">update</span><span class="params">(<span name="specs">specs: <a href="SpecState.html" class="extype" name="com.mesosphere.usi.core.SpecState">SpecState</a></span>, <span name="state">state: <a href="SchedulerState.html" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a></span>, <span name="podIds">podIds: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]</span>)</span><span class="result">: <a href="UpdateResult.html" class="extype" name="com.mesosphere.usi.core.UpdateResult">UpdateResult</a></span>
       </span>
       
       <p class="shortcomment cmt">Maintains a cache of pods pending launch, so a full scan isn't required on every offer</p><div class="fullcomment"><div class="comment cmt"><p>Maintains a cache of pods pending launch, so a full scan isn't required on every offer</p><p>Must be called after podSpecs are updated, and response effects are applied.
