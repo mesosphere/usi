@@ -108,7 +108,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     val frameResultBuilder = fn(FrameResultBuilder.givenState(this.specs, this.state)).process {
       (specs, state, dirtyPodIds) =>
         pruneTaskStatuses(specs, state)(dirtyPodIds)
-    }.process(updateCachesAndRevive)
+    }.process(updateCachesAndSuppressAndRevive)
 
     // update our state for the next frame processing
     this.state = frameResultBuilder.state
@@ -137,13 +137,13 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
       .toList
   }
 
-  private def updateCachesAndRevive(
+  private def updateCachesAndSuppressAndRevive(
       specs: SpecState,
       state: SchedulerState,
       dirtyPodIds: Set[PodId]): SchedulerEvents = {
     val updateResult = this.cachedPendingLaunch.update(specs, state, dirtyPodIds)
-    this.cachedPendingLaunch = updateResult.newCachedPendingLaunch
-    val reviveCalls = updateResult.newToBeLaunched.iterator
+    this.cachedPendingLaunch = updateResult.cachedPendingLaunch
+    val reviveCalls = updateResult.toBeLaunched.iterator
       .map(id => specs.podSpecs.get(id))
       .collect { case Some(p) => p.runSpec.role }
       .toSeq
@@ -151,7 +151,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
       .map(r => mesosCallFactory.newRevive(Some(r)))
       .toList
 
-    val suppressCalls = generateSuppressCalls(cachedPendingLaunch.pendingLaunch, updateResult.newLaunched)
+    val suppressCalls = generateSuppressCalls(cachedPendingLaunch.pendingLaunch, updateResult.launched)
 
     SchedulerEvents(mesosCalls = reviveCalls ++ suppressCalls)
   }
