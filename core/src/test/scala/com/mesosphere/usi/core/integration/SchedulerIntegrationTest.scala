@@ -49,7 +49,8 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
             Goal.Running,
             RunSpec(
               resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
-              shellCommand = "sleep 3600")
+              shellCommand = "sleep 3600",
+              "test")
           ))
       ))
 
@@ -83,7 +84,9 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
           RunSpec(
             resourceRequirements =
               List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256), RangeRequirement.ports(Seq(0))),
-            shellCommand = "sleep 3600")
+            shellCommand = "sleep 3600",
+            "test"
+          )
         ))
       ))
 
