@@ -239,6 +239,10 @@
                         <a href="PodId.html" title="Unique identifier of a pod">PodId</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
+                        <a class="class" href="PodInvalid.html" title=""></a>
+                        <a href="PodInvalid.html" title="">PodInvalid</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
                         <a class="class" href="PodRecord.html" title="Describes facts about the result of a launched PodSpec from the perspective of USI."></a>
                         <a href="PodRecord.html" title="Describes facts about the result of a launched PodSpec from the perspective of USI.">PodRecord</a>
                       </li><li class="current-entities indented5">
@@ -246,7 +250,7 @@
                         <a class="class" href="PodRecordUpdated.html" title=""></a>
                         <a href="PodRecordUpdated.html" title="">PodRecordUpdated</a>
                       </li><li class="current-entities indented5">
-                        <span class="separator"></span>
+                        <a class="object" href="PodSpec$.html" title=""></a>
                         <a class="class" href="PodSpec.html" title="Framework implementation owned specification of some Pod that should be launched."></a>
                         <a href="PodSpec.html" title="Framework implementation owned specification of some Pod that should be launched.">PodSpec</a>
                       </li><li class="current-entities indented5">
@@ -325,6 +329,10 @@
                         <span class="separator"></span>
                         <a class="class" href="TaskId.html" title="Unique Mesos task identifier"></a>
                         <a href="TaskId.html" title="Unique Mesos task identifier">TaskId</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="trait" href="UserError.html" title="Captures a pod event that was caused by a SpecEvent submitted by the user."></a>
+                        <a href="UserError.html" title="Captures a pod event that was caused by a SpecEvent submitted by the user.">UserError</a>
                       </li>
               </ul>
             </div>
@@ -490,6 +498,22 @@ proto files.
       </span>
       
       <p class="shortcomment cmt">Unique identifier of a pod</p>
+    </li><li name="com.mesosphere.usi.core.models.PodInvalid" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PodInvalidextendsUserErrorwithProductwithSerializable"></a><a id="PodInvalid:PodInvalid"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#PodInvalidextendsUserErrorwithProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="PodInvalid.html"><span class="name">PodInvalid</span></a><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="errors">errors: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <a href="UserError.html" class="extype" name="com.mesosphere.usi.core.models.UserError">UserError</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
     </li><li name="com.mesosphere.usi.core.models.PodRecord" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="PodRecordextendsProductwithSerializable"></a><a id="PodRecord:PodRecord"></a>
       <span class="permalink">
@@ -864,6 +888,22 @@ suits the framework's domain.
       </span>
       
       <p class="shortcomment cmt">Unique Mesos task identifier</p>
+    </li><li name="com.mesosphere.usi.core.models.UserError" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="UserErrorextendsPodStateEvent"></a><a id="UserError:UserError"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#UserErrorextendsPodStateEvent" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Captures a pod event that was caused by a SpecEvent submitted by the user." href="UserError.html"><span class="name">UserError</span></a><span class="result"> extends <a href="PodStateEvent.html" class="extype" name="com.mesosphere.usi.core.models.PodStateEvent">PodStateEvent</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Captures a pod event that was caused by a <a href="SpecEvent.html" class="extype" name="com.mesosphere.usi.core.models.SpecEvent">SpecEvent</a> submitted by the user.</p>
     </li></ol>
             </div>
 
@@ -901,6 +941,22 @@ suits the framework's domain.
       </span>
       <span class="symbol">
         <a title="" href="Goal$.html"><span class="name">Goal</span></a>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.PodSpec" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PodSpec"></a><a id="PodSpec:PodSpec"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#PodSpec" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="PodSpec$.html"><span class="name">PodSpec</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
