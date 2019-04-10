@@ -95,9 +95,9 @@ object Scheduler {
   private val stateOutputBreakoutFlow: Flow[StateEvent, StateOutput, NotUsed] = Flow[StateEvent].prefixAndTail(0).map {
     case (_, stateEvents) =>
       val stateUpdates = stateEvents.map {
-        case c: StateUpdated => c
         case _: StateSnapshot =>
           throw new IllegalStateException("Only the first event is allowed to be a state snapshot")
+        case event => event
       }
       (StateSnapshot.empty, stateUpdates)
   }
