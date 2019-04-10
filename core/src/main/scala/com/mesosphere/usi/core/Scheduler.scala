@@ -4,9 +4,10 @@ import akka.NotUsed
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Source}
 import akka.stream.{BidiShape, FlowShape}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
-import com.mesosphere.usi.core.models.{SpecEvent, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot, StateUpdated}
+import com.mesosphere.usi.core.models.{SpecEvent, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+
 import scala.collection.JavaConverters._
 
 /*
