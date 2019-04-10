@@ -28,7 +28,7 @@ object StateSnapshot {
 sealed trait StateUpdated extends StateEvent
 
 /**
-  * Captures a pod event that was caused by user of USI core submitting an invalid PodSpec.
+  * Captures a pod event that was caused by a [[SpecEvent]] submitted by the user.
   */
 sealed trait UserError extends PodStateEvent
 
