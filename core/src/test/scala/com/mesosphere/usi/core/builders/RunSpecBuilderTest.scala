@@ -26,6 +26,7 @@ class RunSpecBuilderTest extends UnitTest {
         RunSpec(
           resourceRequirements = List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 32)),
           shellCommand = "sleep 3600",
+          role = "test",
           fetch = Seq(FetchUri(uri = URI.create(fetchMe), extract = false))
         )
       )
