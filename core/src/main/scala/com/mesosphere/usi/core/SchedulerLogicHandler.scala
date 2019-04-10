@@ -2,7 +2,7 @@ package com.mesosphere.usi.core
 
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
-import com.mesosphere.usi.core.models.{PodId, SpecEvent}
+import com.mesosphere.usi.core.models.{PodId, PodInvalid, PodSpec, PodSpecUpdated, SpecEvent, SpecsSnapshot}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
 
 /**
@@ -85,13 +85,28 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     */
   private var cachedPendingLaunch = CachedPendingLaunch(Set.empty)
 
+  def validateEvent(msg: SpecEvent): Seq[PodInvalid] = msg match {
+    case SpecsSnapshot(podSpecs, _) =>
+      podSpecs.flatMap { p =>
+        PodSpec.isValid(p).toList.map(err => PodInvalid(p.id, Seq(err)))
+      }
+    case PodSpecUpdated(_, Some(podSpec)) =>
+      PodSpec.isValid(podSpec).toList.map(err => PodInvalid(podSpec.id, Seq(err)))
+    case _ => Seq.empty
+  }
+
   def handleSpecEvent(msg: SpecEvent): SchedulerEvents = {
-    handleFrame { builder =>
-      builder
-        .applySpecEvent(msg)
-        .process { (specs, state, dirtyPodIds) =>
-          schedulerLogic.computeNextStateForPods(specs, state)(dirtyPodIds)
-        }
+    val invalidPods = validateEvent(msg)
+    if (invalidPods.nonEmpty) {
+      SchedulerEvents(invalidPods.toList, List.empty)
+    } else {
+      handleFrame { builder =>
+        builder
+          .applySpecEvent(msg)
+          .process { (specs, state, dirtyPodIds) =>
+            schedulerLogic.computeNextStateForPods(specs, state)(dirtyPodIds)
+          }
+      }
     }
   }
 

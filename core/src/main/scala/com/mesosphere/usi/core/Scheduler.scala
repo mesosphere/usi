@@ -4,9 +4,10 @@ import akka.NotUsed
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Source}
 import akka.stream.{BidiShape, FlowShape}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
-import com.mesosphere.usi.core.models.{SpecEvent, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot, StateUpdated}
+import com.mesosphere.usi.core.models.{SpecEvent, SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+
 import scala.collection.JavaConverters._
 
 /**
@@ -100,9 +101,9 @@ object Scheduler {
   private val stateOutputBreakoutFlow: Flow[StateEvent, StateOutput, NotUsed] = Flow[StateEvent].prefixAndTail(0).map {
     case (_, stateEvents) =>
       val stateUpdates = stateEvents.map {
-        case c: StateUpdated => c
         case _: StateSnapshot =>
           throw new IllegalStateException("Only the first event is allowed to be a state snapshot")
+        case event => event
       }
       (StateSnapshot.empty, stateUpdates)
   }
