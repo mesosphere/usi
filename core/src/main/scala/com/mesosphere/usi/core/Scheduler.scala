@@ -59,6 +59,19 @@ object Scheduler {
   def fromSnapshot(specsSnapshot: SpecsSnapshot, client: MesosClient): Flow[SpecUpdated, StateOutput, NotUsed] =
     Flow[SpecUpdated].prefixAndTail(0).map { case (_, rest) => specsSnapshot -> rest }.via(fromClient(client))
 
+  def asFlow(specsSnapshot: SpecsSnapshot, client: MesosClient)(
+      implicit materializer: Materializer): Future[(StateSnapshot, Flow[SpecUpdated, StateEvent, NotUsed])] = {
+
+    implicit val ec = scala.concurrent.ExecutionContext.Implicits.global //only for ultra-fast non-blocking onComplete
+
+    val (snap, source, sink) = asSourceAndSink(specsSnapshot, client)
+
+    snap.map { snapshot =>
+      (snapshot, Flow.fromSinkAndSourceCoupled(sink, source))
+    }
+
+  }
+
   /**
     * Represents the scheduler as a Sink and Source.
     *

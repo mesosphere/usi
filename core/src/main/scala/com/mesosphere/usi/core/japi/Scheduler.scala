@@ -3,13 +3,15 @@ package com.mesosphere.usi.core.japi
 import java.util.concurrent.CompletableFuture
 
 import akka.NotUsed
-import akka.stream.javadsl.{Sink, Source}
+import akka.stream.javadsl.{Flow, Sink, Source}
 import akka.stream.{Materializer, javadsl}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.{Scheduler => ScalaScheduler}
 import com.mesosphere.usi.core.models.{SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+
 import scala.compat.java8.FutureConverters._
+import scala.concurrent.ExecutionContext
 
 /**
   * Java friendly factory methods of [[com.mesosphere.usi.core.Scheduler]].
@@ -101,6 +103,31 @@ object Scheduler {
     }
 
     def getSnapshot: CompletableFuture[StateSnapshot] = {
+      snap
+    }
+  }
+
+  def asFlow(
+      specsSnapshot: SpecsSnapshot,
+      client: MesosClient,
+      materializer: Materializer): CompletableFuture[FlowResult] = {
+
+    implicit val ec = ExecutionContext.Implicits.global
+
+    val flowFuture = ScalaScheduler.asFlow(specsSnapshot, client)(materializer)
+    flowFuture.map {
+      case (snapshot, flow) =>
+        new FlowResult(snapshot, flow.asJava)
+    }.toJava.toCompletableFuture
+
+  }
+
+  class FlowResult(snap: StateSnapshot, flow: Flow[SpecUpdated, StateEvent, NotUsed]) {
+    def getFlow: Flow[SpecUpdated, StateEvent, NotUsed] = {
+      flow
+    }
+
+    def getSnapshot: StateSnapshot = {
       snap
     }
   }
