@@ -24,6 +24,7 @@ case class InMemoryPodRecordRepository() extends PodRecordRepository with Strict
     Flow[PodRecord].mapAsync(1)(store)
 
   override def delete(podId: PodId): Future[Unit] = synchronized {
+    logger.info(s"Delete record $podId")
     data -= podId
     Future.unit
   }

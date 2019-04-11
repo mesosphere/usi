@@ -1,9 +1,8 @@
 package com.mesosphere.usi.core
 
 import akka.NotUsed
-import akka.stream.Attributes
-import akka.stream.{BidiShape, FlowShape, Inlet, Outlet}
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
+import akka.stream.{Attributes, BidiShape, FlowShape, Inlet, Outlet}
+import akka.stream.stage.{AsyncCallback, GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, Source}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.models.{
@@ -152,74 +151,61 @@ object Scheduler {
     }
   }
 
-  private def persistenceFlow(
-      podRecordRepository: PodRecordRepository
-  ): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
+  /**
+    * This persistence flow is (intentionally) designed to process only one [[SchedulerEvents]] at a time.
+    * Backpressure until ALL the [[StateEvent]] in a single [[SchedulerEvents]] can be processed.
+    */
+  private[core] def persistenceFlow(
+      podRecordRepository: PodRecordRepository): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
     Flow.fromGraph(new GraphStage[FlowShape[SchedulerEvents, SchedulerEvents]] {
 
-      private val inlet = Inlet[SchedulerEvents]("scheduler-events-inlet")
-      private val outlet = Outlet[SchedulerEvents]("scheduler-events-outlet")
+      private val inlet = Inlet[SchedulerEvents]("persistence-inlet")
+      private val outlet = Outlet[SchedulerEvents]("persistence-outlet")
 
-      override def shape: FlowShape[SchedulerEvents, SchedulerEvents] =
-        new FlowShape[SchedulerEvents, SchedulerEvents](inlet, outlet)
+      override def shape: FlowShape[SchedulerEvents, SchedulerEvents] = new FlowShape(inlet, outlet)
 
       override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
-        new GraphStageLogic(shape) {
-          private[this] var nextElement: Option[SchedulerEvents] = None
-          val eventCounter = new AtomicInteger(0)
-
-          val maybePushToPull = this.getAsyncCallback[Unit] { _ =>
-            if (nextElement.isDefined && isAvailable(outlet)) {
+        new GraphStageLogic(shape) with InHandler with OutHandler {
+          var nextElement: Option[SchedulerEvents] = None
+          val eventCounter = new AtomicInteger()
+          val maybePushToPull: AsyncCallback[Unit] = this.getAsyncCallback[Unit] { _ =>
+            if (nextElement.isDefined && isAvailable(outlet) && eventCounter.get() == 0) {
               push(outlet, nextElement.get)
               nextElement = None
             }
             if (nextElement.isEmpty && !hasBeenPulled(inlet)) {
-              pull(inlet)
+              tryPull(inlet)
             }
           }
+          setHandlers(inlet, outlet, this)
 
-          setHandler(
-            inlet,
-            new InHandler {
-              override def onPush(): Unit = {
-                if (nextElement.isEmpty) {
-                  val schedulerEvents = grab(inlet)
-                  val (storeRecords, deleteRecords) = schedulerEvents.stateEvents.collect {
-                    case x: PodRecordUpdated => x
-                  }.partition(_.newRecord.isDefined)
-                  eventCounter.addAndGet(storeRecords.size + deleteRecords.size)
-                  nextElement = Some(schedulerEvents)
-                  if (eventCounter.get() == 0) {
-                    maybePushToPull.invoke(())
-                  } else {
-                    Source(storeRecords)
-                      .map(_.newRecord.get)
-                      .via(podRecordRepository.storeFlow)
-                      .runWith(Sink.foreach(_ => {
-                        if (eventCounter.decrementAndGet() == 0) maybePushToPull.invoke(())
-                      }))(materializer)
-                    Source(deleteRecords)
-                      .map(_.id)
-                      .via(podRecordRepository.deleteFlow)
-                      .runWith(Sink.foreach(_ => {
-                        if (eventCounter.decrementAndGet() == 0) maybePushToPull.invoke(())
-                      }))(materializer)
-                  }
-                }
+          override def onPush(): Unit = {
+            if (nextElement.isEmpty) {
+              require(eventCounter.get() == 0)
+              val schedulerEvents = grab(inlet)
+              val (storeRecords, deleteRecords) = schedulerEvents.stateEvents.collect { case x: PodRecordUpdated => x }
+                .partition(_.newRecord.isDefined)
+              if (eventCounter.addAndGet(storeRecords.size + deleteRecords.size) == 0) {
+                nextElement = Some(schedulerEvents)
+                maybePushToPull.invoke(())
+              } else {
+                nextElement = Some(schedulerEvents)
+                Source(storeRecords).collect { case PodRecordUpdated(_, Some(record)) => record }
+                  .via(podRecordRepository.storeFlow)
+                  .runWith(Sink.foreach(_ => {
+                    if (eventCounter.decrementAndGet() == 0) maybePushToPull.invoke(())
+                  }))(materializer)
+                Source(deleteRecords)
+                  .map(_.id)
+                  .via(podRecordRepository.deleteFlow)
+                  .runWith(Sink.foreach(_ => {
+                    if (eventCounter.decrementAndGet() == 0) maybePushToPull.invoke(())
+                  }))(materializer)
               }
             }
-          )
-
-          setHandler(
-            outlet,
-            new OutHandler {
-              override def onPull(): Unit = if (eventCounter.get() == 0) maybePushToPull.invoke(())
-            }
-          )
-
-          override def preStart(): Unit = {
-            pull(inlet)
           }
+
+          override def onPull(): Unit = maybePushToPull.invoke(())
         }
       }
     })
