@@ -266,4 +266,11 @@ private[usi] object ProtoBuilders {
       .setUpdate(MesosEvent.Update.newBuilder().setStatus(taskStatus))
       .build()
   }
+
+  def newOfferEvent(offer: Mesos.Offer): MesosEvent = {
+    MesosEvent
+      .newBuilder()
+      .setOffers(MesosEvent.Offers.newBuilder().addOffers(offer))
+      .build()
+  }
 }

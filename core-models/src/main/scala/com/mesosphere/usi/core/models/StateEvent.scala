@@ -27,6 +27,12 @@ object StateSnapshot {
   */
 sealed trait StateUpdated extends StateEvent
 
+/**
+  * Captures a pod event that was caused by a [[SpecEvent]] submitted by the user.
+  */
+sealed trait UserError extends PodStateEvent
+
+case class PodInvalid(id: PodId, errors: Seq[String]) extends UserError
 case class PodStatusUpdated(id: PodId, newStatus: Option[PodStatus]) extends StateUpdated with PodStateEvent
 case class PodRecordUpdated(id: PodId, newRecord: Option[PodRecord]) extends StateUpdated with PodStateEvent
 case class AgentRecordUpdated(id: PodId, newRecord: Option[AgentRecord]) extends StateUpdated with PodStateEvent
