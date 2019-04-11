@@ -9,19 +9,10 @@ import akka.stream.{ActorMaterializer, KillSwitch, Materializer}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
+import com.mesosphere.usi.core.Scheduler.SpecInput
+import com.mesosphere.usi.core.Scheduler.StateOutput
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
-import com.mesosphere.usi.core.models.{
-  Goal,
-  PodId,
-  PodSpec,
-  PodStatus,
-  PodStatusUpdated,
-  RunSpec,
-  SpecUpdated,
-  SpecsSnapshot,
-  StateEvent,
-  StateSnapshot
-}
+import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodStatus, PodStatusUpdated, RunSpec, SpecsSnapshot}
 import com.mesosphere.usi.repository.{InMemoryPodRecordRepository, PodRecordRepository}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
@@ -48,9 +39,9 @@ case class CoreHelloWorldFramework(frameworkId: FrameworkID, killSwitch: KillSwi
 object CoreHelloWorldFramework extends StrictLogging {
 
   /**
-    * The type of [[SchedulerFlow]] might look scary at the first glance (and sometimes even at second) but it is
-    * at the core (!) of any framework. Basically it is a Flow that [[SpecUpdated]] events as input and produces
-    * [[StateEvent]] as an output.
+    * Scheduler Flow might look scary at the first glance (and sometimes even at second) but it is
+    * at the core (!) of any framework. Basically it is a Flow that [[com.mesosphere.usi.core.models.SpecUpdated]] events as input and produces
+    * [[com.mesosphere.usi.core.models.StateEvent]] as an output.
     *
     * +--------------------+         +-----------------------+        +-----------------------+
     * |                    |         |                       |        |                       |
@@ -61,23 +52,20 @@ object CoreHelloWorldFramework extends StrictLogging {
     * +--------------------+         +-----------------------+        +-----------------------+
     *
     *
-    * In a nutshell: frameworks sends [[PodSpec]] updates down the flow and receives [[StateEvent]]s when things
-    * change. So why is the input parameter of that Flow not simply a [[SpecUpdated]] but a tuple of
-    * [[SpecsSnapshot]] and Source[[SpecUpdated]]? This is because the first message sent to the scheduler
+    * In a nutshell: frameworks sends [[PodSpec]] updates down the flow and receives [[com.mesosphere.usi.core.models.StateEvent]]s when things
+    * change. So why is the input parameter of that Flow not simply a [[com.mesosphere.usi.core.models.SpecUpdated]] but a tuple of
+    * [[SpecsSnapshot]] and Source[[com.mesosphere.usi.core.models.SpecUpdated]]? This is because the first message sent to the scheduler
     * by the framework should be a snapshot of all PodSpecs known to the framework - a [[SpecsSnapshot]]. Internally
     * this will trigger [task reconciliation](http://mesos.apache.org/documentation/latest/reconciliation/) by the
     * scheduler.
     *
-    * The same logic applies for the output parameter of the scheduler Flow - it's a tuple of [[StateSnapshot]] and a
-    * Source of [[StateEvent]], which means that the first state event received by the framework will be a
+    * The same logic applies for the output parameter of the scheduler Flow - it's a tuple of [[com.mesosphere.usi.core.models.StateSnapshot]] and a
+    * Source of [[com.mesosphere.usi.core.models.StateEvent]], which means that the first state event received by the framework will be a
     * snapshot of all reconciled tasks states, followed by a individual updates.
     *
     * For more about the scheduler flow see [[Scheduler]] class documentation.
     *
     */
-  type SchedulerFlow =
-    Flow[(SpecsSnapshot, Source[SpecUpdated, Any]), (StateSnapshot, Source[StateEvent, Any]), NotUsed]
-
   def main(args: Array[String]): Unit = {
     implicit val actorSystem = ActorSystem()
     implicit val ec = actorSystem.dispatcher
@@ -140,7 +128,7 @@ object CoreHelloWorldFramework extends StrictLogging {
       conf: Config,
       podRecordRepository: PodRecordRepository,
       frameworkInfo: FrameworkInfo
-  )(implicit system: ActorSystem, materializer: Materializer): (MesosClient, SchedulerFlow) = {
+  )(implicit system: ActorSystem, materializer: Materializer): (MesosClient, Flow[SpecInput, StateOutput, NotUsed]) = {
     val clientSettings = MesosClientSettings(conf.getString("master-url"))
     val client: MesosClient = Await.result(MesosClient(clientSettings, frameworkInfo).runWith(Sink.head), 10.seconds)
     (client, Scheduler.fromClient(client, podRecordRepository))

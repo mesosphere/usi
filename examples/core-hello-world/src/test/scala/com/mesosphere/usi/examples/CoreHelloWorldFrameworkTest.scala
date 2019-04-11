@@ -1,8 +1,16 @@
 package com.mesosphere.usi.examples
 
+import akka.NotUsed
+import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Sink
 import akka.stream.scaladsl.Source
+import akka.stream.testkit.TestPublisher
+import akka.stream.testkit.TestSubscriber
+import com.mesosphere.usi.core.Scheduler.SpecInput
+import com.mesosphere.usi.core.Scheduler.StateOutput
+import com.mesosphere.usi.core.models.PodRecordUpdated
 import com.mesosphere.usi.core.models.PodStatusUpdated
+import com.mesosphere.usi.core.models.SpecUpdated
 import com.mesosphere.usi.core.models.SpecsSnapshot
 import com.mesosphere.usi.core.models.StateEvent
 import com.mesosphere.usi.core.models.StateSnapshot
@@ -14,10 +22,8 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import java.util
 import org.apache.mesos.v1.Protos.FrameworkID
-import org.apache.mesos.v1.Protos.TaskState.TASK_RUNNING
 import org.scalatest.Inside
-import org.scalatest.exceptions.TestFailedDueToTimeoutException
-import scala.collection.mutable.ListBuffer
+import scala.concurrent.duration._
 
 class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest with Inside {
 
@@ -51,18 +57,18 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
 
     And("an initial pod spec is launched")
     val specsSnapshot = CoreHelloWorldFramework.generateSpecSnapshot
-    val mutableEventList = ListBuffer[StateEvent]()
-    runAndGetTaskCount(scheduler, specsSnapshot, mutableEventList)
+    val (_, sub1) = runGraphAndFeedSnapshot(scheduler, specsSnapshot)
 
-    Then("the first ever snapshot is empty and our tasks have been launched")
-    eventually {
-      mutableEventList.collect {
-        case PodStatusUpdated(_, Some(status)) => status.taskStatuses.count(_._2.getState == TASK_RUNNING)
-      }.sum shouldBe 1
-      val stateSnapshots = mutableEventList.collect { case x: StateSnapshot => x }
-      stateSnapshots.size shouldBe 1
-      stateSnapshots.head.podRecords.size shouldBe 0
-    }
+    Then("Receive an empty snapshot is followed by other state events")
+    val e1 = sub1.requestNext()
+    e1 shouldBe a[StateSnapshot]
+    e1.asInstanceOf[StateSnapshot].podRecords shouldBe empty
+    val e2 = sub1.requestNext()
+    e2 shouldBe a[PodRecordUpdated]
+    val e3 = sub1.requestNext()
+    e3 shouldBe a[PodStatusUpdated]
+    val podStatus = e3.asInstanceOf[PodStatusUpdated].newStatus
+    podStatus shouldBe defined
 
     And("persistence storage has correct set of records")
     val podRecords = customPersistenceStore.readAll().runWith(Sink.head).futureValue.values
@@ -74,36 +80,34 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
 
     Then("upon recovery, emitted snapshot should have valid information")
     val (newClient, newScheduler) = CoreHelloWorldFramework.buildGraph(conf, customPersistenceStore, frameworkInfo)
-    mutableEventList.clear()
-    runAndGetTaskCount(newScheduler, specsSnapshot, mutableEventList)
-    eventually {
-      val stateSnapshots = mutableEventList.collect { case x: StateSnapshot => x }
-      stateSnapshots.size shouldBe 1
-      stateSnapshots.head.podRecords.size shouldBe 1
-      stateSnapshots.head.podRecords.head shouldEqual podRecords.head
-    }
+    val (_, sub2) = runGraphAndFeedSnapshot(newScheduler, specsSnapshot)
+    val e4 = sub2.requestNext()
+    e4 shouldBe a[StateSnapshot]
+    e4.asInstanceOf[StateSnapshot].podRecords should contain theSameElementsAs podRecords
 
     And("no new pod records have been created")
     val newPodRecords = customPersistenceStore.readAll().runWith(Sink.head).futureValue.values
-    newPodRecords.size shouldBe 1
-    newPodRecords.head shouldEqual podRecords.head
+    newPodRecords should contain theSameElementsAs podRecords
 
-    And(s"a ${PodStatusUpdated.getClass.getSimpleName} should never be emitted")
-    intercept[TestFailedDueToTimeoutException](eventually {
-      mutableEventList.count(_.isInstanceOf[PodStatusUpdated]) should be > 0
-    })
+    And(s"no new elements should be emitted")
+    assertThrows[AssertionError](sub2.expectNext(5.seconds))
     newClient.killSwitch.shutdown()
   }
 
-  private val runAndGetTaskCount =
-    (graph: CoreHelloWorldFramework.SchedulerFlow, specs: SpecsSnapshot, eventCapturer: ListBuffer[StateEvent]) => {
-      Source.maybe
-        .prepend(Source.single(specs))
-        .map(snapshot => (snapshot, Source.empty))
-        .via(graph)
-        .flatMapConcat { case (snapshot, updates) => updates.prepend(Source.single(snapshot)) }
-        .runWith(Sink.foreach[StateEvent](eventCapturer.append(_)))
-    }
+  private def runGraphAndFeedSnapshot(
+      graph: Flow[SpecInput, StateOutput, NotUsed],
+      specs: SpecsSnapshot
+  ): (TestPublisher.Probe[SpecUpdated], TestSubscriber.Probe[StateEvent]) = {
+    val specUpdatePub = TestPublisher.probe[SpecUpdated]()
+    val stateEventSub = TestSubscriber.probe[StateEvent]()
+    Source.maybe
+      .prepend(Source.single(specs))
+      .map(snapshot => (snapshot, Source.fromPublisher(specUpdatePub)))
+      .via(graph)
+      .flatMapConcat { case (snapshot, updates) => updates.prepend(Source.single(snapshot)) }
+      .runWith(Sink.fromSubscriber(stateEventSub))
+    (specUpdatePub, stateEventSub)
+  }
 
   def withFixture(frameworkId: Option[FrameworkID.Builder] = None)(fn: Fixture => Unit): Unit = {
     val f = new Fixture(frameworkId)

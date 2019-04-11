@@ -2,8 +2,7 @@ package com.mesosphere.usi.core
 
 import akka.Done
 import akka.NotUsed
-import akka.stream.Materializer
-import akka.stream.{BidiShape, FlowShape}
+import akka.stream.{BidiShape, FlowShape, Materializer}
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, Source}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.models.{
