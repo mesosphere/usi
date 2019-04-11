@@ -1,11 +1,15 @@
 package com.mesosphere.usi.core.japi
 
+import java.util.concurrent.CompletableFuture
+
 import akka.NotUsed
-import akka.stream.javadsl
+import akka.stream.javadsl.{Sink, Source}
+import akka.stream.{Materializer, javadsl}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.{Scheduler => ScalaScheduler}
 import com.mesosphere.usi.core.models.{SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+import scala.compat.java8.FutureConverters._
 
 /**
   * Java friendly factory methods of [[com.mesosphere.usi.core.Scheduler]].
@@ -66,5 +70,38 @@ object Scheduler {
       .map(pair => pair.first -> pair.second.asScala)
       .via(ScalaScheduler.fromFlow(mesosCallFactory, mesosFlow.asScala))
       .map { case (taken, tail) => akka.japi.Pair(taken, tail.asJava) }
+  }
+
+  /**
+    * Constructs the scheduler as a Sink and Source.
+    *
+    * This method will materialize the scheduler first, then Sink and Source can be materialized independently.
+    *
+    * @param specsSnapshot Snapshot of the current specs
+    * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
+    */
+  def asSourceAndSink(
+      specsSnapshot: SpecsSnapshot,
+      client: MesosClient,
+      materializer: Materializer): SourceAndSinkResult = {
+    val (snap, source, sink) = ScalaScheduler.asSourceAndSink(specsSnapshot, client)(materializer)
+    new SourceAndSinkResult(snap.toJava.toCompletableFuture, source.asJava, sink.asJava)
+  }
+
+  class SourceAndSinkResult(
+      snap: CompletableFuture[StateSnapshot],
+      source: Source[StateEvent, NotUsed],
+      sink: Sink[SpecUpdated, NotUsed]) {
+    def getSource: Source[StateEvent, NotUsed] = {
+      source
+    }
+
+    def getSink: Sink[SpecUpdated, NotUsed] = {
+      sink
+    }
+
+    def getSnapshot: CompletableFuture[StateSnapshot] = {
+      snap
+    }
   }
 }
