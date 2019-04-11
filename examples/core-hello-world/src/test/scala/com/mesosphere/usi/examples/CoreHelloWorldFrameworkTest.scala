@@ -46,7 +46,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     val conf = loadConfig
     val frameworkInfo = CoreHelloWorldFramework.buildFrameworkInfo
     val customPersistenceStore = InMemoryPodRecordRepository()
-    customPersistenceStore.readAll().futureValue.size shouldBe 0
+    customPersistenceStore.readAll().runWith(Sink.head).futureValue.size shouldBe 0
     val (mesosClient, scheduler) = CoreHelloWorldFramework.buildGraph(conf, customPersistenceStore, frameworkInfo)
 
     And("an initial pod spec is launched")
@@ -65,7 +65,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     }
 
     And("persistence storage has correct set of records")
-    val podRecords = customPersistenceStore.readAll().futureValue.values
+    val podRecords = customPersistenceStore.readAll().runWith(Sink.head).futureValue.values
     podRecords.size shouldBe 1
     podRecords.head.podId shouldEqual specsSnapshot.podSpecs.head.id
 
@@ -84,7 +84,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     }
 
     And("no new pod records have been created")
-    val newPodRecords = customPersistenceStore.readAll().futureValue.values
+    val newPodRecords = customPersistenceStore.readAll().runWith(Sink.head).futureValue.values
     newPodRecords.size shouldBe 1
     newPodRecords.head shouldEqual podRecords.head
 

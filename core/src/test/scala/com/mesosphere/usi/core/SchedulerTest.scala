@@ -1,6 +1,7 @@
 package com.mesosphere.usi.core
 
 import akka.Done
+import akka.stream.scaladsl.Sink
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import akka.stream.{ActorMaterializer, FlowShape}
@@ -120,18 +121,15 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
     Then("flow should emit the exact element it receives")
     val deleteOp = SchedulerEvents(List(PodRecordUpdated(PodId("A"), None)))
-    sub.ensureSubscription()
-    sub.request(1)
     pub.expectRequest()
     pub.sendNext(deleteOp)
-    sub.expectNext(deleteOp)
-    slowPodRecordRepo.readAll().futureValue.keySet shouldBe empty
+    sub.requestNext(deleteOp)
+    slowPodRecordRepo.readAll().runWith(Sink.head).futureValue.keySet shouldBe empty
 
     Then("flow should pipeline writes pulling only one element at a time")
-    sub.request(1)
     pub.sendNext(deleteOp)
     assertThrows[AssertionError](sub.expectNext(delayPerElement / 2))
-    sub.expectNext(deleteOp)
+    sub.requestNext(deleteOp)
 
     Given("a list of fake pod record events")
     val podIds = List(List("A", "B"), List("C", "D"), List("E", "F")).map(_.map(PodId))
@@ -143,7 +141,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     sub.request(podIds.flatten.size)
     storeEvents.foreach(x => pub.sendNext(SchedulerEvents(x)))
     storeEvents.foreach(x => sub.expectNext(SchedulerEvents(x)))
-    val result = slowPodRecordRepo.readAll().futureValue
+    val result = slowPodRecordRepo.readAll().runWith(Sink.head).futureValue
     result.keySet shouldEqual podIds.flatten.toSet
     result.values.toSet shouldEqual storeEvents.flatten.flatMap(_.newRecord).toSet
 
@@ -151,6 +149,6 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     sub.request(podIds.flatten.size)
     deleteEvents.foreach(x => pub.sendNext(SchedulerEvents(x)))
     deleteEvents.foreach(x => sub.expectNext(SchedulerEvents(x)))
-    slowPodRecordRepo.readAll().futureValue.keySet shouldBe empty
+    slowPodRecordRepo.readAll().runWith(Sink.head).futureValue.keySet shouldBe empty
   }
 }

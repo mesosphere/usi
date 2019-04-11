@@ -2,7 +2,7 @@ package com.mesosphere.usi.repository
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
-import scala.concurrent.Future
+import akka.stream.scaladsl.Source
 
 trait RecordRepository {
 
@@ -11,24 +11,19 @@ trait RecordRepository {
   type RecordId
 
   /**
-    * Create/update the provided record in the repository.
-    * @param record
-    * @return id of the provided record
+    * Flow that deletes the [[Record]] for given [[RecordId]] if it exists. If the record is missing, this is a no-op.
     */
-  def store(record: Record): Future[RecordId]
+  def deleteFlow: Flow[RecordId, Unit, NotUsed]
+
+  /**
+    * Flow that consumes a [[Record]] and emits a corresponding [[RecordId]] after a successful create/update.
+    */
   def storeFlow: Flow[Record, RecordId, NotUsed]
 
   /**
-    * Retrieves all the existing records (if any).
-    * @return Map containing all the current pod records. Can be empty if there are no pod records.
+    * Source that retrieves all the existing records (if any) at the time of materialization. Creates a map containing
+    * all the current records on every materialization. Can be an empty map if there are no records.
+    * Source completes after emitting the current snapshot.
     */
-  def readAll(): Future[Map[RecordId, Record]]
-
-  /**
-    * Deletes the record if it exists. If the record is missing, this is a no-op.
-    * @param recordId
-    * @return Unit either if the node delete was successful OR if the node did not exist.
-    */
-  def delete(recordId: RecordId): Future[Unit]
-  def deleteFlow: Flow[RecordId, Unit, NotUsed]
+  def readAll(): Source[Map[RecordId, Record], NotUsed]
 }
