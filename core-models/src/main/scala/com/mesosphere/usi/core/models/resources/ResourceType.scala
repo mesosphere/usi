@@ -1,4 +1,4 @@
-package com.mesosphere.usi.core.models
+package com.mesosphere.usi.core.models.resources
 
 sealed trait ResourceType {
   def name: String

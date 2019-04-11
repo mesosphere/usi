@@ -2,10 +2,12 @@ package com.mesosphere.usi.core.helpers
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
+import com.google.protobuf.ByteString
 import com.mesosphere.usi.core.models.AgentId
 import com.mesosphere.usi.core.protos.ProtoBuilders
-import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+import org.apache.mesos.v1.{Protos => Mesos}
+
 import scala.collection.JavaConverters._
 
 object MesosMock {
@@ -29,7 +31,11 @@ object MesosMock {
           operation <- call.getAccept.getOperationsList.iterator.asScala
           taskInfo <- operation.getLaunch.getTaskInfosList.asScala
         } yield {
-          val taskStatus = newTaskStatus(taskId = taskInfo.getTaskId, state = Mesos.TaskState.TASK_RUNNING)
+          val taskStatus = newTaskStatus(
+            taskId = taskInfo.getTaskId,
+            state = Mesos.TaskState.TASK_RUNNING,
+            agentId = mockAgentId.asProto,
+            uuid = ByteString.copyFromUtf8("uuid"))
           MesosEvent.newBuilder
             .setUpdate(
               MesosEvent.Update

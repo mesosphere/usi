@@ -13,15 +13,12 @@ import com.mesosphere.utils.zookeeper.ZookeeperServerTest
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.curator.framework.CuratorFramework
 import org.apache.zookeeper.KeeperException.{NoNodeException, NodeExistsException}
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 
 import scala.collection.concurrent.TrieMap
 import scala.collection.immutable.Seq
 import scala.concurrent.{Await, ExecutionContext}
 import scala.util.{Failure, Random, Success}
 
-@RunWith(classOf[JUnitRunner])
 class ZooKeeperPersistenceStoreTest extends UnitTest with ZookeeperServerTest with StrictLogging {
 
   implicit val system: ActorSystem = ActorSystem()

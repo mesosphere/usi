@@ -1,5 +1,5 @@
 package com.mesosphere.usi.core
-import com.mesosphere.usi.core.models.ResourceType
+import com.mesosphere.usi.core.models.resources.ResourceType
 import com.mesosphere.usi.core.protos.ProtoBuilders
 import com.mesosphere.usi.core.protos.ProtoConversions._
 import com.mesosphere.utils.UnitTest
