@@ -4,8 +4,8 @@ import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
 import com.mesosphere.usi.core.models.PodRecord
 import com.mesosphere.usi.core.models.StateSnapshot
-import com.mesosphere.usi.core.models.{PodId, SpecEvent}
-import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
+import com.mesosphere.usi.core.models.{PodId, PodInvalid, PodSpec, PodSpecUpdated, SpecEvent, SpecsSnapshot}
+import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
 
 /**
   * Container class responsible for keeping track of the state and cache.
@@ -87,13 +87,28 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     */
   private var cachedPendingLaunch = CachedPendingLaunch(Set.empty)
 
+  def validateEvent(msg: SpecEvent): Seq[PodInvalid] = msg match {
+    case SpecsSnapshot(podSpecs, _) =>
+      podSpecs.flatMap { p =>
+        PodSpec.isValid(p).toList.map(err => PodInvalid(p.id, Seq(err)))
+      }
+    case PodSpecUpdated(_, Some(podSpec)) =>
+      PodSpec.isValid(podSpec).toList.map(err => PodInvalid(podSpec.id, Seq(err)))
+    case _ => Seq.empty
+  }
+
   def handleSpecEvent(msg: SpecEvent): SchedulerEvents = {
-    handleFrame { builder =>
-      builder
-        .applySpecEvent(msg)
-        .process { (specs, state, dirtyPodIds) =>
-          schedulerLogic.computeNextStateForPods(specs, state)(dirtyPodIds)
-        }
+    val invalidPods = validateEvent(msg)
+    if (invalidPods.nonEmpty) {
+      SchedulerEvents(invalidPods.toList, List.empty)
+    } else {
+      handleFrame { builder =>
+        builder
+          .applySpecEvent(msg)
+          .process { (specs, state, dirtyPodIds) =>
+            schedulerLogic.computeNextStateForPods(specs, state)(dirtyPodIds)
+          }
+      }
     }
   }
 
@@ -137,7 +152,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     val frameResultBuilder = fn(FrameResultBuilder.givenState(this.specs, this.state)).process {
       (specs, state, dirtyPodIds) =>
         pruneTaskStatuses(specs, state)(dirtyPodIds)
-    }.process(updateCachesAndRevive)
+    }.process(updateCachesAndSuppressAndRevive)
 
     // update our state for the next frame processing
     this.state = frameResultBuilder.state
@@ -147,15 +162,42 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     frameResultBuilder.result
   }
 
-  private def updateCachesAndRevive(
+  def generateSuppressCalls(pendingLaunch: Set[PodId], newLaunched: Set[PodId]): List[Call] = {
+    val alreadyLaunchedRoles: Iterator[String] = newLaunched.iterator.collect {
+      case id if specs.podSpecs.contains(id) => specs.podSpecs(id).runSpec.role
+    }
+
+    val rolesBeingLaunched: Set[String] = pendingLaunch
+      .map(id => specs.podSpecs.get(id))
+      .collect { case Some(p) => p.runSpec.role }
+
+    alreadyLaunchedRoles
+      .filterNot(rolesBeingLaunched)
+      .toSeq
+      .distinct
+      .map { r =>
+        mesosCallFactory.newSuppress(Some(r))
+      }
+      .toList
+  }
+
+  private def updateCachesAndSuppressAndRevive(
       specs: SpecState,
       state: SchedulerState,
       dirtyPodIds: Set[PodId]): SchedulerEvents = {
-    this.cachedPendingLaunch = this.cachedPendingLaunch.update(specs, state, dirtyPodIds)
-    if (cachedPendingLaunch.pendingLaunch.nonEmpty)
-      SchedulerEvents(mesosCalls = List(mesosCallFactory.newRevive(None)))
-    else
-      SchedulerEvents.empty
+    val updateResult = this.cachedPendingLaunch.update(specs, state, dirtyPodIds)
+    this.cachedPendingLaunch = updateResult.cachedPendingLaunch
+    val reviveCalls = updateResult.toBeLaunched.iterator
+      .map(id => specs.podSpecs.get(id))
+      .collect { case Some(p) => p.runSpec.role }
+      .toSeq
+      .distinct
+      .map(r => mesosCallFactory.newRevive(Some(r)))
+      .toList
+
+    val suppressCalls = generateSuppressCalls(cachedPendingLaunch.pendingLaunch, updateResult.launched)
+
+    SchedulerEvents(mesosCalls = reviveCalls ++ suppressCalls)
   }
 
   /**
