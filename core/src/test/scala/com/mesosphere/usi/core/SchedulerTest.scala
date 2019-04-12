@@ -128,6 +128,9 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
     Then("flow should pipeline writes pulling only one element at a time")
     pub.sendNext(deleteOp)
+    pub.sendNext(deleteOp)
+    assertThrows[AssertionError](sub.expectNext(delayPerElement / 2))
+    sub.requestNext(deleteOp)
     assertThrows[AssertionError](sub.expectNext(delayPerElement / 2))
     sub.requestNext(deleteOp)
 

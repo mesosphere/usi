@@ -59,7 +59,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     val specsSnapshot = CoreHelloWorldFramework.generateSpecSnapshot
     val (_, sub1) = runGraphAndFeedSnapshot(scheduler, specsSnapshot)
 
-    Then("Receive an empty snapshot is followed by other state events")
+    Then("receive an empty snapshot followed by other state events")
     val e1 = sub1.requestNext()
     e1 shouldBe a[StateSnapshot]
     e1.asInstanceOf[StateSnapshot].podRecords shouldBe empty
@@ -89,8 +89,8 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     val newPodRecords = customPersistenceStore.readAll().runWith(Sink.head).futureValue.values
     newPodRecords should contain theSameElementsAs podRecords
 
-    And(s"no new elements should be emitted")
-    assertThrows[AssertionError](sub2.expectNext(5.seconds))
+    And(s"no further elements should be emitted")
+    assertThrows[AssertionError](sub2.expectNext(5.seconds)) // This is just a best effort check.
     newClient.killSwitch.shutdown()
   }
 

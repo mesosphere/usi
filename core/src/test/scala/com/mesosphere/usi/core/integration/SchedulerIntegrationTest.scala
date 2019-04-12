@@ -28,7 +28,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     .build()
 
   lazy val mesosClient: MesosClient = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
-  lazy val schedulerFlow = Scheduler.fromClient(mesosClient, new InMemoryPodRecordRepository)
+  lazy val schedulerFlow = Scheduler.fromClient(mesosClient, InMemoryPodRecordRepository())
   lazy val (input, output) = specInputSource(SpecsSnapshot.empty)
     .via(schedulerFlow)
     .toMat(outputFlatteningSink)(Keep.both)
