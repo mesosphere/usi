@@ -1,9 +1,13 @@
 package com.mesosphere.usi.repository
 
-import akka.NotUsed
-import akka.stream.scaladsl.Flow
-import akka.stream.scaladsl.Source
+import akka.Done
+import scala.concurrent.Future
 
+/*
+ * Order of execution must be respected! If a store for record A is invoked, then delete for record A is invoked, in
+ * serial without waiting for the completion of each returned future, then the implementation MUST apply these
+ * operations in order
+ */
 trait RecordRepository {
 
   type Record
@@ -11,19 +15,23 @@ trait RecordRepository {
   type RecordId
 
   /**
-    * Flow that deletes the [[Record]] for given [[RecordId]] if it exists. If the record is missing, this is a no-op.
+    * Deletes the record specified, returns completed future when this operation is confirmed to be applied
+    *
+    * Note the guarantee described for [[RecordRepository]]
     */
-  def deleteFlow: Flow[RecordId, Unit, NotUsed]
+  def delete(record: RecordId): Future[Done]
 
   /**
-    * Flow that consumes a [[Record]] and emits a corresponding [[RecordId]] after a successful create/update.
+    * Store the record specified, returns completed future when this operation is confirmed to be applied
+    *
+    * Note the guarantee described for [[RecordRepository]]
     */
-  def storeFlow: Flow[Record, RecordId, NotUsed]
+  def store(record: Record): Future[Done]
 
   /**
     * Source that retrieves all the existing records (if any) at the time of materialization. Creates a map containing
     * all the current records on every materialization. Can be an empty map if there are no records.
     * Source completes after emitting the current snapshot.
     */
-  def readAll(): Source[Map[RecordId, Record], NotUsed]
+  def readAll(): Future[Map[RecordId, Record]]
 }

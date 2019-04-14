@@ -1,7 +1,6 @@
 package com.mesosphere.usi.core
 
 import akka.Done
-import akka.stream.scaladsl.Sink
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import akka.stream.{ActorMaterializer, FlowShape}
@@ -109,10 +108,12 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   "Persistence flow pipelines writes" in {
     Given("a slow persistence storage and a flow using it")
-    val delayPerElement = 100.millis // Delay precision is 10ms
+    val delayPerElement = 50.millis // Delay precision is 10ms
     val slowPodRecordRepo = new InMemoryPodRecordRepository {
-      override def storeFlow = super.storeFlow.initialDelay(delayPerElement).delay(delayPerElement)
-      override def deleteFlow = super.deleteFlow.initialDelay(delayPerElement).delay(delayPerElement)
+      override def store(record: PodRecord): Future[Done] =
+        akka.pattern.after(delayPerElement, system.scheduler)(super.store(record))
+      override def delete(podId: PodId): Future[Done] =
+        akka.pattern.after(delayPerElement, system.scheduler)(super.delete(podId))
     }
     val (pub, sub) = TestSource
       .probe[SchedulerEvents]
@@ -120,32 +121,32 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       .toMat(TestSink.probe[SchedulerEvents])(Keep.both)
       .run()
 
-    Then("flow should emit the exact element it receives")
-    val deleteOp = SchedulerEvents(List(PodRecordUpdated(PodId("A"), None)))
-    pub.expectRequest()
-    pub.sendNext(deleteOp)
-    sub.requestNext(deleteOp)
-    slowPodRecordRepo.readAll().runWith(Sink.head).futureValue.keySet shouldBe empty
-
-    Then("flow should pipeline writes pulling only one element at a time")
-    pub.sendNext(deleteOp)
-    pub.sendNext(deleteOp)
-    assertThrows[AssertionError](sub.expectNext(delayPerElement / 2))
-    sub.requestNext(deleteOp)
-    assertThrows[AssertionError](sub.expectNext(delayPerElement / 2))
-    sub.requestNext(deleteOp)
-
     Given("a list of fake pod record events")
     val podIds = List(List("A", "B"), List("C", "D"), List("E", "F")).map(_.map(PodId))
     val deleteEvents = podIds.map(_.map(PodRecordUpdated(_, None)))
     val storeEvents =
       deleteEvents.map(_.map(x => x.copy(newRecord = Some(PodRecord(x.id, Instant.now(), AgentId("-"))))))
 
+    Then("flow behaves as an Identity")
+    pub.expectRequest()
+    pub.sendNext(SchedulerEvents(deleteEvents.head))
+    sub.requestNext(SchedulerEvents(deleteEvents.head))
+    slowPodRecordRepo.readAll().futureValue.keySet shouldBe empty
+
+    Then(s"flow pipelines writes pulling only one ${SchedulerEvents.getClass.getSimpleName} at a time")
+    deleteEvents.map(SchedulerEvents(_)).foreach { deleteEvent =>
+      pub.sendNext(deleteEvent)
+    }
+    deleteEvents.map(SchedulerEvents(_)).foreach { deleteEvent =>
+      assertThrows[AssertionError](sub.expectNext(delayPerElement / 2))
+      sub.requestNext(deleteEvent)
+    }
+
     Then("flow should be able to persist records")
     sub.request(podIds.flatten.size)
     storeEvents.foreach(x => pub.sendNext(SchedulerEvents(x)))
     storeEvents.foreach(x => sub.expectNext(SchedulerEvents(x)))
-    val result = slowPodRecordRepo.readAll().runWith(Sink.head).futureValue
+    val result = slowPodRecordRepo.readAll().futureValue
     result.keySet shouldEqual podIds.flatten.toSet
     result.values.toSet shouldEqual storeEvents.flatten.flatMap(_.newRecord).toSet
 
@@ -153,6 +154,6 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     sub.request(podIds.flatten.size)
     deleteEvents.foreach(x => pub.sendNext(SchedulerEvents(x)))
     deleteEvents.foreach(x => sub.expectNext(SchedulerEvents(x)))
-    slowPodRecordRepo.readAll().runWith(Sink.head).futureValue.keySet shouldBe empty
+    slowPodRecordRepo.readAll().futureValue.keySet shouldBe empty
   }
 }

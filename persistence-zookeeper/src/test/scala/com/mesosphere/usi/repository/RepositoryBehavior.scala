@@ -1,9 +1,9 @@
 package com.mesosphere.usi.repository
 
+import akka.Done
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import akka.stream.scaladsl.Keep
-import akka.stream.scaladsl.Sink
 import akka.stream.testkit.TestPublisher
 import akka.stream.testkit.TestSubscriber
 import akka.stream.testkit.scaladsl.TestSink
@@ -32,9 +32,8 @@ trait RepositoryBehavior extends AkkaUnitTestLike { this: UnitTest =>
     "create a record" in {
       val f = Fixture()
       val repo = newRepo()
-      val (pub, sub) = pubAndSub(repo.storeFlow)
-      pub.sendNext(f.record)
-      sub.requestNext(f.record.podId)
+      repo.store(f.record).futureValue shouldBe Done
+      repo.readAll().futureValue.head shouldBe (f.podId -> f.record)
     }
 
     "update a record" in {
@@ -44,13 +43,12 @@ trait RepositoryBehavior extends AkkaUnitTestLike { this: UnitTest =>
 
       Given("a record already exists")
       val repo = newRepo()
-      val (pub, sub) = pubAndSub(repo.storeFlow)
-      pub.sendNext(record)
-      sub.requestNext(podId)
+      repo.store(record).futureValue shouldBe Done
+      repo.readAll().futureValue.head shouldBe (podId -> record)
 
       Then("the record is updated")
-      pub.sendNext(record)
-      sub.requestNext(podId)
+      repo.store(record).futureValue shouldBe Done
+      repo.readAll().futureValue.head shouldBe (podId -> record)
     }
   }
 
@@ -66,12 +64,10 @@ trait RepositoryBehavior extends AkkaUnitTestLike { this: UnitTest =>
 
       Given(s"a known record id ${f.podId}")
       val repo = newRepo()
-      val (pub, sub) = pubAndSub(repo.storeFlow)
-      pub.sendNext(f.record)
-      sub.requestNext(f.record.podId)
+      repo.store(f.record).futureValue
 
       When("all records are read")
-      val maybeRecord = repo.readAll().runWith(Sink.head).futureValue
+      val maybeRecord = repo.readAll().futureValue
 
       Then("the stored record is returned")
       maybeRecord.head should be(f.record.podId -> f.record)
@@ -82,13 +78,10 @@ trait RepositoryBehavior extends AkkaUnitTestLike { this: UnitTest =>
 
       Given(s"few known record ids ${fixtures.map(_.podId)}")
       val repo = newRepo()
-      val (pub, sub) = pubAndSub(repo.storeFlow)
-      fixtures.map(_.record).map(pub.sendNext)
-      sub.request(fixtures.size)
-      fixtures.map(_.record.podId).map(sub.expectNext)
+      fixtures.map(_.record).map(repo.store).map(_.futureValue)
 
       When("all records are read")
-      val records = repo.readAll().runWith(Sink.head).futureValue
+      val records = repo.readAll().futureValue
 
       Then("all the stored records are returned")
       records.values should contain theSameElementsAs fixtures.map(_.record)
@@ -107,17 +100,13 @@ trait RepositoryBehavior extends AkkaUnitTestLike { this: UnitTest =>
 
       Given(s"a known record id ${f.podId}")
       val repo = newRepo()
-      val (pub, sub) = pubAndSub(repo.storeFlow)
-      pub.sendNext(f.record)
-      sub.requestNext(f.record.podId)
+      repo.store(f.record).futureValue
 
       When("the record is deleted")
-      val (delPub, delSub) = pubAndSub(repo.deleteFlow)
-      delPub.sendNext(f.record.podId)
-      delSub.requestNext(())
+      repo.delete(f.podId).futureValue
 
       Then("the record should not exist")
-      repo.readAll().runWith(Sink.head).futureValue should not contain f.podId -> f.record
+      repo.readAll().futureValue should not contain f.podId -> f.record
     }
 
     "delete is idempotent" in {
@@ -126,14 +115,13 @@ trait RepositoryBehavior extends AkkaUnitTestLike { this: UnitTest =>
       val unknownPodId = PodId("unknown")
 
       When("the unknown record is deleted")
-      val (pub, sub) = pubAndSub(repo.deleteFlow)
-      pub.sendNext(unknownPodId)
+      val result = repo.delete(unknownPodId)
 
       Then("no error is returned")
-      sub.requestNext(())
+      result.futureValue
 
       And("the record should not exist")
-      repo.readAll().runWith(Sink.head).futureValue shouldBe empty
+      repo.readAll().futureValue shouldBe empty
     }
   }
 

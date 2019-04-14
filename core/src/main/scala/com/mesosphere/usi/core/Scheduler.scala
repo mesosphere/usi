@@ -1,6 +1,5 @@
 package com.mesosphere.usi.core
 
-import akka.Done
 import akka.NotUsed
 import akka.stream.{BidiShape, FlowShape, Materializer}
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, Source}
@@ -17,7 +16,6 @@ import com.mesosphere.usi.repository.PodRecordRepository
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import scala.collection.JavaConverters._
-import scala.concurrent.Future
 
 /**
   * Provides the scheduler graph component. The component has two inputs, and two outputs:
@@ -132,10 +130,9 @@ object Scheduler {
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository
   )(implicit materializer: Materializer): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
+    val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, podRecordRepository.readAll())
     BidiFlow.fromGraph {
-      GraphDSL.create(
-        new SchedulerLogicGraph(mesosCallFactory, podRecordRepository.readAll().runWith(Sink.head)),
-      ) { implicit builder => (schedulerLogic) =>
+      GraphDSL.create(schedulerLogicGraph) { implicit builder => (schedulerLogic) =>
         {
           import GraphDSL.Implicits._
 
@@ -162,32 +159,18 @@ object Scheduler {
     }
   }
 
+  val PipeliningLimit = 128
+
   private[core] def persistenceFlow(
       podRecordRepository: PodRecordRepository
   )(implicit materializer: Materializer): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
     Flow[SchedulerEvents].mapAsync(1) { events =>
-      val (storeRecords, deleteRecords) = events.stateEvents.collect { case x: PodRecordUpdated => x }
-        .partition(_.newRecord.isDefined)
-      if (storeRecords.isEmpty && deleteRecords.isEmpty) {
-        Future.successful(events)
-      } else {
-        val storeResult = if (storeRecords.nonEmpty) {
-          Source(storeRecords).collect { case PodRecordUpdated(_, Some(record)) => record }
-            .via(podRecordRepository.storeFlow)
-            .grouped(storeRecords.size)
-            .map(_ => Done)
-        } else Source.single(Done)
-        val deleteResult = if (deleteRecords.nonEmpty) {
-          Source(deleteRecords)
-            .map(_.id)
-            .via(podRecordRepository.deleteFlow)
-            .grouped(deleteRecords.size)
-            .map(_ => Done)
-        } else Source.single(Done)
-        Source
-          .zipWithN[Done, SchedulerEvents](_ => events)(List(storeResult, deleteResult))
-          .runWith(Sink.head) // This materialization is cheap compared to the IO operation.
-      }
+      Source(events.stateEvents).collect {
+        case PodRecordUpdated(_, Some(podRecord)) => podRecordRepository.store(podRecord)
+        case PodRecordUpdated(podId, None) => podRecordRepository.delete(podId)
+      }.mapAsync(PipeliningLimit)(identity)
+        .runWith(Sink.ignore)
+        .map(_ => events)(CallerThreadExecutionContext.context)
     }
   }
 

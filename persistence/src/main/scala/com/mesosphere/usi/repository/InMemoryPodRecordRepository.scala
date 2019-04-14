@@ -1,8 +1,6 @@
 package com.mesosphere.usi.repository
 
-import akka.NotUsed
-import akka.stream.scaladsl.Flow
-import akka.stream.scaladsl.Source
+import akka.Done
 import com.mesosphere.usi.core.models.{PodId, PodRecord}
 import com.typesafe.scalalogging.StrictLogging
 import scala.collection.mutable
@@ -15,26 +13,20 @@ import scala.concurrent.Future
 case class InMemoryPodRecordRepository() extends PodRecordRepository with StrictLogging {
   val data = mutable.Map.empty[PodId, PodRecord]
 
-  override def storeFlow: Flow[PodRecord, PodId, NotUsed] =
-    Flow[PodRecord].map { record =>
-      synchronized {
-        logger.info(s"Create record ${record.podId}")
-        data += record.podId -> record
-        record.podId
-      }
-    }
+  override def store(record: PodRecord): Future[Done] = synchronized {
+    logger.info(s"Create record ${record.podId}")
+    data += record.podId -> record
+    Future.successful(Done)
+  }
 
-  override def deleteFlow: Flow[PodId, Unit, NotUsed] =
-    Flow[PodId].map { podId =>
-      synchronized {
-        logger.info(s"Delete record $podId")
-        data -= podId
-        Future.unit
-      }
-    }
+  override def delete(podId: PodId): Future[Done] = synchronized {
+    logger.info(s"Delete record $podId")
+    data -= podId
+    Future.successful(Done)
+  }
 
-  override def readAll(): Source[Map[PodId, PodRecord], NotUsed] = {
-    Source.single(data.toMap)
+  override def readAll(): Future[Map[PodId, PodRecord]] = {
+    Future.successful(data.toMap)
   }
 
 }
