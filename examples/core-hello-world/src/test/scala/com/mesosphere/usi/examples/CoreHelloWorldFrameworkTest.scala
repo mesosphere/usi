@@ -89,7 +89,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     val newPodRecords = customPersistenceStore.readAll().futureValue.values
     newPodRecords should contain theSameElementsAs podRecords
 
-    And(s"no further elements should be emitted")
+    And("no further elements should be emitted")
     assertThrows[AssertionError](sub2.expectNext(5.seconds)) // This is just a best effort check.
     newClient.killSwitch.shutdown()
   }

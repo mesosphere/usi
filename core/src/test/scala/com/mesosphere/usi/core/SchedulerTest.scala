@@ -16,7 +16,7 @@ import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEv
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest._
 import scala.concurrent.Future
-import scala.concurrent.duration._
+import scala.util.Success
 
 class SchedulerTest extends AkkaUnitTest with Inside {
 
@@ -107,53 +107,40 @@ class SchedulerTest extends AkkaUnitTest with Inside {
   }
 
   "Persistence flow pipelines writes" in {
-    Given("a slow persistence storage and a flow using it")
-    val delayPerElement = 50.millis // Delay precision is 10ms
-    val slowPodRecordRepo = new InMemoryPodRecordRepository {
+    Given("a fuzzy persistence storage and a flow using it")
+    val rand = scala.util.Random
+    val fuzzyPodRecordRepo = new InMemoryPodRecordRepository {
       override def store(record: PodRecord): Future[Done] =
-        akka.pattern.after(delayPerElement, system.scheduler)(super.store(record))
-      override def delete(podId: PodId): Future[Done] =
-        akka.pattern.after(delayPerElement, system.scheduler)(super.delete(podId))
+        super.store(record).andThen {
+          case Success(Done) =>
+            Thread.sleep(rand.nextInt(100).toLong)
+            Done
+        }
     }
     val (pub, sub) = TestSource
       .probe[SchedulerEvents]
-      .via(Scheduler.persistenceFlow(slowPodRecordRepo))
+      .via(Scheduler.persistenceFlow(fuzzyPodRecordRepo))
       .toMat(TestSink.probe[SchedulerEvents])(Keep.both)
       .run()
 
     Given("a list of fake pod record events")
     val podIds = List(List("A", "B"), List("C", "D"), List("E", "F")).map(_.map(PodId))
-    val deleteEvents = podIds.map(_.map(PodRecordUpdated(_, None)))
-    val storeEvents =
-      deleteEvents.map(_.map(x => x.copy(newRecord = Some(PodRecord(x.id, Instant.now(), AgentId("-"))))))
-
-    Then("flow behaves as an Identity")
-    pub.expectRequest()
-    pub.sendNext(SchedulerEvents(deleteEvents.head))
-    sub.requestNext(SchedulerEvents(deleteEvents.head))
-    slowPodRecordRepo.readAll().futureValue.keySet shouldBe empty
-
-    Then(s"flow pipelines writes pulling only one ${SchedulerEvents.getClass.getSimpleName} at a time")
-    deleteEvents.map(SchedulerEvents(_)).foreach { deleteEvent =>
-      pub.sendNext(deleteEvent)
-    }
-    deleteEvents.map(SchedulerEvents(_)).foreach { deleteEvent =>
-      assertThrows[AssertionError](sub.expectNext(delayPerElement / 2))
-      sub.requestNext(deleteEvent)
+    val storesAndDeletes = podIds.flatMap { ids =>
+      val storeEvents = ids.map(id => PodRecordUpdated(id, Some(PodRecord(id, Instant.now(), AgentId("-")))))
+      val deleteEvents = ids.map(PodRecordUpdated(_, None))
+      List(SchedulerEvents(storeEvents), SchedulerEvents(deleteEvents))
     }
 
-    Then("flow should be able to persist records")
-    sub.request(podIds.flatten.size)
-    storeEvents.foreach(x => pub.sendNext(SchedulerEvents(x)))
-    storeEvents.foreach(x => sub.expectNext(SchedulerEvents(x)))
-    val result = slowPodRecordRepo.readAll().futureValue
-    result.keySet shouldEqual podIds.flatten.toSet
-    result.values.toSet shouldEqual storeEvents.flatten.flatMap(_.newRecord).toSet
+    Then("flow behaves as an Identity (with side-effects)")
+    val oneEvent = storesAndDeletes.fold(SchedulerEvents.empty)((acc, e) => acc.copy(acc.stateEvents ++ e.stateEvents))
+    pub.sendNext(oneEvent)
+    sub.requestNext(oneEvent)
+    fuzzyPodRecordRepo.readAll().futureValue.keySet shouldBe empty
 
-    Then("flow should be able to delete the persisted records")
-    sub.request(podIds.flatten.size)
-    deleteEvents.foreach(x => pub.sendNext(SchedulerEvents(x)))
-    deleteEvents.foreach(x => sub.expectNext(SchedulerEvents(x)))
-    slowPodRecordRepo.readAll().futureValue.keySet shouldBe empty
+    And("respects the order of the events")
+    sub.request(storesAndDeletes.size)
+    storesAndDeletes.reverse.foreach(pub.sendNext)
+    storesAndDeletes.reverse.foreach(sub.expectNext)
+    fuzzyPodRecordRepo.readAll().futureValue.keySet should contain theSameElementsAs podIds.flatten
   }
 }
