@@ -22,7 +22,7 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 
   val specsSnapshot = KeepAlivePodSpecHelper.specsSnapshot(100)
 
-  // KeepAliveWatcher looks for a terminal task even and then restarts the whole pod.
+  // KeepAliveWatcher looks for a terminal task and then restarts the whole pod.
   val keepAliveWatcher: Flow[StateEvent, SpecUpdated, NotUsed] = Flow[StateEvent].mapConcat {
     // Main state event handler. We log happy events and restart the pod if something goes wrong
     case s: StateSnapshot =>

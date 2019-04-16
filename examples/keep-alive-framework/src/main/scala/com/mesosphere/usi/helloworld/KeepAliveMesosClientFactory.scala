@@ -12,6 +12,9 @@ import scala.concurrent.duration._
 import scala.concurrent.Await
 import scala.sys.SystemProperties
 
+/**
+  * Helper that builds a mesos client
+  */
 class KeepAliveMesosClientFactory(conf: Config)(implicit system: ActorSystem, mat: ActorMaterializer) {
 
   val settings = MesosClientSettings(conf.getString("master-url"))

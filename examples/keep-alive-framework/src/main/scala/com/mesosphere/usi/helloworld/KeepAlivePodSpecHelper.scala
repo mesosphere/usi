@@ -5,6 +5,9 @@ import java.util.UUID
 import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, RunSpec, SpecsSnapshot}
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 
+/**
+  * This is a helper object that generates pod specs and snapshots.
+  */
 object KeepAlivePodSpecHelper {
 
   val runSpec: RunSpec = RunSpec(
