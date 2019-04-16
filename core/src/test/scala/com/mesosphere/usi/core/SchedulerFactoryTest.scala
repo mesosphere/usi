@@ -1,10 +1,9 @@
-package com.mesosphere.usi.core.scalaapi
+package com.mesosphere.usi.core
 
 import akka.NotUsed
 import akka.stream.scaladsl.{SinkQueueWithCancel, SourceQueueWithComplete}
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.OverflowStrategy
-import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.usi.core.models._
 import com.mesosphere.utils.AkkaUnitTest
@@ -13,7 +12,7 @@ import org.scalatest._
 import scala.concurrent.Promise
 import scala.util.{Failure, Success}
 
-class SchedulerAdapterTest extends AkkaUnitTest with Inside {
+class SchedulerFactoryTest extends AkkaUnitTest with Inside {
 
   def createMockedScheduler: (
       Flow[Scheduler.SpecInput, Scheduler.StateOutput, NotUsed],
@@ -43,7 +42,7 @@ class SchedulerAdapterTest extends AkkaUnitTest with Inside {
     val (scheduler, specInputQueue, stateOutputQueue) = createMockedScheduler
   }
 
-  "SchedulerAdapter" when {
+  "SchedulerFactory" when {
     "materialized as Source and Sink" should {
       "Propagate a snapshot to the underlying scheduler" in new SchedulerFixture {
         Scheduler.asSourceAndSink(SpecsSnapshot(List(podSpec), Nil), scheduler)
