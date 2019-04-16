@@ -16,7 +16,7 @@ import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEv
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest._
 import scala.concurrent.Future
-import scala.util.Success
+import scala.concurrent.duration._
 
 class SchedulerTest extends AkkaUnitTest with Inside {
 
@@ -107,15 +107,14 @@ class SchedulerTest extends AkkaUnitTest with Inside {
   }
 
   "Persistence flow pipelines writes" in {
-    Given("a fuzzy persistence storage and a flow using it")
-    val rand = scala.util.Random
+    Given("a persistence storage and a flow using it")
     val fuzzyPodRecordRepo = new InMemoryPodRecordRepository {
-      override def store(record: PodRecord): Future[Done] =
-        super.store(record).andThen {
-          case Success(Done) =>
-            Thread.sleep(rand.nextInt(100).toLong)
-            Done
+      val rand = scala.util.Random
+      override def store(record: PodRecord): Future[Done] = {
+        super.store(record).flatMap { _ =>
+          akka.pattern.after(rand.nextInt(1000).millis, system.scheduler)(Future.successful(Done))
         }
+      }
     }
     val (pub, sub) = TestSource
       .probe[SchedulerEvents]
@@ -131,8 +130,8 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       List(SchedulerEvents(storeEvents), SchedulerEvents(deleteEvents))
     }
 
-    Then("flow behaves as an Identity (with side-effects)")
-    val oneEvent = storesAndDeletes.fold(SchedulerEvents.empty)((acc, e) => acc.copy(acc.stateEvents ++ e.stateEvents))
+    Then("persistence flow behaves as an Identity (with side-effects)")
+    val oneEvent = storesAndDeletes.reduce((e1, e2) => SchedulerEvents(e1.stateEvents ++ e2.stateEvents))
     pub.sendNext(oneEvent)
     sub.requestNext(oneEvent)
     fuzzyPodRecordRepo.readAll().futureValue.keySet shouldBe empty
