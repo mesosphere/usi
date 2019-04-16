@@ -112,7 +112,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       val rand = scala.util.Random
       override def store(record: PodRecord): Future[Done] = {
         super.store(record).flatMap { _ =>
-          akka.pattern.after(rand.nextInt(1000).millis, system.scheduler)(Future.successful(Done))
+          akka.pattern.after(rand.nextInt(100).millis, system.scheduler)(Future.successful(Done))
         }
       }
     }
