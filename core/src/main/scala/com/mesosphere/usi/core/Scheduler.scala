@@ -1,8 +1,8 @@
 package com.mesosphere.usi.core
 
-import akka.NotUsed
-import akka.stream.{BidiShape, FlowShape, Materializer}
-import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, Source}
+import akka.{Done, NotUsed}
+import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, SinkQueueWithCancel, Source}
+import akka.stream.{BidiShape, FlowShape, KillSwitches, Materializer, OverflowStrategy, QueueOfferResult}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.models.{
   PodRecordUpdated,
@@ -16,6 +16,8 @@ import com.mesosphere.usi.repository.PodRecordRepository
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import scala.collection.JavaConverters._
+import scala.concurrent.{Future, Promise}
+import scala.util.{Failure, Success}
 
 /**
   * Provides the scheduler graph component. The component has two inputs, and two outputs:
@@ -61,12 +63,154 @@ object Scheduler {
 
   type StateOutput = (StateSnapshot, Source[StateEvent, Any])
 
-  def fromSnapshot(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository)(
-      implicit materializer: Materializer): Flow[SpecUpdated, StateOutput, NotUsed] =
+  def fromSnapshot(
+      specsSnapshot: SpecsSnapshot,
+      client: MesosClient,
+      podRecordRepository: PodRecordRepository
+  )(implicit materializer: Materializer): Flow[SpecUpdated, StateOutput, NotUsed] =
     Flow[SpecUpdated]
       .prefixAndTail(0)
       .map { case (_, rest) => specsSnapshot -> rest }
       .via(fromClient(client, podRecordRepository))
+
+  def asFlow(
+      specsSnapshot: SpecsSnapshot,
+      client: MesosClient,
+      podRecordRepository: PodRecordRepository
+  )(implicit materializer: Materializer): Future[(StateSnapshot, Flow[SpecUpdated, StateEvent, NotUsed])] = {
+
+    implicit val ec = scala.concurrent.ExecutionContext.Implicits.global //only for ultra-fast non-blocking onComplete
+
+    val (snap, source, sink) = asSourceAndSink(specsSnapshot, client, podRecordRepository)
+
+    snap.map { snapshot =>
+      (snapshot, Flow.fromSinkAndSourceCoupled(sink, source))
+    }
+
+  }
+
+  /**
+    * Represents the scheduler as a Sink and Source.
+    *
+    * This method will materialize the scheduler first, then Sink and Source can be materialized independently, but only once.
+    *
+    * @param specsSnapshot Snapshot of the current specs
+    * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
+    */
+  def asSourceAndSink(
+      specsSnapshot: SpecsSnapshot,
+      client: MesosClient,
+      podRecordRepository: PodRecordRepository
+  )(implicit mat: Materializer): (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]) = {
+    val flow = fromClient(client, podRecordRepository)
+    asSourceAndSink(specsSnapshot, flow)(mat)
+  }
+
+  def asSourceAndSink(
+      specsSnapshot: SpecsSnapshot,
+      schedulerFlow: Flow[SpecInput, StateOutput, NotUsed]
+  )(implicit mat: Materializer): (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]) = {
+
+    implicit val ec = scala.concurrent.ExecutionContext.Implicits.global //only for ultra-fast non-blocking onComplete
+
+    val (stateQueue, stateSource) = Source.queue[StateEvent](1, OverflowStrategy.backpressure).preMaterialize()
+
+    val (specQueue, specSink) = Sink.queue[SpecUpdated]().preMaterialize()
+
+    val stateSnapshotPromise = Promise[StateSnapshot]()
+
+    val killSwitch = KillSwitches.shared("SchedulerAdapter.asSourceAndSink")
+
+    // We need to handle the case when the source is canceled or failed
+    stateQueue.watchCompletion().onComplete {
+      case Success(_) =>
+        killSwitch.shutdown()
+      case Failure(cause) =>
+        killSwitch.abort(cause)
+    }
+
+    def sourceFromSinkQueue[T](queue: SinkQueueWithCancel[T]): Source[T, NotUsed] = {
+      Source
+        .unfoldResourceAsync[T, SinkQueueWithCancel[T]](
+          create = () => Future.successful(queue),
+          read = queue => queue.pull(),
+          close = queue =>
+            Future.successful {
+              killSwitch.shutdown()
+              queue.cancel()
+              Done
+          })
+    }
+
+    Source.maybe.prepend {
+      val events = sourceFromSinkQueue(specQueue)
+        .watchTermination() {
+          case (_, completionSignal) =>
+            completionSignal.onComplete {
+              case Success(_) =>
+                killSwitch.shutdown()
+              case Failure(cause) =>
+                killSwitch.abort(cause)
+            }
+        }
+
+      Source.single(specsSnapshot -> events)
+    }.via(schedulerFlow)
+      .flatMapConcat {
+        case (snapshot, updates) =>
+          stateSnapshotPromise.trySuccess(snapshot)
+          updates.watchTermination() {
+            case (_, cancellationSignal) =>
+              cancellationSignal.onComplete {
+                case Success(_) =>
+                  killSwitch.shutdown()
+                case Failure(cause) =>
+                  killSwitch.abort(cause)
+              }
+          }
+      }
+      .mapAsync(1)(stateQueue.offer)
+      .map {
+        case QueueOfferResult.Enqueued =>
+        case QueueOfferResult.QueueClosed =>
+          killSwitch.shutdown()
+        case QueueOfferResult.Failure(cause) =>
+          killSwitch.abort(cause)
+        case QueueOfferResult.Dropped => // we shouldn't receive that at all because OverflowStrategy.backpressure
+          throw new RuntimeException("Unexpected QueueOfferResult.Dropped element")
+      }
+      .runWith(Sink.ignore)
+
+    val sourceWithKillSwitch = stateSource
+      .watchTermination() {
+        case (materializedValue, cancellationSignal) =>
+          cancellationSignal.onComplete {
+            case Success(_) =>
+              killSwitch.shutdown()
+            case Failure(cause) =>
+              killSwitch.abort(cause)
+          }
+          materializedValue
+      }
+      .via(killSwitch.flow)
+
+    val sinkWithKillSwitch = Flow[SpecUpdated]
+      .watchTermination() {
+        case (materializedValue, cancellationSignal) =>
+          cancellationSignal.onComplete {
+            case Success(_) =>
+              killSwitch.shutdown()
+            case Failure(cause) =>
+              killSwitch.abort(cause)
+          }
+          materializedValue
+      }
+      .via(killSwitch.flow)
+      .to(specSink)
+
+    (stateSnapshotPromise.future, sourceWithKillSwitch, sinkWithKillSwitch)
+
+  }
 
   def fromClient(
       client: MesosClient,

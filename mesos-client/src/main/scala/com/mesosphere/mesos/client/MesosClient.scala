@@ -319,7 +319,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       case (httpResponse, connectionInfo) =>
         val sharedKillSwitch =
           KillSwitches.shared(s"MesosClient-${conf.master}")
-        httpResponse.entity.dataBytes
+        httpResponse.entity.withoutSizeLimit.dataBytes
           .via(eventReader)
           .via(sharedKillSwitch.flow)
           .prefixAndTail(1)
