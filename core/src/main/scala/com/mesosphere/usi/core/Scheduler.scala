@@ -63,21 +63,15 @@ object Scheduler {
 
   type StateOutput = (StateSnapshot, Source[StateEvent, Any])
 
-  def fromSnapshot(
-      specsSnapshot: SpecsSnapshot,
-      client: MesosClient,
-      podRecordRepository: PodRecordRepository
-  )(implicit materializer: Materializer): Flow[SpecUpdated, StateOutput, NotUsed] =
+  def fromSnapshot(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository)(
+      implicit materializer: Materializer): Flow[SpecUpdated, StateOutput, NotUsed] =
     Flow[SpecUpdated]
       .prefixAndTail(0)
       .map { case (_, rest) => specsSnapshot -> rest }
       .via(fromClient(client, podRecordRepository))
 
-  def asFlow(
-      specsSnapshot: SpecsSnapshot,
-      client: MesosClient,
-      podRecordRepository: PodRecordRepository
-  )(implicit materializer: Materializer): Future[(StateSnapshot, Flow[SpecUpdated, StateEvent, NotUsed])] = {
+  def asFlow(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository)(
+      implicit materializer: Materializer): Future[(StateSnapshot, Flow[SpecUpdated, StateEvent, NotUsed])] = {
 
     implicit val ec = scala.concurrent.ExecutionContext.Implicits.global //only for ultra-fast non-blocking onComplete
 
@@ -97,19 +91,14 @@ object Scheduler {
     * @param specsSnapshot Snapshot of the current specs
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
-  def asSourceAndSink(
-      specsSnapshot: SpecsSnapshot,
-      client: MesosClient,
-      podRecordRepository: PodRecordRepository
-  )(implicit mat: Materializer): (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]) = {
+  def asSourceAndSink(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository)(
+      implicit mat: Materializer): (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]) = {
     val flow = fromClient(client, podRecordRepository)
     asSourceAndSink(specsSnapshot, flow)(mat)
   }
 
-  def asSourceAndSink(
-      specsSnapshot: SpecsSnapshot,
-      schedulerFlow: Flow[SpecInput, StateOutput, NotUsed]
-  )(implicit mat: Materializer): (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]) = {
+  def asSourceAndSink(specsSnapshot: SpecsSnapshot, schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
+      implicit mat: Materializer): (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]) = {
 
     implicit val ec = scala.concurrent.ExecutionContext.Implicits.global //only for ultra-fast non-blocking onComplete
 
@@ -212,10 +201,8 @@ object Scheduler {
 
   }
 
-  def fromClient(
-      client: MesosClient,
-      podRecordRepository: PodRecordRepository
-  )(implicit materializer: Materializer): Flow[SpecInput, StateOutput, NotUsed] = {
+  def fromClient(client: MesosClient, podRecordRepository: PodRecordRepository)(
+      implicit materializer: Materializer): Flow[SpecInput, StateOutput, NotUsed] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
@@ -227,8 +214,8 @@ object Scheduler {
   def fromFlow(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
-      mesosFlow: Flow[MesosCall, MesosEvent, Any]
-  )(implicit materializer: Materializer): Flow[SpecInput, StateOutput, NotUsed] = {
+      mesosFlow: Flow[MesosCall, MesosEvent, Any])(
+      implicit materializer: Materializer): Flow[SpecInput, StateOutput, NotUsed] = {
     Flow.fromGraph {
       GraphDSL.create(unconnectedGraph(mesosCallFactory, podRecordRepository), mesosFlow)((_, _) => NotUsed) {
         implicit builder =>
@@ -270,10 +257,8 @@ object Scheduler {
       (stateSnapshot, stateUpdates)
   }
 
-  private[core] def unconnectedGraph(
-      mesosCallFactory: MesosCalls,
-      podRecordRepository: PodRecordRepository
-  )(implicit materializer: Materializer): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
+  private[core] def unconnectedGraph(mesosCallFactory: MesosCalls, podRecordRepository: PodRecordRepository)(
+      implicit materializer: Materializer): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
     val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, podRecordRepository.readAll())
     BidiFlow.fromGraph {
       GraphDSL.create(schedulerLogicGraph) { implicit builder => (schedulerLogic) =>
@@ -305,9 +290,8 @@ object Scheduler {
 
   val PipeliningLimit = 128
 
-  private[core] def persistenceFlow(
-      podRecordRepository: PodRecordRepository
-  )(implicit materializer: Materializer): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
+  private[core] def persistenceFlow(podRecordRepository: PodRecordRepository)(
+      implicit materializer: Materializer): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
     Flow[SchedulerEvents].mapAsync(1) { events =>
       Source(events.stateEvents).collect {
         case PodRecordUpdated(_, Some(podRecord)) => podRecordRepository.store(podRecord)

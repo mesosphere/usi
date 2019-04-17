@@ -122,7 +122,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       .toMat(TestSink.probe[SchedulerEvents])(Keep.both)
       .run()
 
-    Given("a list of fake pod record events")
+    And("a list of fake pod record events")
     val podIds = List(List("A", "B"), List("C", "D"), List("E", "F")).map(_.map(PodId))
     val storesAndDeletes = podIds.flatMap { ids =>
       val storeEvents = ids.map(id => PodRecordUpdated(id, Some(PodRecord(id, Instant.now(), AgentId("-")))))
