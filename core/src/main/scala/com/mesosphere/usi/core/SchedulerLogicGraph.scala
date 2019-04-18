@@ -94,6 +94,7 @@ private[core] class SchedulerLogicGraph(
           this.failStage(ex)
       }
 
+      // This will be removed if/when we refactor the code to not receive snapshot's anymore.
       override def preStart(): Unit =
         initialPodRecords.onComplete(startGraph.invoke)(CallerThreadExecutionContext.context)
 
