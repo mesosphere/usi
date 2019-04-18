@@ -129,11 +129,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
   def handlePodRecordSnapshot(podRecords: Map[PodId, PodRecord]): SchedulerEvents = {
     handleFrame { builder =>
       builder.process { (specs, state, _) =>
-        if (state.podRecords.nonEmpty || specs.podSpecs.nonEmpty) {
-          throw new IllegalStateException(
-            s"Expected initial Scheduler state to be empty." +
-              s" Found ${state.podRecords.size} records and ${specs.podSpecs.size} statuses")
-        }
+        require(state.podRecords.isEmpty && specs.podSpecs.isEmpty)
         SchedulerEvents(stateEvents = List(StateSnapshot.empty.copy(podRecords = podRecords.values.toSeq)))
       }
     }

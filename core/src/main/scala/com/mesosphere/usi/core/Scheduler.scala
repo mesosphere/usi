@@ -10,9 +10,10 @@ import com.mesosphere.usi.core.models.{
   SpecUpdated,
   SpecsSnapshot,
   StateEvent,
-  StateSnapshot,
+  StateSnapshot
 }
 import com.mesosphere.usi.repository.PodRecordRepository
+import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import scala.collection.JavaConverters._
@@ -62,6 +63,8 @@ object Scheduler {
   type SpecInput = (SpecsSnapshot, Source[SpecUpdated, Any])
 
   type StateOutput = (StateSnapshot, Source[StateEvent, Any])
+
+  val PipeliningLimit = ConfigFactory.load().getInt("persistence.pipeline-limit")
 
   def fromSnapshot(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository)(
       implicit materializer: Materializer): Flow[SpecUpdated, StateOutput, NotUsed] =
@@ -288,18 +291,24 @@ object Scheduler {
     }
   }
 
-  val PipeliningLimit = 128
-
   private[core] def persistenceFlow(podRecordRepository: PodRecordRepository)(
       implicit materializer: Materializer): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
     Flow[SchedulerEvents].mapAsync(1) { events =>
-      Source(events.stateEvents).collect {
-        case PodRecordUpdated(_, Some(podRecord)) => podRecordRepository.store(podRecord)
-        case PodRecordUpdated(podId, None) => podRecordRepository.delete(podId)
-      }.mapAsync(PipeliningLimit)(identity)
-        .runWith(Sink.ignore)
-        .map(_ => events)(CallerThreadExecutionContext.context)
+      persistEvents(events, podRecordRepository).map(_ => events)(CallerThreadExecutionContext.context)
     }
+  }
+
+  private def persistEvents(events: SchedulerEvents, podRecordRepository: PodRecordRepository)(
+      implicit materializer: Materializer): Future[Done] = {
+    Source(events.stateEvents).collect {
+      case PodRecordUpdated(_, Some(podRecord)) =>
+        () =>
+          podRecordRepository.store(podRecord)
+      case PodRecordUpdated(podId, None) =>
+        () =>
+          podRecordRepository.delete(podId)
+    }.mapAsync(PipeliningLimit)(call => call())
+      .runWith(Sink.ignore)
   }
 
   private def isMultiRoleFramework(frameworkInfo: FrameworkInfo): Boolean =
