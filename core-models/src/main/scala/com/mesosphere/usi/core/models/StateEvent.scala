@@ -12,10 +12,7 @@ sealed trait PodStateEvent extends StateEvent {
   def id: PodId
 }
 
-case class StateSnapshot(
-    podRecords: Seq[PodRecord],
-    agentRecords: Seq[AgentRecord])
-    extends StateEvent
+case class StateSnapshot(podRecords: Seq[PodRecord], agentRecords: Seq[AgentRecord]) extends StateEvent
 object StateSnapshot {
   def empty = StateSnapshot(Nil, Nil)
 }

@@ -15,7 +15,8 @@ import java.time.Instant
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest._
-import scala.concurrent.Future
+import scala.annotation.tailrec
+import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration._
 
 class SchedulerTest extends AkkaUnitTest with Inside {
@@ -141,5 +142,59 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     storesAndDeletes.reverse.foreach(pub.sendNext)
     storesAndDeletes.reverse.foreach(sub.expectNext)
     fuzzyPodRecordRepo.readAll().futureValue.keySet should contain theSameElementsAs podIds.flatten
+  }
+
+  "Persistence flow honors the pipe-lining threshold" in {
+    Given("a list of persistence operations with count strictly greater than twice the pipeline limit")
+    val limit = Scheduler.PipeliningLimit
+    val deleteEvents = (1 to limit * 2 + 1)
+      .map(x => PodRecordUpdated(PodId("pod-" + x), None))
+      .grouped(100)
+      .map(x => SchedulerEvents(stateEvents = x.toList))
+      .toList
+
+    And("a persistence flow using a controllable pod record repository")
+    val controlledRepository = new ControlledRepository()
+    val (pub, sub) = TestSource
+      .probe[SchedulerEvents]
+      .via(Scheduler.persistenceFlow(controlledRepository))
+      .toMat(TestSink.probe[SchedulerEvents])(Keep.both)
+      .run()
+
+    When("downstream requests for new events and upstream sends the events")
+    sub.request(deleteEvents.size)
+    deleteEvents.foreach(pub.sendNext)
+
+    Then("flow should throttle the number of futures across multiple events")
+    eventually {
+      assertThrows[AssertionError](sub.expectNext(10.millis))
+      controlledRepository.pendingWrites shouldEqual limit - 1 // limit - 1 because the last element is input itself.
+    }
+
+    Then("flow should be able to continue to throttle")
+    controlledRepository.markCompleted(limit - 1)
+    eventually {
+      assertThrows[AssertionError](sub.expectNext(10.millis))
+      controlledRepository.pendingWrites shouldEqual limit - 1
+    }
+  }
+
+  class ControlledRepository extends InMemoryPodRecordRepository {
+    import java.util.concurrent.ConcurrentLinkedQueue
+    val queue = new ConcurrentLinkedQueue[Promise[Done]]
+    override def delete(podId: PodId): Future[Done] = {
+      val completed = Promise[Done]
+      queue.offer(completed)
+      super.delete(podId).flatMap(_ => completed.future)
+    }
+
+    def pendingWrites = queue.size()
+
+    @tailrec final def markCompleted(n: Int): Unit = {
+      if ((n > 0) && !queue.isEmpty) {
+        queue.poll().success(Done)
+        markCompleted(n - 1)
+      }
+    }
   }
 }

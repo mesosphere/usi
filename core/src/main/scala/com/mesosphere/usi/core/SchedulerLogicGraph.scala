@@ -96,7 +96,8 @@ private[core] class SchedulerLogicGraph(
       val startGraph = this.getAsyncCallback[Try[Map[PodId, PodRecord]]] {
         case Success(podRecords) =>
           handler = new SchedulerLogicHandler(mesosCallFactory, podRecords)
-          pushOrQueueIntents(SchedulerEvents(stateEvents = List(StateSnapshot.empty.copy(podRecords = podRecords.values.toSeq))))
+          pushOrQueueIntents(
+            SchedulerEvents(stateEvents = List(StateSnapshot.empty.copy(podRecords = podRecords.values.toSeq))))
           maybePull()
         case Failure(ex) =>
           this.failStage(ex)
