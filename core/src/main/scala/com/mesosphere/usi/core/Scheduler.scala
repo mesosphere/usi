@@ -66,8 +66,7 @@ object Scheduler {
 
   val PipeliningLimit = ConfigFactory.load().getInt("persistence.pipeline-limit")
 
-  def fromSnapshot(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository)(
-      implicit materializer: Materializer): Flow[SpecUpdated, StateOutput, NotUsed] =
+  def fromSnapshot(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository): Flow[SpecUpdated, StateOutput, NotUsed] =
     Flow[SpecUpdated]
       .prefixAndTail(0)
       .map { case (_, rest) => specsSnapshot -> rest }
@@ -204,8 +203,7 @@ object Scheduler {
 
   }
 
-  def fromClient(client: MesosClient, podRecordRepository: PodRecordRepository)(
-      implicit materializer: Materializer): Flow[SpecInput, StateOutput, NotUsed] = {
+  def fromClient(client: MesosClient, podRecordRepository: PodRecordRepository): Flow[SpecInput, StateOutput, NotUsed] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
@@ -217,8 +215,7 @@ object Scheduler {
   def fromFlow(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
-      mesosFlow: Flow[MesosCall, MesosEvent, Any])(
-      implicit materializer: Materializer): Flow[SpecInput, StateOutput, NotUsed] = {
+      mesosFlow: Flow[MesosCall, MesosEvent, Any]): Flow[SpecInput, StateOutput, NotUsed] = {
     Flow.fromGraph {
       GraphDSL.create(unconnectedGraph(mesosCallFactory, podRecordRepository), mesosFlow)((_, _) => NotUsed) {
         implicit builder =>
@@ -260,8 +257,7 @@ object Scheduler {
       (stateSnapshot, stateUpdates)
   }
 
-  private[core] def unconnectedGraph(mesosCallFactory: MesosCalls, podRecordRepository: PodRecordRepository)(
-      implicit materializer: Materializer): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
+  private[core] def unconnectedGraph(mesosCallFactory: MesosCalls, podRecordRepository: PodRecordRepository): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
     val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, podRecordRepository.readAll())
     BidiFlow.fromGraph {
       GraphDSL.create(schedulerLogicGraph) { implicit builder => (schedulerLogic) =>
@@ -291,24 +287,25 @@ object Scheduler {
     }
   }
 
-  private[core] def persistenceFlow(podRecordRepository: PodRecordRepository)(
-      implicit materializer: Materializer): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
-    Flow[SchedulerEvents].mapAsync(1) { events =>
-      persistEvents(events, podRecordRepository).map(_ => events)(CallerThreadExecutionContext.context)
-    }
-  }
+  private[core] def persistenceFlow(podRecordRepository: PodRecordRepository): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
 
-  private def persistEvents(events: SchedulerEvents, podRecordRepository: PodRecordRepository)(
-      implicit materializer: Materializer): Future[Done] = {
-    Source(events.stateEvents).collect {
-      case PodRecordUpdated(_, Some(podRecord)) =>
-        () =>
-          podRecordRepository.store(podRecord)
-      case PodRecordUpdated(podId, None) =>
-        () =>
-          podRecordRepository.delete(podId)
-    }.mapAsync(PipeliningLimit)(call => call())
-      .runWith(Sink.ignore)
+    Flow[SchedulerEvents].mapConcat { events =>
+      val ops: Vector[Future[Option[SchedulerEvents]]] = events.stateEvents.collect {
+        case PodRecordUpdated(_, Some(podRecord)) =>
+          podRecordRepository
+            .store(podRecord)
+            .map { _ =>
+              None
+            }(CallerThreadExecutionContext.context)
+        case PodRecordUpdated(podId, None) =>
+          podRecordRepository
+            .delete(podId)
+            .map { _ =>
+              None
+            }(CallerThreadExecutionContext.context)
+      }(collection.breakOut)
+      ops :+ Future.successful(Some(events))
+    }.mapAsync(PipeliningLimit)(identity).collect { case Some(events) => events }
   }
 
   private def isMultiRoleFramework(frameworkInfo: FrameworkInfo): Boolean =

@@ -3,8 +3,9 @@ package com.mesosphere.usi.core
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
 import com.mesosphere.mesos.client.MesosCalls
-import com.mesosphere.usi.core.models.{PodId, PodRecord, SpecEvent}
+import com.mesosphere.usi.core.models.{PodId, PodRecord, SpecEvent, StateSnapshot}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
+
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -58,9 +59,10 @@ private[core] class SchedulerLogicGraph(
 
   // This is where the actual (possibly stateful) logic will live
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
-    val handler = new SchedulerLogicHandler(mesosCallFactory)
 
     new GraphStageLogic(shape) {
+      private[this] var handler: SchedulerLogicHandler = _
+
       val pendingEffects: mutable.Queue[SchedulerEvents] = mutable.Queue.empty
 
       setHandler(mesosEventsInlet, new InHandler {
@@ -86,15 +88,24 @@ private[core] class SchedulerLogicGraph(
         }
       })
 
+      /**
+        * Callback which is called as soon as our initial pod snapshot is available
+        *
+        * Once this snapshot is available, we publish the initial state snapshot event; podStatuses will not be in the snapshot in the future
+        */
       val startGraph = this.getAsyncCallback[Try[Map[PodId, PodRecord]]] {
-        case Success(initialSnapshot) =>
-          pushOrQueueIntents(handler.handlePodRecordSnapshot(initialSnapshot))
+        case Success(podRecords) =>
+          handler = new SchedulerLogicHandler(mesosCallFactory, podRecords)
+          pushOrQueueIntents(SchedulerEvents(stateEvents = List(StateSnapshot.empty.copy(podRecords = podRecords.values.toSeq))))
           maybePull()
         case Failure(ex) =>
           this.failStage(ex)
       }
 
-      // This will be removed if/when we refactor the code to not receive snapshot's anymore.
+      /*
+       * We don't start processing any commands until we've finished loading the entire set of podRecords
+       * This code delays the starting of the scheduler stage until this podRecord snapshot is available.
+       */
       override def preStart(): Unit =
         initialPodRecords.onComplete(startGraph.invoke)(CallerThreadExecutionContext.context)
 

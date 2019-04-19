@@ -4,7 +4,7 @@ import java.util.concurrent.CompletableFuture
 
 import akka.NotUsed
 import akka.stream.javadsl.{Flow, Sink, Source}
-import akka.stream.{Materializer, javadsl}
+import akka.stream.{Materializer, javadsl, scaladsl}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.{Scheduler => ScalaScheduler}
 import com.mesosphere.usi.core.models.{SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
@@ -32,10 +32,12 @@ object Scheduler {
     */
   def fromSnapshot(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository)(
       mat: Materializer): javadsl.Flow[SpecUpdated, StateOutput, NotUsed] = {
-    javadsl.Flow
-      .create[SpecUpdated]()
-      .via(ScalaScheduler.fromSnapshot(specsSnapshot, client, podRecordRepository)(mat))
-      .map { case (taken, tail) => akka.japi.Pair(taken, tail.asJava) }
+
+    scaladsl.Flow[SpecUpdated]
+      .via(ScalaScheduler.fromSnapshot(specsSnapshot, client, podRecordRepository))
+      .map {
+        case (taken, tail) => akka.japi.Pair(taken, tail.asJava) }
+      .asJava
   }
 
   /**
@@ -51,11 +53,11 @@ object Scheduler {
       client: MesosClient,
       podRecordRepository: PodRecordRepository
   )(mat: Materializer): javadsl.Flow[SpecInput, StateOutput, NotUsed] = {
-    javadsl.Flow
-      .create[SpecInput]()
+    scaladsl.Flow[SpecInput]
       .map(pair => pair.first -> pair.second.asScala)
-      .via(ScalaScheduler.fromClient(client, podRecordRepository)(mat))
+      .via(ScalaScheduler.fromClient(client, podRecordRepository))
       .map { case (taken, tail) => akka.japi.Pair(taken, tail.asJava) }
+      .asJava
   }
 
   /**
@@ -72,11 +74,12 @@ object Scheduler {
       podRecordRepository: PodRecordRepository,
       mesosFlow: javadsl.Flow[MesosCall, MesosEvent, Any]
   )(mat: Materializer): javadsl.Flow[SpecInput, StateOutput, NotUsed] = {
-    javadsl.Flow
-      .create[SpecInput]()
+    scaladsl.Flow[SpecInput]
       .map(pair => pair.first -> pair.second.asScala)
-      .via(ScalaScheduler.fromFlow(mesosCallFactory, podRecordRepository, mesosFlow.asScala)(mat))
-      .map { case (taken, tail) => akka.japi.Pair(taken, tail.asJava) }
+      .via(ScalaScheduler.fromFlow(mesosCallFactory, podRecordRepository, mesosFlow.asScala))
+      .map { case (taken, tail) =>
+        akka.japi.Pair(taken, tail.asJava)
+      }.asJava
   }
 
   /**

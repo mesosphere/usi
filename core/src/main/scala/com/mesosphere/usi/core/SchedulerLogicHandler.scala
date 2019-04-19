@@ -3,7 +3,6 @@ package com.mesosphere.usi.core
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
 import com.mesosphere.usi.core.models.PodRecord
-import com.mesosphere.usi.core.models.StateSnapshot
 import com.mesosphere.usi.core.models.{PodId, PodInvalid, PodSpec, PodSpecUpdated, SpecEvent, SpecsSnapshot}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
 
@@ -64,7 +63,7 @@ import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
   * through the application of several functions. The result of that event will lead to the emission of several
   * stateEvents and Mesos intents, which will be accumulated and emitted via a data structure we call the FrameResult.
   */
-private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
+private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialPodRecords: Map[PodId, PodRecord]) {
 
   private val schedulerLogic = new SpecLogic(mesosCallFactory)
   private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory)
@@ -79,7 +78,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     * contain persistent, non-recoverable facts from Mesos, such as pod-launched time, agentId on which a pod was
     * launched, agent information or the time at which a pod was first seen as unhealthy or unreachable.
     */
-  private var state: SchedulerState = SchedulerState.empty
+  private var state: SchedulerState = SchedulerState(podStatuses = Map.empty, podRecords = initialPodRecords)
 
   /**
     * Cached view of SchedulerState and SpecificationState. We incrementally update this computation at the end of each
@@ -122,15 +121,6 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls) {
     handleFrame { builder =>
       builder.process { (specs, state, _) =>
         mesosEventsLogic.processEvent(specs, state, cachedPendingLaunch.pendingLaunch)(event)
-      }
-    }
-  }
-
-  def handlePodRecordSnapshot(podRecords: Map[PodId, PodRecord]): SchedulerEvents = {
-    handleFrame { builder =>
-      builder.process { (specs, state, _) =>
-        require(state.podRecords.isEmpty && specs.podSpecs.isEmpty)
-        SchedulerEvents(stateEvents = List(StateSnapshot.empty.copy(podRecords = podRecords.values.toSeq)))
       }
     }
   }
