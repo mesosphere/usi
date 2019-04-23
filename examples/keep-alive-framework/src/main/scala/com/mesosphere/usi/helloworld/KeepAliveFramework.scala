@@ -16,11 +16,11 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
   implicit val mat = ActorMaterializer()
   implicit val ec = system.dispatcher
 
-  val client = new KeepAliveMesosClientcdFactory(conf).client
+  val client = new KeepAliveMesosClientFactory(conf).client
 
   val runSpec = KeepAlivePodSpecHelper.runSpec
 
-  val specsSnapshot = KeepAlivePodSpecHelper.specsSnapshot(100)
+  val specsSnapshot = KeepAlivePodSpecHelper.specsSnapshot(conf.getInt("keep-alive-framework.tasks-started"))
 
   // KeepAliveWatcher looks for a terminal task and then restarts the whole pod.
   val keepAliveWatcher: Flow[StateEvent, SpecUpdated, NotUsed] = Flow[StateEvent].mapConcat {
@@ -91,7 +91,7 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 object KeepAliveFramework {
 
   def main(args: Array[String]): Unit = {
-    val conf = ConfigFactory.load().getConfig("mesos-client")
+    val conf = ConfigFactory.load().getConfig("mesos-client").withFallback(ConfigFactory.load())
     KeepAliveFramework(conf)
   }
 

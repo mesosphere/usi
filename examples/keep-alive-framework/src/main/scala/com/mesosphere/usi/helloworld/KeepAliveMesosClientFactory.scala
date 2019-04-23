@@ -13,7 +13,7 @@ import scala.concurrent.Await
 import scala.sys.SystemProperties
 
 /**
-  * Helper that builds a mesos client
+  * Helper that builds a mesos client that can be used by USI
   */
 class KeepAliveMesosClientFactory(conf: Config)(implicit system: ActorSystem, mat: ActorMaterializer) {
 
