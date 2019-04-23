@@ -17,7 +17,6 @@ import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import scala.collection.JavaConverters._
-import scala.collection.immutable
 import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success}
 
@@ -297,17 +296,24 @@ object Scheduler {
 
   private[core] def persistenceFlow(
       podRecordRepository: PodRecordRepository): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
-    Flow[SchedulerEvents].mapConcat { events =>
-      val ops: List[() => Future[Option[SchedulerEvents]]] = events.stateEvents.collect {
-        case PodRecordUpdated(_, Some(podRecord)) =>
-          () =>
-            podRecordRepository.store(podRecord).map(_ => None)(CallerThreadExecutionContext.context)
-        case PodRecordUpdated(podId, None) =>
-          () =>
-            podRecordRepository.delete(podId).map(_ => None)(CallerThreadExecutionContext.context)
-      }
-      (() => Future.successful(Some(events))) +: ops
-    }.mapAsync(PipeliningLimit)(call => call()).collect { case Some(events) => events }
+    Flow[SchedulerEvents]
+      .mapConcat(persistEvents(_, podRecordRepository))
+      .mapAsync(PipeliningLimit)(call => call())
+      .collect { case Some(events) => events }
+  }
+
+  private def persistEvents(
+      events: SchedulerEvents,
+      podRecordRepository: PodRecordRepository): List[() => Future[Option[SchedulerEvents]]] = {
+    val ops: List[() => Future[Option[SchedulerEvents]]] = events.stateEvents.collect {
+      case PodRecordUpdated(_, Some(podRecord)) =>
+        () =>
+          podRecordRepository.store(podRecord).map(_ => None)(CallerThreadExecutionContext.context)
+      case PodRecordUpdated(podId, None) =>
+        () =>
+          podRecordRepository.delete(podId).map(_ => None)(CallerThreadExecutionContext.context)
+    }
+    ops :+ (() => Future.successful(Some(events)))
   }
 
   private def isMultiRoleFramework(frameworkInfo: FrameworkInfo): Boolean =

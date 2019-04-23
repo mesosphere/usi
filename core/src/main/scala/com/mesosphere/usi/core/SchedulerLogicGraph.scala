@@ -5,7 +5,6 @@ import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.models.{PodId, PodRecord, SpecEvent, StateSnapshot}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
-
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
