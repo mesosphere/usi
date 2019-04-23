@@ -118,7 +118,8 @@ object CoreHelloWorldFramework extends StrictLogging {
     val podId = PodId(s"hello-world.${UUID.randomUUID()}")
     val runSpec = RunSpec(
       resourceRequirements = List(ScalarRequirement.cpus(0.1), ScalarRequirement.memory(32)),
-      shellCommand = """echo "Hello, world" && sleep 123456789"""
+      shellCommand = """echo "Hello, world" && sleep 123456789""",
+      role = "test"
     )
     val podSpec = PodSpec(
       id = podId,

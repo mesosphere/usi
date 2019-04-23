@@ -19,7 +19,8 @@ class MesosEventsLogicTest extends UnitTest {
     Goal.Running,
     RunSpec(
       List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
-      shellCommand = "sleep 3600")
+      shellCommand = "sleep 3600",
+      "test")
   )
 
   "MesosEventsLogic" should {

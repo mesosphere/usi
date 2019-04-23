@@ -16,4 +16,5 @@ import com.mesosphere.usi.core.models.resources.ResourceRequirement
 case class RunSpec(
     resourceRequirements: Seq[ResourceRequirement],
     shellCommand: String,
+    role: String,
     fetch: Seq[FetchUri] = Seq.empty)
