@@ -23,8 +23,8 @@ allprojects {
     apply plugin: "scala"
     apply plugin: 'cz.alenkacz.gradle.scalafmt'
 
-    sourceCompatibility = 1.11
-    targetCompatibility = 1.11
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
     compileScala.targetCompatibility = 1.8
 
     archivesBaseName = "usi-${it.name}"
@@ -94,8 +94,8 @@ scaladoc {
 
 idea {
   project {
-    jdkName = '1.11'
-    languageLevel = '1.11'
+    jdkName = '1.8'
+    languageLevel = '1.8'
     vcs = 'Git'
   }
 }

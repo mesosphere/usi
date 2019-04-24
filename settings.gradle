@@ -19,3 +19,5 @@ project(':mesos-client-example').projectDir = new File('examples/mesos-client-ex
 include 'simple-hello-world'
 project(':simple-hello-world')?.projectDir = new File('examples/simple-hello-world')
 
+include 'keep-alive-framework'
+project(':keep-alive-framework')?.projectDir = new File('examples/keep-alive-framework')

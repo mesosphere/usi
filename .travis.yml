@@ -1,6 +1,6 @@
 sudo: required
 jdk:
-  - openjdk11
+  - openjdk8
 language: scala
 # this is necessary because otherwise travis runs gradlew assemble before out tasks
 # and if that is run, checkScalaFmtAll won't work
