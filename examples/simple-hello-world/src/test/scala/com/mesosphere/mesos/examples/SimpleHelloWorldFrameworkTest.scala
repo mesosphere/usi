@@ -42,7 +42,7 @@ class SimpleHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest {
     val mesosUrl = new java.net.URI(mesosFacade.url)
 
     val conf = ConfigFactory
-      .parseMap(util.Map.of("mesos-client.master-url", s"${mesosUrl.getHost}:${mesosUrl.getPort}"))
+      .parseMap(util.Collections.singletonMap("mesos-client.master-url", s"${mesosUrl.getHost}:${mesosUrl.getPort}"))
       .withFallback(ConfigFactory.load())
 
     val framework = SimpleHelloWorldFramework(conf.getConfig("mesos-client"))
