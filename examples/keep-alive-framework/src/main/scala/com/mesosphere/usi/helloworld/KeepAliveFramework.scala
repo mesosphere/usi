@@ -46,7 +46,7 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
       }
 
     case e =>
-      logger.error(s"Unhandled event: $e") // we ignore everything else for now
+      logger.warn(s"Unhandled event: $e") // we ignore everything else for now
       Nil
   }
 
