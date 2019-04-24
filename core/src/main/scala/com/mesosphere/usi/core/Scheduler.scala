@@ -4,6 +4,7 @@ import akka.{Done, NotUsed}
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, SinkQueueWithCancel, Source}
 import akka.stream.{BidiShape, FlowShape, KillSwitches, Materializer, OverflowStrategy, QueueOfferResult}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
+import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.{
   PodRecordUpdated,
   SpecEvent,
@@ -64,16 +65,7 @@ object Scheduler {
 
   type StateOutput = (StateSnapshot, Source[StateEvent, Any])
 
-  val PipeliningLimit = ConfigFactory.load().getInt("persistence.pipeline-limit")
-
-  def fromSnapshot(
-      specsSnapshot: SpecsSnapshot,
-      client: MesosClient,
-      podRecordRepository: PodRecordRepository): Flow[SpecUpdated, StateOutput, NotUsed] =
-    Flow[SpecUpdated]
-      .prefixAndTail(0)
-      .map { case (_, rest) => specsSnapshot -> rest }
-      .via(fromClient(client, podRecordRepository))
+  private val schedulerSettings = SchedulerSettings.fromConfig(ConfigFactory.load().getConfig("scheduler"))
 
   def asFlow(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository)(
       implicit materializer: Materializer): Future[(StateSnapshot, Flow[SpecUpdated, StateEvent, NotUsed])] = {
@@ -85,7 +77,6 @@ object Scheduler {
     snap.map { snapshot =>
       (snapshot, Flow.fromSinkAndSourceCoupled(sink, source))
     }
-
   }
 
   /**
@@ -265,7 +256,7 @@ object Scheduler {
   private[core] def unconnectedGraph(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
-    val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, podRecordRepository.readAll())
+    val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, () => podRecordRepository.readAll())
     BidiFlow.fromGraph {
       GraphDSL.create(schedulerLogicGraph) { implicit builder => (schedulerLogic) =>
         {
@@ -298,7 +289,7 @@ object Scheduler {
       podRecordRepository: PodRecordRepository): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
     Flow[SchedulerEvents]
       .mapConcat(persistEvents(_, podRecordRepository))
-      .mapAsync(PipeliningLimit)(call => call())
+      .mapAsync(schedulerSettings.persistencePipelineLimit)(call => call())
       .collect { case Some(events) => events }
   }
 

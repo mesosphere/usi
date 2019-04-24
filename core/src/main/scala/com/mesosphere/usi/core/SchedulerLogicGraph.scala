@@ -44,7 +44,7 @@ object SchedulerLogicGraph {
   */
 private[core] class SchedulerLogicGraph(
     mesosCallFactory: MesosCalls,
-    initialPodRecords: => Future[Map[PodId, PodRecord]])
+    initialPodRecords: () => Future[Map[PodId, PodRecord]])
     extends GraphStage[FanInShape2[SpecEvent, MesosEvent, SchedulerEvents]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
@@ -107,7 +107,7 @@ private[core] class SchedulerLogicGraph(
        * This code delays the starting of the scheduler stage until this podRecord snapshot is available.
        */
       override def preStart(): Unit =
-        initialPodRecords.onComplete(startGraph.invoke)(CallerThreadExecutionContext.context)
+        initialPodRecords().onComplete(startGraph.invoke)(CallerThreadExecutionContext.context)
 
       def pushOrQueueIntents(effects: SchedulerEvents): Unit = {
         if (isAvailable(frameResultOutlet)) {

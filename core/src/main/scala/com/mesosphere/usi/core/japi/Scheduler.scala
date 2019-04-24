@@ -24,24 +24,6 @@ object Scheduler {
   type StateOutput = akka.japi.Pair[StateSnapshot, javadsl.Source[StateEvent, Any]]
 
   /**
-    * Constructs a USI scheduler given an initial pod specs snapshot.
-    *
-    * @param specsSnapshot The initial snapshot of pod specs.
-    * @param client The [[MesosClient]] used to interact with Mesos.
-    * @return A [[javadsl]] flow from pod spec updates to state events.
-    */
-  def fromSnapshot(
-      specsSnapshot: SpecsSnapshot,
-      client: MesosClient,
-      podRecordRepository: PodRecordRepository): javadsl.Flow[SpecUpdated, StateOutput, NotUsed] = {
-    scaladsl
-      .Flow[SpecUpdated]
-      .via(ScalaScheduler.fromSnapshot(specsSnapshot, client, podRecordRepository))
-      .map { case (taken, tail) => akka.japi.Pair(taken, tail.asJava) }
-      .asJava
-  }
-
-  /**
     * Constructs a USI scheduler flow to managing pods.
     *
     * The input is a [[akka.japi.Pair]] of [[SpecsSnapshot]] and [[javadsl.Source]] of [[SpecInput]]. The output is a [[akka.japi.Pair]]

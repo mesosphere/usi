@@ -5,12 +5,14 @@ import akka.stream.scaladsl.{Flow, GraphDSL, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import akka.stream.{ActorMaterializer, FlowShape}
 import com.mesosphere.mesos.client.MesosCalls
+import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.usi.repository.InMemoryPodRecordRepository
 import com.mesosphere.utils.AkkaUnitTest
+import com.typesafe.config.ConfigFactory
 import java.time.Instant
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
@@ -146,7 +148,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   "Persistence flow honors the pipe-lining threshold" in {
     Given("a list of persistence operations with count strictly greater than twice the pipeline limit")
-    val limit = Scheduler.PipeliningLimit
+    val limit = SchedulerSettings.fromConfig(ConfigFactory.load().getConfig("scheduler")).persistencePipelineLimit
     val deleteEvents = (1 to limit * 2 + 1)
       .map(x => PodRecordUpdated(PodId("pod-" + x), None))
       .grouped(100)
