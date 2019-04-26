@@ -5,6 +5,8 @@ import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, SinkQueu
 import akka.stream.{BidiShape, FlowShape, KillSwitches, Materializer, OverflowStrategy, QueueOfferResult}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.conf.SchedulerSettings
+import com.mesosphere.usi.core.models.PodId
+import com.mesosphere.usi.core.models.PodRecord
 import com.mesosphere.usi.core.models.{
   PodRecordUpdated,
   SpecEvent,
@@ -18,6 +20,8 @@ import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import scala.collection.JavaConverters._
+import scala.concurrent.Await
+import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success}
 
@@ -70,7 +74,7 @@ object Scheduler {
   def asFlow(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository)(
       implicit materializer: Materializer): Future[(StateSnapshot, Flow[SpecUpdated, StateEvent, NotUsed])] = {
 
-    implicit val ec = scala.concurrent.ExecutionContext.Implicits.global //only for ultra-fast non-blocking onComplete
+    implicit val ec = scala.concurrent.ExecutionContext.Implicits.global //only for ultra-fast non-blocking map
 
     val (snap, source, sink) = asSourceAndSink(specsSnapshot, client, podRecordRepository)
 
@@ -256,7 +260,7 @@ object Scheduler {
   private[core] def unconnectedGraph(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
-    val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, () => podRecordRepository.readAll())
+    val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, loadPodRecords(podRecordRepository))
     BidiFlow.fromGraph {
       GraphDSL.create(schedulerLogicGraph) { implicit builder => (schedulerLogic) =>
         {
@@ -305,6 +309,17 @@ object Scheduler {
           podRecordRepository.delete(podId).map(_ => None)(CallerThreadExecutionContext.context)
     }
     ops :+ (() => Future.successful(Some(events)))
+  }
+
+  /*
+   * We don't start processing any commands until we've finished loading the entire set of podRecords
+   * This code delays building a scheduler stage until this podRecord snapshot is available.
+   *
+   * Block for IO - If the IO call fails or a timeout occurs, we should not make any progress.
+   */
+  private def loadPodRecords(podRecordRepository: PodRecordRepository): Map[PodId, PodRecord] = {
+    // Add better error handling (and maybe a retry mechanism).
+    Await.result(podRecordRepository.readAll(), schedulerSettings.persistenceLoadTimeout.seconds)
   }
 
   private def isMultiRoleFramework(frameworkInfo: FrameworkInfo): Boolean =

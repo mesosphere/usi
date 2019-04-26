@@ -6,8 +6,6 @@ import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.models.{PodId, PodRecord, SpecEvent, StateSnapshot}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 import scala.collection.mutable
-import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
 
 object SchedulerLogicGraph {
   val BUFFER_SIZE = 32
@@ -42,9 +40,7 @@ object SchedulerLogicGraph {
   * It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
   * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
-private[core] class SchedulerLogicGraph(
-    mesosCallFactory: MesosCalls,
-    initialPodRecords: () => Future[Map[PodId, PodRecord]])
+private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialPodRecords: Map[PodId, PodRecord])
     extends GraphStage[FanInShape2[SpecEvent, MesosEvent, SchedulerEvents]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
@@ -87,27 +83,11 @@ private[core] class SchedulerLogicGraph(
         }
       })
 
-      /**
-        * Callback which is called as soon as our initial pod snapshot is available
-        *
-        * Once this snapshot is available, we publish the initial state snapshot event; podStatuses will not be in the snapshot in the future
-        */
-      val startGraph = this.getAsyncCallback[Try[Map[PodId, PodRecord]]] {
-        case Success(podRecords) =>
-          handler = new SchedulerLogicHandler(mesosCallFactory, podRecords)
-          pushOrQueueIntents(
-            SchedulerEvents(stateEvents = List(StateSnapshot.empty.copy(podRecords = podRecords.values.toSeq))))
-          maybePull()
-        case Failure(ex) =>
-          this.failStage(ex)
+      override def preStart(): Unit = {
+        handler = new SchedulerLogicHandler(mesosCallFactory, initialPodRecords)
+        // Publish the initial state snapshot event; podStatuses will not be in the snapshot in the future
+        pushOrQueueIntents(SchedulerEvents(List(StateSnapshot(podRecords = initialPodRecords.values.toSeq))))
       }
-
-      /*
-       * We don't start processing any commands until we've finished loading the entire set of podRecords
-       * This code delays the starting of the scheduler stage until this podRecord snapshot is available.
-       */
-      override def preStart(): Unit =
-        initialPodRecords().onComplete(startGraph.invoke)(CallerThreadExecutionContext.context)
 
       def pushOrQueueIntents(effects: SchedulerEvents): Unit = {
         if (isAvailable(frameResultOutlet)) {
