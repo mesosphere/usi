@@ -14,10 +14,10 @@ import com.mesosphere.usi.core.models.SpecUpdated
 import com.mesosphere.usi.core.models.SpecsSnapshot
 import com.mesosphere.usi.core.models.StateEvent
 import com.mesosphere.usi.core.models.StateSnapshot
-import com.mesosphere.usi.repository.InMemoryPodRecordRepository
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
+import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import java.util
@@ -53,22 +53,16 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     val frameworkInfo = CoreHelloWorldFramework.buildFrameworkInfo
     val customPersistenceStore = InMemoryPodRecordRepository()
     customPersistenceStore.readAll().futureValue.size shouldBe 0
-    val (mesosClient, scheduler) = CoreHelloWorldFramework.buildGraph(conf, customPersistenceStore, frameworkInfo)
+    val (mesosClient, scheduler) = CoreHelloWorldFramework.init(conf, customPersistenceStore, frameworkInfo)
 
     And("an initial pod spec is launched")
     val specsSnapshot = CoreHelloWorldFramework.generateSpecSnapshot
-    val (_, sub1) = runGraphAndFeedSnapshot(scheduler, specsSnapshot)
+    val (_, sub) = runGraphAndFeedSnapshot(scheduler, specsSnapshot)
 
     Then("receive an empty snapshot followed by other state events")
-    val e1 = sub1.requestNext()
-    e1 shouldBe a[StateSnapshot]
-    e1.asInstanceOf[StateSnapshot].podRecords shouldBe empty
-    val e2 = sub1.requestNext()
-    e2 shouldBe a[PodRecordUpdated]
-    val e3 = sub1.requestNext()
-    e3 shouldBe a[PodStatusUpdated]
-    val podStatus = e3.asInstanceOf[PodStatusUpdated].newStatus
-    podStatus shouldBe defined
+    inside(sub.requestNext()) { case snap: StateSnapshot => snap.podRecords shouldBe empty }
+    inside(sub.requestNext()) { case _: PodRecordUpdated => () }
+    inside(sub.requestNext()) { case podStatus: PodStatusUpdated => podStatus.newStatus shouldBe defined }
 
     And("persistence storage has correct set of records")
     val podRecords = customPersistenceStore.readAll().futureValue.values
@@ -79,18 +73,18 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     mesosClient.killSwitch.abort(new RuntimeException("an intentional crash"))
 
     Then("upon recovery, emitted snapshot should have valid information")
-    val (newClient, newScheduler) = CoreHelloWorldFramework.buildGraph(conf, customPersistenceStore, frameworkInfo)
-    val (_, sub2) = runGraphAndFeedSnapshot(newScheduler, specsSnapshot)
-    val e4 = sub2.requestNext()
-    e4 shouldBe a[StateSnapshot]
-    e4.asInstanceOf[StateSnapshot].podRecords should contain theSameElementsAs podRecords
+    val (newClient, newScheduler) = CoreHelloWorldFramework.init(conf, customPersistenceStore, frameworkInfo)
+    val (_, newSub) = runGraphAndFeedSnapshot(newScheduler, specsSnapshot)
+    inside(newSub.requestNext()) {
+      case snap: StateSnapshot => snap.podRecords should contain theSameElementsAs podRecords
+    }
 
     And("no new pod records have been created")
     val newPodRecords = customPersistenceStore.readAll().futureValue.values
     newPodRecords should contain theSameElementsAs podRecords
 
     And("no further elements should be emitted")
-    assertThrows[AssertionError](sub2.expectNext(5.seconds)) // This is just a best effort check.
+    assertThrows[AssertionError](newSub.expectNext(5.seconds)) // This is just a best effort check.
     newClient.killSwitch.shutdown()
   }
 

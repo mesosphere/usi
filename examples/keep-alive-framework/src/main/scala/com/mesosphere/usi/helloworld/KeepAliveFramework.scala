@@ -6,7 +6,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.models._
-import com.mesosphere.usi.repository.InMemoryPodRecordRepository
+import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}

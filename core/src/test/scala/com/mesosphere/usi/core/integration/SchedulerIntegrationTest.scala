@@ -8,9 +8,9 @@ import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.core.models.resources.{RangeRequirement, ScalarRequirement}
-import com.mesosphere.usi.repository.InMemoryPodRecordRepository
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
+import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import org.apache.mesos.v1.Protos
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.scalatest.Inside

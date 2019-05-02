@@ -10,8 +10,8 @@ import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
-import com.mesosphere.usi.repository.InMemoryPodRecordRepository
 import com.mesosphere.utils.AkkaUnitTest
+import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.ConfigFactory
 import java.time.Instant
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}

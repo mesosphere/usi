@@ -13,7 +13,8 @@ import com.mesosphere.usi.core.Scheduler.SpecInput
 import com.mesosphere.usi.core.Scheduler.StateOutput
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodStatus, PodStatusUpdated, RunSpec, SpecsSnapshot}
-import com.mesosphere.usi.repository.{InMemoryPodRecordRepository, PodRecordRepository}
+import com.mesosphere.usi.repository.PodRecordRepository
+import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo, TaskState, TaskStatus}
@@ -125,7 +126,7 @@ object CoreHelloWorldFramework extends StrictLogging {
     )
   }
 
-  def buildGraph(
+  def init(
       conf: Config,
       podRecordRepository: PodRecordRepository,
       frameworkInfo: FrameworkInfo
@@ -137,7 +138,7 @@ object CoreHelloWorldFramework extends StrictLogging {
 
   def run(conf: Config)(implicit system: ActorSystem): CoreHelloWorldFramework = {
     implicit val mat = ActorMaterializer()
-    val (client, schedulerFlow) = buildGraph(conf, InMemoryPodRecordRepository(), buildFrameworkInfo)
+    val (client, schedulerFlow) = init(conf, InMemoryPodRecordRepository(), buildFrameworkInfo)
     val specsSnapshot = generateSpecSnapshot
 
     // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
@@ -148,7 +149,7 @@ object CoreHelloWorldFramework extends StrictLogging {
     // Note: this is hardly realistic since an orchestrator will need to react to StateEvents by sending SpecUpdates
     // to the scheduler. We're making our lives easier by ignoring this part for now - all we care about is to start
     // a "hello-world" task once.
-    val result: Future[Done] = Source.maybe
+    val completed: Future[Done] = Source.maybe
       .prepend(Source.single(specsSnapshot))
       .map(snapshot => (snapshot, Source.empty))
       // Here our initial snapshot is going to the scheduler flow
@@ -178,6 +179,6 @@ object CoreHelloWorldFramework extends StrictLogging {
       .toMat(Sink.ignore)(Keep.right)
       .run()
 
-    CoreHelloWorldFramework(client.frameworkId, client.killSwitch, result)
+    CoreHelloWorldFramework(client.frameworkId, client.killSwitch, completed)
   }
 }

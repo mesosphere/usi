@@ -1,5 +1,6 @@
 dependencies {
     implementation project(':metrics')
+    implementation project(':persistence')
 
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
     compile group: 'de.heikoseeberger', name: "akka-http-play-json_$scalaVersion", version: '1.18.1'

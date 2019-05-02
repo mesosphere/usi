@@ -1,7 +1,9 @@
-package com.mesosphere.usi.repository
+package com.mesosphere.utils.persistence
 
 import akka.Done
-import com.mesosphere.usi.core.models.{PodId, PodRecord}
+import com.mesosphere.usi.core.models.PodId
+import com.mesosphere.usi.core.models.PodRecord
+import com.mesosphere.usi.repository.PodRecordRepository
 import com.typesafe.scalalogging.StrictLogging
 import scala.collection.mutable
 import scala.concurrent.Future

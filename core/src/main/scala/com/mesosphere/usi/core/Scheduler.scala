@@ -318,7 +318,7 @@ object Scheduler {
    * Block for IO - If the IO call fails or a timeout occurs, we should not make any progress.
    */
   private def loadPodRecords(podRecordRepository: PodRecordRepository): Map[PodId, PodRecord] = {
-    // Add better error handling (and maybe a retry mechanism).
+    // Add error handling (and maybe a retry mechanism).
     Await.result(podRecordRepository.readAll(), schedulerSettings.persistenceLoadTimeout.seconds)
   }
 
