@@ -149,6 +149,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi">usi</a></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.conf" visbl="pub" class="indented5 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="conf"></a><a id="conf:conf"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#conf" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="conf/index.html"><span class="name">conf</span></a>
+      </span>
+      
+      
     </li><li name="com.mesosphere.usi.core.japi" visbl="pub" class="indented5 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="japi"></a><a id="japi:japi"></a>
       <span class="permalink">
@@ -238,9 +254,9 @@
                         <a class="class" href="SchedulerEventsBuilder.html" title="Immutable intents builder"></a>
                         <a href="SchedulerEventsBuilder.html" title="Immutable intents builder">SchedulerEventsBuilder</a>
                       </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="object" href="SchedulerLogicGraph$.html" title=""></a>
-                        <a class="class" href="SchedulerLogicGraph.html" title="A simple stateful fan-in graph stage that instantiates an instance of the SchedulerLogic, feeding messages from each of the two inputs as appropriate."></a>
-                        <a href="SchedulerLogicGraph.html" title="A simple stateful fan-in graph stage that instantiates an instance of the SchedulerLogic, feeding messages from each of the two inputs as appropriate.">SchedulerLogicGraph</a>
+                        <a href="SchedulerLogicGraph$.html" title="">SchedulerLogicGraph</a>
                       </li><li class="current-entities indented4">
                         <a class="object" href="SchedulerState$.html" title=""></a>
                         <a class="class" href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic."></a>
@@ -465,34 +481,6 @@ calls
       
       <p class="shortcomment cmt">Immutable intents builder</p><div class="fullcomment"><div class="comment cmt"><p>Immutable intents builder</p><p>Effects are appended in lazy fashion by using the exposed effect methods.</p><p>Effects preserve order. For append-efficiency a link-list data structure is used. List is lazily reversed when
 effects are asked for.</p><p>Note, SchedulerEventsBuilder will accumulate state events. The scheduler logic loop happens to consume this.
-</p></div></div>
-    </li><li name="com.mesosphere.usi.core.SchedulerLogicGraph" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="SchedulerLogicGraphextendsGraphStage[akka.stream.FanInShape2[com.mesosphere.usi.core.models.SpecEvent,org.apache.mesos.v1.scheduler.Protos.Event,com.mesosphere.usi.core.SchedulerEvents]]"></a><a id="SchedulerLogicGraph:SchedulerLogicGraph"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/index.html#SchedulerLogicGraphextendsGraphStage[akka.stream.FanInShape2[com.mesosphere.usi.core.models.SpecEvent,org.apache.mesos.v1.scheduler.Protos.Event,com.mesosphere.usi.core.SchedulerEvents]]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a title="A simple stateful fan-in graph stage that instantiates an instance of the SchedulerLogic, feeding messages from each of the two inputs as appropriate." href="SchedulerLogicGraph.html"><span class="name">SchedulerLogicGraph</span></a><span class="result"> extends <span class="extype" name="akka.stream.stage.GraphStage">GraphStage</span>[<span class="extype" name="akka.stream.FanInShape2">FanInShape2</span>[<a href="models/SpecEvent.html" class="extype" name="com.mesosphere.usi.core.models.SpecEvent">SpecEvent</a>, <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <a href="SchedulerEvents.html" class="extype" name="com.mesosphere.usi.core.SchedulerEvents">SchedulerEvents</a>]]</span>
-      </span>
-      
-      <p class="shortcomment cmt">A simple stateful fan-in graph stage that instantiates an instance of the SchedulerLogic, feeding messages from each
-of the two inputs as appropriate.</p><div class="fullcomment"><div class="comment cmt"><p>A simple stateful fan-in graph stage that instantiates an instance of the SchedulerLogic, feeding messages from each
-of the two inputs as appropriate.</p><p>This graph component looks like this:</p><p>     Spec Events   +---------------------+
-  -----------------&gt;                     |
-                   |                     |   Response
-                   |   Scheduler Logic   &gt;-------------
-    Mesos Events   |                     |
-  -----------------&gt;                     |
-                   +---------------------+</p><p>Only one event is processed at a time.</p><p>For more detail, see Scheduler</p><p>The component has an internal buffer; if this buffer is above BUFFER_SIZE, then it will stop pulling.</p><p>Author's Note:</p><p>This was prematurely implemented; a simple fan-in merge component would suffice for now. In early
-development phases of the scheduler, it seemed that having an actual BIDI flow stage with robust stream termination
-logic would've been needed.</p><p>It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
-likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
 </p></div></div>
     </li><li name="com.mesosphere.usi.core.SchedulerState" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="SchedulerStateextendsProductwithSerializable"></a><a id="SchedulerState:SchedulerState"></a>

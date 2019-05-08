@@ -133,6 +133,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi">usi</a></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.conf" visbl="pub" class="indented5 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="conf"></a><a id="conf:conf"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#conf" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="conf/index.html"><span class="name">conf</span></a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
     </li><li name="com.mesosphere.usi.core.japi" visbl="pub" class="indented5 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="japi"></a><a id="japi:japi"></a>
       <span class="permalink">
@@ -222,9 +238,9 @@
                         <a class="class" href="SchedulerEventsBuilder.html" title="Immutable intents builder"></a>
                         <a href="SchedulerEventsBuilder.html" title="Immutable intents builder">SchedulerEventsBuilder</a>
                       </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="object" href="SchedulerLogicGraph$.html" title=""></a>
-                        <a class="class" href="SchedulerLogicGraph.html" title="A simple stateful fan-in graph stage that instantiates an instance of the SchedulerLogic, feeding messages from each of the two inputs as appropriate."></a>
-                        <a href="SchedulerLogicGraph.html" title="A simple stateful fan-in graph stage that instantiates an instance of the SchedulerLogic, feeding messages from each of the two inputs as appropriate.">SchedulerLogicGraph</a>
+                        <a href="SchedulerLogicGraph$.html" title="">SchedulerLogicGraph</a>
                       </li><li class="current-entities indented4">
                         <a class="object" href="SchedulerState$.html" title=""></a>
                         <a class="class" href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic."></a>
@@ -432,9 +448,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.mesosphere.usi.core.Scheduler#asFlow" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="asFlow(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient)(implicitmaterializer:akka.stream.Materializer):scala.concurrent.Future[(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.SpecUpdated,com.mesosphere.usi.core.models.StateEvent,akka.NotUsed])]"></a><a id="asFlow(SpecsSnapshot,MesosClient)(Materializer):Future[(StateSnapshot,Flow[SpecUpdated,StateEvent,NotUsed])]"></a>
+      <a id="asFlow(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository)(implicitmaterializer:akka.stream.Materializer):scala.concurrent.Future[(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.SpecUpdated,com.mesosphere.usi.core.models.StateEvent,akka.NotUsed])]"></a><a id="asFlow(SpecsSnapshot,MesosClient,PodRecordRepository)(Materializer):Future[(StateSnapshot,Flow[SpecUpdated,StateEvent,NotUsed])]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/Scheduler$.html#asFlow(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient)(implicitmaterializer:akka.stream.Materializer):scala.concurrent.Future[(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.SpecUpdated,com.mesosphere.usi.core.models.StateEvent,akka.NotUsed])]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/Scheduler$.html#asFlow(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository)(implicitmaterializer:akka.stream.Materializer):scala.concurrent.Future[(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.SpecUpdated,com.mesosphere.usi.core.models.StateEvent,akka.NotUsed])]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -443,7 +459,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">asFlow</span><span class="params">(<span name="specsSnapshot">specsSnapshot: <a href="models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a></span>, <span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="materializer">materializer: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[(<a href="models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a>, <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<a href="models/SpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.SpecUpdated">SpecUpdated</a>, <a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>])]</span>
+        <span class="name">asFlow</span><span class="params">(<span name="specsSnapshot">specsSnapshot: <a href="models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a></span>, <span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="materializer">materializer: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[(<a href="models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a>, <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<a href="models/SpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.SpecUpdated">SpecUpdated</a>, <a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>])]</span>
       </span>
       
       
@@ -480,9 +496,9 @@
       
       
     </li><li name="com.mesosphere.usi.core.Scheduler#asSourceAndSink" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="asSourceAndSink(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient)(implicitmat:akka.stream.Materializer):(scala.concurrent.Future[com.mesosphere.usi.core.models.StateSnapshot],akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,akka.NotUsed],akka.stream.scaladsl.Sink[com.mesosphere.usi.core.models.SpecUpdated,akka.NotUsed])"></a><a id="asSourceAndSink(SpecsSnapshot,MesosClient)(Materializer):(Future[StateSnapshot],Source[StateEvent,NotUsed],Sink[SpecUpdated,NotUsed])"></a>
+      <a id="asSourceAndSink(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository)(implicitmat:akka.stream.Materializer):(scala.concurrent.Future[com.mesosphere.usi.core.models.StateSnapshot],akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,akka.NotUsed],akka.stream.scaladsl.Sink[com.mesosphere.usi.core.models.SpecUpdated,akka.NotUsed])"></a><a id="asSourceAndSink(SpecsSnapshot,MesosClient,PodRecordRepository)(Materializer):(Future[StateSnapshot],Source[StateEvent,NotUsed],Sink[SpecUpdated,NotUsed])"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/Scheduler$.html#asSourceAndSink(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient)(implicitmat:akka.stream.Materializer):(scala.concurrent.Future[com.mesosphere.usi.core.models.StateSnapshot],akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,akka.NotUsed],akka.stream.scaladsl.Sink[com.mesosphere.usi.core.models.SpecUpdated,akka.NotUsed])" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/Scheduler$.html#asSourceAndSink(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository)(implicitmat:akka.stream.Materializer):(scala.concurrent.Future[com.mesosphere.usi.core.models.StateSnapshot],akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,akka.NotUsed],akka.stream.scaladsl.Sink[com.mesosphere.usi.core.models.SpecUpdated,akka.NotUsed])" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -491,7 +507,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">asSourceAndSink</span><span class="params">(<span name="specsSnapshot">specsSnapshot: <a href="models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a></span>, <span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="mat">mat: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: (<span class="extype" name="scala.concurrent.Future">Future</span>[<a href="models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a>], <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>], <span class="extype" name="akka.stream.scaladsl.Sink">Sink</span>[<a href="models/SpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.SpecUpdated">SpecUpdated</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>])</span>
+        <span class="name">asSourceAndSink</span><span class="params">(<span name="specsSnapshot">specsSnapshot: <a href="models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a></span>, <span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="mat">mat: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: (<span class="extype" name="scala.concurrent.Future">Future</span>[<a href="models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a>], <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>], <span class="extype" name="akka.stream.scaladsl.Sink">Sink</span>[<a href="models/SpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.SpecUpdated">SpecUpdated</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>])</span>
       </span>
       
       <p class="shortcomment cmt">Represents the scheduler as a Sink and Source.</p><div class="fullcomment"><div class="comment cmt"><p>Represents the scheduler as a Sink and Source.</p><p>This method will materialize the scheduler first, then Sink and Source can be materialized independently, but only once.
@@ -575,9 +591,9 @@
               
         </dd></dl></div>
     </li><li name="com.mesosphere.usi.core.Scheduler#fromClient" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="fromClient(client:com.mesosphere.mesos.client.MesosClient):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.Scheduler.SpecInput,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]"></a><a id="fromClient(MesosClient):Flow[SpecInput,StateOutput,NotUsed]"></a>
+      <a id="fromClient(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.Scheduler.SpecInput,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]"></a><a id="fromClient(MesosClient,PodRecordRepository):Flow[SpecInput,StateOutput,NotUsed]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/Scheduler$.html#fromClient(client:com.mesosphere.mesos.client.MesosClient):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.Scheduler.SpecInput,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/Scheduler$.html#fromClient(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.Scheduler.SpecInput,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -586,14 +602,14 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">fromClient</span><span class="params">(<span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<a href="#SpecInput=(com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.SpecInput">SpecInput</a>, <a href="#StateOutput=(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">fromClient</span><span class="params">(<span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<a href="#SpecInput=(com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.SpecInput">SpecInput</a>, <a href="#StateOutput=(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
       </span>
       
       
     </li><li name="com.mesosphere.usi.core.Scheduler#fromFlow" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="fromFlow(mesosCallFactory:com.mesosphere.mesos.client.MesosCalls,mesosFlow:akka.stream.scaladsl.Flow[org.apache.mesos.v1.scheduler.Protos.Call,org.apache.mesos.v1.scheduler.Protos.Event,Any]):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.Scheduler.SpecInput,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]"></a><a id="fromFlow(MesosCalls,Flow[Call,Event,Any]):Flow[SpecInput,StateOutput,NotUsed]"></a>
+      <a id="fromFlow(mesosCallFactory:com.mesosphere.mesos.client.MesosCalls,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,mesosFlow:akka.stream.scaladsl.Flow[org.apache.mesos.v1.scheduler.Protos.Call,org.apache.mesos.v1.scheduler.Protos.Event,Any]):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.Scheduler.SpecInput,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]"></a><a id="fromFlow(MesosCalls,PodRecordRepository,Flow[Call,Event,Any]):Flow[SpecInput,StateOutput,NotUsed]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/Scheduler$.html#fromFlow(mesosCallFactory:com.mesosphere.mesos.client.MesosCalls,mesosFlow:akka.stream.scaladsl.Flow[org.apache.mesos.v1.scheduler.Protos.Call,org.apache.mesos.v1.scheduler.Protos.Event,Any]):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.Scheduler.SpecInput,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/Scheduler$.html#fromFlow(mesosCallFactory:com.mesosphere.mesos.client.MesosCalls,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,mesosFlow:akka.stream.scaladsl.Flow[org.apache.mesos.v1.scheduler.Protos.Call,org.apache.mesos.v1.scheduler.Protos.Event,Any]):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.Scheduler.SpecInput,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -602,23 +618,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">fromFlow</span><span class="params">(<span name="mesosCallFactory">mesosCallFactory: <a href="../../mesos/client/MesosCalls.html" class="extype" name="com.mesosphere.mesos.client.MesosCalls">MesosCalls</a></span>, <span name="mesosFlow">mesosFlow: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>, <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<a href="#SpecInput=(com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.SpecInput">SpecInput</a>, <a href="#StateOutput=(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.Scheduler#fromSnapshot" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="fromSnapshot(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.SpecUpdated,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]"></a><a id="fromSnapshot(SpecsSnapshot,MesosClient):Flow[SpecUpdated,StateOutput,NotUsed]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/Scheduler$.html#fromSnapshot(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient):akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.SpecUpdated,com.mesosphere.usi.core.Scheduler.StateOutput,akka.NotUsed]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">fromSnapshot</span><span class="params">(<span name="specsSnapshot">specsSnapshot: <a href="models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a></span>, <span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<a href="models/SpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.SpecUpdated">SpecUpdated</a>, <a href="#StateOutput=(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">fromFlow</span><span class="params">(<span name="mesosCallFactory">mesosCallFactory: <a href="../../mesos/client/MesosCalls.html" class="extype" name="com.mesosphere.mesos.client.MesosCalls">MesosCalls</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="mesosFlow">mesosFlow: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>, <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<a href="#SpecInput=(com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.SpecInput">SpecInput</a>, <a href="#StateOutput=(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
       </span>
       
       
@@ -762,22 +762,6 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.Scheduler#unconnectedGraph" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="unconnectedGraph(mesosCallFactory:com.mesosphere.mesos.client.MesosCalls):akka.stream.scaladsl.BidiFlow[com.mesosphere.usi.core.Scheduler.SpecInput,com.mesosphere.usi.core.Scheduler.StateOutput,org.apache.mesos.v1.scheduler.Protos.Event,org.apache.mesos.v1.scheduler.Protos.Call,akka.NotUsed]"></a><a id="unconnectedGraph(MesosCalls):BidiFlow[SpecInput,StateOutput,Event,Call,NotUsed]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/Scheduler$.html#unconnectedGraph(mesosCallFactory:com.mesosphere.mesos.client.MesosCalls):akka.stream.scaladsl.BidiFlow[com.mesosphere.usi.core.Scheduler.SpecInput,com.mesosphere.usi.core.Scheduler.StateOutput,org.apache.mesos.v1.scheduler.Protos.Event,org.apache.mesos.v1.scheduler.Protos.Call,akka.NotUsed]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">unconnectedGraph</span><span class="params">(<span name="mesosCallFactory">mesosCallFactory: <a href="../../mesos/client/MesosCalls.html" class="extype" name="com.mesosphere.mesos.client.MesosCalls">MesosCalls</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.BidiFlow">BidiFlow</span>[<a href="#SpecInput=(com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.SpecInput">SpecInput</a>, <a href="#StateOutput=(com.mesosphere.usi.core.models.StateSnapshot,akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,Any])" class="extmbr" name="com.mesosphere.usi.core.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">

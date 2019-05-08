@@ -139,14 +139,6 @@
                         <a href="" title="Repository for PodRecord.">PodRecordRepository</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="class" href="RecordAlreadyExistsException.html" title=""></a>
-                        <a href="RecordAlreadyExistsException.html" title="">RecordAlreadyExistsException</a>
-                      </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="RecordNotFoundException.html" title=""></a>
-                        <a href="RecordNotFoundException.html" title="">RecordNotFoundException</a>
-                      </li><li class="current-entities indented4">
-                        <span class="separator"></span>
                         <a class="trait" href="RecordRepository.html" title=""></a>
                         <a href="RecordRepository.html" title="">RecordRepository</a>
                       </li><li class="current-entities indented4">
@@ -187,7 +179,12 @@
             Linear Supertypes
           </span>
           <div class="superTypes hiddenContent"><a href="RecordRepository.html" class="extype" name="com.mesosphere.usi.repository.RecordRepository">RecordRepository</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
-        </div></div>
+        </div><div class="toggleContainer block">
+            <span class="toggle">
+              Known Subclasses
+            </span>
+            <div class="subClasses hiddenContent"><a href="../../utils/persistence/InMemoryPodRecordRepository.html" class="extype" name="com.mesosphere.utils.persistence.InMemoryPodRecordRepository">InMemoryPodRecordRepository</a></div>
+          </div></div>
         
 
       <div id="mbrsel">
@@ -271,10 +268,10 @@
 
         <div class="values members">
               <h3>Abstract Value Members</h3>
-              <ol><li name="com.mesosphere.usi.repository.RecordRepository#create" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="create(record:RecordRepository.this.Record):scala.concurrent.Future[RecordRepository.this.RecordId]"></a><a id="create(Record):Future[RecordId]"></a>
+              <ol><li name="com.mesosphere.usi.repository.RecordRepository#delete" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="delete(record:RecordRepository.this.RecordId):scala.concurrent.Future[akka.Done]"></a><a id="delete(RecordId):Future[Done]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/repository/PodRecordRepository.html#create(record:RecordRepository.this.Record):scala.concurrent.Future[RecordRepository.this.RecordId]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/repository/PodRecordRepository.html#delete(record:RecordRepository.this.RecordId):scala.concurrent.Future[akka.Done]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -283,15 +280,15 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">create</span><span class="params">(<span name="record">record: <a href="#Record=com.mesosphere.usi.core.models.PodRecord" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.Record">Record</a></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<a href="#RecordId=com.mesosphere.usi.core.models.PodId" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.RecordId">RecordId</a>]</span>
+        <span class="name">delete</span><span class="params">(<span name="record">record: <a href="#RecordId=com.mesosphere.usi.core.models.PodId" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.RecordId">RecordId</a></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="akka.Done">Done</span>]</span>
       </span>
       
-      <p class="shortcomment cmt">Stores the provided record in the repository if it doesn't exist.</p><div class="fullcomment"><div class="comment cmt"><p>Stores the provided record in the repository if it doesn't exist.
-If the record is already there, resulting future will be failed with a <a href="RecordAlreadyExistsException.html" class="extype" name="com.mesosphere.usi.repository.RecordAlreadyExistsException">RecordAlreadyExistsException</a>.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>id of the provided record</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="RecordRepository.html" class="extype" name="com.mesosphere.usi.repository.RecordRepository">RecordRepository</a></dd></dl></div>
-    </li><li name="com.mesosphere.usi.repository.RecordRepository#delete" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="delete(record:RecordRepository.this.Record):scala.concurrent.Future[RecordRepository.this.RecordId]"></a><a id="delete(Record):Future[RecordId]"></a>
+      <p class="shortcomment cmt">Deletes the record specified, returns completed future when this operation is confirmed to be applied</p><div class="fullcomment"><div class="comment cmt"><p>Deletes the record specified, returns completed future when this operation is confirmed to be applied</p><p>Note the guarantee described for <a href="RecordRepository.html" class="extype" name="com.mesosphere.usi.repository.RecordRepository">RecordRepository</a>
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="RecordRepository.html" class="extype" name="com.mesosphere.usi.repository.RecordRepository">RecordRepository</a></dd></dl></div>
+    </li><li name="com.mesosphere.usi.repository.RecordRepository#readAll" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="readAll():scala.concurrent.Future[Map[RecordRepository.this.RecordId,RecordRepository.this.Record]]"></a><a id="readAll():Future[Map[RecordId,Record]]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/repository/PodRecordRepository.html#delete(record:RecordRepository.this.Record):scala.concurrent.Future[RecordRepository.this.RecordId]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/repository/PodRecordRepository.html#readAll():scala.concurrent.Future[Map[RecordRepository.this.RecordId,RecordRepository.this.Record]]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -300,16 +297,17 @@ If the record is already there, resulting future will be failed with a <a href="
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">delete</span><span class="params">(<span name="record">record: <a href="#Record=com.mesosphere.usi.core.models.PodRecord" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.Record">Record</a></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<a href="#RecordId=com.mesosphere.usi.core.models.PodId" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.RecordId">RecordId</a>]</span>
+        <span class="name">readAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<a href="#RecordId=com.mesosphere.usi.core.models.PodId" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.RecordId">RecordId</a>, <a href="#Record=com.mesosphere.usi.core.models.PodRecord" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.Record">Record</a>]]</span>
       </span>
       
-      <p class="shortcomment cmt">Deletes the record if it exists.</p><div class="fullcomment"><div class="comment cmt"><p>Deletes the record if it exists. If the record is missing,
-* the future will be failed with an <a href="RecordNotFoundException.html" class="extype" name="com.mesosphere.usi.repository.RecordNotFoundException">RecordNotFoundException</a>.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>id of the deleted record</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="RecordRepository.html" class="extype" name="com.mesosphere.usi.repository.RecordRepository">RecordRepository</a></dd></dl></div>
-    </li><li name="com.mesosphere.usi.repository.RecordRepository#read" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="read(recordId:RecordRepository.this.RecordId):scala.concurrent.Future[Option[RecordRepository.this.Record]]"></a><a id="read(RecordId):Future[Option[Record]]"></a>
+      <p class="shortcomment cmt">Source that retrieves all the existing records (if any) at the time of materialization.</p><div class="fullcomment"><div class="comment cmt"><p>Source that retrieves all the existing records (if any) at the time of materialization. Creates a map containing
+all the current records on every materialization. Can be an empty map if there are no records.
+Source completes after emitting the current snapshot.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="RecordRepository.html" class="extype" name="com.mesosphere.usi.repository.RecordRepository">RecordRepository</a></dd></dl></div>
+    </li><li name="com.mesosphere.usi.repository.RecordRepository#store" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="store(record:RecordRepository.this.Record):scala.concurrent.Future[akka.Done]"></a><a id="store(Record):Future[Done]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/repository/PodRecordRepository.html#read(recordId:RecordRepository.this.RecordId):scala.concurrent.Future[Option[RecordRepository.this.Record]]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/repository/PodRecordRepository.html#store(record:RecordRepository.this.Record):scala.concurrent.Future[akka.Done]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -318,28 +316,11 @@ If the record is already there, resulting future will be failed with a <a href="
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">read</span><span class="params">(<span name="recordId">recordId: <a href="#RecordId=com.mesosphere.usi.core.models.PodId" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.RecordId">RecordId</a></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[<a href="#Record=com.mesosphere.usi.core.models.PodRecord" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.Record">Record</a>]]</span>
+        <span class="name">store</span><span class="params">(<span name="record">record: <a href="#Record=com.mesosphere.usi.core.models.PodRecord" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.Record">Record</a></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="akka.Done">Done</span>]</span>
       </span>
       
-      <p class="shortcomment cmt">Retrieves the record if it exists.</p><div class="fullcomment"><div class="comment cmt"><p>Retrieves the record if it exists.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>Option(record) if it exists, None otherwise</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="RecordRepository.html" class="extype" name="com.mesosphere.usi.repository.RecordRepository">RecordRepository</a></dd></dl></div>
-    </li><li name="com.mesosphere.usi.repository.RecordRepository#update" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="update(record:RecordRepository.this.Record):scala.concurrent.Future[RecordRepository.this.RecordId]"></a><a id="update(Record):Future[RecordId]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/repository/PodRecordRepository.html#update(record:RecordRepository.this.Record):scala.concurrent.Future[RecordRepository.this.RecordId]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">update</span><span class="params">(<span name="record">record: <a href="#Record=com.mesosphere.usi.core.models.PodRecord" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.Record">Record</a></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<a href="#RecordId=com.mesosphere.usi.core.models.PodId" class="extmbr" name="com.mesosphere.usi.repository.PodRecordRepository.RecordId">RecordId</a>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">Updates the record if it exists.</p><div class="fullcomment"><div class="comment cmt"><p>Updates the record if it exists. If the record is missing,
-the future will be failed with an <a href="RecordNotFoundException.html" class="extype" name="com.mesosphere.usi.repository.RecordNotFoundException">RecordNotFoundException</a>.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>id of the updated record</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="RecordRepository.html" class="extype" name="com.mesosphere.usi.repository.RecordRepository">RecordRepository</a></dd></dl></div>
+      <p class="shortcomment cmt">Store the record specified, returns completed future when this operation is confirmed to be applied</p><div class="fullcomment"><div class="comment cmt"><p>Store the record specified, returns completed future when this operation is confirmed to be applied</p><p>Note the guarantee described for <a href="RecordRepository.html" class="extype" name="com.mesosphere.usi.repository.RecordRepository">RecordRepository</a>
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="RecordRepository.html" class="extype" name="com.mesosphere.usi.repository.RecordRepository">RecordRepository</a></dd></dl></div>
     </li></ol>
             </div>
 

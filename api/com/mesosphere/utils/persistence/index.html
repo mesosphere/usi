@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1 API  - com.mesosphere.utils.metrics</title>
-          <meta name="description" content="usi 0.1 API - com.mesosphere.utils.metrics" />
-          <meta name="keywords" content="usi 0.1 API com.mesosphere.utils.metrics" />
+          <title>usi 0.1 API  - com.mesosphere.utils.persistence</title>
+          <meta name="description" content="usi 0.1 API - com.mesosphere.utils.persistence" />
+          <meta name="keywords" content="usi 0.1 API com.mesosphere.utils.persistence" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -149,7 +149,7 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.utils">utils</a></dd></dl></div>
-    </li><li name="com.mesosphere.utils.metrics" visbl="pub" class="indented4 current" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.mesosphere.utils.metrics" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="metrics"></a><a id="metrics:metrics"></a>
       <span class="permalink">
       <a href="../../../com/mesosphere/utils/index.html#metrics" title="Permalink">
@@ -161,15 +161,11 @@
         <span class="kind">package</span>
       </span>
       <span class="symbol">
-        <span class="name">metrics</span>
+        <a title="" href="../metrics/index.html"><span class="name">metrics</span></a>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.utils">utils</a></dd></dl></div>
-    </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="object" href="DummyMetrics$.html" title="As the name suggest, this is a dummy metrics implementation of the Metrics interface found in the metrics module."></a>
-                        <a href="DummyMetrics$.html" title="As the name suggest, this is a dummy metrics implementation of the Metrics interface found in the metrics module.">DummyMetrics</a>
-                      </li><li name="com.mesosphere.utils.persistence" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.mesosphere.utils.persistence" visbl="pub" class="indented4 current" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="persistence"></a><a id="persistence:persistence"></a>
       <span class="permalink">
       <a href="../../../com/mesosphere/utils/index.html#persistence" title="Permalink">
@@ -181,11 +177,15 @@
         <span class="kind">package</span>
       </span>
       <span class="symbol">
-        <a title="" href="../persistence/index.html"><span class="name">persistence</span></a>
+        <span class="name">persistence</span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.utils">utils</a></dd></dl></div>
-    </li><li name="com.mesosphere.utils.zookeeper" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="InMemoryPodRecordRepository.html" title="A simple in memory implementation of the PodRecordRepository."></a>
+                        <a href="InMemoryPodRecordRepository.html" title="A simple in memory implementation of the PodRecordRepository.">InMemoryPodRecordRepository</a>
+                      </li><li name="com.mesosphere.utils.zookeeper" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="zookeeper"></a><a id="zookeeper:zookeeper"></a>
       <span class="permalink">
       <a href="../../../com/mesosphere/utils/index.html#zookeeper" title="Permalink">
@@ -210,8 +210,8 @@
       <div id="definition">
         <div class="big-circle package">p</div>
         <p id="owner"><a href="../../../index.html" class="extype" name="com">com</a>.<a href="../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../index.html" class="extype" name="com.mesosphere.utils">utils</a></p>
-        <h1>metrics<span class="permalink">
-      <a href="../../../../com/mesosphere/utils/metrics/index.html" title="Permalink">
+        <h1>persistence<span class="permalink">
+      <a href="../../../../com/mesosphere/utils/persistence/index.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -224,7 +224,7 @@
         <span class="kind">package</span>
       </span>
       <span class="symbol">
-        <span class="name">metrics</span>
+        <span class="name">persistence</span>
       </span>
       </h4>
 
@@ -232,65 +232,38 @@
           <div id="comment" class="fullcommenttop"></div>
         
 
-      <div id="mbrsel">
-        <div class="toggle"></div>
-        <div id="memberfilter">
-          <i class="material-icons arrow"></i>
-          <span class="input">
-            <input id="mbrsel-input" placeholder="Filter all members" type="text" accesskey="/" />
-          </span>
-          <i class="clear material-icons"></i>
-        </div>
-        <div id="filterby">
-          <div id="order">
-            <span class="filtertype">Ordering</span>
-            <ol>
-              
-              <li class="alpha in"><span>Alphabetic</span></li>
-              
-            </ol>
-          </div>
-          
-          <div id="visbl">
-              <span class="filtertype">Visibility</span>
-              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
-            </div>
-        </div>
-      </div>
+      
 
       <div id="template">
         <div id="allMembers">
         
 
-        
-
-        
-
-        <div class="values members">
-              <h3>Value Members</h3>
-              <ol>
-                <li name="com.mesosphere.utils.metrics.DummyMetrics" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="DummyMetrics"></a><a id="DummyMetrics:DummyMetrics"></a>
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.mesosphere.utils.persistence.InMemoryPodRecordRepository" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="InMemoryPodRecordRepositoryextendsPodRecordRepositorywithStrictLoggingwithProductwithSerializable"></a><a id="InMemoryPodRecordRepository:InMemoryPodRecordRepository"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/metrics/index.html#DummyMetrics" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/persistence/index.html#InMemoryPodRecordRepositoryextendsPodRecordRepositorywithStrictLoggingwithProductwithSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">object</span>
+        <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="As the name suggest, this is a dummy metrics implementation of the Metrics interface found in the metrics module." href="DummyMetrics$.html"><span class="name">DummyMetrics</span></a><span class="result"> extends <a href="../../usi/metrics/Metrics.html" class="extype" name="com.mesosphere.usi.metrics.Metrics">Metrics</a></span>
+        <a title="A simple in memory implementation of the PodRecordRepository." href="InMemoryPodRecordRepository.html"><span class="name">InMemoryPodRecordRepository</span></a><span class="params">()</span><span class="result"> extends <a href="../../usi/repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
-      <p class="shortcomment cmt">As the name suggest, this is a dummy metrics implementation of the <span class="extype" name="Metrics">Metrics</span> interface found in the <code>metrics</code>
-module.</p><div class="fullcomment"><div class="comment cmt"><p>As the name suggest, this is a dummy metrics implementation of the <span class="extype" name="Metrics">Metrics</span> interface found in the <code>metrics</code>
-module. Should be used for testing only.
+      <p class="shortcomment cmt">A simple in memory implementation of the <span class="extype" name="PodRecordRepository">PodRecordRepository</span>.</p><div class="fullcomment"><div class="comment cmt"><p>A simple in memory implementation of the <span class="extype" name="PodRecordRepository">PodRecordRepository</span>. It should not be used in production but merely
+defines a common behavior to all CRUD repositories used by USI.
 </p></div></div>
-    </li>
-              </ol>
+    </li></ol>
             </div>
+
+        
+
+        
 
         
 

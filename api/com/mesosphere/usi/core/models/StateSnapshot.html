@@ -310,7 +310,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">StateSnapshot</span><span class="params">(<span name="podStatuses">podStatuses: <span class="extype" name="scala.Seq">Seq</span>[<a href="PodStatus.html" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a>]</span>, <span name="podRecords">podRecords: <span class="extype" name="scala.Seq">Seq</span>[<a href="PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>]</span>, <span name="agentRecords">agentRecords: <span class="extype" name="scala.Seq">Seq</span>[<a href="AgentRecord.html" class="extype" name="com.mesosphere.usi.core.models.AgentRecord">AgentRecord</a>]</span>, <span name="reservationStatuses">reservationStatuses: <span class="extype" name="scala.Seq">Seq</span>[<a href="ReservationStatus.html" class="extype" name="com.mesosphere.usi.core.models.ReservationStatus">ReservationStatus</a>]</span>)</span><span class="result"> extends <a href="StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">StateSnapshot</span><span class="params">(<span name="podRecords">podRecords: <span class="extype" name="scala.Seq">Seq</span>[<a href="PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>] = <span class="symbol">Nil</span></span>, <span name="agentRecords">agentRecords: <span class="extype" name="scala.Seq">Seq</span>[<a href="AgentRecord.html" class="extype" name="com.mesosphere.usi.core.models.AgentRecord">AgentRecord</a>] = <span class="symbol">Nil</span></span>)</span><span class="result"> extends <a href="StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -366,9 +366,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.core.models.StateSnapshot#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(podStatuses:Seq[com.mesosphere.usi.core.models.PodStatus],podRecords:Seq[com.mesosphere.usi.core.models.PodRecord],agentRecords:Seq[com.mesosphere.usi.core.models.AgentRecord],reservationStatuses:Seq[com.mesosphere.usi.core.models.ReservationStatus]):com.mesosphere.usi.core.models.StateSnapshot"></a><a id="&lt;init&gt;:StateSnapshot"></a>
+      <a id="&lt;init&gt;(podRecords:Seq[com.mesosphere.usi.core.models.PodRecord],agentRecords:Seq[com.mesosphere.usi.core.models.AgentRecord]):com.mesosphere.usi.core.models.StateSnapshot"></a><a id="&lt;init&gt;:StateSnapshot"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/StateSnapshot.html#&lt;init&gt;(podStatuses:Seq[com.mesosphere.usi.core.models.PodStatus],podRecords:Seq[com.mesosphere.usi.core.models.PodRecord],agentRecords:Seq[com.mesosphere.usi.core.models.AgentRecord],reservationStatuses:Seq[com.mesosphere.usi.core.models.ReservationStatus]):com.mesosphere.usi.core.models.StateSnapshot" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateSnapshot.html#&lt;init&gt;(podRecords:Seq[com.mesosphere.usi.core.models.PodRecord],agentRecords:Seq[com.mesosphere.usi.core.models.AgentRecord]):com.mesosphere.usi.core.models.StateSnapshot" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -377,7 +377,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">StateSnapshot</span><span class="params">(<span name="podStatuses">podStatuses: <span class="extype" name="scala.Seq">Seq</span>[<a href="PodStatus.html" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a>]</span>, <span name="podRecords">podRecords: <span class="extype" name="scala.Seq">Seq</span>[<a href="PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>]</span>, <span name="agentRecords">agentRecords: <span class="extype" name="scala.Seq">Seq</span>[<a href="AgentRecord.html" class="extype" name="com.mesosphere.usi.core.models.AgentRecord">AgentRecord</a>]</span>, <span name="reservationStatuses">reservationStatuses: <span class="extype" name="scala.Seq">Seq</span>[<a href="ReservationStatus.html" class="extype" name="com.mesosphere.usi.core.models.ReservationStatus">ReservationStatus</a>]</span>)</span>
+        <span class="name">StateSnapshot</span><span class="params">(<span name="podRecords">podRecords: <span class="extype" name="scala.Seq">Seq</span>[<a href="PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>] = <span class="symbol">Nil</span></span>, <span name="agentRecords">agentRecords: <span class="extype" name="scala.Seq">Seq</span>[<a href="AgentRecord.html" class="extype" name="com.mesosphere.usi.core.models.AgentRecord">AgentRecord</a>] = <span class="symbol">Nil</span></span>)</span>
       </span>
       
       
@@ -635,38 +635,6 @@
       </span>
       <span class="symbol">
         <span class="name">podRecords</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>]</span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.models.StateSnapshot#podStatuses" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="podStatuses:Seq[com.mesosphere.usi.core.models.PodStatus]"></a><a id="podStatuses:Seq[PodStatus]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/StateSnapshot.html#podStatuses:Seq[com.mesosphere.usi.core.models.PodStatus]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">podStatuses</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="PodStatus.html" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a>]</span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.models.StateSnapshot#reservationStatuses" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="reservationStatuses:Seq[com.mesosphere.usi.core.models.ReservationStatus]"></a><a id="reservationStatuses:Seq[ReservationStatus]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/StateSnapshot.html#reservationStatuses:Seq[com.mesosphere.usi.core.models.ReservationStatus]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">reservationStatuses</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<a href="ReservationStatus.html" class="extype" name="com.mesosphere.usi.core.models.ReservationStatus">ReservationStatus</a>]</span>
       </span>
       
       
