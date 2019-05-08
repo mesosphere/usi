@@ -8,6 +8,9 @@ application {
 
 dependencies {
     implementation project(':core')
-    testCompile project(':test-utils')
+    implementation project(':persistence')
+
+    // Use testCompile when we add implementation project(':persistence-zookeeper')
+    implementation project(':test-utils')
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 }

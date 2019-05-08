@@ -9,7 +9,7 @@ import com.mesosphere.utils.UnitTest
 class SchedulerLogicHandlerTest extends UnitTest {
   "produce a Mesos call with revive for new podspec role" in {
     Given("Scheduler logic handler with empty state")
-    val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId))
+    val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), Map.empty)
     val podId = PodId("pod")
 
     When("pod with role 'test-role' is updated")
@@ -28,7 +28,7 @@ class SchedulerLogicHandlerTest extends UnitTest {
 
   "produce a mesos call with suppress when all podspecs for that roles were launched" in {
     Given("Scheduler logic handler with not launched pod")
-    val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId))
+    val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), Map.empty)
     val podId = PodId("pod")
     // creates not launched pod in the internal state of scheduler logic
     handler.handleSpecEvent(

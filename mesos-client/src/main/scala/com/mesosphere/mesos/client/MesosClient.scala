@@ -297,7 +297,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
   def apply(conf: MesosClientSettings, frameworkInfo: FrameworkInfo)(
       implicit
       system: ActorSystem,
-      materializer: ActorMaterializer): Source[MesosClient, NotUsed] = {
+      materializer: Materializer): Source[MesosClient, NotUsed] = {
 
     val initialUrl =
       if (conf.master.toLowerCase().startsWith("http://"))
