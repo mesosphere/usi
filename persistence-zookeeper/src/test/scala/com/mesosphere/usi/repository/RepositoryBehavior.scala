@@ -19,6 +19,7 @@ import com.mesosphere.utils.UnitTest
   * should follow. See the unit tests of the Zookeeper persistence package for an example.
   */
 trait RepositoryBehavior extends AkkaUnitTestLike { this: UnitTest =>
+  // This trait should ideally be located in test-utils module but moving this to test-utils will result in a cyclic dependency.
 
   val podCount = new AtomicInteger()
 
