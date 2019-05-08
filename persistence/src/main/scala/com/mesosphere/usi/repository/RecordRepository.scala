@@ -1,7 +1,13 @@
 package com.mesosphere.usi.repository
 
+import akka.Done
 import scala.concurrent.Future
 
+/*
+ * Order of execution must be respected! If a store for record A is invoked, then delete for record A is invoked, in
+ * serial without waiting for the completion of each returned future, then the implementation MUST apply these
+ * operations in order
+ */
 trait RecordRepository {
 
   type Record
@@ -9,38 +15,23 @@ trait RecordRepository {
   type RecordId
 
   /**
-    * Stores the provided record in the repository if it doesn't exist.
-    * If the record is already there, resulting future will be failed with a [[RecordAlreadyExistsException]].
-    * @param record
-    * @return id of the provided record
-    */
-  def create(record: Record): Future[RecordId]
-
-  /**
-    * Retrieves the record if it exists.
-    * @param recordId
-    * @return Option(record) if it exists, None otherwise
-    */
-  def read(recordId: RecordId): Future[Option[Record]]
-
-  /**
-    * Updates the record if it exists. If the record is missing,
-    * the future will be failed with an [[RecordNotFoundException]].
+    * Deletes the record specified, returns completed future when this operation is confirmed to be applied
     *
-    * @param record
-    * @return id of the updated record
+    * Note the guarantee described for [[RecordRepository]]
     */
-  def update(record: Record): Future[RecordId]
+  def delete(record: RecordId): Future[Done]
 
   /**
-    * Deletes the record if it exists. If the record is missing,
-    * * the future will be failed with an [[RecordNotFoundException]].
+    * Store the record specified, returns completed future when this operation is confirmed to be applied
     *
-    * @param record
-    * @return id of the deleted record
+    * Note the guarantee described for [[RecordRepository]]
     */
-  def delete(record: Record): Future[RecordId]
+  def store(record: Record): Future[Done]
+
+  /**
+    * Source that retrieves all the existing records (if any) at the time of materialization. Creates a map containing
+    * all the current records on every materialization. Can be an empty map if there are no records.
+    * Source completes after emitting the current snapshot.
+    */
+  def readAll(): Future[Map[RecordId, Record]]
 }
-
-class RecordAlreadyExistsException(id: String) extends RuntimeException(s"record with id $id already exists.")
-class RecordNotFoundException(id: String) extends RuntimeException(s"record with id $id doesn't exist.")

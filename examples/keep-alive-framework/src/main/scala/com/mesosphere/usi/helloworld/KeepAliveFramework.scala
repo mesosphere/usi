@@ -10,6 +10,7 @@ import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.helloworld.runspecs.InMemoryDemoRunSpecService
 import com.mesosphere.usi.helloworld.http.Routes
 import com.mesosphere.usi.helloworld.keepalive.KeepAliveWatcher
+import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 
@@ -24,13 +25,15 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 
   val client = new KeepAliveMesosClientFactory(conf).client
 
+  val podRecordRepository = InMemoryPodRecordRepository()
 
 
-  val (stateSnapshot, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, client)
+  val (stateSnapshot, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, client, podRecordRepository)
 
   val sharableSink = MergeHub.source.to(sink).run()
 
   val sharableSource = source.toMat(BroadcastHub.sink)(Keep.right).run()
+
 
   val appsService = new InMemoryDemoRunSpecService(sharableSink, sharableSource)
 

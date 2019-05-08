@@ -58,7 +58,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
         val (snapshotF, _, _) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
         specInputQueue.pull().futureValue
 
-        val stateSnapshot = StateSnapshot(List(PodStatus(podSpec.id, Map.empty)), Nil, Nil, Nil)
+        val stateSnapshot = StateSnapshot(Nil, Nil)
 
         stateOutputQueue.offer(stateSnapshot -> Source.maybe)
 

@@ -27,12 +27,14 @@ case class FrameResultBuilder(
     if (schedulerEvents == SchedulerEvents.empty)
       this
     else {
-      val newDirty = dirtyPodIds ++ schedulerEvents.stateEvents.iterator.collect {
-        case podEvent: PodStateEvent => podEvent.id
-        case _: StateSnapshot =>
-          // We need to handle status snapshots and create a mechanism to signal that all cache should be recomputed
-          ???
-      }
+      val newDirty: Set[PodId] = dirtyPodIds ++ schedulerEvents.stateEvents.iterator
+        .collect[Set[PodId]] {
+          case podEvent: PodStateEvent => Set(podEvent.id)
+          // We need to handle status snapshots with a mechanism to signal that all cache should be recomputed
+          case snapshot: StateSnapshot => snapshot.podRecords.map(_.podId).toSet
+        }
+        .flatten
+
       copy(
         state = state.applyStateIntents(schedulerEvents.stateEvents),
         dirtyPodIds = newDirty,
