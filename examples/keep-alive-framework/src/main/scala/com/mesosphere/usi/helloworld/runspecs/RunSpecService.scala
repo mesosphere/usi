@@ -35,13 +35,11 @@ case class DeploymentId(value: String)
 
 case class RunSpecInfo(id: RunSpecId, runSpec: RunSpec, status: String)
 
-
 case class RunSpecInstanceId(runSpecId: RunSpecId, instanceId: UUID, incarnation: Long) {
   def toPodId: PodId = PodId(s"${runSpecId.value}.${instanceId.toString}.$incarnation")
   def nextIncarnation: RunSpecInstanceId = {
     RunSpecInstanceId(runSpecId, instanceId, incarnation + 1)
   }
-
 
   override def toString: String = {
     s"${runSpecId.value}.${instanceId.toString}"

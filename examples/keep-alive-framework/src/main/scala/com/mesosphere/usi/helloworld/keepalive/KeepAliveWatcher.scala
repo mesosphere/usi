@@ -2,7 +2,17 @@ package com.mesosphere.usi.helloworld.keepalive
 
 import akka.{NotUsed}
 import akka.stream.scaladsl.Flow
-import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodSpecUpdated, PodStatus, PodStatusUpdated, SpecUpdated, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.{
+  Goal,
+  PodId,
+  PodSpec,
+  PodSpecUpdated,
+  PodStatus,
+  PodStatusUpdated,
+  SpecUpdated,
+  StateEvent,
+  StateSnapshot
+}
 import com.mesosphere.usi.helloworld.runspecs.{RunSpecService, RunSpecInstanceId}
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}
@@ -12,8 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class KeepAliveWatcher(appsService: RunSpecService)(implicit val ec: ExecutionContext) extends LazyLogging {
 
   // KeepAliveWatcher looks for a terminal task and then restarts the whole pod.
-  val flow: Flow[StateEvent, SpecUpdated, NotUsed] = Flow[StateEvent]
-    .map {
+  val flow: Flow[StateEvent, SpecUpdated, NotUsed] = Flow[StateEvent].map {
     // Main state event handler. We log happy events and restart the pod if something goes wrong
     case s: StateSnapshot =>
       logger.info(s"Initial state snapshot: $s")
@@ -34,8 +43,7 @@ class KeepAliveWatcher(appsService: RunSpecService)(implicit val ec: ExecutionCo
     case e =>
       logger.warn(s"Unhandled event: $e") // we ignore everything else for now
       DoNothing
-  }
-    .mapAsync(1) {
+  }.mapAsync(1) {
 
       case DoNothing =>
         Future.successful(Nil)
@@ -47,19 +55,17 @@ class KeepAliveWatcher(appsService: RunSpecService)(implicit val ec: ExecutionCo
         appsService.findRunSpec(instanceId.runSpecId).map {
           // AppInfo found
           case Some(appInfo) =>
-              List(
-                PodSpecUpdated(podId, None), // Remove the currentPod
-                PodSpecUpdated(newPodId, Some(PodSpec(newPodId, Goal.Running, appInfo.runSpec))) // Launch the new pod
-              )
+            List(
+              PodSpecUpdated(podId, None), // Remove the currentPod
+              PodSpecUpdated(newPodId, Some(PodSpec(newPodId, Goal.Running, appInfo.runSpec))) // Launch the new pod
+            )
 
           // AppInfo was deleted
           case None =>
-          Nil
+            Nil
         }
     }
     .mapConcat(identity)
-
-
 
   sealed trait KeepAliveWatcherCommand
   case class SpawnNewIncarnation(podId: PodId) extends KeepAliveWatcherCommand

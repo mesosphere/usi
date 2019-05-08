@@ -5,13 +5,20 @@ import java.util.concurrent.ConcurrentHashMap
 import akka.stream.{Materializer, OverflowStrategy, QueueOfferResult}
 import akka.NotUsed
 import akka.stream.scaladsl.{Sink, Source}
-import com.mesosphere.usi.core.models.{Goal, PodSpec, PodSpecUpdated, PodStatusUpdated, RunSpec, SpecUpdated, StateEvent}
+import com.mesosphere.usi.core.models.{
+  Goal,
+  PodSpec,
+  PodSpecUpdated,
+  PodStatusUpdated,
+  RunSpec,
+  SpecUpdated,
+  StateEvent
+}
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import org.apache.mesos.v1.Protos.TaskState._
-
 
 /**
   * Simple in-memory implementation of the RunSpecService.
@@ -22,10 +29,11 @@ import org.apache.mesos.v1.Protos.TaskState._
   * @param mat
   * @param ec
   */
-class InMemoryDemoRunSpecService(specSink: Sink[SpecUpdated, NotUsed],
-                                 stateSource: Source[StateEvent, NotUsed])(
-    implicit mat: Materializer, ec: ExecutionContext)
-    extends RunSpecService with LazyLogging {
+class InMemoryDemoRunSpecService(specSink: Sink[SpecUpdated, NotUsed], stateSource: Source[StateEvent, NotUsed])(
+    implicit mat: Materializer,
+    ec: ExecutionContext)
+    extends RunSpecService
+    with LazyLogging {
 
   private val specUpdateQueue = Source
     .queue[List[SpecUpdated]](8, OverflowStrategy.dropNew)
@@ -43,25 +51,26 @@ class InMemoryDemoRunSpecService(specSink: Sink[SpecUpdated, NotUsed],
 
         case PodStatusUpdated(id, Some(newStatus)) =>
           // TODO fix this one pod status will be there
-          val newPodStaus = newStatus.taskStatuses.values.headOption.map(_.getState).map {
-            case TASK_STAGING | TASK_STARTING =>
-              Staging
+          val newPodStaus = newStatus.taskStatuses.values.headOption
+            .map(_.getState)
+            .map {
+              case TASK_STAGING | TASK_STARTING =>
+                Staging
 
-            case TASK_RUNNING =>
-              Running
+              case TASK_RUNNING =>
+                Running
 
-            case _ =>
-              Finished
+              case _ =>
+                Finished
 
-          }
+            }
             .getOrElse(Finished) // no tasks found
 
-        val appId = RunSpecInstanceId.fromPodId(id).runSpecId
+          val appId = RunSpecInstanceId.fromPodId(id).runSpecId
 
           database.computeIfPresent(appId, { (appId, state) =>
             state.copy(status = newPodStaus)
           })
-
 
         case other =>
       }
@@ -145,24 +154,13 @@ class InMemoryDemoRunSpecService(specSink: Sink[SpecUpdated, NotUsed],
     }
   }
 
-
-
-
-
-
-
   private def state2appInfo(state: RunSpecState): RunSpecInfo = {
     RunSpecInfo(state.runSpecInstanceId.runSpecId, state.runSpec, state.status.toString)
   }
 }
 
-
-
-
 private[runspecs] sealed trait Status
 private[runspecs] case object Staging extends Status
 private[runspecs] case object Running extends Status
 private[runspecs] case object Finished extends Status
-private[runspecs] case class RunSpecState(runSpecInstanceId: RunSpecInstanceId,
-                                          runSpec: RunSpec,
-                                          status: Status)
+private[runspecs] case class RunSpecState(runSpecInstanceId: RunSpecInstanceId, runSpec: RunSpec, status: Status)

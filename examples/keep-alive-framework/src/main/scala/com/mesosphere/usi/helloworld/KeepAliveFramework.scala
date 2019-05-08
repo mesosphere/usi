@@ -27,13 +27,11 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 
   val podRecordRepository = InMemoryPodRecordRepository()
 
-
   val (stateSnapshot, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, client, podRecordRepository)
 
   val sharableSink = MergeHub.source.to(sink).run()
 
   val sharableSource = source.toMat(BroadcastHub.sink)(Keep.right).run()
-
 
   val appsService = new InMemoryDemoRunSpecService(sharableSink, sharableSource)
 
@@ -42,7 +40,9 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
   val stopped = Promise[Done]()
 
   sharableSource
-    .watchTermination() { (m , f) => f.onComplete(stopped.complete); m}
+    .watchTermination() { (m, f) =>
+      f.onComplete(stopped.complete); m
+    }
     .via(keepAliveFlow.flow)
     .to(sharableSink)
     .run()

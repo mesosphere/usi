@@ -47,22 +47,22 @@ class Routes(appsService: RunSpecService) {
           }
         }
       } ~
-      pathPrefix("list") {
-        get {
-          onSuccess(appsService.listRunSpecs()) { apps =>
-            val jsonApps = apps.map(appInfo2Json)
+        pathPrefix("list") {
+          get {
+            onSuccess(appsService.listRunSpecs()) { apps =>
+              val jsonApps = apps.map(appInfo2Json)
 
-            complete(jsonApps)
+              complete(jsonApps)
+            }
+          }
+        } ~
+        pathPrefix("remove" / Segment) { appId =>
+          post {
+            onSuccess(appsService.wipeRunspec(RunSpecId(appId))) { _ =>
+              complete(StatusCodes.OK)
+            }
           }
         }
-      } ~
-      pathPrefix("remove" / Segment) { appId =>
-        post {
-          onSuccess(appsService.wipeRunspec(RunSpecId(appId))) { _ =>
-            complete(StatusCodes.OK)
-          }
-        }
-      }
     }
 
   def appInfo2Json(appInfo: RunSpecInfo): JsonAppInfo = {

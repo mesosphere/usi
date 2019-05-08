@@ -1,6 +1,5 @@
 package com.mesosphere.usi.helloworld.http
 
-
 /**
   * Set of classes used to marshall and unmarshall JSON entities.
   *
@@ -21,12 +20,7 @@ object JsonDTO {
 
   case class JsonApp(id: String, runSpec: JsonRunSpec)
 
-  case class JsonRunSpecDefinition(id: String,
-                                   cpus: Double,
-                                   mem: Double,
-                                   disk: Double,
-                                   command: String
-                        )
+  case class JsonRunSpecDefinition(id: String, cpus: Double, mem: Double, disk: Double, command: String)
 
   case class JsonAppInfo(id: String, runSpec: JsonRunSpec, status: String)
 
