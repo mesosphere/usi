@@ -10,4 +10,8 @@ dependencies {
     implementation project(':core')
     testCompile project(':test-utils')
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
+    compile group: 'io.circe', name: 'circe-core_2.12', version: '0.11.1'
+    compile group: 'io.circe', name: 'circe-generic_2.12', version: '0.11.1'
+    compile group: 'io.circe', name: 'circe-parser_2.12', version: '0.11.1'
+    compile group: 'de.heikoseeberger', name: 'akka-http-circe_2.12', version: '1.25.2'
 }

@@ -1,14 +1,20 @@
 package com.mesosphere.usi.helloworld
 
-import akka.NotUsed
+import akka.Done
 import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Flow
+import akka.stream.scaladsl.{BroadcastHub, Keep, MergeHub}
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.helloworld.runspecs.InMemoryDemoRunSpecService
+import com.mesosphere.usi.helloworld.http.Routes
+import com.mesosphere.usi.helloworld.keepalive.KeepAliveWatcher
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
-import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Promise}
 
 class KeepAliveFramework(conf: Config) extends StrictLogging {
 
@@ -18,73 +24,33 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 
   val client = new KeepAliveMesosClientFactory(conf).client
 
-  val runSpec = KeepAlivePodSpecHelper.runSpec
 
-  val specsSnapshot = KeepAlivePodSpecHelper.specsSnapshot(conf.getInt("keep-alive-framework.tasks-started"))
 
-  // KeepAliveWatcher looks for a terminal task and then restarts the whole pod.
-  val keepAliveWatcher: Flow[StateEvent, SpecUpdated, NotUsed] = Flow[StateEvent].mapConcat {
-    // Main state event handler. We log happy events and restart the pod if something goes wrong
-    case s: StateSnapshot =>
-      logger.info(s"Initial state snapshot: $s")
-      Nil
+  val (stateSnapshot, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, client)
 
-    case PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
-      import TaskState._
-      def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
-      // We're only interested in the bad task statuses for our pod
-      val failedTasks = taskStatuses.filterNot { case (id, status) => activeTask(status) }
-      if (failedTasks.nonEmpty) {
-        logger.info(s"Restarting Pod $id")
-        val newId = KeepAlivePodSpecHelper.createNewIncarnationId(id)
-        List(
-          PodSpecUpdated(id, None), // Remove the currentPod
-          PodSpecUpdated(newId, Some(PodSpec(newId, Goal.Running, runSpec))) // Launch the new pod
-        )
-      } else {
-        Nil
-      }
+  val sharableSink = MergeHub.source.to(sink).run()
 
-    case e =>
-      logger.warn(s"Unhandled event: $e") // we ignore everything else for now
-      Nil
-  }
+  val sharableSource = source.toMat(BroadcastHub.sink)(Keep.right).run()
 
-  val (stateSnapshot, source, sink) = Scheduler.asSourceAndSink(specsSnapshot, client)
+  val appsService = new InMemoryDemoRunSpecService(sharableSink, sharableSource)
 
-  /**
-    * This is the core part of this framework. Source with SpecEvents is pushing events to the keepAliveWatcher,
-    * which pushes the pod updates to the SpecUpdates Sink:
+  val keepAliveFlow = new KeepAliveWatcher(appsService)
 
-      +-----------------------+
-      |SpecEvents Source      |
-      |(What happened to pod) |
-      +----------+------------+
-                 |
-                 v
-      +----------+------------+
-      |keepAliveWatcher       |
-      |(listens to PodFinished|
-      |events and issues      |
-      |commands to spawn new  |
-      |pods)                  |
-      +----------+------------+
-                 |
-                 v
-      +----------+------------+
-      |SpecUpdates Sink       |
-      |(commands to launch    |
-      |new pods)              |
-      +-----------------------+
+  val stopped = Promise[Done]()
 
-    */
-  source
-    .via(keepAliveWatcher)
-    .to(sink)
+  sharableSource
+    .watchTermination() { (m , f) => f.onComplete(stopped.complete); m}
+    .via(keepAliveFlow.flow)
+    .to(sharableSink)
     .run()
 
-  // We let the framework run "forever"
-  io.StdIn.readLine("Keep alive framework is started")
+  val routes = new Routes(appsService)
+
+  Http().bindAndHandle(routes.root, "localhost", 8080)
+
+  Await.result(stopped.future, Duration.Inf)
+
+  system.terminate()
 
 }
 

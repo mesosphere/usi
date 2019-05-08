@@ -25,7 +25,7 @@ class KeepAliveMesosClientFactory(conf: Config)(implicit system: ActorSystem, ma
         .get("user.name")
         .getOrElse(throw new IllegalArgumentException("A local user is needed to launch Mesos tasks")))
     .setName("KeepAliveFramework")
-    .addRoles("test")
+    .addRoles(Configuration.role)
     .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .setFailoverTimeout(0d)
     .build()
