@@ -78,9 +78,9 @@ object Scheduler {
   }
 
   class SourceAndSinkResult(
-                             snap: CompletableFuture[StateSnapshot],
-                             source: Source[StateEventOrSnapshot, NotUsed],
-                             sink: Sink[SchedulerCommand, CompletableFuture[Done]]) {
+      snap: CompletableFuture[StateSnapshot],
+      source: Source[StateEventOrSnapshot, NotUsed],
+      sink: Sink[SchedulerCommand, CompletableFuture[Done]]) {
     def getSource: Source[StateEventOrSnapshot, NotUsed] = {
       source
     }

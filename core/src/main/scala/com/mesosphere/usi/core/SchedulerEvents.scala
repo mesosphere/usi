@@ -28,8 +28,8 @@ object SchedulerEvents {
   * Note, SchedulerEventsBuilder will accumulate state events. The scheduler logic loop happens to consume this.
   */
 case class SchedulerEventsBuilder(
-                                   reverseStateEvents: List[StateEventOrSnapshot] = Nil,
-                                   reverseMesosCalls: List[MesosCall] = Nil) {
+    reverseStateEvents: List[StateEventOrSnapshot] = Nil,
+    reverseMesosCalls: List[MesosCall] = Nil) {
   lazy val result = SchedulerEvents(reverseStateEvents.reverse, reverseMesosCalls.reverse)
 
   def ++(other: SchedulerEventsBuilder): SchedulerEventsBuilder = {

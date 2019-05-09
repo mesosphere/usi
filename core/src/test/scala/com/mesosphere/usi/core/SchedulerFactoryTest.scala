@@ -46,7 +46,8 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
   def newMockedScheduler[M, O](
       snapshot: StateSnapshot = StateSnapshot.empty,
       commandInputSink: Sink[SchedulerCommand, M],
-      stateEventsSource: Source[StateEventOrSnapshot, O]): (Flow[SchedulerCommand, Scheduler.StateOutput, NotUsed], M, O) = {
+      stateEventsSource: Source[StateEventOrSnapshot, O])
+    : (Flow[SchedulerCommand, Scheduler.StateOutput, NotUsed], M, O) = {
 
     val (m, preMaterializedCommandInput) =
       Flow[SchedulerCommand]

@@ -5,7 +5,14 @@ import akka.stream.{BidiShape, FlowShape, Materializer}
 import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.conf.SchedulerSettings
-import com.mesosphere.usi.core.models.{PodId, PodRecord, PodRecordUpdatedEvent, SchedulerCommand, StateEventOrSnapshot, StateSnapshot}
+import com.mesosphere.usi.core.models.{
+  PodId,
+  PodRecord,
+  PodRecordUpdatedEvent,
+  SchedulerCommand,
+  StateEventOrSnapshot,
+  StateSnapshot
+}
 import com.mesosphere.usi.repository.PodRecordRepository
 import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkInfo
@@ -58,8 +65,8 @@ object Scheduler {
 
   private val schedulerSettings = SchedulerSettings.fromConfig(ConfigFactory.load().getConfig("scheduler"))
 
-  def asFlow(client: MesosClient, podRecordRepository: PodRecordRepository)(
-      implicit materializer: Materializer): Future[(StateSnapshot, Flow[SchedulerCommand, StateEventOrSnapshot, NotUsed])] = {
+  def asFlow(client: MesosClient, podRecordRepository: PodRecordRepository)(implicit materializer: Materializer)
+    : Future[(StateSnapshot, Flow[SchedulerCommand, StateEventOrSnapshot, NotUsed])] = {
 
     implicit val ec = ExecutionContext.global //only for ultra-fast non-blocking map
 
@@ -133,19 +140,20 @@ object Scheduler {
     }
   }
 
-  private val stateOutputBreakoutFlow: Flow[StateEventOrSnapshot, StateOutput, NotUsed] = Flow[StateEventOrSnapshot].prefixAndTail(1).map {
-    case (Seq(snapshot), stateEvents) =>
-      val stateSnapshot = snapshot match {
-        case x: StateSnapshot => x
-        case _ => throw new IllegalStateException("First event is allowed to be only a state snapshot")
-      }
-      val stateUpdates = stateEvents.map {
-        case _: StateSnapshot =>
-          throw new IllegalStateException("Only the first event is allowed to be a state snapshot")
-        case event => event
-      }
-      (stateSnapshot, stateUpdates)
-  }
+  private val stateOutputBreakoutFlow: Flow[StateEventOrSnapshot, StateOutput, NotUsed] =
+    Flow[StateEventOrSnapshot].prefixAndTail(1).map {
+      case (Seq(snapshot), stateEvents) =>
+        val stateSnapshot = snapshot match {
+          case x: StateSnapshot => x
+          case _ => throw new IllegalStateException("First event is allowed to be only a state snapshot")
+        }
+        val stateUpdates = stateEvents.map {
+          case _: StateSnapshot =>
+            throw new IllegalStateException("Only the first event is allowed to be a state snapshot")
+          case event => event
+        }
+        (stateSnapshot, stateUpdates)
+    }
 
   private[core] def unconnectedGraph(mesosCallFactory: MesosCalls, podRecordRepository: PodRecordRepository)
     : BidiFlow[SchedulerCommand, StateOutput, MesosEvent, MesosCall, NotUsed] = {

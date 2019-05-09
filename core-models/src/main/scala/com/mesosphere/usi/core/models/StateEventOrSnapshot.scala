@@ -64,7 +64,7 @@ case class PodInvalid(id: PodId, errors: Seq[String]) extends UserError
 case class PodSpecUpdatedEvent(id: PodId, newState: Option[PodSpec]) extends StateEvent with PodStateEvent
 
 /** Sent each time a Mesos task status is received for one of the tasks in a pod.
- */
+  */
 case class PodStatusUpdatedEvent(id: PodId, newStatus: Option[PodStatus]) extends StateEvent with PodStateEvent
 
 /**
@@ -75,5 +75,9 @@ case class PodStatusUpdatedEvent(id: PodId, newStatus: Option[PodStatus]) extend
   * @param id
   * @param newRecord
   */
-case class PodRecordUpdatedEvent(id: PodId, newRecord: Option[PodRecord]) extends PersistedStateUpdatedEvent with PodStateEvent
-case class AgentRecordUpdatedEvent(id: PodId, newRecord: Option[AgentRecord]) extends PersistedStateUpdatedEvent with PodStateEvent
+case class PodRecordUpdatedEvent(id: PodId, newRecord: Option[PodRecord])
+    extends PersistedStateUpdatedEvent
+    with PodStateEvent
+case class AgentRecordUpdatedEvent(id: PodId, newRecord: Option[AgentRecord])
+    extends PersistedStateUpdatedEvent
+    with PodStateEvent
