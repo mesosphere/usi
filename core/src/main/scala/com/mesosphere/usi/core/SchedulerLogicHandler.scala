@@ -8,8 +8,8 @@ import com.mesosphere.usi.core.models.{
   PodInvalid,
   PodRecord,
   PodSpec,
-  PodSpecUpdated,
-  PodStatusUpdated,
+  PodSpecUpdatedEvent,
+  PodStatusUpdatedEvent,
   RunningPodSpec,
   SchedulerCommand
 }
@@ -138,7 +138,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialP
         val unknownOrConsiderTerminal = state.podStatuses.get(podId).forall(_.isTerminalOrUnreachable)
 
         if (unknownOrConsiderTerminal && state.podSpecs.get(podId).exists(_.isTerminal))
-          events.withStateEvent(PodSpecUpdated(podId, None))
+          events.withStateEvent(PodSpecUpdatedEvent(podId, None))
         else
           events
       }
@@ -154,7 +154,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialP
         val terminalLikeOrNoStatus = state.podStatuses.get(podId).exists(_.isTerminalOrUnreachable)
         // prune pod statuses if there is no podRecord associated with it
         if (terminalLikeOrNoStatus && !state.podRecords.contains(podId))
-          events.withStateEvent(PodStatusUpdated(podId, None))
+          events.withStateEvent(PodStatusUpdatedEvent(podId, None))
         else
           events
       }

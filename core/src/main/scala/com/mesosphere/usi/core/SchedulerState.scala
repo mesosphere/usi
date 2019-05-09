@@ -20,31 +20,31 @@ case class SchedulerState(
     * The difference between a stateIntent and a stateEvent is semantic; a stateIntent has not yet been applied to the
     * frame state. Once it has, it is then a stateEvent and is used for external replication and persistence.
     */
-  def applyStateIntents(stateIntents: List[StateEvent]): SchedulerState = {
+  def applyStateIntents(stateIntents: List[StateEventOrSnapshot]): SchedulerState = {
     var newPodRecords = podRecords
     var newPodStatuses = podStatuses
     var newPodSpecs = podSpecs
     stateIntents.foreach {
-      case recordChange: PodRecordUpdated =>
+      case recordChange: PodRecordUpdatedEvent =>
         recordChange.newRecord match {
           case Some(newRecord) =>
             newPodRecords = newPodRecords.updated(recordChange.id, newRecord)
           case None =>
             newPodRecords -= recordChange.id
         }
-      case statusChange: PodStatusUpdated =>
+      case statusChange: PodStatusUpdatedEvent =>
         statusChange.newStatus match {
           case Some(newStatus) =>
             newPodStatuses = newPodStatuses.updated(statusChange.id, newStatus)
           case None =>
             newPodStatuses -= statusChange.id
         }
-      case agentRecordChange: AgentRecordUpdated => ???
+      case agentRecordChange: AgentRecordUpdatedEvent => ???
       case stateSnapshot: StateSnapshot =>
         // TODO (DCOS-47476) Implement cache invalidation and handle snapshot fully
         newPodRecords = stateSnapshot.podRecords
           .foldLeft(newPodRecords)((acc, record) => acc.updated(record.podId, record))
-      case PodSpecUpdated(id, newState) =>
+      case PodSpecUpdatedEvent(id, newState) =>
         newState match {
           case Some(podSpec) =>
             newPodSpecs = podSpecs.updated(id, podSpec)

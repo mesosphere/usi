@@ -28,13 +28,13 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
     KeepAlivePodSpecHelper.specsSnapshot(conf.getInt("keep-alive-framework.tasks-started"))
 
   // KeepAliveWatcher looks for a terminal task and then restarts the whole pod.
-  val keepAliveWatcher: Flow[StateEvent, SchedulerCommand, NotUsed] = Flow[StateEvent].mapConcat {
+  val keepAliveWatcher: Flow[StateEventOrSnapshot, SchedulerCommand, NotUsed] = Flow[StateEventOrSnapshot].mapConcat {
     // Main state event handler. We log happy events and restart the pod if something goes wrong
     case s: StateSnapshot =>
       logger.info(s"Initial state snapshot: $s")
       Nil
 
-    case PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
+    case PodStatusUpdatedEvent(id, Some(PodStatus(_, taskStatuses))) =>
       import TaskState._
       def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
       // We're only interested in the bad task statuses for our pod

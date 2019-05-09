@@ -4,7 +4,7 @@ import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.SchedulerState
 import com.mesosphere.usi.core.helpers.MesosMock
-import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdated, RunSpec, RunningPodSpec, TaskId}
+import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunSpec, RunningPodSpec, TaskId}
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskStatus}
 import com.mesosphere.utils.UnitTest
@@ -82,8 +82,8 @@ class MesosEventsLogicTest extends UnitTest {
       events.mesosCalls.head.getAcknowledge.getTaskId shouldEqual taskId
 
       events.stateEvents.length shouldEqual 1
-      events.stateEvents.head shouldBe a[PodStatusUpdated]
-      val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdated]
+      events.stateEvents.head shouldBe a[PodStatusUpdatedEvent]
+      val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdatedEvent]
       podStatusUpdate.newStatus shouldBe defined
       podStatusUpdate.newStatus.get.taskStatuses should contain(
         TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus
@@ -110,8 +110,8 @@ class MesosEventsLogicTest extends UnitTest {
       events.mesosCalls.head.getAcknowledge.getTaskId shouldEqual taskId
 
       events.stateEvents.length shouldEqual 1
-      events.stateEvents.head shouldBe a[PodStatusUpdated]
-      val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdated]
+      events.stateEvents.head shouldBe a[PodStatusUpdatedEvent]
+      val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdatedEvent]
       podStatusUpdate.newStatus shouldBe defined
       podStatusUpdate.newStatus.get.taskStatuses should contain(
         TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus

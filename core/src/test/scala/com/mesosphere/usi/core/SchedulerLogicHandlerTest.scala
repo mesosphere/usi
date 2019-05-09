@@ -7,11 +7,11 @@ import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.usi.core.models.{
   LaunchPod,
   PodId,
-  PodRecordUpdated,
-  PodSpecUpdated,
-  PodStatusUpdated,
+  PodRecordUpdatedEvent,
+  PodSpecUpdatedEvent,
+  PodStatusUpdatedEvent,
   RunSpec,
-  StateEvent
+  StateEventOrSnapshot
 }
 import com.mesosphere.usi.core.protos.ProtoBuilders
 import com.mesosphere.utils.UnitTest
@@ -30,16 +30,16 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
     case call if call.hasAccept => call.getAccept
   }
 
-  def podRecordUpdatesIn(events: Seq[StateEvent]): Seq[PodRecordUpdated] = events.collect {
-    case podRecordUpdated: PodRecordUpdated => podRecordUpdated
+  def podRecordUpdatesIn(events: Seq[StateEventOrSnapshot]): Seq[PodRecordUpdatedEvent] = events.collect {
+    case podRecordUpdated: PodRecordUpdatedEvent => podRecordUpdated
   }
 
-  def podStatusUpdatesIn(events: Seq[StateEvent]): Seq[PodStatusUpdated] = events.collect {
-    case podStatusUpdated: PodStatusUpdated => podStatusUpdated
+  def podStatusUpdatesIn(events: Seq[StateEventOrSnapshot]): Seq[PodStatusUpdatedEvent] = events.collect {
+    case podStatusUpdated: PodStatusUpdatedEvent => podStatusUpdated
   }
 
-  def podSpecUpdatesIn(events: Seq[StateEvent]): Seq[PodSpecUpdated] = events.collect {
-    case podSpecUpdated: PodSpecUpdated => podSpecUpdated
+  def podSpecUpdatesIn(events: Seq[StateEventOrSnapshot]): Seq[PodSpecUpdatedEvent] = events.collect {
+    case podSpecUpdated: PodSpecUpdatedEvent => podSpecUpdated
   }
 
   "launching pods" should {
@@ -86,7 +86,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
 
       inside(handler.handleMesosEvent(newOfferEvent(offer))) {
         case SchedulerEvents(stateEvents, mesosCalls) =>
-          val Seq(PodRecordUpdated(_, Some(podRecord))) = podRecordUpdatesIn(stateEvents)
+          val Seq(PodRecordUpdatedEvent(_, Some(podRecord))) = podRecordUpdatesIn(stateEvents)
           podRecord.podId shouldBe podId
           podRecord.agentId shouldBe MesosMock.mockAgentId
 
@@ -96,7 +96,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
 
       inside(handler.handleMesosEvent(newTaskUpdateEvent(runningTaskStatus))) {
         case SchedulerEvents(stateEvents, mesosCalls) =>
-          val Some(podStatus) = stateEvents.collectFirst { case PodStatusUpdated(_, Some(podStatus)) => podStatus }
+          val Some(podStatus) = stateEvents.collectFirst { case PodStatusUpdatedEvent(_, Some(podStatus)) => podStatus }
           podStatus.id shouldBe podId
 
           mesosCalls.head.hasAcknowledge shouldBe true
@@ -119,7 +119,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
       val result = handler.handleMesosEvent(newTaskUpdateEvent(runningTaskStatus))
 
       Then("a podStatus should be emitted")
-      inside(result.stateEvents.collectFirst { case PodStatusUpdated(_, Some(podStatus)) => podStatus }) {
+      inside(result.stateEvents.collectFirst { case PodStatusUpdatedEvent(_, Some(podStatus)) => podStatus }) {
         case Some(podStatus) =>
           podStatus.id shouldBe podId
           podStatus.taskStatuses.size shouldBe 1
@@ -149,7 +149,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
       val resultForTerminalTaskStatus = handler.handleMesosEvent(newTaskUpdateEvent(terminalTaskStatus))
 
       Then("the podStatus should be cleared")
-      inside(resultForTerminalTaskStatus.stateEvents.collect { case p: PodStatusUpdated => p }) {
+      inside(resultForTerminalTaskStatus.stateEvents.collect { case p: PodStatusUpdatedEvent => p }) {
         case Seq(terminalUpdate, pruneUpdate) =>
           terminalUpdate.id shouldBe podId
           terminalUpdate.newStatus shouldNot be(empty)
@@ -177,7 +177,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
       val resultForTerminalTaskStatus = handler.handleMesosEvent(newTaskUpdateEvent(terminalTaskStatus))
 
       Then("the podStatus should be cleared")
-      inside(resultForTerminalTaskStatus.stateEvents.collect { case p: PodStatusUpdated => p }) {
+      inside(resultForTerminalTaskStatus.stateEvents.collect { case p: PodStatusUpdatedEvent => p }) {
         case Seq(terminalUpdate, pruneUpdate) =>
           terminalUpdate.id shouldBe podId
           terminalUpdate.newStatus shouldNot be(empty)

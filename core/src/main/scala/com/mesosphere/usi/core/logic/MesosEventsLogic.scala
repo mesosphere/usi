@@ -133,7 +133,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
         }
 
         SchedulerEvents(
-          stateEvents = List(PodStatusUpdated(podId, Some(newStatus))),
+          stateEvents = List(PodStatusUpdatedEvent(podId, Some(newStatus))),
           mesosCalls = if (taskStatus.hasUuid) {
             // frameworks should accept only status updates that have UUID set
             // http://mesos.apache.org/documentation/latest/scheduler-http-api/#acknowledge

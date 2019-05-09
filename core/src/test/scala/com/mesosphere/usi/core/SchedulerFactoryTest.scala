@@ -46,7 +46,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
   def newMockedScheduler[M, O](
       snapshot: StateSnapshot = StateSnapshot.empty,
       commandInputSink: Sink[SchedulerCommand, M],
-      stateEventsSource: Source[StateEvent, O]): (Flow[SchedulerCommand, Scheduler.StateOutput, NotUsed], M, O) = {
+      stateEventsSource: Source[StateEventOrSnapshot, O]): (Flow[SchedulerCommand, Scheduler.StateOutput, NotUsed], M, O) = {
 
     val (m, preMaterializedCommandInput) =
       Flow[SchedulerCommand]
@@ -72,7 +72,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
     )
   )
   val deletePodSpec = ExpungePod(podSpec.id)
-  val deletePodStatus = PodStatusUpdated(podSpec.id, None)
+  val deletePodStatus = PodStatusUpdatedEvent(podSpec.id, None)
 
   "SchedulerFactory" when {
     "materialized as Source and Sink" should {

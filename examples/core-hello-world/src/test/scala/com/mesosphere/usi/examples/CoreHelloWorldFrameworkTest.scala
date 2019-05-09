@@ -6,7 +6,7 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.testkit.{TestPublisher, TestSubscriber}
 import com.mesosphere.usi.core.Scheduler.StateOutput
-import com.mesosphere.usi.core.models.{PodStatusUpdated, SchedulerCommand, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.{PodStatusUpdatedEvent, SchedulerCommand, StateEventOrSnapshot, StateSnapshot}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
@@ -55,7 +55,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     Then("receive an empty snapshot followed by other state events")
     inside(sub.requestNext()) { case snap: StateSnapshot => snap.podRecords shouldBe empty }
     eventually {
-      inside(sub.requestNext()) { case podStatus: PodStatusUpdated => podStatus.newStatus shouldBe defined }
+      inside(sub.requestNext()) { case podStatus: PodStatusUpdatedEvent => podStatus.newStatus shouldBe defined }
     }
 
     And("persistence storage has correct set of records")
@@ -85,9 +85,9 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
 
   private def testScheduler(
       graph: Flow[SchedulerCommand, StateOutput, NotUsed]
-  ): (TestPublisher.Probe[SchedulerCommand], TestSubscriber.Probe[StateEvent]) = {
+  ): (TestPublisher.Probe[SchedulerCommand], TestSubscriber.Probe[StateEventOrSnapshot]) = {
     val commandPublisher = TestPublisher.probe[SchedulerCommand]()
-    val stateEventSub = TestSubscriber.probe[StateEvent]()
+    val stateEventSub = TestSubscriber.probe[StateEventOrSnapshot]()
     Source
       .fromPublisher(commandPublisher)
       .via(graph)

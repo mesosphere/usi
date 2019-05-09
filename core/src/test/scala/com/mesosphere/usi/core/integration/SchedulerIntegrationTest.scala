@@ -55,16 +55,16 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
         snapshot shouldBe StateSnapshot.empty
     }
     inside(output.pull().futureValue) {
-      case Some(specUpdated: PodSpecUpdated) =>
+      case Some(specUpdated: PodSpecUpdatedEvent) =>
         specUpdated.id shouldBe podId
     }
     inside(output.pull().futureValue) {
-      case Some(recordUpdated: PodRecordUpdated) =>
+      case Some(recordUpdated: PodRecordUpdatedEvent) =>
         recordUpdated.id shouldBe podId
     }
     eventually {
       inside(output.pull().futureValue) {
-        case Some(podStatusChange: PodStatusUpdated) =>
+        case Some(podStatusChange: PodStatusUpdatedEvent) =>
           podStatusChange.newStatus.get
             .taskStatuses(TaskId(podId.value))
             .getState shouldBe Protos.TaskState.TASK_RUNNING
@@ -88,7 +88,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
 
     eventually {
       inside(output.pull().futureValue) {
-        case Some(podStatusChange: PodStatusUpdated) =>
+        case Some(podStatusChange: PodStatusUpdatedEvent) =>
           podStatusChange.newStatus.get
             .taskStatuses(TaskId(podId.value))
             .getState shouldBe Protos.TaskState.TASK_RUNNING

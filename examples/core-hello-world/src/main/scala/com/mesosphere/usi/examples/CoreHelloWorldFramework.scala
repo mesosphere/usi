@@ -11,7 +11,7 @@ import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.Scheduler.StateOutput
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
-import com.mesosphere.usi.core.models.{LaunchPod, PodId, PodStatus, PodStatusUpdated, RunSpec, SchedulerCommand}
+import com.mesosphere.usi.core.models.{LaunchPod, PodId, PodStatus, PodStatusUpdatedEvent, RunSpec, SchedulerCommand}
 import com.mesosphere.usi.repository.PodRecordRepository
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.{Config, ConfigFactory}
@@ -41,7 +41,7 @@ object CoreHelloWorldFramework extends StrictLogging {
   /**
     * Scheduler Flow might look scary at the first glance (and sometimes even at second) but it is
     * at the core (!) of any framework. Basically it is a Flow that [[SchedulerCommand]] events as input and produces
-    * [[com.mesosphere.usi.core.models.StateEvent]] as an output.
+    * [[com.mesosphere.usi.core.models.StateEventOrSnapshot]] as an output.
     *
     * +--------------------+         +-----------------------+        +-----------------------+
     * |                    |         |                       |        |                       |
@@ -53,12 +53,12 @@ object CoreHelloWorldFramework extends StrictLogging {
     *
     *
     * In a nutshell: frameworks sends [[SchedulerCommand]] commands down the flow and receives
-    * [[com.mesosphere.usi.core.models.StateEvent]]s when things change. USI remembers which pods it has launched by the
+    * [[com.mesosphere.usi.core.models.StateEventOrSnapshot]]s when things change. USI remembers which pods it has launched by the
     * use of PodRecords. These are persisted and used to trigger an initial [task
     * reconciliation](http://mesos.apache.org/documentation/latest/reconciliation/) by the scheduler.
     *
     * For the output parameter of the scheduler Flow - it's a tuple of [[com.mesosphere.usi.core.models.StateSnapshot]]
-    * and a Source of [[com.mesosphere.usi.core.models.StateEvent]], which means that the first state event received by
+    * and a Source of [[com.mesosphere.usi.core.models.StateEventOrSnapshot]], which means that the first state event received by
     * the framework will be a snapshot of all reconciled tasks states, followed by a individual updates.
     *
     * For more about the scheduler flow see [[Scheduler]] class documentation.
@@ -151,7 +151,7 @@ object CoreHelloWorldFramework extends StrictLogging {
       }
       .map {
         // Main state event handler. We log happy events and exit if something goes wrong
-        case PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
+        case PodStatusUpdatedEvent(id, Some(PodStatus(_, taskStatuses))) =>
           import TaskState._
           def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
 

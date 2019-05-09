@@ -18,10 +18,10 @@ import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
   * @param dirtyPodIds The podIds that have been changed during the lifecycle of this FrameWithEvents instance
   */
 case class FrameResultBuilder(
-    state: SchedulerState,
-    appliedStateEvents: List[StateEvent],
-    mesosCalls: List[MesosCall],
-    dirtyPodIds: Set[PodId]) {
+                               state: SchedulerState,
+                               appliedStateEvents: List[StateEventOrSnapshot],
+                               mesosCalls: List[MesosCall],
+                               dirtyPodIds: Set[PodId]) {
   private def applyAndAccumulate(schedulerEvents: SchedulerEvents): FrameResultBuilder = {
     if (schedulerEvents == SchedulerEvents.empty)
       this

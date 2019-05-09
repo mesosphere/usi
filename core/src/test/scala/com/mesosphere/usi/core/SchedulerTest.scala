@@ -10,7 +10,7 @@ import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{commandInputSource, outputFlatteningSink}
-import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord, PodRecordUpdated, SchedulerCommand}
+import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord, PodRecordUpdatedEvent, SchedulerCommand}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.ConfigFactory
@@ -92,8 +92,8 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     And("a list of fake pod record events")
     val podIds = List(List("A", "B"), List("C", "D"), List("E", "F")).map(_.map(PodId))
     val storesAndDeletes = podIds.flatMap { ids =>
-      val storeEvents = ids.map(id => PodRecordUpdated(id, Some(PodRecord(id, Instant.now(), AgentId("-")))))
-      val deleteEvents = ids.map(PodRecordUpdated(_, None))
+      val storeEvents = ids.map(id => PodRecordUpdatedEvent(id, Some(PodRecord(id, Instant.now(), AgentId("-")))))
+      val deleteEvents = ids.map(PodRecordUpdatedEvent(_, None))
       List(SchedulerEvents(storeEvents), SchedulerEvents(deleteEvents))
     }
 
@@ -114,7 +114,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     Given("a list of persistence operations with count strictly greater than twice the pipeline limit")
     val limit = SchedulerSettings.fromConfig(ConfigFactory.load().getConfig("scheduler")).persistencePipelineLimit
     val deleteEvents = (1 to limit * 2 + 1)
-      .map(x => PodRecordUpdated(PodId("pod-" + x), None))
+      .map(x => PodRecordUpdatedEvent(PodId("pod-" + x), None))
       .grouped(100)
       .map(x => SchedulerEvents(stateEvents = x.toList))
       .toList

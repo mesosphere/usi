@@ -3,16 +3,16 @@ package com.mesosphere.usi.core
 import com.mesosphere.usi.core.models.{
   PodId,
   PodRecord,
-  PodRecordUpdated,
+  PodRecordUpdatedEvent,
   PodSpec,
-  PodSpecUpdated,
+  PodSpecUpdatedEvent,
   PodStatus,
-  PodStatusUpdated,
-  StateEvent
+  PodStatusUpdatedEvent,
+  StateEventOrSnapshot
 }
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
 
-case class SchedulerEvents(stateEvents: List[StateEvent] = Nil, mesosCalls: List[MesosCall] = Nil)
+case class SchedulerEvents(stateEvents: List[StateEventOrSnapshot] = Nil, mesosCalls: List[MesosCall] = Nil)
 object SchedulerEvents {
   val empty = SchedulerEvents()
 }
@@ -28,8 +28,8 @@ object SchedulerEvents {
   * Note, SchedulerEventsBuilder will accumulate state events. The scheduler logic loop happens to consume this.
   */
 case class SchedulerEventsBuilder(
-    reverseStateEvents: List[StateEvent] = Nil,
-    reverseMesosCalls: List[MesosCall] = Nil) {
+                                   reverseStateEvents: List[StateEventOrSnapshot] = Nil,
+                                   reverseMesosCalls: List[MesosCall] = Nil) {
   lazy val result = SchedulerEvents(reverseStateEvents.reverse, reverseMesosCalls.reverse)
 
   def ++(other: SchedulerEventsBuilder): SchedulerEventsBuilder = {
@@ -51,7 +51,7 @@ case class SchedulerEventsBuilder(
     * @return A FrameEffects with this effect appended
     */
   def withPodStatus(id: PodId, newStatus: Option[PodStatus]): SchedulerEventsBuilder =
-    withStateEvent(PodStatusUpdated(id, newStatus))
+    withStateEvent(PodStatusUpdatedEvent(id, newStatus))
 
   /**
     * Append an effect which will change some PodRecord.
@@ -60,12 +60,12 @@ case class SchedulerEventsBuilder(
     * @return A FrameEffects with this effect appended
     */
   def withPodRecord(id: PodId, newRecord: Option[PodRecord]): SchedulerEventsBuilder =
-    withStateEvent(PodRecordUpdated(id, newRecord))
+    withStateEvent(PodRecordUpdatedEvent(id, newRecord))
 
   def withPodSpec(id: PodId, newPodSpec: Option[PodSpec]): SchedulerEventsBuilder =
-    withStateEvent(PodSpecUpdated(id, newPodSpec))
+    withStateEvent(PodSpecUpdatedEvent(id, newPodSpec))
 
-  def withStateEvent(event: StateEvent): SchedulerEventsBuilder =
+  def withStateEvent(event: StateEventOrSnapshot): SchedulerEventsBuilder =
     copy(reverseStateEvents = event :: reverseStateEvents)
 
   /**

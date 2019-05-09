@@ -5,7 +5,7 @@ import akka.stream.{BidiShape, FlowShape, Materializer}
 import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.conf.SchedulerSettings
-import com.mesosphere.usi.core.models.{PodId, PodRecord, PodRecordUpdated, SchedulerCommand, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.{PodId, PodRecord, PodRecordUpdatedEvent, SchedulerCommand, StateEventOrSnapshot, StateSnapshot}
 import com.mesosphere.usi.repository.PodRecordRepository
 import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkInfo
@@ -54,12 +54,12 @@ import scala.concurrent.{Await, ExecutionContext, Future}
   * }}}
   */
 object Scheduler {
-  type StateOutput = (StateSnapshot, Source[StateEvent, Any])
+  type StateOutput = (StateSnapshot, Source[StateEventOrSnapshot, Any])
 
   private val schedulerSettings = SchedulerSettings.fromConfig(ConfigFactory.load().getConfig("scheduler"))
 
   def asFlow(client: MesosClient, podRecordRepository: PodRecordRepository)(
-      implicit materializer: Materializer): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
+      implicit materializer: Materializer): Future[(StateSnapshot, Flow[SchedulerCommand, StateEventOrSnapshot, NotUsed])] = {
 
     implicit val ec = ExecutionContext.global //only for ultra-fast non-blocking map
 
@@ -78,13 +78,13 @@ object Scheduler {
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
   def asSourceAndSink(client: MesosClient, podRecordRepository: PodRecordRepository)(implicit mat: Materializer)
-    : (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]]) = {
+    : (Future[StateSnapshot], Source[StateEventOrSnapshot, NotUsed], Sink[SchedulerCommand, Future[Done]]) = {
     val flow = fromClient(client, podRecordRepository)
     asSourceAndSink(flow)(mat)
   }
 
   def asSourceAndSink(schedulerFlow: Flow[SchedulerCommand, StateOutput, NotUsed])(implicit mat: Materializer)
-    : (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]]) = {
+    : (Future[StateSnapshot], Source[StateEventOrSnapshot, NotUsed], Sink[SchedulerCommand, Future[Done]]) = {
 
     val ((commandInputSubscriber, subscriberCompleted), commandInputSource) =
       Source.asSubscriber[SchedulerCommand].watchTermination()(Keep.both).preMaterialize()
@@ -133,7 +133,7 @@ object Scheduler {
     }
   }
 
-  private val stateOutputBreakoutFlow: Flow[StateEvent, StateOutput, NotUsed] = Flow[StateEvent].prefixAndTail(1).map {
+  private val stateOutputBreakoutFlow: Flow[StateEventOrSnapshot, StateOutput, NotUsed] = Flow[StateEventOrSnapshot].prefixAndTail(1).map {
     case (Seq(snapshot), stateEvents) =>
       val stateSnapshot = snapshot match {
         case x: StateSnapshot => x
@@ -188,10 +188,10 @@ object Scheduler {
       events: SchedulerEvents,
       podRecordRepository: PodRecordRepository): List[() => Future[Option[SchedulerEvents]]] = {
     val ops: List[() => Future[Option[SchedulerEvents]]] = events.stateEvents.collect {
-      case PodRecordUpdated(_, Some(podRecord)) =>
+      case PodRecordUpdatedEvent(_, Some(podRecord)) =>
         () =>
           podRecordRepository.store(podRecord).map(_ => None)(CallerThreadExecutionContext.context)
-      case PodRecordUpdated(podId, None) =>
+      case PodRecordUpdatedEvent(podId, None) =>
         () =>
           podRecordRepository.delete(podId).map(_ => None)(CallerThreadExecutionContext.context)
     }

@@ -14,21 +14,21 @@ private[core] class SpecLogic(mesosCallFactory: MesosCalls) {
     command match {
       case LaunchPod(id, runSpec) =>
         if (!state.podRecords.contains(id))
-          SchedulerEvents(stateEvents = List(PodSpecUpdated(id, Some(RunningPodSpec(id, runSpec)))))
+          SchedulerEvents(stateEvents = List(PodSpecUpdatedEvent(id, Some(RunningPodSpec(id, runSpec)))))
         else
           // if we already have a record for the pod, ignore
           SchedulerEvents.empty
       case ExpungePod(podId) =>
         var b = SchedulerEventsBuilder.empty
         if (state.podSpecs.contains(podId)) {
-          b = b.withStateEvent(PodSpecUpdated(podId, None))
+          b = b.withStateEvent(PodSpecUpdatedEvent(podId, None))
         }
         if (state.podRecords.contains(podId)) {
-          b = b.withStateEvent(PodRecordUpdated(podId, None))
+          b = b.withStateEvent(PodRecordUpdatedEvent(podId, None))
         }
         b.result
       case KillPod(podId) =>
-        var b = SchedulerEventsBuilder.empty.withStateEvent(PodSpecUpdated(podId, Some(TerminalPodSpec(podId))))
+        var b = SchedulerEventsBuilder.empty.withStateEvent(PodSpecUpdatedEvent(podId, Some(TerminalPodSpec(podId))))
 
         state.podStatuses.get(podId).foreach { status =>
           b = killPod(b, status)
