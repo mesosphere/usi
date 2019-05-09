@@ -44,9 +44,9 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
   }
 
   def newMockedScheduler[M, O](
-                                snapshot: StateSnapshot = StateSnapshot.empty,
-                                commandInputSink: Sink[SchedulerCommand, M],
-                                stateEventsSource: Source[StateEvent, O]): (Flow[SchedulerCommand, Scheduler.StateOutput, NotUsed], M, O) = {
+      snapshot: StateSnapshot = StateSnapshot.empty,
+      commandInputSink: Sink[SchedulerCommand, M],
+      stateEventsSource: Source[StateEvent, O]): (Flow[SchedulerCommand, Scheduler.StateOutput, NotUsed], M, O) = {
 
     val (m, preMaterializedCommandInput) =
       Flow[SchedulerCommand]
@@ -87,7 +87,8 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
       }
 
       "Push the SpecUpdatedEvents downstream" in {
-        val (scheduler, firstSpec, _) = newMockedScheduler(commandInputSink = Sink.head, stateEventsSource = Source.maybe)
+        val (scheduler, firstSpec, _) =
+          newMockedScheduler(commandInputSink = Sink.head, stateEventsSource = Source.maybe)
         val (_, _, sink) = Scheduler.asSourceAndSink(scheduler)
 
         Source.repeat(deletePodSpec).runWith(sink)

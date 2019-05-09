@@ -30,7 +30,8 @@ object Scheduler {
     * @param client The [[MesosClient]] used to interact with Mesos.
     * @return A [[javadsl]] flow from pod specs to state events.
     */
-  def fromClient(client: MesosClient,
+  def fromClient(
+      client: MesosClient,
       podRecordRepository: PodRecordRepository): javadsl.Flow[SchedulerCommand, StateOutput, NotUsed] = {
     val flow = Flow.fromSinkAndSource(client.mesosSink, client.mesosSource)
     fromFlow(client.calls, podRecordRepository, flow)
@@ -46,10 +47,9 @@ object Scheduler {
     * @return A [[javadsl]] flow from pod specs to state events.
     */
   def fromFlow(
-                mesosCallFactory: MesosCalls,
-          podRecordRepository: PodRecordRepository,
-
-                mesosFlow: javadsl.Flow[MesosCall, MesosEvent, NotUsed]): javadsl.Flow[SchedulerCommand, StateOutput, NotUsed] = {
+      mesosCallFactory: MesosCalls,
+      podRecordRepository: PodRecordRepository,
+      mesosFlow: javadsl.Flow[MesosCall, MesosEvent, NotUsed]): javadsl.Flow[SchedulerCommand, StateOutput, NotUsed] = {
     javadsl.Flow
       .create[SchedulerCommand]()
       .via(ScalaScheduler.fromFlow(mesosCallFactory, podRecordRepository, mesosFlow.asScala))
@@ -66,7 +66,10 @@ object Scheduler {
     *
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
-  def asSourceAndSink(client: MesosClient, podRecordRepository: PodRecordRepository, materializer: Materializer): SourceAndSinkResult = {
+  def asSourceAndSink(
+      client: MesosClient,
+      podRecordRepository: PodRecordRepository,
+      materializer: Materializer): SourceAndSinkResult = {
     val (snap, source, sink) = ScalaScheduler.asSourceAndSink(client, podRecordRepository)(materializer)
     new SourceAndSinkResult(
       snap.toJava.toCompletableFuture,
@@ -91,7 +94,10 @@ object Scheduler {
     }
   }
 
-  def asFlow(client: MesosClient, podRecordRepository: PodRecordRepository, materializer: Materializer): CompletableFuture[FlowResult] = {
+  def asFlow(
+      client: MesosClient,
+      podRecordRepository: PodRecordRepository,
+      materializer: Materializer): CompletableFuture[FlowResult] = {
 
     implicit val ec = ExecutionContext.Implicits.global
 

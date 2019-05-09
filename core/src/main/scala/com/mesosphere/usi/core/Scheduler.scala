@@ -59,7 +59,7 @@ object Scheduler {
   private val schedulerSettings = SchedulerSettings.fromConfig(ConfigFactory.load().getConfig("scheduler"))
 
   def asFlow(client: MesosClient, podRecordRepository: PodRecordRepository)(
-    implicit materializer: Materializer): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
+      implicit materializer: Materializer): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
 
     implicit val ec = ExecutionContext.global //only for ultra-fast non-blocking map
 
@@ -78,7 +78,7 @@ object Scheduler {
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
   def asSourceAndSink(client: MesosClient, podRecordRepository: PodRecordRepository)(implicit mat: Materializer)
-  : (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]]) = {
+    : (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]]) = {
     val flow = fromClient(client, podRecordRepository)
     asSourceAndSink(flow)(mat)
   }
@@ -105,7 +105,7 @@ object Scheduler {
 
   def fromClient(
       client: MesosClient,
-    podRecordRepository: PodRecordRepository): Flow[SchedulerCommand, StateOutput, NotUsed] = {
+      podRecordRepository: PodRecordRepository): Flow[SchedulerCommand, StateOutput, NotUsed] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
@@ -147,9 +147,8 @@ object Scheduler {
       (stateSnapshot, stateUpdates)
   }
 
-  private[core] def unconnectedGraph(
-      mesosCallFactory: MesosCalls,
-      podRecordRepository: PodRecordRepository): BidiFlow[SchedulerCommand, StateOutput, MesosEvent, MesosCall, NotUsed] = {
+  private[core] def unconnectedGraph(mesosCallFactory: MesosCalls, podRecordRepository: PodRecordRepository)
+    : BidiFlow[SchedulerCommand, StateOutput, MesosEvent, MesosCall, NotUsed] = {
     val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, loadPodRecords(podRecordRepository))
     BidiFlow.fromGraph {
       GraphDSL.create(schedulerLogicGraph) { implicit builder => (schedulerLogic) =>

@@ -86,10 +86,13 @@ private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialPod
       override def preStart(): Unit = {
         handler = new SchedulerLogicHandler(mesosCallFactory, initialPodRecords)
         // Publish the initial state snapshot event; podStatuses will not be in the snapshot in the future
-        pushOrQueueIntents(SchedulerEvents(List(StateSnapshot(
-          podRecords = initialPodRecords.values.toSeq,
-          agentRecords = Nil
-        ))))
+        pushOrQueueIntents(
+          SchedulerEvents(
+            List(
+              StateSnapshot(
+                podRecords = initialPodRecords.values.toSeq,
+                agentRecords = Nil
+              ))))
       }
 
       def pushOrQueueIntents(effects: SchedulerEvents): Unit = {

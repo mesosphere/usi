@@ -2,7 +2,17 @@ package com.mesosphere.usi.core
 
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
-import com.mesosphere.usi.core.models.{LaunchPod, PodId, PodInvalid, PodRecord, PodSpec, PodSpecUpdated, PodStatusUpdated, RunningPodSpec, SchedulerCommand}
+import com.mesosphere.usi.core.models.{
+  LaunchPod,
+  PodId,
+  PodInvalid,
+  PodRecord,
+  PodSpec,
+  PodSpecUpdated,
+  PodStatusUpdated,
+  RunningPodSpec,
+  SchedulerCommand
+}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
 
 /**
@@ -70,7 +80,8 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialP
   /**
     * State managed by the SchedulerLogicHandler. Statuses are derived from Mesos events.
     */
-  private var state: SchedulerState = SchedulerState(podStatuses = Map.empty, podRecords = initialPodRecords, podSpecs = Map.empty)
+  private var state: SchedulerState =
+    SchedulerState(podStatuses = Map.empty, podRecords = initialPodRecords, podSpecs = Map.empty)
 
   def validateEvent(msg: SchedulerCommand): Seq[PodInvalid] = msg match {
     case LaunchPod(id, runSpec) =>
