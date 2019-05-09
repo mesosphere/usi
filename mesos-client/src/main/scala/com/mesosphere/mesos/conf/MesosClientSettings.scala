@@ -49,4 +49,9 @@ object MesosClientSettings {
     val conf = ConfigFactory.load();
     MesosClientSettings.fromConfig(conf.getConfig("mesos-client"))
   }
+
+  def load(loader: ClassLoader): MesosClientSettings = {
+    val conf = ConfigFactory.load(loader);
+    MesosClientSettings.fromConfig(conf.getConfig("mesos-client"))
+  }
 }
