@@ -17,7 +17,7 @@ import org.scalatest.Inside
 class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with Inside {
   implicit val materializer = ActorMaterializer()
 
-  lazy val settings = MesosClientSettings(mesosFacade.url)
+  lazy val settings = MesosClientSettings.load().withMasters(mesosFacade.url)
   val frameworkInfo = Protos.FrameworkInfo
     .newBuilder()
     .setUser("test")

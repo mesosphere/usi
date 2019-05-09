@@ -22,7 +22,6 @@ import com.mesosphere.usi.core.models.{
   StateEvent,
   StateSnapshot
 }
-import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo, TaskState, TaskStatus}
 
@@ -48,9 +47,9 @@ object CoreHelloWorldFramework extends StrictLogging {
 
   def main(args: Array[String]): Unit = {
     implicit val actorSystem = ActorSystem()
-    val conf = ConfigFactory.load().getConfig("mesos-client")
+    val settings = MesosClientSettings.load()
     try {
-      run(conf)
+      run(settings)
     } catch {
       case ex: Throwable =>
         System.err.println(s"Exception while starting framework! ${ex}")
@@ -60,11 +59,10 @@ object CoreHelloWorldFramework extends StrictLogging {
     }
   }
 
-  def run(conf: Config)(implicit system: ActorSystem): CoreHelloWorldFramework = {
+  def run(settings: MesosClientSettings)(implicit system: ActorSystem): CoreHelloWorldFramework = {
     implicit val mat = ActorMaterializer()
     implicit val ec = system.dispatcher
 
-    val settings = MesosClientSettings(conf.getString("master-url"))
     val frameworkInfo = FrameworkInfo
       .newBuilder()
       .setUser(

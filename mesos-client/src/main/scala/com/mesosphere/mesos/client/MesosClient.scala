@@ -1,7 +1,7 @@
 package com.mesosphere.mesos.client
 
 import java.io.IOException
-import java.net.{URI, URL}
+import java.net.URL
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -202,16 +202,18 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
               response.discardEntityBytes()
               throw new IllegalArgumentException(s"Mesos server error: $response")
           }
-        }.recoverWithRetries(1, {
-          case ex @ MesosRedirectException(leader)=>
-             if (redirectRetries > 0)
-              mesosHttpConnection(frameworkInfo, (leader :: rest).distinct, redirectRetries - 1)
-             else
-               throw new IOException("Failed to connect to Mesos: Too many redirects.", ex)
-          case ex =>
-            logger.warn(s"Failed to connect to Mesos $url", ex)
-            mesosHttpConnection(frameworkInfo, rest, redirectRetries)
-        })
+        }.recoverWithRetries(
+          1, {
+            case ex @ MesosRedirectException(leader) =>
+              if (redirectRetries > 0)
+                mesosHttpConnection(frameworkInfo, (leader :: rest).distinct, redirectRetries - 1)
+              else
+                throw new IOException("Failed to connect to Mesos: Too many redirects.", ex)
+            case ex =>
+              logger.warn(s"Failed to connect to Mesos $url", ex)
+              mesosHttpConnection(frameworkInfo, rest, redirectRetries)
+          }
+        )
     }
 
   /**

@@ -2,6 +2,7 @@ package com.mesosphere.usi.examples
 
 import java.util
 
+import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
@@ -40,12 +41,12 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
   }
 
   class Fixture(existingFrameworkId: Option[FrameworkID.Builder] = None) {
-    val mesosUrl = new java.net.URI(mesosFacade.url)
+    val mesosUrl = mesosFacade.url
 
     val conf = ConfigFactory
       .parseMap(util.Collections.singletonMap("mesos-client.master-url", s"${mesosUrl.getHost}:${mesosUrl.getPort}"))
       .withFallback(ConfigFactory.load())
 
-    val framework = CoreHelloWorldFramework.run(conf.getConfig("mesos-client"))
+    val framework = CoreHelloWorldFramework.run(MesosClientSettings.fromConfig(conf))
   }
 }

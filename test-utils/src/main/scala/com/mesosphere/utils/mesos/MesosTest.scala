@@ -1,7 +1,7 @@
 package com.mesosphere.utils.mesos
 
 import java.io.File
-import java.net.{InetAddress, NetworkInterface}
+import java.net.{InetAddress, NetworkInterface, URL}
 import java.nio.charset.Charset
 import java.nio.file.{Files, Paths}
 
@@ -146,7 +146,7 @@ case class MesosCluster(
     start()
   }
 
-  def start(prefix: Option[String] = None): String = {
+  def start(prefix: Option[String] = None): URL = {
     masters.foreach(_.start(prefix))
     agents.foreach(_.start(prefix))
     val masterUrl = waitForLeader()
@@ -155,17 +155,17 @@ case class MesosCluster(
     masterUrl
   }
 
-  def waitForLeader(): String = {
-    val firstMaster = s"http://${masters.head.ip}:${masters.head.port}"
+  def waitForLeader(): URL = {
+    val firstMaster = new URL(s"http://${masters.head.ip}:${masters.head.port}")
     val mesosFacade = new MesosFacade(firstMaster)
 
     val leader = eventually(timeout(waitForMesosTimeout), interval(1.seconds)) {
       mesosFacade.redirect().headers.find(_.lowercaseName() == "location").map(_.value()).get
     }
-    s"http:$leader"
+    new URL(s"http:$leader")
   }
 
-  def waitForAgents(masterUrl: String): Unit = {
+  def waitForAgents(masterUrl: URL): Unit = {
     val mesosFacade = new MesosFacade(masterUrl)
     eventually(timeout(waitForMesosTimeout), interval(1.seconds)) {
       mesosFacade.state.value.agents.size == agents.size

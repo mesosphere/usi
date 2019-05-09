@@ -2,22 +2,31 @@ package com.mesosphere.mesos.conf
 
 import java.net.URL
 
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
 class MesosClientSettings private (
     val masters: Seq[URL],
-    val redirectRetries: Int = 3,
-    val idleTimeout: FiniteDuration = 75.seconds,
-    val sourceBufferSize: Int = 10) {
+    val redirectRetries: Int,
+    val idleTimeout: FiniteDuration,
+    val sourceBufferSize: Int) {
 
-  private def copy(masters: Seq[URL] = this.masters, redirectRetries: Int = this.redirectRetries, idleTimeout: FiniteDuration = this.idleTimeout, sourceBufferSize: Int = this.sourceBufferSize) =
+  private def copy(
+      masters: Seq[URL] = this.masters,
+      redirectRetries: Int = this.redirectRetries,
+      idleTimeout: FiniteDuration = this.idleTimeout,
+      sourceBufferSize: Int = this.sourceBufferSize) =
     new MesosClientSettings(masters, redirectRetries, idleTimeout, sourceBufferSize)
 
-
   def withMasters(urls: URL*): MesosClientSettings = copy(masters = urls)
+
+  def withRedirectRetries(redirectRetries: Int): MesosClientSettings = copy(redirectRetries = redirectRetries)
+
+  def withIdleTimeout(timeout: FiniteDuration): MesosClientSettings = copy(idleTimeout = timeout)
+
+  def withSourceBufferSize(bufferSize: Int): MesosClientSettings = copy(sourceBufferSize = bufferSize)
 }
 
 object MesosClientSettings {
@@ -32,5 +41,10 @@ object MesosClientSettings {
 
     new MesosClientSettings(masterUrls, redirectRetries, idleTimeout, sourceBufferSize)
 
+  }
+
+  def load(): MesosClientSettings = {
+    val conf = ConfigFactory.load();
+    MesosClientSettings.fromConfig(conf.getConfig("mesos-client"))
   }
 }

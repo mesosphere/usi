@@ -1,4 +1,5 @@
 package com.mesosphere.utils.mesos
+import java.net.URL
 import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
@@ -9,9 +10,9 @@ import scala.concurrent.duration.FiniteDuration
 
 class MesosClusterExtension(val mesosCluster: MesosCluster) extends BeforeAllCallback with AfterAllCallback {
 
-  private var mesosUrl: String = null
+  private var mesosUrl: URL = null
 
-  def getMesosUrl: String = mesosUrl
+  def getMesosUrl: URL = mesosUrl
 
   override def beforeAll(context: ExtensionContext): Unit = {
     this.mesosUrl = mesosCluster.start(Some(context.getDisplayName))
