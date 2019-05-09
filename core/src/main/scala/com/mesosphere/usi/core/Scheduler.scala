@@ -1,36 +1,25 @@
 package com.mesosphere.usi.core
 
+import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Keep, Sink, Source}
+import akka.stream.{BidiShape, FlowShape, Materializer}
 import akka.{Done, NotUsed}
-import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, SinkQueueWithCancel, Source}
-import akka.stream.{BidiShape, FlowShape, KillSwitches, Materializer, OverflowStrategy, QueueOfferResult}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.conf.SchedulerSettings
-import com.mesosphere.usi.core.models.PodId
-import com.mesosphere.usi.core.models.PodRecord
-import com.mesosphere.usi.core.models.{
-  PodRecordUpdated,
-  SpecEvent,
-  SpecUpdated,
-  SpecsSnapshot,
-  StateEvent,
-  StateSnapshot
-}
+import com.mesosphere.usi.core.models.{PodId, PodRecord, PodRecordUpdated, SchedulerCommand, StateEvent, StateSnapshot}
 import com.mesosphere.usi.repository.PodRecordRepository
 import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
+
 import scala.collection.JavaConverters._
-import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.concurrent.{Future, Promise}
-import scala.util.{Failure, Success}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
   * Provides the scheduler graph component. The component has two inputs, and two outputs:
   *
   * Input:
-  * 1) SpecInput - Used to replicate the specification state from the framework implementation to the USI SchedulerLogic;
-  *    First, a spec snapshot, followed by spec updates.
+  * 1) SchedulerCommands - Receives SchedulerCommand objects to launch, kill/destroy, and remove pods or reservations.
   * 2) MesosEvents - Events from Mesos; offers, task status updates, etc.
   *
   * Output:
@@ -45,7 +34,7 @@ import scala.util.{Failure, Success}
   *                    +------------------------------------------------------------------------+
   *                    |                                                                        |
   *                    |  +------------------+           +-------------+        StateOutput     |
-  *        SpecInput   |  |                  |           |             |     /------------------>----> (framework)
+  *  SchedulerCommands |  |                  |           |             |     /------------------>----> (framework)
   * (framework) >------>-->                  | Scheduler |             |    /                   |
   *                    |  |                  |  Events   |             |   /                    |
   *                    |  |  SchedulerLogic  o-----------> Persistence o--+                     |
@@ -65,18 +54,16 @@ import scala.util.{Failure, Success}
   * }}}
   */
 object Scheduler {
-  type SpecInput = (SpecsSnapshot, Source[SpecUpdated, Any])
-
   type StateOutput = (StateSnapshot, Source[StateEvent, Any])
 
   private val schedulerSettings = SchedulerSettings.fromConfig(ConfigFactory.load().getConfig("scheduler"))
 
-  def asFlow(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository)(
-      implicit materializer: Materializer): Future[(StateSnapshot, Flow[SpecUpdated, StateEvent, NotUsed])] = {
+  def asFlow(client: MesosClient, podRecordRepository: PodRecordRepository)(
+    implicit materializer: Materializer): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
 
-    implicit val ec = scala.concurrent.ExecutionContext.Implicits.global //only for ultra-fast non-blocking map
+    implicit val ec = ExecutionContext.global //only for ultra-fast non-blocking map
 
-    val (snap, source, sink) = asSourceAndSink(specsSnapshot, client, podRecordRepository)
+    val (snap, source, sink) = asSourceAndSink(client, podRecordRepository)
 
     snap.map { snapshot =>
       (snapshot, Flow.fromSinkAndSourceCoupled(sink, source))
@@ -88,122 +75,37 @@ object Scheduler {
     *
     * This method will materialize the scheduler first, then Sink and Source can be materialized independently, but only once.
     *
-    * @param specsSnapshot Snapshot of the current specs
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
-  def asSourceAndSink(specsSnapshot: SpecsSnapshot, client: MesosClient, podRecordRepository: PodRecordRepository)(
-      implicit mat: Materializer): (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]) = {
+  def asSourceAndSink(client: MesosClient, podRecordRepository: PodRecordRepository)(implicit mat: Materializer)
+  : (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]]) = {
     val flow = fromClient(client, podRecordRepository)
-    asSourceAndSink(specsSnapshot, flow)(mat)
+    asSourceAndSink(flow)(mat)
   }
 
-  def asSourceAndSink(specsSnapshot: SpecsSnapshot, schedulerFlow: Flow[SpecInput, StateOutput, NotUsed])(
-      implicit mat: Materializer): (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SpecUpdated, NotUsed]) = {
+  def asSourceAndSink(schedulerFlow: Flow[SchedulerCommand, StateOutput, NotUsed])(implicit mat: Materializer)
+    : (Future[StateSnapshot], Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]]) = {
 
-    implicit val ec = scala.concurrent.ExecutionContext.Implicits.global //only for ultra-fast non-blocking onComplete
+    val ((commandInputSubscriber, subscriberCompleted), commandInputSource) =
+      Source.asSubscriber[SchedulerCommand].watchTermination()(Keep.both).preMaterialize()
 
-    val (stateQueue, stateSource) = Source.queue[StateEvent](1, OverflowStrategy.backpressure).preMaterialize()
+    val firstStateOutput = commandInputSource
+      .via(schedulerFlow)
+      .runWith(Sink.head)
 
-    val (specQueue, specSink) = Sink.queue[SpecUpdated]().preMaterialize()
+    val stateSnapshot = firstStateOutput.map { case (snapshot, _) => snapshot }(ExecutionContext.global)
 
-    val stateSnapshotPromise = Promise[StateSnapshot]()
+    val stateEvents = Source.fromFuture(firstStateOutput).flatMapConcat { case (_, events) => events }
 
-    val killSwitch = KillSwitches.shared("SchedulerAdapter.asSourceAndSink")
-
-    // We need to handle the case when the source is canceled or failed
-    stateQueue.watchCompletion().onComplete {
-      case Success(_) =>
-        killSwitch.shutdown()
-      case Failure(cause) =>
-        killSwitch.abort(cause)
-    }
-
-    def sourceFromSinkQueue[T](queue: SinkQueueWithCancel[T]): Source[T, NotUsed] = {
-      Source
-        .unfoldResourceAsync[T, SinkQueueWithCancel[T]](
-          create = () => Future.successful(queue),
-          read = queue => queue.pull(),
-          close = queue =>
-            Future.successful {
-              killSwitch.shutdown()
-              queue.cancel()
-              Done
-          })
-    }
-
-    Source.maybe.prepend {
-      val events = sourceFromSinkQueue(specQueue)
-        .watchTermination() {
-          case (_, completionSignal) =>
-            completionSignal.onComplete {
-              case Success(_) =>
-                killSwitch.shutdown()
-              case Failure(cause) =>
-                killSwitch.abort(cause)
-            }
-        }
-
-      Source.single(specsSnapshot -> events)
-    }.via(schedulerFlow)
-      .flatMapConcat {
-        case (snapshot, updates) =>
-          stateSnapshotPromise.trySuccess(snapshot)
-          updates.watchTermination() {
-            case (_, cancellationSignal) =>
-              cancellationSignal.onComplete {
-                case Success(_) =>
-                  killSwitch.shutdown()
-                case Failure(cause) =>
-                  killSwitch.abort(cause)
-              }
-          }
-      }
-      .mapAsync(1)(stateQueue.offer)
-      .map {
-        case QueueOfferResult.Enqueued =>
-        case QueueOfferResult.QueueClosed =>
-          killSwitch.shutdown()
-        case QueueOfferResult.Failure(cause) =>
-          killSwitch.abort(cause)
-        case QueueOfferResult.Dropped => // we shouldn't receive that at all because OverflowStrategy.backpressure
-          throw new RuntimeException("Unexpected QueueOfferResult.Dropped element")
-      }
-      .runWith(Sink.ignore)
-
-    val sourceWithKillSwitch = stateSource
-      .watchTermination() {
-        case (materializedValue, cancellationSignal) =>
-          cancellationSignal.onComplete {
-            case Success(_) =>
-              killSwitch.shutdown()
-            case Failure(cause) =>
-              killSwitch.abort(cause)
-          }
-          materializedValue
-      }
-      .via(killSwitch.flow)
-
-    val sinkWithKillSwitch = Flow[SpecUpdated]
-      .watchTermination() {
-        case (materializedValue, cancellationSignal) =>
-          cancellationSignal.onComplete {
-            case Success(_) =>
-              killSwitch.shutdown()
-            case Failure(cause) =>
-              killSwitch.abort(cause)
-          }
-          materializedValue
-      }
-      .via(killSwitch.flow)
-      .to(specSink)
-
-    (stateSnapshotPromise.future, sourceWithKillSwitch, sinkWithKillSwitch)
-
+    (
+      stateSnapshot,
+      stateEvents,
+      Sink.fromSubscriber(commandInputSubscriber).mapMaterializedValue(_ => subscriberCompleted))
   }
 
   def fromClient(
       client: MesosClient,
-      podRecordRepository: PodRecordRepository): Flow[SpecInput, StateOutput, NotUsed] = {
+    podRecordRepository: PodRecordRepository): Flow[SchedulerCommand, StateOutput, NotUsed] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
@@ -215,7 +117,7 @@ object Scheduler {
   def fromFlow(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
-      mesosFlow: Flow[MesosCall, MesosEvent, Any]): Flow[SpecInput, StateOutput, NotUsed] = {
+      mesosFlow: Flow[MesosCall, MesosEvent, Any]): Flow[SchedulerCommand, StateOutput, NotUsed] = {
     Flow.fromGraph {
       GraphDSL.create(unconnectedGraph(mesosCallFactory, podRecordRepository), mesosFlow)((_, _) => NotUsed) {
         implicit builder =>
@@ -229,18 +131,6 @@ object Scheduler {
           }
       }
     }
-  }
-
-  /**
-    * We express an interface of receiving a snapshot, followed by a series of events, to guide consumers of USI down a
-    * proper implementation path. A SpecSnapshot should be the very first thing that the USI Scheduler receives from the
-    * Framework implementation.
-    *
-    * However, for convenience in working with streams, internally we deal with a single stream of SpecEvents.
-    */
-  private val specInputFlatteningFlow: Flow[SpecInput, SpecEvent, NotUsed] = Flow[SpecInput].flatMapConcat {
-    case (snapshot, rest) =>
-      rest.prepend(Source.single(snapshot))
   }
 
   private val stateOutputBreakoutFlow: Flow[StateEvent, StateOutput, NotUsed] = Flow[StateEvent].prefixAndTail(1).map {
@@ -259,7 +149,7 @@ object Scheduler {
 
   private[core] def unconnectedGraph(
       mesosCallFactory: MesosCalls,
-      podRecordRepository: PodRecordRepository): BidiFlow[SpecInput, StateOutput, MesosEvent, MesosCall, NotUsed] = {
+      podRecordRepository: PodRecordRepository): BidiFlow[SchedulerCommand, StateOutput, MesosEvent, MesosCall, NotUsed] = {
     val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, loadPodRecords(podRecordRepository))
     BidiFlow.fromGraph {
       GraphDSL.create(schedulerLogicGraph) { implicit builder => (schedulerLogic) =>
@@ -267,11 +157,9 @@ object Scheduler {
           import GraphDSL.Implicits._
 
           val broadcast = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true))
-          val specInputFlattening = builder.add(specInputFlatteningFlow)
           val stateOutputBreakout = builder.add(stateOutputBreakoutFlow)
-
           val persistenceStorageFlow = builder.add(persistenceFlow(podRecordRepository))
-          specInputFlattening ~> schedulerLogic.in0
+
           schedulerLogic.out ~> persistenceStorageFlow ~> broadcast.in
 
           val mesosCalls = broadcast.out(0).mapConcat { frameResult =>
@@ -283,7 +171,7 @@ object Scheduler {
 
           stateEvents ~> stateOutputBreakout
 
-          BidiShape.apply(specInputFlattening.in, stateOutputBreakout.outlet, schedulerLogic.in1, mesosCalls.outlet)
+          BidiShape.apply(schedulerLogic.in0, stateOutputBreakout.outlet, schedulerLogic.in1, mesosCalls.outlet)
         }
       }
     }

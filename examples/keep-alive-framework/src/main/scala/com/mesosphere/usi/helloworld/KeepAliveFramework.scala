@@ -3,7 +3,8 @@ package com.mesosphere.usi.helloworld
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Flow
+import akka.stream.scaladsl.{Flow, Source}
+import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.models._
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
@@ -11,20 +12,23 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}
 
+import scala.concurrent.ExecutionContextExecutor
+
 class KeepAliveFramework(conf: Config) extends StrictLogging {
 
-  implicit val system = ActorSystem()
-  implicit val mat = ActorMaterializer()
-  implicit val ec = system.dispatcher
+  implicit val system: ActorSystem = ActorSystem()
+  implicit val mat: ActorMaterializer = ActorMaterializer()
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
 
-  val client = new KeepAliveMesosClientFactory(conf).client
+  val client: MesosClient = new KeepAliveMesosClientFactory(conf).client
 
-  val runSpec = KeepAlivePodSpecHelper.runSpec
+  val runSpec: RunSpec = KeepAlivePodSpecHelper.runSpec
 
-  val specsSnapshot = KeepAlivePodSpecHelper.specsSnapshot(conf.getInt("keep-alive-framework.tasks-started"))
+  val specsSnapshot: List[RunningPodSpec] =
+    KeepAlivePodSpecHelper.specsSnapshot(conf.getInt("keep-alive-framework.tasks-started"))
 
   // KeepAliveWatcher looks for a terminal task and then restarts the whole pod.
-  val keepAliveWatcher: Flow[StateEvent, SpecUpdated, NotUsed] = Flow[StateEvent].mapConcat {
+  val keepAliveWatcher: Flow[StateEvent, SchedulerCommand, NotUsed] = Flow[StateEvent].mapConcat {
     // Main state event handler. We log happy events and restart the pod if something goes wrong
     case s: StateSnapshot =>
       logger.info(s"Initial state snapshot: $s")
@@ -39,8 +43,8 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
         logger.info(s"Restarting Pod $id")
         val newId = KeepAlivePodSpecHelper.createNewIncarnationId(id)
         List(
-          PodSpecUpdated(id, None), // Remove the currentPod
-          PodSpecUpdated(newId, Some(PodSpec(newId, Goal.Running, runSpec))) // Launch the new pod
+          ExpungePod(id), // Remove the currentPod
+          LaunchPod(newId, runSpec) // Launch the new pod
         )
       } else {
         Nil
@@ -53,7 +57,7 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 
   val podRecordRepository = InMemoryPodRecordRepository()
 
-  val (stateSnapshot, source, sink) = Scheduler.asSourceAndSink(specsSnapshot, client, podRecordRepository)
+  val (stateSnapshot, source, sink) = Scheduler.asSourceAndSink(client, podRecordRepository)
 
   /**
     * This is the core part of this framework. Source with SpecEvents is pushing events to the keepAliveWatcher,
@@ -83,6 +87,9 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
     */
   source
     .via(keepAliveWatcher)
+    .prepend(Source(specsSnapshot.map { spec =>
+      LaunchPod(spec.id, spec.runSpec)
+    }))
     .to(sink)
     .run()
 

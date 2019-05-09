@@ -3,7 +3,7 @@ package com.mesosphere.usi.core.builders
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.logic.MesosEventsLogic
-import com.mesosphere.usi.core.models.{FetchUri, Goal, PodId, PodSpec, RunSpec}
+import com.mesosphere.usi.core.models.{FetchUri, PodId, RunningPodSpec, RunSpec}
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.{Protos => Mesos}
@@ -12,7 +12,7 @@ import com.mesosphere.usi.core.protos.ProtoBuilders.{newResource, newResourceAll
 
 import java.net.URI
 
-class RunSpecBuilderTest extends UnitTest {
+class SpecBuilderTest extends UnitTest {
 
   private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId))
 
@@ -20,9 +20,8 @@ class RunSpecBuilderTest extends UnitTest {
     "build Mesos proto from RunSpec when fetchUri is defined" in {
       Given("a PodSpec with a RunSpec with fetchUri defined")
       val fetchMe = "http://foo.bar"
-      val pod: PodSpec = PodSpec(
+      val pod: RunningPodSpec = RunningPodSpec(
         PodId("mock-podId"),
-        Goal.Running,
         RunSpec(
           resourceRequirements = List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 32)),
           shellCommand = "sleep 3600",

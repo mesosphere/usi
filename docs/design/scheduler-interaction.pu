@@ -1,15 +1,14 @@
-@startuml Participant FrameworkState
+@startuml
+Participant FrameworkState
 Participant Scheduler
 Participant SchedulerStorage
 Participant Mesos
 Participant Orchestrator
 
-FrameworkState -> Scheduler: PodSpec A#1 goal running
+FrameworkState -> Scheduler: Launch Pod A#1
 hnote over Scheduler
-  No task exists for A#1; lets run.
-  Task placed into internal list of
-  pending instances.
-  Offers wanted signaled
+  No record exists for A#1; enqueued to launch.
+  Revive for role sent to Mesos
 end hnote
 
 Scheduler -> SchedulerStorage: Revive

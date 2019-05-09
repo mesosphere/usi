@@ -13,7 +13,9 @@ import org.apache.mesos.v1.{Protos => Mesos}
   * there is no specification.
   */
 case class PodStatus(id: PodId, taskStatuses: Map[TaskId, Mesos.TaskStatus]) {
+  private val activeTaskStatus = Set(Mesos.TaskState.TASK_RUNNING, Mesos.TaskState.TASK_STAGING)
+
   def isTerminalOrUnreachable: Boolean = {
-    taskStatuses.values.forall(status => status.getState == Mesos.TaskState.TASK_RUNNING)
+    !taskStatuses.valuesIterator.forall(status => activeTaskStatus(status.getState))
   }
 }

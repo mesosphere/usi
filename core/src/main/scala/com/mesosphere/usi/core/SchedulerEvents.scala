@@ -1,6 +1,15 @@
 package com.mesosphere.usi.core
 
-import com.mesosphere.usi.core.models.{PodId, PodRecord, PodRecordUpdated, PodStatus, PodStatusUpdated, StateEvent}
+import com.mesosphere.usi.core.models.{
+  PodId,
+  PodRecord,
+  PodRecordUpdated,
+  PodSpec,
+  PodSpecUpdated,
+  PodStatus,
+  PodStatusUpdated,
+  StateEvent
+}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
 
 case class SchedulerEvents(stateEvents: List[StateEvent] = Nil, mesosCalls: List[MesosCall] = Nil)
@@ -42,20 +51,22 @@ case class SchedulerEventsBuilder(
     * @return A FrameEffects with this effect appended
     */
   def withPodStatus(id: PodId, newStatus: Option[PodStatus]): SchedulerEventsBuilder =
-    withStateUpdated(PodStatusUpdated(id, newStatus))
+    withStateEvent(PodStatusUpdated(id, newStatus))
 
   /**
     * Append an effect which will change some PodRecord.
     *
     * @param id PodId
-    * @param newStatus Optional value; None means remove
     * @return A FrameEffects with this effect appended
     */
   def withPodRecord(id: PodId, newRecord: Option[PodRecord]): SchedulerEventsBuilder =
-    withStateUpdated(PodRecordUpdated(id, newRecord))
+    withStateEvent(PodRecordUpdated(id, newRecord))
 
-  private def withStateUpdated(message: StateEvent): SchedulerEventsBuilder =
-    copy(reverseStateEvents = message :: reverseStateEvents)
+  def withPodSpec(id: PodId, newPodSpec: Option[PodSpec]): SchedulerEventsBuilder =
+    withStateEvent(PodSpecUpdated(id, newPodSpec))
+
+  def withStateEvent(event: StateEvent): SchedulerEventsBuilder =
+    copy(reverseStateEvents = event :: reverseStateEvents)
 
   /**
     * Append an effect which will cause some Mesos call to be emitted

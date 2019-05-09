@@ -5,60 +5,47 @@ import com.mesosphere.usi.core._
 import com.mesosphere.usi.core.models._
 
 /**
-  * The current home for USI business logic
+  * The current home for USI business logic for dealing with spec commands
   *
   */
 private[core] class SpecLogic(mesosCallFactory: MesosCalls) {
-  import SchedulerLogicHelpers._
 
-  /**
-    * Process the modification of some podSpec.
-    *
-    * - If a podSpec is deleted:
-    *   - Also delete the podRecord.
-    *   - Prune a terminal / unknown task status.
-    * - If a podSpec is marked as terminal, then issue a kill.
-    */
-  private[core] def computeNextStateForPods(specs: SpecState, state: SchedulerState)(
-      changedPodIds: Set[PodId]): SchedulerEvents = {
-    import com.mesosphere.usi.core.protos.ProtoConversions._
-    changedPodIds
-      .foldLeft(SchedulerEventsBuilder.empty) { (initialSchedulerEvents, podId) =>
-        specs.podSpecs.get(podId) match {
-          case None =>
-            def maybePrunePodStatus(effects: SchedulerEventsBuilder) = {
-              // This is spurious if e have a non-terminal podStatus
-              val existingTerminalStatus = state.podStatuses.get(podId).exists(_.isTerminalOrUnreachable)
-              if (existingTerminalStatus) {
-                effects.withPodStatus(podId, None)
-              } else {
-                effects
-              }
-            }
-
-            def maybePruneRecord(effects: SchedulerEventsBuilder) = {
-              if (state.podRecords.contains(podId)) {
-                // delete podRecord
-                effects.withPodRecord(podId, None)
-              } else {
-                effects
-              }
-            }
-
-            maybePrunePodStatus(maybePruneRecord(initialSchedulerEvents))
-
-          case Some(podSpec) =>
-            if (podSpec.goal == Goal.Terminal) {
-              taskIdsFor(podSpec).foldLeft(initialSchedulerEvents) { (effects, taskId) =>
-                effects.withMesosCall(
-                  mesosCallFactory
-                    .newKill(taskId.asProto, state.podRecords.get(podSpec.id).map(_.agentId.asProto), None))
-              }
-            } else {
-              initialSchedulerEvents
-            }
+  private[core] def handleCommand(state: SchedulerState)(command: SchedulerCommand): SchedulerEvents = {
+    command match {
+      case LaunchPod(id, runSpec) =>
+        if (!state.podRecords.contains(id))
+          SchedulerEvents(stateEvents = List(PodSpecUpdated(id, Some(RunningPodSpec(id, runSpec)))))
+        else
+          // if we already have a record for the pod, ignore
+          SchedulerEvents.empty
+      case ExpungePod(podId) =>
+        var b = SchedulerEventsBuilder.empty
+        if (state.podSpecs.contains(podId)) {
+          b = b.withStateEvent(PodSpecUpdated(podId, None))
         }
-      }
-      .result
+        if (state.podRecords.contains(podId)) {
+          b = b.withStateEvent(PodRecordUpdated(podId, None))
+        }
+        b.result
+      case KillPod(podId) =>
+        var b = SchedulerEventsBuilder.empty.withStateEvent(PodSpecUpdated(podId, Some(TerminalPodSpec(podId))))
+
+        state.podStatuses.get(podId).foreach { status =>
+          b = killPod(b, status)
+        }
+        b.result
+      case _: CreateReservation =>
+        ???
+    }
+  }
+
+  private[core] def killPod(eventsBuilder: SchedulerEventsBuilder, podStatus: PodStatus) = {
+    import com.mesosphere.usi.core.protos.ProtoConversions._
+    podStatus.taskStatuses.foldLeft(eventsBuilder) {
+      case (eventsBuilder, (taskId, status)) =>
+        eventsBuilder.withMesosCall(
+          mesosCallFactory
+            .newKill(taskId.asProto, if (status.hasAgentId) Some(status.getAgentId) else None, None))
+    }
   }
 }

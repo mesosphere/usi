@@ -1,25 +1,26 @@
 package com.mesosphere.usi.core
 
+import java.time.Instant
+
 import akka.Done
+import akka.stream.FlowShape
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
-import akka.stream.{ActorMaterializer, FlowShape}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.helpers.MesosMock
-import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
-import com.mesosphere.usi.core.models._
-import com.mesosphere.usi.core.models.resources.ScalarRequirement
+import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{commandInputSource, outputFlatteningSink}
+import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord, PodRecordUpdated, SchedulerCommand}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.ConfigFactory
-import java.time.Instant
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
-import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest._
+
 import scala.annotation.tailrec
-import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
+import scala.util.Random
 
 class SchedulerTest extends AkkaUnitTest with Inside {
 
@@ -35,7 +36,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       event
     }
 
-  def mockedScheduler: Flow[Scheduler.SpecInput, Scheduler.StateOutput, Future[Done]] = {
+  def mockedScheduler: Flow[SchedulerCommand, Scheduler.StateOutput, Future[Done]] = {
     Flow.fromGraph {
       GraphDSL.create(
         Scheduler.unconnectedGraph(new MesosCalls(MesosMock.mockFrameworkId), InMemoryPodRecordRepository()),
@@ -52,45 +53,8 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     }
   }
 
-  "It reports a running task when I provide " in {
-    implicit val materializer = ActorMaterializer()
-    val podId = PodId("running-pod-on-a-mocked-mesos")
-    val (input, output) = specInputSource(SpecsSnapshot.empty)
-      .via(mockedScheduler)
-      .toMat(outputFlatteningSink)(Keep.both)
-      .run
-
-    input.offer(
-      PodSpecUpdated(
-        podId,
-        Some(
-          PodSpec(
-            podId,
-            Goal.Running,
-            RunSpec(
-              resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
-              shellCommand = "sleep 3600",
-              "test")
-          ))
-      ))
-
-    inside(output.pull().futureValue) {
-      case Some(snapshot: StateSnapshot) =>
-        snapshot shouldBe StateSnapshot.empty
-    }
-    inside(output.pull().futureValue) {
-      case Some(podRecord: PodRecordUpdated) =>
-        podRecord.id shouldBe podId
-        podRecord.newRecord.get.agentId shouldBe MesosMock.mockAgentId
-    }
-    inside(output.pull().futureValue) {
-      case Some(podStatusChange: PodStatusUpdated) =>
-        podStatusChange.newStatus.get.taskStatuses(TaskId(podId.value)).getState shouldBe Mesos.TaskState.TASK_RUNNING
-    }
-  }
-
   "It closes the Mesos client when the specs input stream terminates" in {
-    val ((input, mesosCompleted), _) = specInputSource(SpecsSnapshot.empty)
+    val ((input, mesosCompleted), _) = commandInputSource
       .viaMat(mockedScheduler)(Keep.both)
       .toMat(outputFlatteningSink)(Keep.both)
       .run
@@ -100,7 +64,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
   }
 
   "It closes the Mesos client when the scheduler state events are closed" in {
-    val ((_, mesosCompleted), output) = specInputSource(SpecsSnapshot.empty)
+    val ((_, mesosCompleted), output) = commandInputSource
       .viaMat(mockedScheduler)(Keep.both)
       .toMat(outputFlatteningSink)(Keep.both)
       .run
@@ -111,8 +75,8 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   "Persistence flow pipelines writes" in {
     Given("a persistence storage and a flow using it")
-    val fuzzyPodRecordRepo = new InMemoryPodRecordRepository {
-      val rand = scala.util.Random
+    val fuzzyPodRecordRepo: InMemoryPodRecordRepository = new InMemoryPodRecordRepository {
+      val rand: Random = scala.util.Random
       override def store(record: PodRecord): Future[Done] = {
         super.store(record).flatMap { _ =>
           akka.pattern.after(rand.nextInt(100).millis, system.scheduler)(Future.successful(Done))
@@ -190,7 +154,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       super.delete(podId).flatMap(_ => completed.future)
     }
 
-    def pendingWrites = queue.size()
+    def pendingWrites: Int = queue.size()
 
     @tailrec final def markCompleted(n: Int): Unit = {
       if ((n > 0) && !queue.isEmpty) {

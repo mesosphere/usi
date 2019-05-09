@@ -19,17 +19,22 @@ import scala.collection.JavaConverters._
 private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher: OfferMatcher = new FCFSOfferMatcher())
     extends ImplicitStrictLogging {
 
-  private[core] def matchOffer(offer: Mesos.Offer, specs: Iterable[PodSpec]): (Set[PodId], SchedulerEventsBuilder) = {
+  private[core] def matchOffer(
+      offer: Mesos.Offer,
+      specs: Iterable[RunningPodSpec]): (Set[PodId], SchedulerEventsBuilder) = {
     import com.mesosphere.usi.core.protos.ProtoBuilders._
     import com.mesosphere.usi.core.protos.ProtoConversions._
 
-    val matchedSpecs: Map[PodSpec, scala.List[Mesos.Resource]] = offerMatcher.matchOffer(offer, specs)
+    val matchedSpecs: Map[RunningPodSpec, scala.List[Mesos.Resource]] = offerMatcher.matchOffer(offer, specs)
     val taskInfos = matchedSpecs.map {
       case (spec, resources) => spec.id -> buildTaskInfos(spec, offer.getAgentId, resources)
     }
 
     val eventsBuilder = taskInfos.keys.foldLeft(SchedulerEventsBuilder.empty) { (events, podId) =>
-      events.withPodRecord(podId, Some(PodRecord(podId, Instant.now(), offer.getAgentId.asModel)))
+      // Add pod record for all matched pods, and remove the pod spec for the newly launched pod
+      events
+        .withPodRecord(podId, Some(PodRecord(podId, Instant.now(), offer.getAgentId.asModel)))
+        .withPodSpec(podId, None)
     }
 
     val offerEvent = if (taskInfos.isEmpty) {
@@ -67,7 +72,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
   }
 
   /**
-    * Given a [[PodSpec]], an [[Mesos.AgentID]] and a list of matched resources return a list of [[Mesos.TaskInfo]]s
+    * Given a [[RunningPodSpec]], an [[Mesos.AgentID]] and a list of matched resources return a list of [[Mesos.TaskInfo]]s
     *
     * @param podSpec podSpec
     * @param agentId agentId from the offer
@@ -75,7 +80,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
     * @return
     */
   def buildTaskInfos(
-      podSpec: PodSpec,
+      podSpec: RunningPodSpec,
       agentId: Mesos.AgentID,
       resources: List[Mesos.Resource]): List[Mesos.TaskInfo] = {
     import com.mesosphere.usi.core.protos.ProtoBuilders._
@@ -94,17 +99,19 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
     }(collection.breakOut)
   }
 
-  def processEvent(specs: SpecState, state: SchedulerState, pendingLaunch: Set[PodId])(
-      event: MesosEvent): SchedulerEvents = {
+  def processEvent(state: SchedulerState)(event: MesosEvent): SchedulerEvents = {
     import com.mesosphere.usi.core.protos.ProtoConversions.EventMatchers._
     event match {
       case OffersEvent(offersList) =>
+        val pendingLaunchPodSpecs: Map[PodId, RunningPodSpec] =
+          state.podSpecs.collect { case (id, runningPodSpec: RunningPodSpec) => id -> runningPodSpec }
+
         val (schedulerEventsBuilder, _) =
-          offersList.asScala.foldLeft((SchedulerEventsBuilder.empty, pendingLaunch)) {
+          offersList.asScala.foldLeft((SchedulerEventsBuilder.empty, pendingLaunchPodSpecs)) {
             case ((builder, pending), offer) =>
               val (matchedPodIds, offerMatchSchedulerEvents) = matchOffer(
                 offer,
-                pendingLaunch.flatMap(specs.podSpecs.get)
+                pending.values
               )
 
               (builder ++ offerMatchSchedulerEvents, pending -- matchedPodIds)
@@ -118,28 +125,23 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
           s"Received task status update from taskId $taskId and podId $podId with status ${taskStatus.getState}"
         )(LoggingArgs("taskId" -> taskId, "podId" -> podId))
 
-        if (specs.podSpecs.contains(podId)) {
-          val newStatus = state.podStatuses.get(podId) match {
-            case Some(oldStatus) =>
-              oldStatus.copy(taskStatuses = oldStatus.taskStatuses.updated(taskId, taskStatus))
-            case None =>
-              PodStatus(podId, Map(taskId -> taskStatus))
-          }
-
-          SchedulerEvents(
-            stateEvents = List(PodStatusUpdated(podId, Some(newStatus))),
-            mesosCalls = if (taskStatus.hasUuid) {
-              // frameworks should accept only status updates that have UUID set
-              // http://mesos.apache.org/documentation/latest/scheduler-http-api/#acknowledge
-              List(mesosCallFactory.newAcknowledge(taskStatus.getAgentId, taskStatus.getTaskId, taskStatus.getUuid))
-            } else {
-              Nil
-            }
-          )
-
-        } else {
-          SchedulerEvents.empty
+        val newStatus = state.podStatuses.get(podId) match {
+          case Some(oldStatus) =>
+            oldStatus.copy(taskStatuses = oldStatus.taskStatuses.updated(taskId, taskStatus))
+          case None =>
+            PodStatus(podId, Map(taskId -> taskStatus))
         }
+
+        SchedulerEvents(
+          stateEvents = List(PodStatusUpdated(podId, Some(newStatus))),
+          mesosCalls = if (taskStatus.hasUuid) {
+            // frameworks should accept only status updates that have UUID set
+            // http://mesos.apache.org/documentation/latest/scheduler-http-api/#acknowledge
+            List(mesosCallFactory.newAcknowledge(taskStatus.getAgentId, taskStatus.getTaskId, taskStatus.getUuid))
+          } else {
+            Nil
+          }
+        )
       case other =>
         logger.warn(s"No handler defined for event ${other.getType} - ${other}")
         SchedulerEvents.empty

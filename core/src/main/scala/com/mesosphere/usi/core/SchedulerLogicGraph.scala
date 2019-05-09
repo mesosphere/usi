@@ -3,8 +3,9 @@ package com.mesosphere.usi.core
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
 import com.mesosphere.mesos.client.MesosCalls
-import com.mesosphere.usi.core.models.{PodId, PodRecord, SpecEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.{PodId, PodRecord, SchedulerCommand, StateSnapshot}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
+
 import scala.collection.mutable
 
 object SchedulerLogicGraph {
@@ -17,12 +18,12 @@ object SchedulerLogicGraph {
   *
   * This graph component looks like this:
   *
-  *      Spec Events   +---------------------+
-  *   ----------------->                     |
+  * Scheduler Commands +---------------------+
+  * ------------------->                     |
   *                    |                     |   Response
   *                    |   Scheduler Logic   >-------------
-  *     Mesos Events   |                     |
-  *   ----------------->                     |
+  *    Mesos Events    |                     |
+  * ------------------->                     |
   *                    +---------------------+
   *
   * Only one event is processed at a time.
@@ -41,16 +42,15 @@ object SchedulerLogicGraph {
   * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
 private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialPodRecords: Map[PodId, PodRecord])
-    extends GraphStage[FanInShape2[SpecEvent, MesosEvent, SchedulerEvents]] {
+    extends GraphStage[FanInShape2[SchedulerCommand, MesosEvent, SchedulerEvents]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
   private val mesosEventsInlet = Inlet[MesosEvent]("mesos-events")
-  private val specEventsInlet = Inlet[SpecEvent]("specs")
+  private val schedulerCommandsInlet = Inlet[SchedulerCommand]("commands")
   private val frameResultOutlet = Outlet[SchedulerEvents]("effects")
-
   // Define the shape of this stage, which is SourceShape with the port we defined above
-  override val shape: FanInShape2[SpecEvent, MesosEvent, SchedulerEvents] =
-    new FanInShape2(specEventsInlet, mesosEventsInlet, frameResultOutlet)
+  override val shape: FanInShape2[SchedulerCommand, MesosEvent, SchedulerEvents] =
+    new FanInShape2(schedulerCommandsInlet, mesosEventsInlet, frameResultOutlet)
 
   // This is where the actual (possibly stateful) logic will live
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
@@ -67,9 +67,9 @@ private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialPod
         }
       })
 
-      setHandler(specEventsInlet, new InHandler {
+      setHandler(schedulerCommandsInlet, new InHandler {
         override def onPush(): Unit = {
-          pushOrQueueIntents(handler.handleSpecEvent(grab(specEventsInlet)))
+          pushOrQueueIntents(handler.handleCommand(grab(schedulerCommandsInlet)))
           maybePull()
         }
       })
@@ -86,7 +86,10 @@ private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialPod
       override def preStart(): Unit = {
         handler = new SchedulerLogicHandler(mesosCallFactory, initialPodRecords)
         // Publish the initial state snapshot event; podStatuses will not be in the snapshot in the future
-        pushOrQueueIntents(SchedulerEvents(List(StateSnapshot(podRecords = initialPodRecords.values.toSeq))))
+        pushOrQueueIntents(SchedulerEvents(List(StateSnapshot(
+          podRecords = initialPodRecords.values.toSeq,
+          agentRecords = Nil
+        ))))
       }
 
       def pushOrQueueIntents(effects: SchedulerEvents): Unit = {
@@ -105,8 +108,8 @@ private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialPod
         if (pendingEffects.length < BUFFER_SIZE) {
           if (!hasBeenPulled(mesosEventsInlet))
             pull(mesosEventsInlet)
-          if (!hasBeenPulled(specEventsInlet))
-            pull(specEventsInlet)
+          if (!hasBeenPulled(schedulerCommandsInlet))
+            pull(schedulerCommandsInlet)
         }
       }
     }
