@@ -2,28 +2,28 @@ package com.mesosphere.usi.core.models
 
 import com.mesosphere.usi.core.models.resources.{ExactValue, RangeRequirement, ResourceRequirement, ScalarRequirement}
 
+/**
+  * Scheduler logic state indicating the action to take for some pod [[RunningPodSpec]] or [[TerminalPodSpec]]
+  */
 sealed trait PodSpec {
   val id: PodId
-  def isTerminal: Boolean
+  def shouldBeTerminal: Boolean
 }
 
 case class TerminalPodSpec(id: PodId) extends PodSpec {
-  override def isTerminal: Boolean = true
+  override def shouldBeTerminal: Boolean = true
 }
 
 /**
-  * Framework implementation owned specification of some Pod that should be launched.
+  * Scheduler logic state indicating that a pod should be launched (and isn't)
   *
   * Pods are launched at-most-once. It is illegal to transition of [[RunningPodSpec]] from goal terminal to goal running.
-  *
-  * The deletion of a pod for which a known non-terminal task status exists will result in a spurious pod. Spurious pods
-  * can be killed by specifying a [[RunningPodSpec]] for said spurious pod with [[Goal]] terminal.
   *
   * @param id Id of the pod
   * @param runSpec WIP the thing to run, and resource requirements, etc.
   */
 case class RunningPodSpec(id: PodId, runSpec: RunSpec) extends PodSpec {
-  override def isTerminal: Boolean = false
+  override def shouldBeTerminal: Boolean = false
 }
 
 object RunningPodSpec {

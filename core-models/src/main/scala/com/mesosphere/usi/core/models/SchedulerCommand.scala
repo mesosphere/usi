@@ -30,7 +30,11 @@ case class LaunchPod(podId: PodId, runSpec: RunSpec) extends SchedulerCommand
 case class KillPod(podId: PodId) extends SchedulerCommand
 
 /**
-  * Delete the pod record and any pending pod spec (running or kill) for a given pod. Does not result in kill.
+  * Delete the pod record and any pending pod spec (running or kill) for a given pod. Does not result in kill
+  * (immediately, nor immediately).
+  *
+  * The associated PodStatus, if it exists, will remain until the pod is either terminal or unreachable.
+  *
   * @param podId
   */
 case class ExpungePod(podId: PodId) extends SchedulerCommand

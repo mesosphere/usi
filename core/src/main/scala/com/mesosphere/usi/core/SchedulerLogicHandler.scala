@@ -83,14 +83,14 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialP
   private var state: SchedulerState =
     SchedulerState(podStatuses = Map.empty, podRecords = initialPodRecords, podSpecs = Map.empty)
 
-  def validateEvent(msg: SchedulerCommand): Seq[PodInvalid] = msg match {
+  def validateCommand(msg: SchedulerCommand): Seq[PodInvalid] = msg match {
     case LaunchPod(id, runSpec) =>
       RunningPodSpec.isValid(runSpec).toList.map(err => PodInvalid(id, Seq(err)))
     case _ => Seq.empty
   }
 
   def handleCommand(command: SchedulerCommand): SchedulerEvents = {
-    val invalidPods = validateEvent(command)
+    val invalidPods = validateCommand(command)
     if (invalidPods.nonEmpty) {
       SchedulerEvents(invalidPods.toList, List.empty)
     } else {
@@ -111,8 +111,8 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialP
     *
     * @return The total state effects applied over the life-cycle of this state evaluation.
     */
-  private def handleFrame(fn: FrameResultBuilder => FrameResultBuilder): SchedulerEvents = {
-    val frameResultBuilder = fn(FrameResultBuilder.givenState(this.state))
+  private def handleFrame(handler: FrameResultBuilder => FrameResultBuilder): SchedulerEvents = {
+    val frameResultBuilder = handler(FrameResultBuilder.givenState(this.state))
       .process(prunePodStatuses)
       .process(pruneKilledTerminalSpecs)
       .process(suppressAndRevive(state.podSpecs))
@@ -133,14 +133,13 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialP
     * @return
     */
   private[core] def pruneKilledTerminalSpecs(state: SchedulerState, changedPodIds: Set[PodId]): SchedulerEvents = {
-    changedPodIds
-      .foldLeft(SchedulerEventsBuilder.empty) { (events, podId) =>
-        val unknownOrConsiderTerminal = state.podStatuses.get(podId).forall(_.isTerminalOrUnreachable)
+    changedPodIds.iterator.flatMap { podId =>
+      state.podSpecs.get(podId)
+    }.filter { _.shouldBeTerminal }.filter { podSpec =>
+      state.podStatuses.get(podSpec.id).forall(_.isTerminalOrUnreachable)
 
-        if (unknownOrConsiderTerminal && state.podSpecs.get(podId).exists(_.isTerminal))
-          events.withStateEvent(PodSpecUpdatedEvent(podId, None))
-        else
-          events
+    }.foldLeft(SchedulerEventsBuilder.empty) { (events, pod) =>
+        events.withStateEvent(PodSpecUpdatedEvent(pod.id, None))
       }
       .result
   }
@@ -149,14 +148,14 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialP
     * Clean up all terminal-like podStatuses which don't have podRecords
     */
   private[core] def prunePodStatuses(state: SchedulerState, changedPodIds: Set[PodId]): SchedulerEvents = {
-    changedPodIds
-      .foldLeft(SchedulerEventsBuilder.empty) { (events, podId) =>
-        val terminalLikeOrNoStatus = state.podStatuses.get(podId).exists(_.isTerminalOrUnreachable)
-        // prune pod statuses if there is no podRecord associated with it
-        if (terminalLikeOrNoStatus && !state.podRecords.contains(podId))
-          events.withStateEvent(PodStatusUpdatedEvent(podId, None))
-        else
-          events
+    changedPodIds.iterator.filter { podId =>
+      state.podStatuses.get(podId).exists(_.isTerminalOrUnreachable)
+    }
+    // prune pod statuses if there is no podRecord associated with it
+    .filterNot { podId =>
+      state.podRecords.contains(podId)
+    }.foldLeft(SchedulerEventsBuilder.empty) { (events, podId) =>
+        events.withStateEvent(PodStatusUpdatedEvent(podId, None))
       }
       .result
   }

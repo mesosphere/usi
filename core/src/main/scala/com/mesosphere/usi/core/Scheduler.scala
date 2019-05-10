@@ -110,7 +110,7 @@ object Scheduler {
       Sink.fromSubscriber(commandInputSubscriber).mapMaterializedValue(_ => subscriberCompleted))
   }
 
-  def fromClient(
+  private[usi] def fromClient(
       client: MesosClient,
       podRecordRepository: PodRecordRepository): Flow[SchedulerCommand, StateOutput, NotUsed] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
@@ -121,7 +121,7 @@ object Scheduler {
     fromFlow(client.calls, podRecordRepository, Flow.fromSinkAndSource(client.mesosSink, client.mesosSource))
   }
 
-  def fromFlow(
+  private[usi] def fromFlow(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
       mesosFlow: Flow[MesosCall, MesosEvent, Any]): Flow[SchedulerCommand, StateOutput, NotUsed] = {
