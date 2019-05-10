@@ -176,7 +176,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       .via(info("HttpResponse: "))
   }
 
-  private def mesosHttpConnection(frameworkInfo: FrameworkInfo, urls: List[URL], redirectRetries: Int)(
+  private def mesosHttpConnection(frameworkInfo: FrameworkInfo, urls: List[URL], maxRedirects: Int)(
       implicit mat: Materializer,
       as: ActorSystem): Source[(HttpResponse, ConnectionInfo), NotUsed] =
     urls match {
@@ -205,13 +205,13 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
         }.recoverWithRetries(
           1, {
             case ex @ MesosRedirectException(leader) =>
-              if (redirectRetries > 0)
-                mesosHttpConnection(frameworkInfo, (leader :: rest).distinct, redirectRetries - 1)
+              if (maxRedirects > 0)
+                mesosHttpConnection(frameworkInfo, (leader :: rest).distinct, maxRedirects - 1)
               else
                 throw new IOException("Failed to connect to Mesos: Too many redirects.", ex)
             case ex =>
               logger.warn(s"Failed to connect to Mesos $url", ex)
-              mesosHttpConnection(frameworkInfo, rest, redirectRetries)
+              mesosHttpConnection(frameworkInfo, rest, maxRedirects)
           }
         )
     }
@@ -277,7 +277,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     *    `api/v1/scheduler` endpoint, providing framework info as requested. The HTTP response is a stream in RecordIO
     *    format which is handled by the later stages.
     *
-    *    If we connect to a non-leader Mesos master, we automatically follow the redirect up to `conf.redirectRetries`.
+    *    If we connect to a non-leader Mesos master, we automatically follow the redirect up to `conf.maxRedirects`.
     *
     *    When we receive the HTTP response headers from the master connection, we set aside the `Mesos-Stream-Id`(see
     *    the description of the
@@ -313,7 +313,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       materializer: Materializer): Source[MesosClient, NotUsed] = {
 
     val httpConnection: Source[(HttpResponse, ConnectionInfo), NotUsed] =
-      mesosHttpConnection(frameworkInfo, conf.masters.toList, conf.redirectRetries)
+      mesosHttpConnection(frameworkInfo, conf.masters.toList, conf.maxRedirects)
 
     val eventReader = Flow[ByteString]
       .via(RecordIOFraming.scanner())
