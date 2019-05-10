@@ -10,14 +10,18 @@ import com.mesosphere.usi.core.models._
   */
 private[core] class SpecLogic(mesosCallFactory: MesosCalls) {
 
+  private def getRunningPodSpec(podSpecs: Map[PodId, PodSpec], id: PodId): Option[RunningPodSpec] = {
+    podSpecs.get(id).collect { case r: RunningPodSpec => r }
+  }
   private[core] def handleCommand(state: SchedulerState)(command: SchedulerCommand): SchedulerEvents = {
     command match {
       case LaunchPod(id, runSpec) =>
-        if (!state.podRecords.contains(id))
-          SchedulerEvents(stateEvents = List(PodSpecUpdatedEvent(id, Some(RunningPodSpec(id, runSpec)))))
-        else
+        if (state.podRecords.contains(id) || getRunningPodSpec(state.podSpecs, id).exists(_.runSpec == runSpec)) {
           // if we already have a record for the pod, ignore
           SchedulerEvents.empty
+        } else {
+          SchedulerEvents(stateEvents = List(PodSpecUpdatedEvent(id, Some(RunningPodSpec(id, runSpec)))))
+        }
       case ExpungePod(podId) =>
         var b = SchedulerEventsBuilder.empty
         if (state.podSpecs.contains(podId)) {
