@@ -37,13 +37,19 @@ case class LaunchPod(podId: PodId, runSpec: RunSpec) extends SchedulerCommand
 case class KillPod(podId: PodId) extends SchedulerCommand
 
 /**
-  * Delete the pod record and any pending pod spec (running or kill) for a given pod. Does not result in kill
-  * (immediately, nor immediately).
+  * Delete the pod record and any pending [[PodSpec]] ([[RunningPodSpec]] or [[TerminalPodSpec]]) for a given pod. Does
+  * not cause the actual tasks in the pod to be killed.
   *
-  * The associated PodStatus, if it exists, will remain until the pod is either terminal or unreachable.
+  * The associated [[PodStatus]], if it exists, will remain until the [[PodStatus]] is either terminal or unreachable.
   *
   * @param podId
   */
 case class ExpungePod(podId: PodId) extends SchedulerCommand
 
+/**
+  * Not implemented yet; command will be used to make new reservations.
+  *
+  * @param id
+  * @param newState
+  */
 case class CreateReservation(id: ReservationId, newState: Option[ReservationSpec]) extends SchedulerCommand
