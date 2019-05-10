@@ -41,7 +41,7 @@ object MesosClientSettings {
 
     val sourceBufferSize = conf.getInt("back-pressure.source-buffer-size")
 
-    new MesosClientSettings(masterUrls,  maxRedirects , idleTimeout, sourceBufferSize)
+    new MesosClientSettings(masterUrls, maxRedirects, idleTimeout, sourceBufferSize)
 
   }
 
