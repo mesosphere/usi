@@ -51,13 +51,14 @@ sealed trait UserError extends PodStateEvent
 case class PodInvalid(id: PodId, errors: Seq[String]) extends UserError
 
 /**
-  * A Pod is specified to be launched, or killed; or, the pod met the objective.
+  * These specs are managed by the Scheduler in response to [[LaunchPod]] and [[KillPod]] commands. They indicate that
+  * there is some pending action to perform on behalf of a pod.
   *
-  * If [[PodSpec]] is [[RunningPodSpec]], then the pod is launching and offer matching is occurring.
+  * The podSpec is cleared from USI under the following conditions:
+  *
+  * jf [[PodSpec]] is [[RunningPodSpec]], then the pod is launching and offer matching is occurring.
   * If [[PodSpec]] is [[TerminalPodSpec]], then USI is killing a pod and has not yet received a terminal status for the
   * pod.
-  *
-  * A PodSpec is cleared, then there is no pending action for the podSpec.
   * @param id
   * @param newState
   */
