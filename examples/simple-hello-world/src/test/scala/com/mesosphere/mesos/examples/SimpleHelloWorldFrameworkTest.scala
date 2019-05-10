@@ -1,11 +1,9 @@
 package com.mesosphere.mesos.examples
 
-import java.util
-
+import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
-import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkID
 
 class SimpleHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest {
@@ -39,12 +37,7 @@ class SimpleHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest {
   }
 
   class Fixture(existingFrameworkId: Option[FrameworkID.Builder] = None) {
-    val mesosUrl = mesosFacade.url
-
-    val conf = ConfigFactory
-      .parseMap(util.Collections.singletonMap("mesos-client.master-url", s"${mesosUrl.getHost}:${mesosUrl.getPort}"))
-      .withFallback(ConfigFactory.load())
-
-    val framework = SimpleHelloWorldFramework(conf.getConfig("mesos-client"))
+    val settings = MesosClientSettings.load().withMaster(mesosFacade.url)
+    val framework = SimpleHelloWorldFramework(settings)
   }
 }
