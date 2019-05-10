@@ -182,6 +182,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     urls match {
       case Nil => throw new IOException(s"Failed to connect to Mesos: List of master urls exhausted.")
       case url :: rest =>
+        logger.info(s"Connecting to Mesos master $url")
         connectionSource(frameworkInfo, url).map { response =>
           response.status match {
             case StatusCodes.OK =>
