@@ -18,9 +18,8 @@ import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
   * @param dirtyPodIds The podIds that have been changed during the lifecycle of this FrameWithEvents instance
   */
 case class FrameResultBuilder(
-    specs: SpecState,
     state: SchedulerState,
-    appliedStateEvents: List[StateEvent],
+    appliedStateEvents: List[StateEventOrSnapshot],
     mesosCalls: List[MesosCall],
     dirtyPodIds: Set[PodId]) {
   private def applyAndAccumulate(schedulerEvents: SchedulerEvents): FrameResultBuilder = {
@@ -44,62 +43,14 @@ case class FrameResultBuilder(
     }
   }
 
-  private def assertValidPodspecTransition(
-      id: PodId,
-      maybeOldState: Option[PodSpec],
-      maybeNewState: Option[PodSpec]): Unit = {
-    (maybeOldState, maybeNewState) match {
-      case (Some(oldState), Some(newState)) if newState.goal == Goal.Running && oldState.goal == Goal.Terminal =>
-        throw new RuntimeException("It is illegal to transition a podSpec from terminal to running")
-      case _ =>
-      // Okie dokie
-    }
-  }
-
-  /**
-    * Applies the specEvent to the frame, marking podIds as dirty accordingly
-    *
-    * @param specEvent
-    */
-  def applySpecEvent(specEvent: SpecEvent): FrameResultBuilder = {
-    specEvent match {
-      case SpecsSnapshot(podSpecSnapshot, reservationSpecSnapshot) =>
-        if (reservationSpecSnapshot.nonEmpty) {
-          // This should make the framework crash
-          throw new NotImplementedError("ReservationSpec support not yet implemented")
-        }
-        val newPodsSpecs: Map[PodId, PodSpec] = podSpecSnapshot.map { pod =>
-          pod.id -> pod
-        }(collection.breakOut)
-
-        val changedPodIds = specs.podSpecs.keySet ++ newPodsSpecs.keySet
-
-        copy(specs = specs.copy(podSpecs = newPodsSpecs), dirtyPodIds = dirtyPodIds ++ changedPodIds)
-
-      case PodSpecUpdated(id, newState) =>
-        assertValidPodspecTransition(id, specs.podSpecs.get(id), newState)
-        val newPodSpecs = newState match {
-          case Some(podSpec) =>
-            specs.podSpecs.updated(id, podSpec)
-          case None =>
-            specs.podSpecs - id
-        }
-
-        copy(specs = specs.copy(podSpecs = newPodSpecs), dirtyPodIds = dirtyPodIds ++ Set(id))
-
-      case ReservationSpecUpdated(id, _) =>
-        throw new NotImplementedError("ReservationSpec support not yet implemented")
-    }
-  }
-
-  def process(fn: (SpecState, SchedulerState, Set[PodId]) => SchedulerEvents): FrameResultBuilder =
-    applyAndAccumulate(fn(this.specs, this.state, this.dirtyPodIds))
+  def process(fn: (SchedulerState, Set[PodId]) => SchedulerEvents): FrameResultBuilder =
+    applyAndAccumulate(fn(this.state, this.dirtyPodIds))
 
   lazy val result: SchedulerEvents =
     SchedulerEvents(stateEvents = appliedStateEvents, mesosCalls = mesosCalls)
 }
 
 object FrameResultBuilder {
-  def givenState(specificationState: SpecState, state: SchedulerState): FrameResultBuilder =
-    FrameResultBuilder(specificationState, state, Nil, Nil, Set.empty)
+  def givenState(state: SchedulerState): FrameResultBuilder =
+    FrameResultBuilder(state, Nil, Nil, Set.empty)
 }

@@ -2,8 +2,8 @@ package com.mesosphere.usi.helloworld
 
 import java.util.UUID
 
-import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, RunSpec, SpecsSnapshot}
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
+import com.mesosphere.usi.core.models.{PodId, RunningPodSpec, RunSpec}
 
 /**
   * This is a helper object that generates pod specs and snapshots.
@@ -16,22 +16,15 @@ object KeepAlivePodSpecHelper {
     role = "test"
   )
 
-  def generatePodSpec(): PodSpec = {
+  def generatePodSpec(): RunningPodSpec = {
     val podId = PodId(s"hello-world.${UUID.randomUUID()}.1")
 
-    val podSpec = PodSpec(
-      id = podId,
-      goal = Goal.Running,
-      runSpec = runSpec
-    )
-
+    val podSpec = RunningPodSpec(id = podId, runSpec = runSpec)
     podSpec
   }
 
-  def specsSnapshot(numberOfPods: Int): SpecsSnapshot = SpecsSnapshot(
-    podSpecs = (1 to numberOfPods).map(_ => generatePodSpec()),
-    reservationSpecs = Seq.empty
-  )
+  def specsSnapshot(numberOfPods: Int): List[RunningPodSpec] =
+    (1 to numberOfPods).map(_ => generatePodSpec())(collection.breakOut)
 
   def createNewIncarnationId(podId: PodId): PodId = {
     val idAndIncarnation = """^(.+\..*)\.(\d+)$""".r

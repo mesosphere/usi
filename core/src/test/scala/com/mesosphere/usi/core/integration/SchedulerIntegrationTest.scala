@@ -5,7 +5,7 @@ import akka.stream.scaladsl.{Keep, Sink}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
-import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, specInputSource}
+import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, commandInputSource}
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.core.models.resources.{RangeRequirement, ScalarRequirement}
 import com.mesosphere.utils.AkkaUnitTest
@@ -29,7 +29,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
 
   lazy val mesosClient: MesosClient = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
   lazy val schedulerFlow = Scheduler.fromClient(mesosClient, InMemoryPodRecordRepository())
-  lazy val (input, output) = specInputSource(SpecsSnapshot.empty)
+  lazy val (input, output) = commandInputSource
     .via(schedulerFlow)
     .toMat(outputFlatteningSink)(Keep.both)
     .run
@@ -38,21 +38,16 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     super.beforeAll()
   }
 
-  "launches the thing" in {
+  "launches a pod with Mesos and reports the status" in {
     val podId = PodId("scheduler-integration-test-pod")
 
     input.offer(
-      PodSpecUpdated(
+      LaunchPod(
         podId,
-        Some(
-          PodSpec(
-            podId,
-            Goal.Running,
-            RunSpec(
-              resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
-              shellCommand = "sleep 3600",
-              "test")
-          ))
+        RunSpec(
+          resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
+          shellCommand = "sleep 3600",
+          "test")
       ))
 
     inside(output.pull().futureValue) {
@@ -60,12 +55,16 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
         snapshot shouldBe StateSnapshot.empty
     }
     inside(output.pull().futureValue) {
-      case Some(podRecord: PodRecordUpdated) =>
-        podRecord.id shouldBe podId
+      case Some(specUpdated: PodSpecUpdatedEvent) =>
+        specUpdated.id shouldBe podId
+    }
+    inside(output.pull().futureValue) {
+      case Some(recordUpdated: PodRecordUpdatedEvent) =>
+        recordUpdated.id shouldBe podId
     }
     eventually {
       inside(output.pull().futureValue) {
-        case Some(podStatusChange: PodStatusUpdated) =>
+        case Some(podStatusChange: PodStatusUpdatedEvent) =>
           podStatusChange.newStatus.get
             .taskStatuses(TaskId(podId.value))
             .getState shouldBe Protos.TaskState.TASK_RUNNING
@@ -77,23 +76,19 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     val podId = PodId("pod-with-ports")
 
     input.offer(
-      PodSpecUpdated(
+      LaunchPod(
         podId,
-        Some(PodSpec(
-          podId,
-          Goal.Running,
-          RunSpec(
-            resourceRequirements =
-              List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256), RangeRequirement.ports(Seq(0))),
-            shellCommand = "sleep 3600",
-            "test"
-          )
-        ))
+        RunSpec(
+          resourceRequirements =
+            List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256), RangeRequirement.ports(Seq(0))),
+          shellCommand = "sleep 3600",
+          "test"
+        )
       ))
 
     eventually {
       inside(output.pull().futureValue) {
-        case Some(podStatusChange: PodStatusUpdated) =>
+        case Some(podStatusChange: PodStatusUpdatedEvent) =>
           podStatusChange.newStatus.get
             .taskStatuses(TaskId(podId.value))
             .getState shouldBe Protos.TaskState.TASK_RUNNING

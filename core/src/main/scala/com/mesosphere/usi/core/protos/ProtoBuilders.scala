@@ -118,8 +118,8 @@ private[usi] object ProtoBuilders {
   def newTaskStatus(
       taskId: Mesos.TaskID,
       state: Mesos.TaskState,
-      uuid: ByteString, // UUID should be present, only e.g. TASK_ERROR does not have UUID
-      agentId: Mesos.AgentID = null,
+      agentId: Mesos.AgentID,
+      uuid: ByteString = null, // UUID should be present, only e.g. TASK_ERROR does not have UUID
       checkStatus: Mesos.CheckStatusInfo = null,
       containerStatus: Mesos.ContainerStatus = null,
       data: ByteString = null,
@@ -137,8 +137,8 @@ private[usi] object ProtoBuilders {
       .newBuilder()
       .setTaskId(taskId)
       .setState(state)
+      .setAgentId(agentId)
 
-    if (agentId != null) b.setAgentId(agentId)
     if (checkStatus != null) b.setCheckStatus(checkStatus)
     if (containerStatus != null) b.setContainerStatus(containerStatus)
     if (data != null) b.setData(data)
