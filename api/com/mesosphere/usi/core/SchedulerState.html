@@ -214,10 +214,6 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
     </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="CachedPendingLaunch.html" title=""></a>
-                        <a href="CachedPendingLaunch.html" title="">CachedPendingLaunch</a>
-                      </li><li class="current-entities indented4">
                         <a class="object" href="FrameResultBuilder$.html" title=""></a>
                         <a class="class" href="FrameResultBuilder.html" title="Immutable helper data structure which:"></a>
                         <a href="FrameResultBuilder.html" title="Immutable helper data structure which:">FrameResultBuilder</a>
@@ -245,14 +241,6 @@
                         <a class="object" href="SchedulerState$.html" title=""></a>
                         <a class="class" href="" title="Data structure that contains all the state used for the SchedulerLogic."></a>
                         <a href="" title="Data structure that contains all the state used for the SchedulerLogic.">SchedulerState</a>
-                      </li><li class="current-entities indented4">
-                        <a class="object" href="SpecState$.html" title=""></a>
-                        <a class="class" href="SpecState.html" title=""></a>
-                        <a href="SpecState.html" title="">SpecState</a>
-                      </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="UpdateResult.html" title=""></a>
-                        <a href="UpdateResult.html" title="">UpdateResult</a>
                       </li>
               </ul>
             </div>
@@ -278,7 +266,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">SchedulerState</span><span class="params">(<span name="podRecords">podRecords: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>]</span>, <span name="podStatuses">podStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodStatus.html" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">SchedulerState</span><span class="params">(<span name="podRecords">podRecords: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>]</span>, <span name="podStatuses">podStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodStatus.html" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a>]</span>, <span name="podSpecs">podSpecs: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -336,9 +324,9 @@ so that the state can be reliably subscribed to by other components.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.core.SchedulerState#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(podRecords:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodRecord],podStatuses:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodStatus]):com.mesosphere.usi.core.SchedulerState"></a><a id="&lt;init&gt;:SchedulerState"></a>
+      <a id="&lt;init&gt;(podRecords:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodRecord],podStatuses:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodStatus],podSpecs:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodSpec]):com.mesosphere.usi.core.SchedulerState"></a><a id="&lt;init&gt;:SchedulerState"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/SchedulerState.html#&lt;init&gt;(podRecords:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodRecord],podStatuses:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodStatus]):com.mesosphere.usi.core.SchedulerState" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerState.html#&lt;init&gt;(podRecords:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodRecord],podStatuses:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodStatus],podSpecs:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodSpec]):com.mesosphere.usi.core.SchedulerState" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -347,7 +335,7 @@ so that the state can be reliably subscribed to by other components.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">SchedulerState</span><span class="params">(<span name="podRecords">podRecords: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>]</span>, <span name="podStatuses">podStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodStatus.html" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a>]</span>)</span>
+        <span class="name">SchedulerState</span><span class="params">(<span name="podRecords">podRecords: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>]</span>, <span name="podStatuses">podStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodStatus.html" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a>]</span>, <span name="podSpecs">podSpecs: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>]</span>)</span>
       </span>
       
       
@@ -410,9 +398,9 @@ so that the state can be reliably subscribed to by other components.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.mesosphere.usi.core.SchedulerState#applyStateIntents" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="applyStateIntents(stateIntents:List[com.mesosphere.usi.core.models.StateEvent]):com.mesosphere.usi.core.SchedulerState"></a><a id="applyStateIntents(List[StateEvent]):SchedulerState"></a>
+      <a id="applyStateIntents(stateIntents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot]):com.mesosphere.usi.core.SchedulerState"></a><a id="applyStateIntents(List[StateEventOrSnapshot]):SchedulerState"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/SchedulerState.html#applyStateIntents(stateIntents:List[com.mesosphere.usi.core.models.StateEvent]):com.mesosphere.usi.core.SchedulerState" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerState.html#applyStateIntents(stateIntents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot]):com.mesosphere.usi.core.SchedulerState" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -421,7 +409,7 @@ so that the state can be reliably subscribed to by other components.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">applyStateIntents</span><span class="params">(<span name="stateIntents">stateIntents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>]</span>)</span><span class="result">: <a href="" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a></span>
+        <span class="name">applyStateIntents</span><span class="params">(<span name="stateIntents">stateIntents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>]</span>)</span><span class="result">: <a href="" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a></span>
       </span>
       
       <p class="shortcomment cmt">PodRecords, PodStatuses, and other state managed by USI is manipulated through effects, which are generated by
@@ -609,6 +597,22 @@ frame state. Once it has, it is then a stateEvent and is used for external repli
       </span>
       <span class="symbol">
         <span class="name">podRecords</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>]</span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.SchedulerState#podSpecs" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="podSpecs:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodSpec]"></a><a id="podSpecs:Map[PodId,PodSpec]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerState.html#podSpecs:Map[com.mesosphere.usi.core.models.PodId,com.mesosphere.usi.core.models.PodSpec]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">podSpecs</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>]</span>
       </span>
       
       

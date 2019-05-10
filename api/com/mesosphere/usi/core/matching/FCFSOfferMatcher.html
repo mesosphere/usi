@@ -151,8 +151,8 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
     </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="" title="Simple first-come-first-served offer matcher implementation which tries to match PodSpec one after the other, consuming resources from the Mesos.Offer (should there be enough)."></a>
-                        <a href="" title="Simple first-come-first-served offer matcher implementation which tries to match PodSpec one after the other, consuming resources from the Mesos.Offer (should there be enough).">FCFSOfferMatcher</a>
+                        <a class="class" href="" title="Simple first-come-first-served offer matcher implementation which tries to match RunningPodSpec one after the other, consuming resources from the Mesos.Offer (should there be enough)."></a>
+                        <a href="" title="Simple first-come-first-served offer matcher implementation which tries to match RunningPodSpec one after the other, consuming resources from the Mesos.Offer (should there be enough).">FCFSOfferMatcher</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="class" href="MesosRange.html" title=""></a>
@@ -217,7 +217,7 @@
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Simple first-come-first-served offer matcher implementation which tries to match <span class="extype" name="PodSpec">PodSpec</span> one after the other,
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Simple first-come-first-served offer matcher implementation which tries to match <span class="extype" name="RunningPodSpec">RunningPodSpec</span> one after the other,
 consuming resources from the <span class="extype" name="Mesos.Offer">Mesos.Offer</span> (should there be enough). Matcher goes over all passed specs *not*
 breaking out on the first unmatched PodSpec.
 </p></div><div class="toggleContainer block">
@@ -493,9 +493,9 @@ breaking out on the first unmatched PodSpec.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.mesosphere.usi.core.matching.FCFSOfferMatcher#matchOffer" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="matchOffer(offer:org.apache.mesos.v1.Protos.Offer,podSpecs:Iterable[com.mesosphere.usi.core.models.PodSpec]):Map[com.mesosphere.usi.core.models.PodSpec,List[org.apache.mesos.v1.Protos.Resource]]"></a><a id="matchOffer(Offer,Iterable[PodSpec]):Map[PodSpec,List[Resource]]"></a>
+      <a id="matchOffer(offer:org.apache.mesos.v1.Protos.Offer,podSpecs:Iterable[com.mesosphere.usi.core.models.RunningPodSpec]):Map[com.mesosphere.usi.core.models.RunningPodSpec,List[org.apache.mesos.v1.Protos.Resource]]"></a><a id="matchOffer(Offer,Iterable[RunningPodSpec]):Map[RunningPodSpec,List[Resource]]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/FCFSOfferMatcher.html#matchOffer(offer:org.apache.mesos.v1.Protos.Offer,podSpecs:Iterable[com.mesosphere.usi.core.models.PodSpec]):Map[com.mesosphere.usi.core.models.PodSpec,List[org.apache.mesos.v1.Protos.Resource]]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/FCFSOfferMatcher.html#matchOffer(offer:org.apache.mesos.v1.Protos.Offer,podSpecs:Iterable[com.mesosphere.usi.core.models.RunningPodSpec]):Map[com.mesosphere.usi.core.models.RunningPodSpec,List[org.apache.mesos.v1.Protos.Resource]]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -504,11 +504,11 @@ breaking out on the first unmatched PodSpec.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">matchOffer</span><span class="params">(<span name="offer">offer: <span class="extype" name="org.apache.mesos.v1.Protos.Offer">Offer</span></span>, <span name="podSpecs">podSpecs: <span class="extype" name="scala.Iterable">Iterable</span>[<a href="../models/PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../models/PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>, <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.Protos.Resource">Resource</span>]]</span>
+        <span class="name">matchOffer</span><span class="params">(<span name="offer">offer: <span class="extype" name="org.apache.mesos.v1.Protos.Offer">Offer</span></span>, <span name="podSpecs">podSpecs: <span class="extype" name="scala.Iterable">Iterable</span>[<a href="../models/RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../models/RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a>, <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.Protos.Resource">Resource</span>]]</span>
       </span>
       
-      <p class="shortcomment cmt">Given a Mesos <span class="extype" name="Mesos.Offer">Mesos.Offer</span> and a set of <span class="extype" name="PodSpec">PodSpec</span>s return a map of all matched <a href="../models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">com.mesosphere.usi.core.models.PodId</a>s
-along with their corresponding resources.</p><div class="fullcomment"><div class="comment cmt"><p>Given a Mesos <span class="extype" name="Mesos.Offer">Mesos.Offer</span> and a set of <span class="extype" name="PodSpec">PodSpec</span>s return a map of all matched <a href="../models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">com.mesosphere.usi.core.models.PodId</a>s
+      <p class="shortcomment cmt">Given a Mesos <span class="extype" name="Mesos.Offer">Mesos.Offer</span> and a set of <span class="extype" name="RunningPodSpec">RunningPodSpec</span>s return a map of all matched <a href="../models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">com.mesosphere.usi.core.models.PodId</a>s
+along with their corresponding resources.</p><div class="fullcomment"><div class="comment cmt"><p>Given a Mesos <span class="extype" name="Mesos.Offer">Mesos.Offer</span> and a set of <span class="extype" name="RunningPodSpec">RunningPodSpec</span>s return a map of all matched <a href="../models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">com.mesosphere.usi.core.models.PodId</a>s
 along with their corresponding resources.
 </p></div><dl class="paramcmts block"><dt class="param">offer</dt><dd class="cmt"><p>Mesos offer</p></dd><dt class="param">podSpecs</dt><dd class="cmt"><p>a collection of PodSpecs</p></dd><dt>returns</dt><dd class="cmt"><p>a map of PodSpecs that matched the offer with the list of matched Mesos resouces</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.usi.core.matching.FCFSOfferMatcher">FCFSOfferMatcher</a> → <a href="OfferMatcher.html" class="extype" name="com.mesosphere.usi.core.matching.OfferMatcher">OfferMatcher</a></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">

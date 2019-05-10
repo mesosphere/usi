@@ -266,26 +266,10 @@
       </span>
       
       
-    </li><li name="com.mesosphere.usi.core.japi.Scheduler.SpecInput" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="SpecInput=akka.japi.Pair[com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any]]"></a><a id="SpecInput:SpecInput"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#SpecInput=akka.japi.Pair[com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any]]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">type</span>
-      </span>
-      <span class="symbol">
-        <span class="name">SpecInput</span><span class="result alias"> = <span class="extype" name="akka.japi.Pair">Pair</span>[<a href="../models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a>, <span class="extype" name="akka.stream.javadsl.Source">Source</span>[<a href="../models/SpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.SpecUpdated">SpecUpdated</a>, <span class="extype" name="scala.Any">Any</span>]]</span>
-      </span>
-      
-      
     </li><li name="com.mesosphere.usi.core.japi.Scheduler.StateOutput" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="StateOutput=akka.japi.Pair[com.mesosphere.usi.core.models.StateSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEvent,Any]]"></a><a id="StateOutput:StateOutput"></a>
+      <a id="StateOutput=akka.japi.Pair[com.mesosphere.usi.core.models.StateSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEventOrSnapshot,Any]]"></a><a id="StateOutput:StateOutput"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#StateOutput=akka.japi.Pair[com.mesosphere.usi.core.models.StateSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEvent,Any]]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#StateOutput=akka.japi.Pair[com.mesosphere.usi.core.models.StateSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEventOrSnapshot,Any]]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -294,7 +278,7 @@
         <span class="kind">type</span>
       </span>
       <span class="symbol">
-        <span class="name">StateOutput</span><span class="result alias"> = <span class="extype" name="akka.japi.Pair">Pair</span>[<a href="../models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a>, <span class="extype" name="akka.stream.javadsl.Source">Source</span>[<a href="../models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>, <span class="extype" name="scala.Any">Any</span>]]</span>
+        <span class="name">StateOutput</span><span class="result alias"> = <span class="extype" name="akka.japi.Pair">Pair</span>[<a href="../models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a>, <span class="extype" name="akka.stream.javadsl.Source">Source</span>[<a href="../models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>, <span class="extype" name="scala.Any">Any</span>]]</span>
       </span>
       
       
@@ -355,9 +339,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.mesosphere.usi.core.japi.Scheduler#asFlow" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="asFlow(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,materializer:akka.stream.Materializer):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.FlowResult]"></a><a id="asFlow(SpecsSnapshot,MesosClient,PodRecordRepository,Materializer):CompletableFuture[FlowResult]"></a>
+      <a id="asFlow(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,materializer:akka.stream.Materializer):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.FlowResult]"></a><a id="asFlow(MesosClient,PodRecordRepository,Materializer):CompletableFuture[FlowResult]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#asFlow(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,materializer:akka.stream.Materializer):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.FlowResult]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#asFlow(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,materializer:akka.stream.Materializer):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.FlowResult]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -366,7 +350,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">asFlow</span><span class="params">(<span name="specsSnapshot">specsSnapshot: <a href="../models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a></span>, <span name="client">client: <a href="../../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="materializer">materializer: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: <span class="extype" name="java.util.concurrent.CompletableFuture">CompletableFuture</span>[<a href="Scheduler$$FlowResult.html" class="extype" name="com.mesosphere.usi.core.japi.Scheduler.FlowResult">FlowResult</a>]</span>
+        <span class="name">asFlow</span><span class="params">(<span name="client">client: <a href="../../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="materializer">materializer: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: <span class="extype" name="java.util.concurrent.CompletableFuture">CompletableFuture</span>[<a href="Scheduler$$FlowResult.html" class="extype" name="com.mesosphere.usi.core.japi.Scheduler.FlowResult">FlowResult</a>]</span>
       </span>
       
       
@@ -387,9 +371,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.mesosphere.usi.core.japi.Scheduler#asSourceAndSink" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="asSourceAndSink(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,materializer:akka.stream.Materializer):com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult"></a><a id="asSourceAndSink(SpecsSnapshot,MesosClient,PodRecordRepository,Materializer):SourceAndSinkResult"></a>
+      <a id="asSourceAndSink(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,materializer:akka.stream.Materializer):com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult"></a><a id="asSourceAndSink(MesosClient,PodRecordRepository,Materializer):SourceAndSinkResult"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#asSourceAndSink(specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,materializer:akka.stream.Materializer):com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#asSourceAndSink(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,materializer:akka.stream.Materializer):com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -398,11 +382,11 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">asSourceAndSink</span><span class="params">(<span name="specsSnapshot">specsSnapshot: <a href="../models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a></span>, <span name="client">client: <a href="../../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="materializer">materializer: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: <a href="Scheduler$$SourceAndSinkResult.html" class="extype" name="com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult">SourceAndSinkResult</a></span>
+        <span class="name">asSourceAndSink</span><span class="params">(<span name="client">client: <a href="../../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="materializer">materializer: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: <a href="Scheduler$$SourceAndSinkResult.html" class="extype" name="com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult">SourceAndSinkResult</a></span>
       </span>
       
       <p class="shortcomment cmt">Constructs the scheduler as a Sink and Source.</p><div class="fullcomment"><div class="comment cmt"><p>Constructs the scheduler as a Sink and Source.</p><p>This method will materialize the scheduler first, then Sink and Source can be materialized independently.
-</p></div><dl class="paramcmts block"><dt class="param">specsSnapshot</dt><dd class="cmt"><p>Snapshot of the current specs</p></dd><dt>returns</dt><dd class="cmt"><p>Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents</p></dd></dl></div>
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents</p></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
@@ -482,9 +466,9 @@
               
         </dd></dl></div>
     </li><li name="com.mesosphere.usi.core.japi.Scheduler#fromClient" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="fromClient(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository):akka.stream.javadsl.Flow[com.mesosphere.usi.core.japi.Scheduler.SpecInput,com.mesosphere.usi.core.japi.Scheduler.StateOutput,akka.NotUsed]"></a><a id="fromClient(MesosClient,PodRecordRepository):Flow[SpecInput,StateOutput,NotUsed]"></a>
+      <a id="fromClient(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository):akka.stream.javadsl.Flow[com.mesosphere.usi.core.models.SchedulerCommand,com.mesosphere.usi.core.japi.Scheduler.StateOutput,akka.NotUsed]"></a><a id="fromClient(MesosClient,PodRecordRepository):Flow[SchedulerCommand,StateOutput,NotUsed]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#fromClient(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository):akka.stream.javadsl.Flow[com.mesosphere.usi.core.japi.Scheduler.SpecInput,com.mesosphere.usi.core.japi.Scheduler.StateOutput,akka.NotUsed]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#fromClient(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository):akka.stream.javadsl.Flow[com.mesosphere.usi.core.models.SchedulerCommand,com.mesosphere.usi.core.japi.Scheduler.StateOutput,akka.NotUsed]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -493,16 +477,16 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">fromClient</span><span class="params">(<span name="client">client: <a href="../../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.javadsl.Flow">Flow</span>[<a href="#SpecInput=akka.japi.Pair[com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any]]" class="extmbr" name="com.mesosphere.usi.core.japi.Scheduler.SpecInput">SpecInput</a>, <a href="#StateOutput=akka.japi.Pair[com.mesosphere.usi.core.models.StateSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEvent,Any]]" class="extmbr" name="com.mesosphere.usi.core.japi.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">fromClient</span><span class="params">(<span name="client">client: <a href="../../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>)</span><span class="result">: <span class="extype" name="akka.stream.javadsl.Flow">Flow</span>[<a href="../models/SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.SchedulerCommand">SchedulerCommand</a>, <a href="#StateOutput=akka.japi.Pair[com.mesosphere.usi.core.models.StateSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEventOrSnapshot,Any]]" class="extmbr" name="com.mesosphere.usi.core.japi.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
       </span>
       
-      <p class="shortcomment cmt">Constructs a USI scheduler flow to managing pods.</p><div class="fullcomment"><div class="comment cmt"><p>Constructs a USI scheduler flow to managing pods.</p><p>The input is a <span class="extype" name="akka.japi.Pair">akka.japi.Pair</span> of <span class="extype" name="SpecsSnapshot">SpecsSnapshot</span> and <span class="extype" name="javadsl.Source">javadsl.Source</span> of <a href="#SpecInput=akka.japi.Pair[com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any]]" class="extmbr" name="com.mesosphere.usi.core.japi.Scheduler.SpecInput">SpecInput</a>. The output is a <span class="extype" name="akka.japi.Pair">akka.japi.Pair</span>
-of <span class="extype" name="StateSnapshot">StateSnapshot</span> and <span class="extype" name="javadsl.Source">javadsl.Source</span> of <a href="#StateOutput=akka.japi.Pair[com.mesosphere.usi.core.models.StateSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEvent,Any]]" class="extmbr" name="com.mesosphere.usi.core.japi.Scheduler.StateOutput">StateOutput</a>.
+      <p class="shortcomment cmt">Constructs a USI scheduler flow to managing pods.</p><div class="fullcomment"><div class="comment cmt"><p>Constructs a USI scheduler flow to managing pods.</p><p>The input is a <span class="extype" name="javadsl.Source">javadsl.Source</span> of <span class="extype" name="SchedulerCommand">SchedulerCommand</span>. The output is a <span class="extype" name="akka.japi.Pair">akka.japi.Pair</span>
+of <span class="extype" name="StateSnapshot">StateSnapshot</span> and <span class="extype" name="javadsl.Source">javadsl.Source</span> of <a href="#StateOutput=akka.japi.Pair[com.mesosphere.usi.core.models.StateSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEventOrSnapshot,Any]]" class="extmbr" name="com.mesosphere.usi.core.japi.Scheduler.StateOutput">StateOutput</a>.
 </p></div><dl class="paramcmts block"><dt class="param">client</dt><dd class="cmt"><p>The <span class="extype" name="MesosClient">MesosClient</span> used to interact with Mesos.</p></dd><dt>returns</dt><dd class="cmt"><p>A <span class="extype" name="javadsl">javadsl</span> flow from pod specs to state events.</p></dd></dl></div>
     </li><li name="com.mesosphere.usi.core.japi.Scheduler#fromFlow" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="fromFlow(mesosCallFactory:com.mesosphere.mesos.client.MesosCalls,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,mesosFlow:akka.stream.javadsl.Flow[org.apache.mesos.v1.scheduler.Protos.Call,org.apache.mesos.v1.scheduler.Protos.Event,Any]):akka.stream.javadsl.Flow[com.mesosphere.usi.core.japi.Scheduler.SpecInput,com.mesosphere.usi.core.japi.Scheduler.StateOutput,akka.NotUsed]"></a><a id="fromFlow(MesosCalls,PodRecordRepository,Flow[Call,Event,Any]):Flow[SpecInput,StateOutput,NotUsed]"></a>
+      <a id="fromFlow(mesosCallFactory:com.mesosphere.mesos.client.MesosCalls,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,mesosFlow:akka.stream.javadsl.Flow[org.apache.mesos.v1.scheduler.Protos.Call,org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed]):akka.stream.javadsl.Flow[com.mesosphere.usi.core.models.SchedulerCommand,com.mesosphere.usi.core.japi.Scheduler.StateOutput,akka.NotUsed]"></a><a id="fromFlow(MesosCalls,PodRecordRepository,Flow[Call,Event,NotUsed]):Flow[SchedulerCommand,StateOutput,NotUsed]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#fromFlow(mesosCallFactory:com.mesosphere.mesos.client.MesosCalls,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,mesosFlow:akka.stream.javadsl.Flow[org.apache.mesos.v1.scheduler.Protos.Call,org.apache.mesos.v1.scheduler.Protos.Event,Any]):akka.stream.javadsl.Flow[com.mesosphere.usi.core.japi.Scheduler.SpecInput,com.mesosphere.usi.core.japi.Scheduler.StateOutput,akka.NotUsed]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#fromFlow(mesosCallFactory:com.mesosphere.mesos.client.MesosCalls,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,mesosFlow:akka.stream.javadsl.Flow[org.apache.mesos.v1.scheduler.Protos.Call,org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed]):akka.stream.javadsl.Flow[com.mesosphere.usi.core.models.SchedulerCommand,com.mesosphere.usi.core.japi.Scheduler.StateOutput,akka.NotUsed]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -511,7 +495,7 @@ of <span class="extype" name="StateSnapshot">StateSnapshot</span> and <span clas
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">fromFlow</span><span class="params">(<span name="mesosCallFactory">mesosCallFactory: <a href="../../../mesos/client/MesosCalls.html" class="extype" name="com.mesosphere.mesos.client.MesosCalls">MesosCalls</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="mesosFlow">mesosFlow: <span class="extype" name="akka.stream.javadsl.Flow">Flow</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>, <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="akka.stream.javadsl.Flow">Flow</span>[<a href="#SpecInput=akka.japi.Pair[com.mesosphere.usi.core.models.SpecsSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.SpecUpdated,Any]]" class="extmbr" name="com.mesosphere.usi.core.japi.Scheduler.SpecInput">SpecInput</a>, <a href="#StateOutput=akka.japi.Pair[com.mesosphere.usi.core.models.StateSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEvent,Any]]" class="extmbr" name="com.mesosphere.usi.core.japi.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">fromFlow</span><span class="params">(<span name="mesosCallFactory">mesosCallFactory: <a href="../../../mesos/client/MesosCalls.html" class="extype" name="com.mesosphere.mesos.client.MesosCalls">MesosCalls</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="mesosFlow">mesosFlow: <span class="extype" name="akka.stream.javadsl.Flow">Flow</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>, <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>)</span><span class="result">: <span class="extype" name="akka.stream.javadsl.Flow">Flow</span>[<a href="../models/SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.SchedulerCommand">SchedulerCommand</a>, <a href="#StateOutput=akka.japi.Pair[com.mesosphere.usi.core.models.StateSnapshot,akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEventOrSnapshot,Any]]" class="extmbr" name="com.mesosphere.usi.core.japi.Scheduler.StateOutput">StateOutput</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
       </span>
       
       <p class="shortcomment cmt">Constructs a USI scheduler flow to managing pods.</p><div class="fullcomment"><div class="comment cmt"><p>Constructs a USI scheduler flow to managing pods.</p><p>See <span class="extype" name="Scheduler.fromClient()">Scheduler.fromClient()</span> for a simpler constructor.

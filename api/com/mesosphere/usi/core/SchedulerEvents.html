@@ -214,10 +214,6 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
     </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="CachedPendingLaunch.html" title=""></a>
-                        <a href="CachedPendingLaunch.html" title="">CachedPendingLaunch</a>
-                      </li><li class="current-entities indented4">
                         <a class="object" href="FrameResultBuilder$.html" title=""></a>
                         <a class="class" href="FrameResultBuilder.html" title="Immutable helper data structure which:"></a>
                         <a href="FrameResultBuilder.html" title="Immutable helper data structure which:">FrameResultBuilder</a>
@@ -245,14 +241,6 @@
                         <a class="object" href="SchedulerState$.html" title=""></a>
                         <a class="class" href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic."></a>
                         <a href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic.">SchedulerState</a>
-                      </li><li class="current-entities indented4">
-                        <a class="object" href="SpecState$.html" title=""></a>
-                        <a class="class" href="SpecState.html" title=""></a>
-                        <a href="SpecState.html" title="">SpecState</a>
-                      </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="UpdateResult.html" title=""></a>
-                        <a href="UpdateResult.html" title="">UpdateResult</a>
                       </li>
               </ul>
             </div>
@@ -278,7 +266,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">SchedulerEvents</span><span class="params">(<span name="stateEvents">stateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>] = <span class="symbol">Nil</span></span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">SchedulerEvents</span><span class="params">(<span name="stateEvents">stateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>] = <span class="symbol">Nil</span></span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -334,9 +322,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.core.SchedulerEvents#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(stateEvents:List[com.mesosphere.usi.core.models.StateEvent],mesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call]):com.mesosphere.usi.core.SchedulerEvents"></a><a id="&lt;init&gt;:SchedulerEvents"></a>
+      <a id="&lt;init&gt;(stateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot],mesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call]):com.mesosphere.usi.core.SchedulerEvents"></a><a id="&lt;init&gt;:SchedulerEvents"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/SchedulerEvents.html#&lt;init&gt;(stateEvents:List[com.mesosphere.usi.core.models.StateEvent],mesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call]):com.mesosphere.usi.core.SchedulerEvents" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerEvents.html#&lt;init&gt;(stateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot],mesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call]):com.mesosphere.usi.core.SchedulerEvents" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -345,7 +333,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">SchedulerEvents</span><span class="params">(<span name="stateEvents">stateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>] = <span class="symbol">Nil</span></span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span>
+        <span class="name">SchedulerEvents</span><span class="params">(<span name="stateEvents">stateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>] = <span class="symbol">Nil</span></span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span>
       </span>
       
       
@@ -591,9 +579,9 @@
               
         </dd></dl></div>
     </li><li name="com.mesosphere.usi.core.SchedulerEvents#stateEvents" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="stateEvents:List[com.mesosphere.usi.core.models.StateEvent]"></a><a id="stateEvents:List[StateEvent]"></a>
+      <a id="stateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot]"></a><a id="stateEvents:List[StateEventOrSnapshot]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/SchedulerEvents.html#stateEvents:List[com.mesosphere.usi.core.models.StateEvent]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerEvents.html#stateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -602,7 +590,7 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">stateEvents</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>]</span>
+        <span class="name">stateEvents</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>]</span>
       </span>
       
       

@@ -214,10 +214,6 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
     </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="CachedPendingLaunch.html" title=""></a>
-                        <a href="CachedPendingLaunch.html" title="">CachedPendingLaunch</a>
-                      </li><li class="current-entities indented4">
                         <a class="object" href="FrameResultBuilder$.html" title=""></a>
                         <a class="class" href="FrameResultBuilder.html" title="Immutable helper data structure which:"></a>
                         <a href="FrameResultBuilder.html" title="Immutable helper data structure which:">FrameResultBuilder</a>
@@ -245,14 +241,6 @@
                         <a class="object" href="SchedulerState$.html" title=""></a>
                         <a class="class" href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic."></a>
                         <a href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic.">SchedulerState</a>
-                      </li><li class="current-entities indented4">
-                        <a class="object" href="SpecState$.html" title=""></a>
-                        <a class="class" href="SpecState.html" title=""></a>
-                        <a href="SpecState.html" title="">SpecState</a>
-                      </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="UpdateResult.html" title=""></a>
-                        <a href="UpdateResult.html" title="">UpdateResult</a>
                       </li>
               </ul>
             </div>
@@ -278,7 +266,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">SchedulerEventsBuilder</span><span class="params">(<span name="reverseStateEvents">reverseStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>] = <span class="symbol">Nil</span></span>, <span name="reverseMesosCalls">reverseMesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">SchedulerEventsBuilder</span><span class="params">(<span name="reverseStateEvents">reverseStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>] = <span class="symbol">Nil</span></span>, <span name="reverseMesosCalls">reverseMesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -336,9 +324,9 @@ effects are asked for.</p><p>Note, SchedulerEventsBuilder will accumulate state 
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.core.SchedulerEventsBuilder#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(reverseStateEvents:List[com.mesosphere.usi.core.models.StateEvent],reverseMesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call]):com.mesosphere.usi.core.SchedulerEventsBuilder"></a><a id="&lt;init&gt;:SchedulerEventsBuilder"></a>
+      <a id="&lt;init&gt;(reverseStateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot],reverseMesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call]):com.mesosphere.usi.core.SchedulerEventsBuilder"></a><a id="&lt;init&gt;:SchedulerEventsBuilder"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/SchedulerEventsBuilder.html#&lt;init&gt;(reverseStateEvents:List[com.mesosphere.usi.core.models.StateEvent],reverseMesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call]):com.mesosphere.usi.core.SchedulerEventsBuilder" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerEventsBuilder.html#&lt;init&gt;(reverseStateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot],reverseMesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call]):com.mesosphere.usi.core.SchedulerEventsBuilder" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -347,7 +335,7 @@ effects are asked for.</p><p>Note, SchedulerEventsBuilder will accumulate state 
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">SchedulerEventsBuilder</span><span class="params">(<span name="reverseStateEvents">reverseStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>] = <span class="symbol">Nil</span></span>, <span name="reverseMesosCalls">reverseMesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span>
+        <span class="name">SchedulerEventsBuilder</span><span class="params">(<span name="reverseStateEvents">reverseStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>] = <span class="symbol">Nil</span></span>, <span name="reverseMesosCalls">reverseMesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span>
       </span>
       
       
@@ -625,9 +613,9 @@ effects are asked for.</p><p>Note, SchedulerEventsBuilder will accumulate state 
       
       
     </li><li name="com.mesosphere.usi.core.SchedulerEventsBuilder#reverseStateEvents" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="reverseStateEvents:List[com.mesosphere.usi.core.models.StateEvent]"></a><a id="reverseStateEvents:List[StateEvent]"></a>
+      <a id="reverseStateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot]"></a><a id="reverseStateEvents:List[StateEventOrSnapshot]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/SchedulerEventsBuilder.html#reverseStateEvents:List[com.mesosphere.usi.core.models.StateEvent]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerEventsBuilder.html#reverseStateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -636,7 +624,7 @@ effects are asked for.</p><p>Note, SchedulerEventsBuilder will accumulate state 
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">reverseStateEvents</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>]</span>
+        <span class="name">reverseStateEvents</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>]</span>
       </span>
       
       
@@ -759,6 +747,22 @@ effects are asked for.</p><p>Note, SchedulerEventsBuilder will accumulate state 
       
       <p class="shortcomment cmt">Append an effect which will change some PodRecord.</p><div class="fullcomment"><div class="comment cmt"><p>Append an effect which will change some PodRecord.
 </p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>PodId</p></dd><dt>returns</dt><dd class="cmt"><p>A FrameEffects with this effect appended</p></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.SchedulerEventsBuilder#withPodSpec" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="withPodSpec(id:com.mesosphere.usi.core.models.PodId,newPodSpec:Option[com.mesosphere.usi.core.models.PodSpec]):com.mesosphere.usi.core.SchedulerEventsBuilder"></a><a id="withPodSpec(PodId,Option[PodSpec]):SchedulerEventsBuilder"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerEventsBuilder.html#withPodSpec(id:com.mesosphere.usi.core.models.PodId,newPodSpec:Option[com.mesosphere.usi.core.models.PodSpec]):com.mesosphere.usi.core.SchedulerEventsBuilder" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">withPodSpec</span><span class="params">(<span name="id">id: <a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="newPodSpec">newPodSpec: <span class="extype" name="scala.Option">Option</span>[<a href="models/PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>]</span>)</span><span class="result">: <a href="" class="extype" name="com.mesosphere.usi.core.SchedulerEventsBuilder">SchedulerEventsBuilder</a></span>
+      </span>
+      
+      
     </li><li name="com.mesosphere.usi.core.SchedulerEventsBuilder#withPodStatus" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="withPodStatus(id:com.mesosphere.usi.core.models.PodId,newStatus:Option[com.mesosphere.usi.core.models.PodStatus]):com.mesosphere.usi.core.SchedulerEventsBuilder"></a><a id="withPodStatus(PodId,Option[PodStatus]):SchedulerEventsBuilder"></a>
       <span class="permalink">
@@ -776,6 +780,22 @@ effects are asked for.</p><p>Note, SchedulerEventsBuilder will accumulate state 
       
       <p class="shortcomment cmt">Append an effect which will change some PodStatus.</p><div class="fullcomment"><div class="comment cmt"><p>Append an effect which will change some PodStatus.
 </p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>PodId</p></dd><dt class="param">newStatus</dt><dd class="cmt"><p>Optional value; None means remove</p></dd><dt>returns</dt><dd class="cmt"><p>A FrameEffects with this effect appended</p></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.SchedulerEventsBuilder#withStateEvent" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="withStateEvent(event:com.mesosphere.usi.core.models.StateEventOrSnapshot):com.mesosphere.usi.core.SchedulerEventsBuilder"></a><a id="withStateEvent(StateEventOrSnapshot):SchedulerEventsBuilder"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerEventsBuilder.html#withStateEvent(event:com.mesosphere.usi.core.models.StateEventOrSnapshot):com.mesosphere.usi.core.SchedulerEventsBuilder" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">withStateEvent</span><span class="params">(<span name="event">event: <a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a></span>)</span><span class="result">: <a href="" class="extype" name="com.mesosphere.usi.core.SchedulerEventsBuilder">SchedulerEventsBuilder</a></span>
+      </span>
+      
+      
     </li>
               </ol>
             </div>

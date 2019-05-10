@@ -480,9 +480,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.mesosphere.usi.helloworld.KeepAliveFramework#keepAliveWatcher" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="keepAliveWatcher:akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.StateEvent,com.mesosphere.usi.core.models.SpecUpdated,akka.NotUsed]"></a><a id="keepAliveWatcher:Flow[StateEvent,SpecUpdated,NotUsed]"></a>
+      <a id="keepAliveWatcher:akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.StateEventOrSnapshot,com.mesosphere.usi.core.models.SchedulerCommand,akka.NotUsed]"></a><a id="keepAliveWatcher:Flow[StateEventOrSnapshot,SchedulerCommand,NotUsed]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#keepAliveWatcher:akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.StateEvent,com.mesosphere.usi.core.models.SpecUpdated,akka.NotUsed]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#keepAliveWatcher:akka.stream.scaladsl.Flow[com.mesosphere.usi.core.models.StateEventOrSnapshot,com.mesosphere.usi.core.models.SchedulerCommand,akka.NotUsed]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -491,7 +491,7 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">keepAliveWatcher</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<a href="../core/models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>, <a href="../core/models/SpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.SpecUpdated">SpecUpdated</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">keepAliveWatcher</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<a href="../core/models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>, <a href="../core/models/SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.SchedulerCommand">SchedulerCommand</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
       </span>
       
       
@@ -614,9 +614,9 @@
       
       
     </li><li name="com.mesosphere.usi.helloworld.KeepAliveFramework#sink" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="sink:akka.stream.scaladsl.Sink[com.mesosphere.usi.core.models.SpecUpdated,akka.NotUsed]"></a><a id="sink:Sink[SpecUpdated,NotUsed]"></a>
+      <a id="sink:akka.stream.scaladsl.Sink[com.mesosphere.usi.core.models.SchedulerCommand,scala.concurrent.Future[akka.Done]]"></a><a id="sink:Sink[SchedulerCommand,Future[Done]]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#sink:akka.stream.scaladsl.Sink[com.mesosphere.usi.core.models.SpecUpdated,akka.NotUsed]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#sink:akka.stream.scaladsl.Sink[com.mesosphere.usi.core.models.SchedulerCommand,scala.concurrent.Future[akka.Done]]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -625,14 +625,14 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">sink</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Sink">Sink</span>[<a href="../core/models/SpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.SpecUpdated">SpecUpdated</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">sink</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Sink">Sink</span>[<a href="../core/models/SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.SchedulerCommand">SchedulerCommand</a>, <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="akka.Done">Done</span>]]</span>
       </span>
       
       
     </li><li name="com.mesosphere.usi.helloworld.KeepAliveFramework#source" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="source:akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,akka.NotUsed]"></a><a id="source:Source[StateEvent,NotUsed]"></a>
+      <a id="source:akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEventOrSnapshot,akka.NotUsed]"></a><a id="source:Source[StateEventOrSnapshot,NotUsed]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#source:akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEvent,akka.NotUsed]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#source:akka.stream.scaladsl.Source[com.mesosphere.usi.core.models.StateEventOrSnapshot,akka.NotUsed]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -641,14 +641,14 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">source</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<a href="../core/models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">source</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<a href="../core/models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
       </span>
       
       
     </li><li name="com.mesosphere.usi.helloworld.KeepAliveFramework#specsSnapshot" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot"></a><a id="specsSnapshot:SpecsSnapshot"></a>
+      <a id="specsSnapshot:List[com.mesosphere.usi.core.models.RunningPodSpec]"></a><a id="specsSnapshot:List[RunningPodSpec]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#specsSnapshot:com.mesosphere.usi.core.models.SpecsSnapshot" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#specsSnapshot:List[com.mesosphere.usi.core.models.RunningPodSpec]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -657,7 +657,7 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">specsSnapshot</span><span class="result">: <a href="../core/models/SpecsSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.SpecsSnapshot">SpecsSnapshot</a></span>
+        <span class="name">specsSnapshot</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../core/models/RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a>]</span>
       </span>
       
       

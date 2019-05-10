@@ -214,10 +214,6 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
     </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="CachedPendingLaunch.html" title=""></a>
-                        <a href="CachedPendingLaunch.html" title="">CachedPendingLaunch</a>
-                      </li><li class="current-entities indented4">
                         <a class="object" href="FrameResultBuilder$.html" title=""></a>
                         <a class="class" href="" title="Immutable helper data structure which:"></a>
                         <a href="" title="Immutable helper data structure which:">FrameResultBuilder</a>
@@ -245,14 +241,6 @@
                         <a class="object" href="SchedulerState$.html" title=""></a>
                         <a class="class" href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic."></a>
                         <a href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic.">SchedulerState</a>
-                      </li><li class="current-entities indented4">
-                        <a class="object" href="SpecState$.html" title=""></a>
-                        <a class="class" href="SpecState.html" title=""></a>
-                        <a href="SpecState.html" title="">SpecState</a>
-                      </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="UpdateResult.html" title=""></a>
-                        <a href="UpdateResult.html" title="">UpdateResult</a>
                       </li>
               </ul>
             </div>
@@ -278,7 +266,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">FrameResultBuilder</span><span class="params">(<span name="specs">specs: <a href="SpecState.html" class="extype" name="com.mesosphere.usi.core.SpecState">SpecState</a></span>, <span name="state">state: <a href="SchedulerState.html" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a></span>, <span name="appliedStateEvents">appliedStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>]</span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>]</span>, <span name="dirtyPodIds">dirtyPodIds: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">FrameResultBuilder</span><span class="params">(<span name="state">state: <a href="SchedulerState.html" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a></span>, <span name="appliedStateEvents">appliedStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>]</span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>]</span>, <span name="dirtyPodIds">dirtyPodIds: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -338,9 +326,9 @@ calls
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.core.FrameResultBuilder#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(specs:com.mesosphere.usi.core.SpecState,state:com.mesosphere.usi.core.SchedulerState,appliedStateEvents:List[com.mesosphere.usi.core.models.StateEvent],mesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call],dirtyPodIds:Set[com.mesosphere.usi.core.models.PodId]):com.mesosphere.usi.core.FrameResultBuilder"></a><a id="&lt;init&gt;:FrameResultBuilder"></a>
+      <a id="&lt;init&gt;(state:com.mesosphere.usi.core.SchedulerState,appliedStateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot],mesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call],dirtyPodIds:Set[com.mesosphere.usi.core.models.PodId]):com.mesosphere.usi.core.FrameResultBuilder"></a><a id="&lt;init&gt;:FrameResultBuilder"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/FrameResultBuilder.html#&lt;init&gt;(specs:com.mesosphere.usi.core.SpecState,state:com.mesosphere.usi.core.SchedulerState,appliedStateEvents:List[com.mesosphere.usi.core.models.StateEvent],mesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call],dirtyPodIds:Set[com.mesosphere.usi.core.models.PodId]):com.mesosphere.usi.core.FrameResultBuilder" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/FrameResultBuilder.html#&lt;init&gt;(state:com.mesosphere.usi.core.SchedulerState,appliedStateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot],mesosCalls:List[org.apache.mesos.v1.scheduler.Protos.Call],dirtyPodIds:Set[com.mesosphere.usi.core.models.PodId]):com.mesosphere.usi.core.FrameResultBuilder" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -349,7 +337,7 @@ calls
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">FrameResultBuilder</span><span class="params">(<span name="specs">specs: <a href="SpecState.html" class="extype" name="com.mesosphere.usi.core.SpecState">SpecState</a></span>, <span name="state">state: <a href="SchedulerState.html" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a></span>, <span name="appliedStateEvents">appliedStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>]</span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>]</span>, <span name="dirtyPodIds">dirtyPodIds: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]</span>)</span>
+        <span class="name">FrameResultBuilder</span><span class="params">(<span name="state">state: <a href="SchedulerState.html" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a></span>, <span name="appliedStateEvents">appliedStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>]</span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>]</span>, <span name="dirtyPodIds">dirtyPodIds: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]</span>)</span>
       </span>
       
       <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">state</dt><dd class="cmt"><p>The current SchedulerLogic state</p></dd><dt class="param">appliedStateEvents</dt><dd class="cmt"><p>The cumulative stateEvents applied to the frame; will be included in the FrameResult</p></dd><dt class="param">mesosCalls</dt><dd class="cmt"><p>The cumulative Mesos calls that are intended to be sent</p></dd><dt class="param">dirtyPodIds</dt><dd class="cmt"><p>The podIds that have been changed during the lifecycle of this FrameWithEvents instance</p></dd></dl></div>
@@ -412,9 +400,9 @@ calls
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.mesosphere.usi.core.FrameResultBuilder#appliedStateEvents" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="appliedStateEvents:List[com.mesosphere.usi.core.models.StateEvent]"></a><a id="appliedStateEvents:List[StateEvent]"></a>
+      <a id="appliedStateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot]"></a><a id="appliedStateEvents:List[StateEventOrSnapshot]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/FrameResultBuilder.html#appliedStateEvents:List[com.mesosphere.usi.core.models.StateEvent]" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/FrameResultBuilder.html#appliedStateEvents:List[com.mesosphere.usi.core.models.StateEventOrSnapshot]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -423,27 +411,10 @@ calls
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">appliedStateEvents</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>]</span>
+        <span class="name">appliedStateEvents</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>]</span>
       </span>
       
       
-    </li><li name="com.mesosphere.usi.core.FrameResultBuilder#applySpecEvent" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="applySpecEvent(specEvent:com.mesosphere.usi.core.models.SpecEvent):com.mesosphere.usi.core.FrameResultBuilder"></a><a id="applySpecEvent(SpecEvent):FrameResultBuilder"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/FrameResultBuilder.html#applySpecEvent(specEvent:com.mesosphere.usi.core.models.SpecEvent):com.mesosphere.usi.core.FrameResultBuilder" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">applySpecEvent</span><span class="params">(<span name="specEvent">specEvent: <a href="models/SpecEvent.html" class="extype" name="com.mesosphere.usi.core.models.SpecEvent">SpecEvent</a></span>)</span><span class="result">: <a href="" class="extype" name="com.mesosphere.usi.core.FrameResultBuilder">FrameResultBuilder</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">Applies the specEvent to the frame, marking podIds as dirty accordingly
-</p>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
@@ -644,9 +615,9 @@ calls
               
         </dd></dl></div>
     </li><li name="com.mesosphere.usi.core.FrameResultBuilder#process" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="process(fn:(com.mesosphere.usi.core.SpecState,com.mesosphere.usi.core.SchedulerState,Set[com.mesosphere.usi.core.models.PodId])=&gt;com.mesosphere.usi.core.SchedulerEvents):com.mesosphere.usi.core.FrameResultBuilder"></a><a id="process((SpecState,SchedulerState,Set[PodId])⇒SchedulerEvents):FrameResultBuilder"></a>
+      <a id="process(fn:(com.mesosphere.usi.core.SchedulerState,Set[com.mesosphere.usi.core.models.PodId])=&gt;com.mesosphere.usi.core.SchedulerEvents):com.mesosphere.usi.core.FrameResultBuilder"></a><a id="process((SchedulerState,Set[PodId])⇒SchedulerEvents):FrameResultBuilder"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/FrameResultBuilder.html#process(fn:(com.mesosphere.usi.core.SpecState,com.mesosphere.usi.core.SchedulerState,Set[com.mesosphere.usi.core.models.PodId])=&gt;com.mesosphere.usi.core.SchedulerEvents):com.mesosphere.usi.core.FrameResultBuilder" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/FrameResultBuilder.html#process(fn:(com.mesosphere.usi.core.SchedulerState,Set[com.mesosphere.usi.core.models.PodId])=&gt;com.mesosphere.usi.core.SchedulerEvents):com.mesosphere.usi.core.FrameResultBuilder" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -655,7 +626,7 @@ calls
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">process</span><span class="params">(<span name="fn">fn: (<a href="SpecState.html" class="extype" name="com.mesosphere.usi.core.SpecState">SpecState</a>, <a href="SchedulerState.html" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a>, <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]) ⇒ <a href="SchedulerEvents.html" class="extype" name="com.mesosphere.usi.core.SchedulerEvents">SchedulerEvents</a></span>)</span><span class="result">: <a href="" class="extype" name="com.mesosphere.usi.core.FrameResultBuilder">FrameResultBuilder</a></span>
+        <span class="name">process</span><span class="params">(<span name="fn">fn: (<a href="SchedulerState.html" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a>, <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]) ⇒ <a href="SchedulerEvents.html" class="extype" name="com.mesosphere.usi.core.SchedulerEvents">SchedulerEvents</a></span>)</span><span class="result">: <a href="" class="extype" name="com.mesosphere.usi.core.FrameResultBuilder">FrameResultBuilder</a></span>
       </span>
       
       
@@ -672,22 +643,6 @@ calls
       </span>
       <span class="symbol">
         <span class="name">result</span><span class="result">: <a href="SchedulerEvents.html" class="extype" name="com.mesosphere.usi.core.SchedulerEvents">SchedulerEvents</a></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.FrameResultBuilder#specs" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="specs:com.mesosphere.usi.core.SpecState"></a><a id="specs:SpecState"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/FrameResultBuilder.html#specs:com.mesosphere.usi.core.SpecState" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">specs</span><span class="result">: <a href="SpecState.html" class="extype" name="com.mesosphere.usi.core.SpecState">SpecState</a></span>
       </span>
       
       

@@ -230,10 +230,6 @@
       
       
     </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="CachedPendingLaunch.html" title=""></a>
-                        <a href="CachedPendingLaunch.html" title="">CachedPendingLaunch</a>
-                      </li><li class="current-entities indented4">
                         <a class="object" href="FrameResultBuilder$.html" title=""></a>
                         <a class="class" href="FrameResultBuilder.html" title="Immutable helper data structure which:"></a>
                         <a href="FrameResultBuilder.html" title="Immutable helper data structure which:">FrameResultBuilder</a>
@@ -261,14 +257,6 @@
                         <a class="object" href="SchedulerState$.html" title=""></a>
                         <a class="class" href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic."></a>
                         <a href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic.">SchedulerState</a>
-                      </li><li class="current-entities indented4">
-                        <a class="object" href="SpecState$.html" title=""></a>
-                        <a class="class" href="SpecState.html" title=""></a>
-                        <a href="SpecState.html" title="">SpecState</a>
-                      </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="class" href="UpdateResult.html" title=""></a>
-                        <a href="UpdateResult.html" title="">UpdateResult</a>
                       </li><li name="com.mesosphere.usi.examples" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="examples"></a><a id="examples:examples"></a>
       <span class="permalink">
@@ -412,23 +400,7 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.mesosphere.usi.core.CachedPendingLaunch" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="CachedPendingLaunchextendsProductwithSerializable"></a><a id="CachedPendingLaunch:CachedPendingLaunch"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/index.html#CachedPendingLaunchextendsProductwithSerializable" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="CachedPendingLaunch.html"><span class="name">CachedPendingLaunch</span></a><span class="params">(<span name="pendingLaunch">pendingLaunch: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>] = <span class="symbol">Set.empty</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.FrameResultBuilder" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+              <ol><li name="com.mesosphere.usi.core.FrameResultBuilder" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="FrameResultBuilderextendsProductwithSerializable"></a><a id="FrameResultBuilder:FrameResultBuilder"></a>
       <span class="permalink">
       <a href="../../../../com/mesosphere/usi/core/index.html#FrameResultBuilderextendsProductwithSerializable" title="Permalink">
@@ -440,7 +412,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Immutable helper data structure which:" href="FrameResultBuilder.html"><span class="name">FrameResultBuilder</span></a><span class="params">(<span name="specs">specs: <a href="SpecState.html" class="extype" name="com.mesosphere.usi.core.SpecState">SpecState</a></span>, <span name="state">state: <a href="SchedulerState.html" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a></span>, <span name="appliedStateEvents">appliedStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>]</span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>]</span>, <span name="dirtyPodIds">dirtyPodIds: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Immutable helper data structure which:" href="FrameResultBuilder.html"><span class="name">FrameResultBuilder</span></a><span class="params">(<span name="state">state: <a href="SchedulerState.html" class="extype" name="com.mesosphere.usi.core.SchedulerState">SchedulerState</a></span>, <span name="appliedStateEvents">appliedStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>]</span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>]</span>, <span name="dirtyPodIds">dirtyPodIds: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Immutable helper data structure which:</p><div class="fullcomment"><div class="comment cmt"><p>Immutable helper data structure which:</p><p>- applies state events to the frame to update our snapshot of the state; accumulates them for publishing
@@ -460,7 +432,7 @@ calls
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="" href="SchedulerEvents.html"><span class="name">SchedulerEvents</span></a><span class="params">(<span name="stateEvents">stateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>] = <span class="symbol">Nil</span></span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="" href="SchedulerEvents.html"><span class="name">SchedulerEvents</span></a><span class="params">(<span name="stateEvents">stateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>] = <span class="symbol">Nil</span></span>, <span name="mesosCalls">mesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
@@ -476,7 +448,7 @@ calls
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Immutable intents builder" href="SchedulerEventsBuilder.html"><span class="name">SchedulerEventsBuilder</span></a><span class="params">(<span name="reverseStateEvents">reverseStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>] = <span class="symbol">Nil</span></span>, <span name="reverseMesosCalls">reverseMesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Immutable intents builder" href="SchedulerEventsBuilder.html"><span class="name">SchedulerEventsBuilder</span></a><span class="params">(<span name="reverseStateEvents">reverseStateEvents: <span class="extype" name="scala.List">List</span>[<a href="models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>] = <span class="symbol">Nil</span></span>, <span name="reverseMesosCalls">reverseMesosCalls: <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>] = <span class="symbol">Nil</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Immutable intents builder</p><div class="fullcomment"><div class="comment cmt"><p>Immutable intents builder</p><p>Effects are appended in lazy fashion by using the exposed effect methods.</p><p>Effects preserve order. For append-efficiency a link-list data structure is used. List is lazily reversed when
@@ -494,44 +466,12 @@ effects are asked for.</p><p>Note, SchedulerEventsBuilder will accumulate state 
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Data structure that contains all the state used for the SchedulerLogic." href="SchedulerState.html"><span class="name">SchedulerState</span></a><span class="params">(<span name="podRecords">podRecords: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>]</span>, <span name="podStatuses">podStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodStatus.html" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Data structure that contains all the state used for the SchedulerLogic." href="SchedulerState.html"><span class="name">SchedulerState</span></a><span class="params">(<span name="podRecords">podRecords: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>]</span>, <span name="podStatuses">podStatuses: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodStatus.html" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a>]</span>, <span name="podSpecs">podSpecs: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Data structure that contains all the state used for the SchedulerLogic.</p><div class="fullcomment"><div class="comment cmt"><p>Data structure that contains all the state used for the SchedulerLogic. It's state is manipulated through Effects,
 so that the state can be reliably subscribed to by other components.
 </p></div></div>
-    </li><li name="com.mesosphere.usi.core.SpecState" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="SpecStateextendsProductwithSerializable"></a><a id="SpecState:SpecState"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/index.html#SpecStateextendsProductwithSerializable" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="SpecState.html"><span class="name">SpecState</span></a><span class="params">(<span name="podSpecs">podSpecs: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>, <a href="models/PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.UpdateResult" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="UpdateResultextendsProductwithSerializable"></a><a id="UpdateResult:UpdateResult"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/index.html#UpdateResultextendsProductwithSerializable" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="UpdateResult.html"><span class="name">UpdateResult</span></a><span class="params">(<span name="cachedPendingLaunch">cachedPendingLaunch: <a href="CachedPendingLaunch.html" class="extype" name="com.mesosphere.usi.core.CachedPendingLaunch">CachedPendingLaunch</a></span>, <span name="toBeLaunched">toBeLaunched: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]</span>, <span name="launched">launched: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      
-      
     </li></ol>
             </div>
 
@@ -588,8 +528,7 @@ so that the state can be reliably subscribed to by other components.
       </span>
       
       <p class="shortcomment cmt">Provides the scheduler graph component.</p><div class="fullcomment"><div class="comment cmt"><p>Provides the scheduler graph component. The component has two inputs, and two outputs:</p><p>Input:
-1) SpecInput - Used to replicate the specification state from the framework implementation to the USI SchedulerLogic;
-   First, a spec snapshot, followed by spec updates.
+1) SchedulerCommands - Receives SchedulerCommand objects to launch, kill/destroy, and remove pods or reservations.
 2) MesosEvents - Events from Mesos; offers, task status updates, etc.</p><p>Output:
 1) StateEvents - Used to replicate the state of pods, agents, and reservations to the framework
    First, a scheduler state snapshot, followed by state updates.
@@ -597,7 +536,7 @@ so that the state can be reliably subscribed to by other components.
                    +------------------------------------------------------------------------+
                    |                                                                        |
                    |  +------------------+           +-------------+        StateOutput     |
-       SpecInput   |  |                  |           |             |     /------------------&gt;----&gt; (framework)
+ SchedulerCommands |  |                  |           |             |     /------------------&gt;----&gt; (framework)
 (framework) &gt;------&gt;--&gt;                  | Scheduler |             |    /                   |
                    |  |                  |  Events   |             |   /                    |
                    |  |  SchedulerLogic  o-----------&gt; Persistence o--+                     |
@@ -675,22 +614,6 @@ so that the state can be reliably subscribed to by other components.
       </span>
       <span class="symbol">
         <a title="" href="SchedulerState$.html"><span class="name">SchedulerState</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.SpecState" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="SpecState"></a><a id="SpecState:SpecState"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/index.html#SpecState" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="SpecState$.html"><span class="name">SpecState</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       

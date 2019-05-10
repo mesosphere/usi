@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1 API  - com.mesosphere.usi.core.models.SpecUpdated</title>
-          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.models.SpecUpdated" />
-          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.models.SpecUpdated" />
+          <title>usi 0.1 API  - com.mesosphere.usi.core.models.StateEventOrSnapshot</title>
+          <meta name="description" content="usi 0.1 API - com.mesosphere.usi.core.models.StateEventOrSnapshot" />
+          <meta name="keywords" content="usi 0.1 API com.mesosphere.usi.core.models.StateEventOrSnapshot" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -175,40 +175,56 @@
                         <a href="AgentRecord.html" title="Persistent record of agent attributes and other pertinent non-recoverable facts that are inputs for launching pods.">AgentRecord</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="AgentRecordUpdated.html" title=""></a>
-                        <a href="AgentRecordUpdated.html" title="">AgentRecordUpdated</a>
+                        <a class="class" href="AgentRecordUpdatedEvent.html" title=""></a>
+                        <a href="AgentRecordUpdatedEvent.html" title="">AgentRecordUpdatedEvent</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="class" href="CreateReservation.html" title="Not implemented yet; command will be used to make new reservations."></a>
+                        <a href="CreateReservation.html" title="Not implemented yet; command will be used to make new reservations.">CreateReservation</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="class" href="ExpungePod.html" title="Delete the pod record and any pending PodSpec (RunningPodSpec or TerminalPodSpec) for a given pod."></a>
+                        <a href="ExpungePod.html" title="Delete the pod record and any pending PodSpec (RunningPodSpec or TerminalPodSpec) for a given pod.">ExpungePod</a>
                       </li><li class="current-entities indented5">
                         <a class="object" href="FetchUri$.html" title=""></a>
                         <a class="class" href="FetchUri.html" title="Specification used by the [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) to download resources into the sandbox directory of a task in preparation of running the task."></a>
                         <a href="FetchUri.html" title="Specification used by the [Mesos fetcher](http://mesos.apache.org/documentation/latest/fetcher/) to download resources into the sandbox directory of a task in preparation of running the task.">FetchUri</a>
                       </li><li class="current-entities indented5">
-                        <a class="object" href="Goal$.html" title=""></a>
-                        <a class="trait" href="Goal.html" title="Target state of PodSpec."></a>
-                        <a href="Goal.html" title="Target state of PodSpec.">Goal</a>
+                        <span class="separator"></span>
+                        <a class="class" href="KillPod.html" title="Send a kill for tasks associated with the specified podId."></a>
+                        <a href="KillPod.html" title="Send a kill for tasks associated with the specified podId.">KillPod</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="class" href="LaunchPod.html" title="Launch the specified pod at-most-once."></a>
+                        <a href="LaunchPod.html" title="Launch the specified pod at-most-once.">LaunchPod</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="trait" href="PersistedStateUpdatedEvent.html" title="Implemented by all traits whose updates describe evolution to persisted state"></a>
+                        <a href="PersistedStateUpdatedEvent.html" title="Implemented by all traits whose updates describe evolution to persisted state">PersistedStateUpdatedEvent</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="class" href="PodId.html" title="Unique identifier of a pod"></a>
                         <a href="PodId.html" title="Unique identifier of a pod">PodId</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="PodInvalid.html" title=""></a>
-                        <a href="PodInvalid.html" title="">PodInvalid</a>
+                        <a class="class" href="PodInvalid.html" title="The RunSpec submitted from a LaunchPod command had obvious errors that would prevent it from launching."></a>
+                        <a href="PodInvalid.html" title="The RunSpec submitted from a LaunchPod command had obvious errors that would prevent it from launching.">PodInvalid</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="PodRecord.html" title="Describes facts about the result of a launched PodSpec from the perspective of USI."></a>
-                        <a href="PodRecord.html" title="Describes facts about the result of a launched PodSpec from the perspective of USI.">PodRecord</a>
+                        <a class="class" href="PodRecord.html" title="Describes facts about the result of a launched RunningPodSpec from the perspective of USI."></a>
+                        <a href="PodRecord.html" title="Describes facts about the result of a launched RunningPodSpec from the perspective of USI.">PodRecord</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="PodRecordUpdated.html" title=""></a>
-                        <a href="PodRecordUpdated.html" title="">PodRecordUpdated</a>
-                      </li><li class="current-entities indented5">
-                        <a class="object" href="PodSpec$.html" title=""></a>
-                        <a class="class" href="PodSpec.html" title="Framework implementation owned specification of some Pod that should be launched."></a>
-                        <a href="PodSpec.html" title="Framework implementation owned specification of some Pod that should be launched.">PodSpec</a>
+                        <a class="class" href="PodRecordUpdatedEvent.html" title="Sent each time a PodRecord for some pod has changed."></a>
+                        <a href="PodRecordUpdatedEvent.html" title="Sent each time a PodRecord for some pod has changed.">PodRecordUpdatedEvent</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="PodSpecUpdated.html" title=""></a>
-                        <a href="PodSpecUpdated.html" title="">PodSpecUpdated</a>
+                        <a class="trait" href="PodSpec.html" title="Scheduler logic state indicating that some action still needs to be done some pod RunningPodSpec or TerminalPodSpec"></a>
+                        <a href="PodSpec.html" title="Scheduler logic state indicating that some action still needs to be done some pod RunningPodSpec or TerminalPodSpec">PodSpec</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="class" href="PodSpecUpdatedEvent.html" title="These specs are managed by the Scheduler in response to LaunchPod and KillPod commands."></a>
+                        <a href="PodSpecUpdatedEvent.html" title="These specs are managed by the Scheduler in response to LaunchPod and KillPod commands.">PodSpecUpdatedEvent</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="trait" href="PodStateEvent.html" title=""></a>
@@ -219,8 +235,8 @@
                         <a href="PodStatus.html" title="Describes the task statuses of some pod.">PodStatus</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="PodStatusUpdated.html" title=""></a>
-                        <a href="PodStatusUpdated.html" title="">PodStatusUpdated</a>
+                        <a class="class" href="PodStatusUpdatedEvent.html" title="Sent each time a Mesos task status is received for one of the tasks in a pod."></a>
+                        <a href="PodStatusUpdatedEvent.html" title="Sent each time a Mesos task status is received for one of the tasks in a pod.">PodStatusUpdatedEvent</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="class" href="ReservationId.html" title="Unique identifier of a reservation"></a>
@@ -234,10 +250,6 @@
                         <a class="class" href="ReservationSpec.html" title="Used by the framework-implementation to describe that some reservation should be made, resized, or destroyed."></a>
                         <a href="ReservationSpec.html" title="Used by the framework-implementation to describe that some reservation should be made, resized, or destroyed.">ReservationSpec</a>
                       </li><li class="current-entities indented5">
-                        <span class="separator"></span>
-                        <a class="class" href="ReservationSpecUpdated.html" title=""></a>
-                        <a href="ReservationSpecUpdated.html" title="">ReservationSpecUpdated</a>
-                      </li><li class="current-entities indented5">
                         <a class="object" href="ReservationState$.html" title=""></a>
                         <a class="trait" href="ReservationState.html" title=""></a>
                         <a href="ReservationState.html" title="">ReservationState</a>
@@ -247,44 +259,40 @@
                         <a href="ReservationStatus.html" title="">ReservationStatus</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="ReservationStatusUpdated.html" title=""></a>
-                        <a href="ReservationStatusUpdated.html" title="">ReservationStatusUpdated</a>
+                        <a class="class" href="RunSpec.html" title="Specification used to launch a RunningPodSpec"></a>
+                        <a href="RunSpec.html" title="Specification used to launch a RunningPodSpec">RunSpec</a>
+                      </li><li class="current-entities indented5">
+                        <a class="object" href="RunningPodSpec$.html" title=""></a>
+                        <a class="class" href="RunningPodSpec.html" title="Used by the scheduler to track that a pod pod should be launched (and, isn't yet.)"></a>
+                        <a href="RunningPodSpec.html" title="Used by the scheduler to track that a pod pod should be launched (and, isn't yet.)">RunningPodSpec</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="RunSpec.html" title="Specification used to launch a PodSpec"></a>
-                        <a href="RunSpec.html" title="Specification used to launch a PodSpec">RunSpec</a>
+                        <a class="trait" href="SchedulerCommand.html" title="Trait which includes all possible events that can describe the evolution of the framework implementation's Specification state."></a>
+                        <a href="SchedulerCommand.html" title="Trait which includes all possible events that can describe the evolution of the framework implementation's Specification state.">SchedulerCommand</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="trait" href="SpecEvent.html" title="Sealed trait which includes all possible events that can describe the evolution of the framework implementation's Specification state."></a>
-                        <a href="SpecEvent.html" title="Sealed trait which includes all possible events that can describe the evolution of the framework implementation's Specification state.">SpecEvent</a>
+                        <a class="trait" href="StateEvent.html" title="Trait which describes an update for any of the USI managed state."></a>
+                        <a href="StateEvent.html" title="Trait which describes an update for any of the USI managed state.">StateEvent</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="trait" href="" title="Used to communicate that a specification was updated (added, changed, or deleted)"></a>
-                        <a href="" title="Used to communicate that a specification was updated (added, changed, or deleted)">SpecUpdated</a>
-                      </li><li class="current-entities indented5">
-                        <a class="object" href="SpecsSnapshot$.html" title=""></a>
-                        <a class="class" href="SpecsSnapshot.html" title="Used to describe the initial state on which all SpecUpdated events will apply"></a>
-                        <a href="SpecsSnapshot.html" title="Used to describe the initial state on which all SpecUpdated events will apply">SpecsSnapshot</a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
-                        <a class="trait" href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records)."></a>
-                        <a href="StateEvent.html" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records).">StateEvent</a>
+                        <a class="trait" href="" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records)."></a>
+                        <a href="" title="Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records).">StateEventOrSnapshot</a>
                       </li><li class="current-entities indented5">
                         <a class="object" href="StateSnapshot$.html" title=""></a>
                         <a class="class" href="StateSnapshot.html" title=""></a>
                         <a href="StateSnapshot.html" title="">StateSnapshot</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="trait" href="StateUpdated.html" title="Trait which describes an update for any of the USI managed state."></a>
-                        <a href="StateUpdated.html" title="Trait which describes an update for any of the USI managed state.">StateUpdated</a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
                         <a class="class" href="TaskId.html" title="Unique Mesos task identifier"></a>
                         <a href="TaskId.html" title="Unique Mesos task identifier">TaskId</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="trait" href="UserError.html" title="Captures a pod event that was caused by a SpecEvent submitted by the user."></a>
-                        <a href="UserError.html" title="Captures a pod event that was caused by a SpecEvent submitted by the user.">UserError</a>
+                        <a class="class" href="TerminalPodSpec.html" title="Used by the scheduler to track that a pod needs to be killed"></a>
+                        <a href="TerminalPodSpec.html" title="Used by the scheduler to track that a pod needs to be killed">TerminalPodSpec</a>
+                      </li><li class="current-entities indented5">
+                        <span class="separator"></span>
+                        <a class="trait" href="UserError.html" title="Captures a pod event that was caused by a SchedulerCommand submitted by the user."></a>
+                        <a href="UserError.html" title="Captures a pod event that was caused by a SchedulerCommand submitted by the user.">UserError</a>
                       </li>
               </ul>
             </div>
@@ -294,8 +302,8 @@
       <div id="definition">
         <div class="big-circle trait">t</div>
         <p id="owner"><a href="../../../../index.html" class="extype" name="com">com</a>.<a href="../../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../../index.html" class="extype" name="com.mesosphere.usi">usi</a>.<a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a>.<a href="index.html" class="extype" name="com.mesosphere.usi.core.models">models</a></p>
-        <h1>SpecUpdated<span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html" title="Permalink">
+        <h1>StateEventOrSnapshot<span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -308,22 +316,24 @@
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">SpecUpdated</span><span class="result"> extends <a href="SpecEvent.html" class="extype" name="com.mesosphere.usi.core.models.SpecEvent">SpecEvent</a></span>
+        <span class="name">StateEventOrSnapshot</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Used to communicate that a specification was updated (added, changed, or deleted)
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Sealed trait including all events that can describe the evolution of SchedulerState (statuses and records).</p><p>These events are emitted by the SchedulerLogic in response to evolution of specification states and Mesos events.
+They are provided so the framework-implementation can replicate and react to the evolution of that state as best
+suits the framework's domain.</p><p>The result of all StateEvent
 </p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="SpecEvent.html" class="extype" name="com.mesosphere.usi.core.models.SpecEvent">SpecEvent</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
             <span class="toggle">
               Known Subclasses
             </span>
-            <div class="subClasses hiddenContent"><a href="PodSpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.PodSpecUpdated">PodSpecUpdated</a>, <a href="ReservationSpecUpdated.html" class="extype" name="com.mesosphere.usi.core.models.ReservationSpecUpdated">ReservationSpecUpdated</a></div>
+            <div class="subClasses hiddenContent"><a href="AgentRecordUpdatedEvent.html" class="extype" name="com.mesosphere.usi.core.models.AgentRecordUpdatedEvent">AgentRecordUpdatedEvent</a>, <a href="PersistedStateUpdatedEvent.html" class="extype" name="com.mesosphere.usi.core.models.PersistedStateUpdatedEvent">PersistedStateUpdatedEvent</a>, <a href="PodInvalid.html" class="extype" name="com.mesosphere.usi.core.models.PodInvalid">PodInvalid</a>, <a href="PodRecordUpdatedEvent.html" class="extype" name="com.mesosphere.usi.core.models.PodRecordUpdatedEvent">PodRecordUpdatedEvent</a>, <a href="PodSpecUpdatedEvent.html" class="extype" name="com.mesosphere.usi.core.models.PodSpecUpdatedEvent">PodSpecUpdatedEvent</a>, <a href="PodStateEvent.html" class="extype" name="com.mesosphere.usi.core.models.PodStateEvent">PodStateEvent</a>, <a href="PodStatusUpdatedEvent.html" class="extype" name="com.mesosphere.usi.core.models.PodStatusUpdatedEvent">PodStatusUpdatedEvent</a>, <a href="StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>, <a href="StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a>, <a href="UserError.html" class="extype" name="com.mesosphere.usi.core.models.UserError">UserError</a></div>
           </div></div>
         
 
@@ -349,7 +359,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.usi.core.models.SpecUpdated"><span>SpecUpdated</span></li><li class="in" name="com.mesosphere.usi.core.models.SpecEvent"><span>SpecEvent</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.usi.core.models.StateEventOrSnapshot"><span>StateEventOrSnapshot</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -379,7 +389,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -395,7 +405,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html###():Int" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -411,7 +421,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -427,7 +437,7 @@
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -443,7 +453,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#clone():Object" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -467,7 +477,7 @@
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -483,7 +493,7 @@
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -499,7 +509,7 @@
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#finalize():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -521,7 +531,7 @@
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -540,7 +550,7 @@
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#hashCode():Int" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -559,7 +569,7 @@
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -575,7 +585,7 @@
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -591,7 +601,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#notify():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -610,7 +620,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -629,7 +639,7 @@
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -645,7 +655,7 @@
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#toString():String" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -661,7 +671,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#wait():Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -683,7 +693,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -705,7 +715,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/SpecUpdated.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/StateEventOrSnapshot.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -736,9 +746,7 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.mesosphere.usi.core.models.SpecEvent">
-              <h3>Inherited from <a href="SpecEvent.html" class="extype" name="com.mesosphere.usi.core.models.SpecEvent">SpecEvent</a></h3>
-            </div><div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
