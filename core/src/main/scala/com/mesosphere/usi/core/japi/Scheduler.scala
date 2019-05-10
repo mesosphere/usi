@@ -4,10 +4,11 @@ import java.util.concurrent.CompletableFuture
 
 import akka.NotUsed
 import akka.stream.javadsl.{Flow, Sink, Source}
-import akka.stream.{Materializer, javadsl}
+import akka.stream.{Materializer, javadsl, scaladsl}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.{Scheduler => ScalaScheduler}
 import com.mesosphere.usi.core.models.{SpecUpdated, SpecsSnapshot, StateEvent, StateSnapshot}
+import com.mesosphere.usi.repository.PodRecordRepository
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
 import scala.compat.java8.FutureConverters._
@@ -23,22 +24,6 @@ object Scheduler {
   type StateOutput = akka.japi.Pair[StateSnapshot, javadsl.Source[StateEvent, Any]]
 
   /**
-    * Constructs a USI scheduler given an initial pod specs snapshot.
-    *
-    * @param specsSnapshot The initial snapshot of pod specs.
-    * @param client The [[MesosClient]] used to interact with Mesos.
-    * @return A [[javadsl]] flow from pod spec updates to state events.
-    */
-  def fromSnapshot(
-      specsSnapshot: SpecsSnapshot,
-      client: MesosClient): javadsl.Flow[SpecUpdated, StateOutput, NotUsed] = {
-    javadsl.Flow
-      .create[SpecUpdated]()
-      .via(ScalaScheduler.fromSnapshot(specsSnapshot, client))
-      .map { case (taken, tail) => akka.japi.Pair(taken, tail.asJava) }
-  }
-
-  /**
     * Constructs a USI scheduler flow to managing pods.
     *
     * The input is a [[akka.japi.Pair]] of [[SpecsSnapshot]] and [[javadsl.Source]] of [[SpecInput]]. The output is a [[akka.japi.Pair]]
@@ -47,12 +32,15 @@ object Scheduler {
     * @param client The [[MesosClient]] used to interact with Mesos.
     * @return A [[javadsl]] flow from pod specs to state events.
     */
-  def fromClient(client: MesosClient): javadsl.Flow[SpecInput, StateOutput, NotUsed] = {
-    javadsl.Flow
-      .create[SpecInput]()
+  def fromClient(
+      client: MesosClient,
+      podRecordRepository: PodRecordRepository): javadsl.Flow[SpecInput, StateOutput, NotUsed] = {
+    scaladsl
+      .Flow[SpecInput]
       .map(pair => pair.first -> pair.second.asScala)
-      .via(ScalaScheduler.fromClient(client))
+      .via(ScalaScheduler.fromClient(client, podRecordRepository))
       .map { case (taken, tail) => akka.japi.Pair(taken, tail.asJava) }
+      .asJava
   }
 
   /**
@@ -66,12 +54,14 @@ object Scheduler {
     */
   def fromFlow(
       mesosCallFactory: MesosCalls,
+      podRecordRepository: PodRecordRepository,
       mesosFlow: javadsl.Flow[MesosCall, MesosEvent, Any]): javadsl.Flow[SpecInput, StateOutput, NotUsed] = {
-    javadsl.Flow
-      .create[SpecInput]()
+    scaladsl
+      .Flow[SpecInput]
       .map(pair => pair.first -> pair.second.asScala)
-      .via(ScalaScheduler.fromFlow(mesosCallFactory, mesosFlow.asScala))
+      .via(ScalaScheduler.fromFlow(mesosCallFactory, podRecordRepository, mesosFlow.asScala))
       .map { case (taken, tail) => akka.japi.Pair(taken, tail.asJava) }
+      .asJava
   }
 
   /**
@@ -85,8 +75,9 @@ object Scheduler {
   def asSourceAndSink(
       specsSnapshot: SpecsSnapshot,
       client: MesosClient,
+      podRecordRepository: PodRecordRepository,
       materializer: Materializer): SourceAndSinkResult = {
-    val (snap, source, sink) = ScalaScheduler.asSourceAndSink(specsSnapshot, client)(materializer)
+    val (snap, source, sink) = ScalaScheduler.asSourceAndSink(specsSnapshot, client, podRecordRepository)(materializer)
     new SourceAndSinkResult(snap.toJava.toCompletableFuture, source.asJava, sink.asJava)
   }
 
@@ -110,11 +101,12 @@ object Scheduler {
   def asFlow(
       specsSnapshot: SpecsSnapshot,
       client: MesosClient,
+      podRecordRepository: PodRecordRepository,
       materializer: Materializer): CompletableFuture[FlowResult] = {
 
     implicit val ec = ExecutionContext.Implicits.global
 
-    val flowFuture = ScalaScheduler.asFlow(specsSnapshot, client)(materializer)
+    val flowFuture = ScalaScheduler.asFlow(specsSnapshot, client, podRecordRepository)(materializer)
     flowFuture.map {
       case (snapshot, flow) =>
         new FlowResult(snapshot, flow.asJava)

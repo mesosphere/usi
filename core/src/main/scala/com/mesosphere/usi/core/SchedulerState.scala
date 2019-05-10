@@ -37,7 +37,10 @@ case class SchedulerState(podRecords: Map[PodId, PodRecord], podStatuses: Map[Po
         }
       case agentRecordChange: AgentRecordUpdated => ???
       case reservationStatusChange: ReservationStatusUpdated => ???
-      case statusSnapshot: StateSnapshot => ???
+      case statusSnapshot: StateSnapshot =>
+        // TODO (DCOS-47476) Implement cache invalidation and handle snapshot fully
+        newPodRecords = statusSnapshot.podRecords
+          .foldLeft(newPodRecords)((acc, record) => acc.updated(record.podId, record))
       case _: PodInvalid => ???
     }
 

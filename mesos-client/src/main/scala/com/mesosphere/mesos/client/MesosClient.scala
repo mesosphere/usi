@@ -310,7 +310,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
   def apply(conf: MesosClientSettings, frameworkInfo: FrameworkInfo)(
       implicit
       system: ActorSystem,
-      materializer: ActorMaterializer): Source[MesosClient, NotUsed] = {
+      materializer: Materializer): Source[MesosClient, NotUsed] = {
 
     val httpConnection: Source[(HttpResponse, ConnectionInfo), NotUsed] =
       mesosHttpConnection(frameworkInfo, conf.masters.toList, conf.redirectRetries)

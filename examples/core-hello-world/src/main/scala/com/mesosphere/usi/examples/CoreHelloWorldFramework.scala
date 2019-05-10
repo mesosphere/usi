@@ -1,34 +1,27 @@
 package com.mesosphere.usi.examples
 
+import akka.Done
 import java.util.UUID
-
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
-import akka.stream.{ActorMaterializer, KillSwitch}
+import akka.stream.{ActorMaterializer, KillSwitch, Materializer}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
+import com.mesosphere.usi.core.Scheduler.SpecInput
+import com.mesosphere.usi.core.Scheduler.StateOutput
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
-import com.mesosphere.usi.core.models.{
-  Goal,
-  PodId,
-  PodSpec,
-  PodStatus,
-  PodStatusUpdated,
-  RunSpec,
-  SpecUpdated,
-  SpecsSnapshot,
-  StateEvent,
-  StateSnapshot
-}
+import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodStatus, PodStatusUpdated, RunSpec, SpecsSnapshot}
+import com.mesosphere.usi.repository.PodRecordRepository
+import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo, TaskState, TaskStatus}
-
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.sys.SystemProperties
-import scala.util.{Failure, Success}
+import scala.util.Failure
+import scala.util.Success
 
 /**
   * Run the hello-world example framework that:
@@ -41,15 +34,51 @@ import scala.util.{Failure, Success}
   *  Good to test against local Mesos.
   *
   */
-case class CoreHelloWorldFramework(frameworkId: FrameworkID, killSwitch: KillSwitch)
+case class CoreHelloWorldFramework(frameworkId: FrameworkID, killSwitch: KillSwitch, result: Future[Done])
 
 object CoreHelloWorldFramework extends StrictLogging {
 
+  /**
+    * Scheduler Flow might look scary at the first glance (and sometimes even at second) but it is
+    * at the core (!) of any framework. Basically it is a Flow that [[com.mesosphere.usi.core.models.SpecUpdated]] events as input and produces
+    * [[com.mesosphere.usi.core.models.StateEvent]] as an output.
+    *
+    * +--------------------+         +-----------------------+        +-----------------------+
+    * |                    |         |                       |        |                       |
+    * |     SpecUpdated    |         |                       |        |      StateEvent       |
+    * |                    +--------->  Core SchedulerFlow   +-------->                       |
+    * |   new and updated  |         |                       |        | replicated Pod, Agent |
+    * |       PodSpecs     |         |                       |        | and Reservations state|
+    * +--------------------+         +-----------------------+        +-----------------------+
+    *
+    *
+    * In a nutshell: frameworks sends [[PodSpec]] updates down the flow and receives [[com.mesosphere.usi.core.models.StateEvent]]s when things
+    * change. So why is the input parameter of that Flow not simply a [[com.mesosphere.usi.core.models.SpecUpdated]] but a tuple of
+    * [[SpecsSnapshot]] and Source[[com.mesosphere.usi.core.models.SpecUpdated]]? This is because the first message sent to the scheduler
+    * by the framework should be a snapshot of all PodSpecs known to the framework - a [[SpecsSnapshot]]. Internally
+    * this will trigger [task reconciliation](http://mesos.apache.org/documentation/latest/reconciliation/) by the
+    * scheduler.
+    *
+    * The same logic applies for the output parameter of the scheduler Flow - it's a tuple of [[com.mesosphere.usi.core.models.StateSnapshot]] and a
+    * Source of [[com.mesosphere.usi.core.models.StateEvent]], which means that the first state event received by the framework will be a
+    * snapshot of all reconciled tasks states, followed by a individual updates.
+    *
+    * For more about the scheduler flow see [[Scheduler]] class documentation.
+    *
+    */
   def main(args: Array[String]): Unit = {
     implicit val actorSystem = ActorSystem()
+    implicit val ec = actorSystem.dispatcher
     val settings = MesosClientSettings.load()
     try {
-      run(settings)
+      run(settings).result.onComplete {
+        case Success(res) =>
+          logger.info(s"Stream completed: $res");
+          actorSystem.terminate()
+        case Failure(e) =>
+          logger.error(s"Error in stream: $e");
+          actorSystem.terminate()
+      }
     } catch {
       case ex: Throwable =>
         System.err.println(s"Exception while starting framework! ${ex}")
@@ -59,11 +88,8 @@ object CoreHelloWorldFramework extends StrictLogging {
     }
   }
 
-  def run(settings: MesosClientSettings)(implicit system: ActorSystem): CoreHelloWorldFramework = {
-    implicit val mat = ActorMaterializer()
-    implicit val ec = system.dispatcher
-
-    val frameworkInfo = FrameworkInfo
+  def buildFrameworkInfo: FrameworkInfo = {
+    FrameworkInfo
       .newBuilder()
       .setUser(
         new SystemProperties()
@@ -74,41 +100,9 @@ object CoreHelloWorldFramework extends StrictLogging {
       .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
       .setFailoverTimeout(0d)
       .build()
+  }
 
-    val client: MesosClient = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
-
-    /**
-      * The signature of the [[schedulerFlow]] might look scary at the first glance (and sometimes even at second) but it is
-      * at the core (!) of any framework. Basically it is a Flow that [[SpecUpdated]] events as input and produces
-      * [[StateEvent]] as an output.
-      *
-      * +--------------------+         +-----------------------+        +-----------------------+
-      * |                    |         |                       |        |                       |
-      * |     SpecUpdated    |         |                       |        |      StateEvent       |
-      * |                    +--------->  Core SchedulerFlow   +-------->                       |
-      * |   new and updated  |         |                       |        | replicated Pod, Agent |
-      * |       PodSpecs     |         |                       |        | and Reservations state|
-      * +--------------------+         +-----------------------+        +-----------------------+
-      *
-      *
-      * In a nutshell: frameworks sends [[PodSpec]] updates down the flow and receives [[StateEvent]]s when things
-      * change. So why is the input parameter of that Flow not simply a [[SpecUpdated]] but a tuple of
-      * [[SpecsSnapshot]] and Source[[SpecUpdated]]? This is because the first message sent to the scheduler
-      * by the framework should be a snapshot of all PodSpecs known to the framework - a [[SpecsSnapshot]]. Internally
-      * this will trigger [task reconciliation](http://mesos.apache.org/documentation/latest/reconciliation/) by the
-      * scheduler.
-      *
-      * The same logic applies for the output parameter of the scheduler Flow - it's a tuple of [[StateSnapshot]] and a
-      * Source of [[StateEvent]], which means that the first state event received by the framework will be a
-      * snapshot of all reconciled tasks states, followed by a individual updates.
-      *
-      * For more about the scheduler flow see [[Scheduler]] class documentation.
-      *
-      */
-    val schedulerFlow
-      : Flow[(SpecsSnapshot, Source[SpecUpdated, Any]), (StateSnapshot, Source[StateEvent, Any]), NotUsed] =
-      Scheduler.fromClient(client)
-
+  def generateSpecSnapshot: SpecsSnapshot = {
     // Lets construct the initial specs snapshot which will contain our hello-world PodSpec. For that we generate
     // - a unique PodId
     // - a RunSpec with minimal resource requirements and hello-world shell command
@@ -125,10 +119,25 @@ object CoreHelloWorldFramework extends StrictLogging {
       runSpec = runSpec
     )
 
-    val specsSnapshot = SpecsSnapshot(
+    SpecsSnapshot(
       podSpecs = Seq(podSpec),
       reservationSpecs = Seq.empty
     )
+  }
+
+  def init(
+      clientSettings: MesosClientSettings,
+      podRecordRepository: PodRecordRepository,
+      frameworkInfo: FrameworkInfo
+  )(implicit system: ActorSystem, materializer: Materializer): (MesosClient, Flow[SpecInput, StateOutput, NotUsed]) = {
+    val client: MesosClient = Await.result(MesosClient(clientSettings, frameworkInfo).runWith(Sink.head), 10.seconds)
+    (client, Scheduler.fromClient(client, podRecordRepository))
+  }
+
+  def run(settings: MesosClientSettings)(implicit system: ActorSystem): CoreHelloWorldFramework = {
+    implicit val mat = ActorMaterializer()
+    val (client, schedulerFlow) = init(settings, InMemoryPodRecordRepository(), buildFrameworkInfo)
+    val specsSnapshot = generateSpecSnapshot
 
     // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
     // which emits a materialized promise which when completed with a Some, that value will be produced downstream,
@@ -138,7 +147,7 @@ object CoreHelloWorldFramework extends StrictLogging {
     // Note: this is hardly realistic since an orchestrator will need to react to StateEvents by sending SpecUpdates
     // to the scheduler. We're making our lives easier by ignoring this part for now - all we care about is to start
     // a "hello-world" task once.
-    Source.maybe
+    val completed: Future[Done] = Source.maybe
       .prepend(Source.single(specsSnapshot))
       .map(snapshot => (snapshot, Source.empty))
       // Here our initial snapshot is going to the scheduler flow
@@ -167,16 +176,7 @@ object CoreHelloWorldFramework extends StrictLogging {
       }
       .toMat(Sink.ignore)(Keep.right)
       .run()
-      .onComplete {
-        case Success(res) =>
-          logger.info(s"Stream completed: $res");
-          system.terminate()
-        case Failure(e) =>
-          logger.error(s"Error in stream: $e");
-          system.terminate()
-      }
 
-    client.frameworkId
-    CoreHelloWorldFramework(frameworkId = client.frameworkId, killSwitch = client.killSwitch)
+    CoreHelloWorldFramework(client.frameworkId, client.killSwitch, completed)
   }
 }

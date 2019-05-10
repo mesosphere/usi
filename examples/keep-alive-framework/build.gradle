@@ -3,7 +3,7 @@ plugins {
 }
 
 application {
-    mainClassName = 'com.mesosphere.usi.examples.CoreHelloWorldFramework'
+    mainClassName = "com.mesosphere.usi.helloworld.KeepAliveFramework"
 }
 
 dependencies {
@@ -12,5 +12,5 @@ dependencies {
 
     // Use testCompile when we add implementation project(':persistence-zookeeper')
     implementation project(':test-utils')
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
 }

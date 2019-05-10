@@ -1,16 +1,17 @@
 dependencies {
     implementation project(':metrics')
+    implementation project(':persistence')
 
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
     compile group: 'de.heikoseeberger', name: "akka-http-play-json_$scalaVersion", version: '1.18.1'
     compile group: 'org.scala-lang.modules', name: "scala-async_$scalaVersion", version: '0.9.7'
     compile "org.scalatest:scalatest_$scalaVersion:3.0.5"
     compile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
-    
+    compile "com.typesafe.akka:akka-stream-testkit_$scalaVersion:2.5.22"
+
     // Provides import org.junit.runner.RunWith. We probably want to move to a different test platform for Scalatest or
     // use the Scalatest Runner.
     compile 'junit:junit:4.12'
-    
-    testCompile "com.typesafe.akka:akka-testkit_$scalaVersion:2.5.14"
-    testCompile "org.scalatest:scalatest_$scalaVersion:3.0.4"
+
+    testCompile "com.typesafe.akka:akka-testkit_$scalaVersion:2.5.22"
 }
