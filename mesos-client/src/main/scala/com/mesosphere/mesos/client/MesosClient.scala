@@ -194,7 +194,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
               (response, ConnectionInfo(url, streamId.value()))
             case StatusCodes.TemporaryRedirect =>
               val leader = new URL(response.header[headers.Location].get.value())
-              logger.warn(s"New mesos leader available at $leader")
+              logger.warn(s"New Mesos leader available at $leader")
               // Update the context with the new leader's host and port and throw an exception that is handled in the
               // next `recoverWith` stage.
               response.discardEntityBytes()

@@ -106,7 +106,7 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
     lazy val mesosHost = mesosFacade.url.getHost
     lazy val mesosPort = mesosFacade.url.getPort
 
-    val settings = MesosClientSettings.load().withMasters(mesosFacade.url)
+    val settings = MesosClientSettings.load().withMasters(Seq(mesosFacade.url))
 
     val client = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
 

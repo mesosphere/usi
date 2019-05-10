@@ -37,7 +37,7 @@ class SimpleHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest {
   }
 
   class Fixture(existingFrameworkId: Option[FrameworkID.Builder] = None) {
-    val settings = MesosClientSettings.load().withMaster(mesosFacade.url)
+    val settings = MesosClientSettings.load().withMasters(Seq(mesosFacade.url))
     val framework = SimpleHelloWorldFramework(settings)
   }
 }

@@ -53,7 +53,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     val customPersistenceStore = InMemoryPodRecordRepository()
     customPersistenceStore.readAll().futureValue.size shouldBe 0
     val (mesosClient, scheduler) = CoreHelloWorldFramework.init(
-      MesosClientSettings.load().withMasters(mesosFacade.url),
+      MesosClientSettings.load().withMasters(Seq(mesosFacade.url)),
       customPersistenceStore,
       frameworkInfo)
 
@@ -76,7 +76,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
 
     Then("upon recovery, emitted snapshot should have valid information")
     val (newClient, newScheduler) = CoreHelloWorldFramework.init(
-      MesosClientSettings.load().withMasters(mesosFacade.url),
+      MesosClientSettings.load().withMasters(Seq(mesosFacade.url)),
       customPersistenceStore,
       frameworkInfo)
     val (_, newSub) = runGraphAndFeedSnapshot(newScheduler, specsSnapshot)
@@ -117,6 +117,6 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
   }
 
   class Fixture(existingFrameworkId: Option[FrameworkID.Builder] = None) {
-    val framework = CoreHelloWorldFramework.run(MesosClientSettings.load().withMaster(mesosFacade.url))
+    val framework = CoreHelloWorldFramework.run(MesosClientSettings.load().withMasters(Seq(mesosFacade.url)))
   }
 }

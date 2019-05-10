@@ -20,9 +20,8 @@ class MesosClientSettings private (
       sourceBufferSize: Int = this.sourceBufferSize) =
     new MesosClientSettings(masters, maxRedirects, idleTimeout, sourceBufferSize)
 
-  def withMasters(urls: URL*): MesosClientSettings = copy(masters = urls)
-
-  def withMaster(url: URL) = withMasters(url)
+  def withMasters(urls: Iterable[URL]): MesosClientSettings = copy(masters = urls.toSeq)
+  def withMasters(urls: java.lang.Iterable[URL]): MesosClientSettings = withMasters(urls.asScala)
 
   def withMaxRedirects(maxRedirects: Int): MesosClientSettings = copy(maxRedirects = maxRedirects)
 
