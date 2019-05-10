@@ -1,20 +1,27 @@
 package com.mesosphere.usi.core.models
 
 /**
-  * Sealed trait which includes all possible events that can describe the evolution of the framework implementation's
+  * Trait which includes all possible events that can describe the evolution of the framework implementation's
   * Specification state.
+  *
+  * Supported commands:
+  * - [[LaunchPod]]
+  * - [[KillPod]]
+  * - [[ExpungePod]]
+  * - [[CreateReservation]]
   */
 sealed trait SchedulerCommand
 
 /**
-  * Launch the specified pod at-most-once
+  * Launch the specified pod at-most-once. Frameworks *SHOULD NOT* reuse podIds; if restarting a pod, kill the old and
+  * launch a new with a different id.
   *
   * Submitting a pod to the scheduler for launching will result the appropriate offer revive call. Once an offer is
   * received with suitable resources for the pod, a record of the matching pod is created, persisted, prior to the pod
   * being launched.
   *
-  * Submitting a launch command for a pod that is already launched (or has record of being launched) is a no-op. A
-  * unique pod id must be used for each launch.
+  * Submitting a launch command for a pod that is already launched (has record of being launched), or is pending launch,
+  * is a no-op.
   *
   * @param podId
   * @param runSpec

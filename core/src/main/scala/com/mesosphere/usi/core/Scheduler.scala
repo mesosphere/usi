@@ -10,6 +10,7 @@ import com.mesosphere.usi.core.models.{
   PodRecord,
   PodRecordUpdatedEvent,
   SchedulerCommand,
+  StateEvent,
   StateEventOrSnapshot,
   StateSnapshot
 }
@@ -61,7 +62,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
   * }}}
   */
 object Scheduler {
-  type StateOutput = (StateSnapshot, Source[StateEventOrSnapshot, Any])
+  type StateOutput = (StateSnapshot, Source[StateEvent, Any])
 
   private val schedulerSettings = SchedulerSettings.fromConfig(ConfigFactory.load().getConfig("scheduler"))
 
@@ -150,7 +151,7 @@ object Scheduler {
         val stateUpdates = stateEvents.map {
           case _: StateSnapshot =>
             throw new IllegalStateException("Only the first event is allowed to be a state snapshot")
-          case event => event
+          case event: StateEvent => event
         }
         (stateSnapshot, stateUpdates)
     }

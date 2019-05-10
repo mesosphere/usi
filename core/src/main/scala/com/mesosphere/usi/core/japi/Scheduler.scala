@@ -6,7 +6,7 @@ import akka.stream.javadsl.{Flow, Sink, Source}
 import akka.stream.{Materializer, javadsl, scaladsl}
 import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
-import com.mesosphere.usi.core.models.{SchedulerCommand, StateEventOrSnapshot, StateSnapshot}
+import com.mesosphere.usi.core.models.{SchedulerCommand, StateEvent, StateEventOrSnapshot, StateSnapshot}
 import com.mesosphere.usi.core.{Scheduler => ScalaScheduler}
 import com.mesosphere.usi.repository.PodRecordRepository
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
@@ -54,7 +54,7 @@ object Scheduler {
       .create[SchedulerCommand]()
       .via(ScalaScheduler.fromFlow(mesosCallFactory, podRecordRepository, mesosFlow.asScala))
       .map {
-        case (stateSnapshot: StateSnapshot, stateEvents: scaladsl.Source[StateEventOrSnapshot, Any]) =>
+        case (stateSnapshot: StateSnapshot, stateEvents: scaladsl.Source[StateEvent, Any]) =>
           akka.japi.Pair(stateSnapshot, stateEvents.asJava)
       }
   }

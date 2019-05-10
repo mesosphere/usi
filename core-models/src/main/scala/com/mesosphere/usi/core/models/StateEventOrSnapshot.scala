@@ -27,7 +27,7 @@ sealed trait StateEvent extends StateEventOrSnapshot
   */
 sealed trait PersistedStateUpdatedEvent extends StateEvent
 
-sealed trait PodStateEvent extends StateEventOrSnapshot {
+sealed trait PodStateEvent extends StateEvent {
   def id: PodId
 }
 
