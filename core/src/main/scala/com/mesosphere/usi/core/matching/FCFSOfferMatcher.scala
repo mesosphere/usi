@@ -1,13 +1,13 @@
 package com.mesosphere.usi.core.matching
 import com.mesosphere.usi.core.models.resources.{ResourceRequirement, ResourceType}
-import com.mesosphere.usi.core.models.PodSpec
+import com.mesosphere.usi.core.models.RunningPodSpec
 import org.apache.mesos.v1.{Protos => Mesos}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
 /**
-  * Simple first-come-first-served offer matcher implementation which tries to match [[PodSpec]] one after the other,
+  * Simple first-come-first-served offer matcher implementation which tries to match [[RunningPodSpec]] one after the other,
   * consuming resources from the [[Mesos.Offer]] (should there be enough). Matcher goes over all passed specs *not*
   * breaking out on the first unmatched PodSpec.
   */
@@ -39,8 +39,8 @@ class FCFSOfferMatcher extends OfferMatcher {
   @tailrec private def matchPodSpecsTaskRecords(
       offer: Mesos.Offer,
       remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
-      result: Map[PodSpec, List[Mesos.Resource]],
-      pendingLaunchPodSpecs: List[PodSpec]): Map[PodSpec, List[Mesos.Resource]] = {
+      result: Map[RunningPodSpec, List[Mesos.Resource]],
+      pendingLaunchPodSpecs: List[RunningPodSpec]): Map[RunningPodSpec, List[Mesos.Resource]] = {
 
     pendingLaunchPodSpecs match {
       case Nil =>
@@ -56,7 +56,9 @@ class FCFSOfferMatcher extends OfferMatcher {
     }
   }
 
-  override def matchOffer(offer: Mesos.Offer, podSpecs: Iterable[PodSpec]): Map[PodSpec, List[Mesos.Resource]] = {
+  override def matchOffer(
+      offer: Mesos.Offer,
+      podSpecs: Iterable[RunningPodSpec]): Map[RunningPodSpec, List[Mesos.Resource]] = {
     val groupedResources = offer.getResourcesList.asScala.groupBy(r => ResourceType.fromName(r.getName))
     matchPodSpecsTaskRecords(offer, groupedResources, Map.empty, podSpecs.toList)
   }

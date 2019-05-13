@@ -6,13 +6,13 @@ import akka.stream.{Materializer, OverflowStrategy, QueueOfferResult}
 import akka.NotUsed
 import akka.stream.scaladsl.{Sink, Source}
 import com.mesosphere.usi.core.models.{
-  Goal,
-  PodSpec,
-  PodSpecUpdated,
-  PodStatusUpdated,
+  ExpungePod,
+  KillPod,
+  LaunchPod,
+  PodStatusUpdatedEvent,
   RunSpec,
-  SpecUpdated,
-  StateEvent
+  SchedulerCommand,
+  StateEventOrSnapshot
 }
 import com.typesafe.scalalogging.LazyLogging
 
@@ -29,14 +29,14 @@ import org.apache.mesos.v1.Protos.TaskState._
   * @param mat
   * @param ec
   */
-class InMemoryDemoRunSpecService(specSink: Sink[SpecUpdated, NotUsed], stateSource: Source[StateEvent, NotUsed])(
-    implicit mat: Materializer,
-    ec: ExecutionContext)
+class InMemoryDemoRunSpecService(
+    specSink: Sink[SchedulerCommand, NotUsed],
+    stateSource: Source[StateEventOrSnapshot, NotUsed])(implicit mat: Materializer, ec: ExecutionContext)
     extends RunSpecService
     with LazyLogging {
 
   private val specUpdateQueue = Source
-    .queue[List[SpecUpdated]](8, OverflowStrategy.dropNew)
+    .queue[List[SchedulerCommand]](8, OverflowStrategy.dropNew)
     .mapConcat(identity)
     .to(specSink)
     .run()
@@ -45,11 +45,11 @@ class InMemoryDemoRunSpecService(specSink: Sink[SpecUpdated, NotUsed], stateSour
     new ConcurrentHashMap[RunSpecId, RunSpecState]()
 
   stateSource.runForeach {
-    case event: StateEvent =>
+    case event: StateEventOrSnapshot =>
       logger.info(event.toString)
       event match {
 
-        case PodStatusUpdated(id, Some(newStatus)) =>
+        case PodStatusUpdatedEvent(id, Some(newStatus)) =>
           // TODO fix this one pod status will be there
           val newPodStaus = newStatus.taskStatuses.values.headOption
             .map(_.getState)
@@ -85,13 +85,8 @@ class InMemoryDemoRunSpecService(specSink: Sink[SpecUpdated, NotUsed], stateSour
 
       val incarnation = 1
       val runSpecInstanceId = RunSpecInstanceId(id, UUID.randomUUID(), incarnation)
-      val podSpec = PodSpec(
-        id = runSpecInstanceId.toPodId,
-        goal = Goal.Running,
-        runSpec = runSpec
-      )
 
-      val specUpdated = PodSpecUpdated(runSpecInstanceId.toPodId, Some(podSpec))
+      val specUpdated = LaunchPod(runSpecInstanceId.toPodId, runSpec)
 
       specUpdateQueue.offer(specUpdated :: Nil).map {
         case QueueOfferResult.Enqueued =>
@@ -134,9 +129,9 @@ class InMemoryDemoRunSpecService(specSink: Sink[SpecUpdated, NotUsed], stateSour
 
       val podId = appState.runSpecInstanceId.toPodId
 
-      val specTerminated = PodSpecUpdated(podId, Some(PodSpec(podId, Goal.Terminal, appState.runSpec)))
-      val specRemoved = PodSpecUpdated(podId, None)
-      specUpdateQueue.offer(specTerminated :: specRemoved :: Nil).map {
+      val killPod = KillPod(podId)
+      val expungePod = ExpungePod(podId)
+      specUpdateQueue.offer(killPod :: expungePod :: Nil).map {
         case QueueOfferResult.Enqueued =>
           // TODO remove it once USI will provide the needed events.
           database.remove(id)

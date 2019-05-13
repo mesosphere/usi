@@ -1,19 +1,18 @@
 package com.mesosphere.usi.helloworld.keepalive
 
-import akka.{NotUsed}
+import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.mesosphere.usi.core.models.{
-  Goal,
+  ExpungePod,
+  LaunchPod,
   PodId,
-  PodSpec,
-  PodSpecUpdated,
   PodStatus,
-  PodStatusUpdated,
-  SpecUpdated,
-  StateEvent,
+  PodStatusUpdatedEvent,
+  SchedulerCommand,
+  StateEventOrSnapshot,
   StateSnapshot
 }
-import com.mesosphere.usi.helloworld.runspecs.{RunSpecService, RunSpecInstanceId}
+import com.mesosphere.usi.helloworld.runspecs.{RunSpecInstanceId, RunSpecService}
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}
 
@@ -22,13 +21,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class KeepAliveWatcher(appsService: RunSpecService)(implicit val ec: ExecutionContext) extends LazyLogging {
 
   // KeepAliveWatcher looks for a terminal task and then restarts the whole pod.
-  val flow: Flow[StateEvent, SpecUpdated, NotUsed] = Flow[StateEvent].map {
+  val flow: Flow[StateEventOrSnapshot, SchedulerCommand, NotUsed] = Flow[StateEventOrSnapshot].map {
     // Main state event handler. We log happy events and restart the pod if something goes wrong
     case s: StateSnapshot =>
       logger.info(s"Initial state snapshot: $s")
       DoNothing
 
-    case PodStatusUpdated(id, Some(PodStatus(_, taskStatuses))) =>
+    case PodStatusUpdatedEvent(id, Some(PodStatus(_, taskStatuses))) =>
       import TaskState._
       def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
       // We're only interested in the bad task statuses for our pod
@@ -56,8 +55,8 @@ class KeepAliveWatcher(appsService: RunSpecService)(implicit val ec: ExecutionCo
           // AppInfo found
           case Some(appInfo) =>
             List(
-              PodSpecUpdated(podId, None), // Remove the currentPod
-              PodSpecUpdated(newPodId, Some(PodSpec(newPodId, Goal.Running, appInfo.runSpec))) // Launch the new pod
+              ExpungePod(podId), // Remove the currentPod
+              LaunchPod(newPodId, appInfo.runSpec) // Launch the new pod
             )
 
           // AppInfo was deleted

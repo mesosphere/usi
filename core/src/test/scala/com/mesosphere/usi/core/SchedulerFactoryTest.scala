@@ -1,321 +1,255 @@
 package com.mesosphere.usi.core
 
-import akka.NotUsed
-import akka.stream.scaladsl.{SinkQueueWithCancel, SourceQueueWithComplete}
-import akka.stream.scaladsl.{Flow, Sink, Source}
-import akka.stream.OverflowStrategy
-import com.mesosphere.usi.core.models.resources.ScalarRequirement
+import java.time.Instant
+import java.util.UUID
+
+import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.stream.KillSwitches
+import akka.{Done, NotUsed}
 import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.utils.AkkaUnitTest
 import org.scalatest._
 
-import scala.concurrent.Promise
 import scala.util.{Failure, Success}
 
 class SchedulerFactoryTest extends AkkaUnitTest with Inside {
+  def fromSinkAndSourceWithSharedFate[A, B, M1, M2](sink: Sink[A, M1], source: Source[B, M2]): Flow[A, B, NotUsed] = {
+    val sinkKillSwitch = KillSwitches.shared(s"shared-fate-input-${UUID.randomUUID()}")
+    val sourceKillSwitch = KillSwitches.shared(s"shared-fate-output-${UUID.randomUUID()}")
 
-  def createMockedScheduler: (
-      Flow[Scheduler.SpecInput, Scheduler.StateOutput, NotUsed],
-      SinkQueueWithCancel[Scheduler.SpecInput],
-      SourceQueueWithComplete[Scheduler.StateOutput]) = {
+    val (sinkTerminalSignal, monitoredSink) = Flow[A]
+      .via(sinkKillSwitch.flow)
+      .watchTermination()(Keep.right)
+      .to(sink)
+      .preMaterialize()
 
-    val (outerSinkQueue, outerSink) = Sink.queue[Scheduler.SpecInput]().preMaterialize()
-    val (outerSourceQueue, outerSource) =
-      Source.queue[Scheduler.StateOutput](16, OverflowStrategy.fail).preMaterialize()
+    val (sourceTerminated, monitoredSource) = source
+      .via(sourceKillSwitch.flow)
+      .watchTermination()(Keep.right)
+      .preMaterialize()
 
-    (Flow.fromSinkAndSource(outerSink, outerSource), outerSinkQueue, outerSourceQueue)
+    sinkTerminalSignal.onComplete {
+      case Success(_) =>
+        sourceKillSwitch.shutdown()
+      case Failure(ex) =>
+        sourceKillSwitch.abort(ex)
+    }
+
+    sourceTerminated.onComplete { _ =>
+      sinkKillSwitch.shutdown()
+    }
+
+    Flow.fromSinkAndSource(monitoredSink, monitoredSource)
   }
 
-  class SchedulerFixture {
-    val podSpec = PodSpec(
-      PodId("podId"),
-      Goal.Running,
-      RunSpec(
-        resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
-        shellCommand = "sleep 3600",
-        role = "marathon"
-      )
+  def newMockedScheduler[M, O](
+      snapshot: StateSnapshot = StateSnapshot.empty,
+      commandInputSink: Sink[SchedulerCommand, M],
+      stateEventsSource: Source[StateEvent, O]): (Flow[SchedulerCommand, Scheduler.StateOutput, NotUsed], M, O) = {
+
+    val (m, preMaterializedCommandInput) =
+      Flow[SchedulerCommand]
+        .toMat(commandInputSink)(Keep.right)
+        .preMaterialize()
+
+    val (o, preMaterializedStateEvents) =
+      stateEventsSource.preMaterialize()
+
+    val flow = fromSinkAndSourceWithSharedFate(preMaterializedCommandInput, preMaterializedStateEvents)
+      .prefixAndTail(0)
+      .map { case (_, events) => snapshot -> events }
+
+    (flow, m, o)
+  }
+
+  val podSpec = RunningPodSpec(
+    PodId("podId"),
+    RunSpec(
+      resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
+      shellCommand = "sleep 3600",
+      role = "marathon"
     )
-    val specEvent = PodSpecUpdated(podSpec.id, None)
-    val stateEvent = PodStatusUpdated(podSpec.id, None)
-
-    val (scheduler, specInputQueue, stateOutputQueue) = createMockedScheduler
-  }
+  )
+  val deletePodSpec = ExpungePod(podSpec.id)
+  val deletePodStatus = PodStatusUpdatedEvent(podSpec.id, None)
 
   "SchedulerFactory" when {
     "materialized as Source and Sink" should {
-      "Propagate a snapshot to the underlying scheduler" in new SchedulerFixture {
-        Scheduler.asSourceAndSink(SpecsSnapshot(List(podSpec), Nil), scheduler)
-        specInputQueue.pull().futureValue.value._1.podSpecs.head shouldEqual podSpec
-      }
+      "Complete the snapshot promise once it's available" in {
+        val stateSnapshot = StateSnapshot(List(PodRecord(podSpec.id, Instant.now, AgentId("lol"))), Nil)
+        val (scheduler, _, _) =
+          newMockedScheduler(snapshot = stateSnapshot, commandInputSink = Sink.ignore, stateEventsSource = Source.maybe)
 
-      "If snapshot is not provided push an empty snapshot" in new SchedulerFixture {
-        Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
-        specInputQueue.pull().futureValue.value._1 shouldEqual SpecsSnapshot.empty
-      }
-
-      "Complete the snapshot promise once it's available" in new SchedulerFixture {
-        val (snapshotF, _, _) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
-        specInputQueue.pull().futureValue
-
-        val stateSnapshot = StateSnapshot(Nil, Nil)
-
-        stateOutputQueue.offer(stateSnapshot -> Source.maybe)
+        val (snapshotF, source, _) = Scheduler.asSourceAndSink(scheduler)
 
         snapshotF.futureValue shouldEqual stateSnapshot
       }
 
-      "Push the SpecUpdatedEvents downstream" in new SchedulerFixture {
-        val (_, _, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
+      "Push the SpecUpdatedEvents downstream" in {
+        val (scheduler, firstSpec, _) =
+          newMockedScheduler(commandInputSink = Sink.head, stateEventsSource = Source.maybe)
+        val (_, _, sink) = Scheduler.asSourceAndSink(scheduler)
 
-        Source.repeat(specEvent).runWith(sink)
+        Source.repeat(deletePodSpec).runWith(sink)
 
-        val done = inside(specInputQueue.pull().futureValue) {
-          case Some((_, events)) => events.runWith(Sink.head)
-        }
-
-        done.futureValue shouldEqual specEvent
-
+        firstSpec.futureValue shouldEqual deletePodSpec
       }
 
-      "Push the events from scheduler to the provided Source" in new SchedulerFixture {
-        val (_, source, _) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
+      "Push the events from scheduler to the provided Source" in {
+        val (scheduler, _, _) =
+          newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.repeat(deletePodStatus))
+        val (_, source, _) = Scheduler.asSourceAndSink(scheduler)
 
-        stateOutputQueue.offer(StateSnapshot.empty -> Source.repeat(stateEvent))
-
-        source.runWith(Sink.head).futureValue shouldEqual stateEvent
+        source.runWith(Sink.head).futureValue shouldEqual deletePodStatus
       }
 
-      "Complete both sink and source when the event stream coming to scheduler is cancelled by the scheduler" in new SchedulerFixture {
-        val (_, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
-        val (_, innerSource) = specInputQueue.pull().futureValue.value
+      "Complete both sink and source when the event stream coming to scheduler is cancelled by the scheduler" in {
+        val (scheduler, _, _) =
+          newMockedScheduler(commandInputSink = Sink.head, stateEventsSource = Source.repeat(deletePodStatus))
+        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
 
-        val stateStreamCompletionPromise = Promise[String]()
-        val specStreamCompletionPromise = Promise[String]()
+        val specStreamCompleted = Source
+          .repeat(deletePodSpec)
+          .watchTermination()(Keep.right)
+          .to(sink)
+          .run()
 
-        Source
-          .repeat(specEvent)
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.map(_ => specStreamCompletionPromise.trySuccess("completed")))
-          .runWith(sink)
-        source
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
+        val stateStreamCompleted = source
+          .watchTermination()(Keep.right)
+          .to(Sink.ignore)
+          .run()
+
+        specStreamCompleted.futureValue shouldBe Done
+        stateStreamCompleted.futureValue shouldBe Done
+      }
+
+      "Complete both sink and source when the event stream coming to scheduler is cancelled by the client" in {
+        val (scheduler, _, _) =
+          newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.repeat(deletePodStatus))
+        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
+
+        val specStreamCompleted = Source
+          .single(deletePodSpec) // issue single spec update and then cancel the stream
+          .watchTermination()(Keep.right)
+          .to(sink)
+          .run()
+
+        val stateStreamCompleted = source.runWith(Sink.ignore)
+
+        specStreamCompleted.futureValue shouldBe Done
+        stateStreamCompleted.futureValue shouldBe Done
+      }
+
+      "Complete both sink and source when the event stream outgoing from scheduler is cancelled by the scheduler" in {
+        val (scheduler, _, _) =
+          newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.single(deletePodStatus))
+
+        val (snapshot, source, sink) = Scheduler.asSourceAndSink(scheduler)
+
+        val specStreamCompleted = Source
+          .repeat(deletePodSpec)
+          .watchTermination()(Keep.right)
+          .to(sink)
+          .run()
+
+        val stateStreamCompleted = source
           .runWith(Sink.ignore)
 
-        innerSource.runWith(Sink.cancelled) // cancel incoming updates on scheduler size
-
-        specStreamCompletionPromise.future.futureValue shouldEqual "completed"
-        stateStreamCompletionPromise.future.futureValue shouldEqual "completed"
+        snapshot.futureValue shouldBe StateSnapshot.empty
+        specStreamCompleted.futureValue shouldBe Done
+        stateStreamCompleted.futureValue shouldBe Done
       }
 
-      "Complete both sink and source when the event stream coming to scheduler is cancelled by the client" in new SchedulerFixture {
-        val (_, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
+      "Complete both sink and source when the event stream outgoing from scheduler is cancelled by the client" in {
+        val (scheduler, _, _) =
+          newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.repeat(deletePodStatus))
 
-        inside(specInputQueue.pull().futureValue) {
-          case Some((_, innerSource)) => innerSource.runWith(Sink.ignore)
-        }
+        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
 
-        val stateStreamCompletionPromise = Promise[String]()
-        val specStreamCompletionPromise = Promise[String]()
+        val specStreamCompleted =
+          Source
+            .repeat(deletePodSpec)
+            .runWith(sink)
 
-        Source
-          .single(specEvent) // issue single spec update and then cancel the stream
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.map(_ => specStreamCompletionPromise.trySuccess("completed")))
-          .runWith(sink)
-        source
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
-          .runWith(Sink.ignore)
+        val stateStreamCompleted =
+          source
+            .watchTermination()(Keep.right)
+            .to(Sink.head)
+            .run()
 
-        specStreamCompletionPromise.future.futureValue shouldEqual "completed"
-        stateStreamCompletionPromise.future.futureValue shouldEqual "completed"
+        specStreamCompleted.futureValue shouldEqual Done
+        stateStreamCompleted.futureValue shouldEqual Done
       }
 
-      "Complete both sink and source when the event stream outgoing from scheduler is cancelled by the scheduler" in new SchedulerFixture {
-        val (_, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
-        val (_, innerSource) = specInputQueue.pull().futureValue.value
-        innerSource.runWith(Sink.ignore) // consume all incoming spec updates
+      "Fail both sink and source when the failure occurred in the upstream" in {
+        val (scheduler, _, _) =
+          newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.repeat(deletePodStatus))
 
-        val stateStreamCompletionPromise = Promise[String]()
-        val specStreamCompletionPromise = Promise[String]()
+        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
+
+        val ex = new RuntimeException("Boom!")
 
         Source
-          .repeat(specEvent)
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.map(_ => specStreamCompletionPromise.trySuccess("completed")))
+          .failed(ex)
+          .prepend(Source.single(deletePodSpec))
           .runWith(sink)
 
-        source
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
-          .runWith(Sink.ignore)
+        val stateStreamCompleted =
+          source
+            .watchTermination()(Keep.right)
+            .runWith(Sink.ignore)
 
-        stateOutputQueue.offer(StateSnapshot.empty -> Source.single(stateEvent)).futureValue
-
-        specStreamCompletionPromise.future.futureValue shouldEqual "completed"
-        stateStreamCompletionPromise.future.futureValue shouldEqual "completed"
+        stateStreamCompleted.failed.futureValue shouldEqual ex
       }
 
-      "Complete both sink and source when the event stream outgoing from scheduler is cancelled by the client" in new SchedulerFixture {
-        val (_, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
-        val (_, innerSource) = specInputQueue.pull().futureValue.value
-        innerSource.runWith(Sink.ignore) // consume all incoming spec updates
+      "Cancels the commandInput sink when the failure occurred in the downstream" in {
+        val (scheduler, _, _) =
+          newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.repeat(deletePodStatus))
+        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
 
-        val stateStreamCompletionPromise = Promise[String]()
-        val specStreamCompletionPromise = Promise[String]()
-
-        Source
-          .repeat(specEvent)
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.map(_ => specStreamCompletionPromise.trySuccess("completed")))
-          .runWith(sink)
-
-        source
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.map(_ => stateStreamCompletionPromise.trySuccess("completed")))
-          .runWith(Sink.head)
-
-        stateOutputQueue.offer(StateSnapshot.empty -> Source.repeat(stateEvent)).futureValue
-
-        specStreamCompletionPromise.future.futureValue shouldEqual "completed"
-        stateStreamCompletionPromise.future.futureValue shouldEqual "completed"
-      }
-
-      "Fail both sink and source when the failure occurred in the upstream" in new SchedulerFixture {
-        val (_, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
-        val (_, innerSource) = specInputQueue.pull().futureValue.value
-        innerSource.runWith(Sink.ignore) // consume all incoming spec updates
-
-        stateOutputQueue.offer(StateSnapshot.empty -> Source.repeat(stateEvent)).futureValue
-
-        val stateStreamCompletionPromise = Promise[String]()
-
-        Source
-          .failed(new RuntimeException("Boom!"))
-          .prepend(Source.single(specEvent))
-          .runWith(sink)
-
-        source
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.onComplete {
-              case Success(_) =>
-                stateStreamCompletionPromise.trySuccess("success")
-
-              case Failure(ex) =>
-                stateStreamCompletionPromise.trySuccess("failed")
-          })
-          .runWith(Sink.ignore)
-
-        stateStreamCompletionPromise.future.futureValue shouldEqual "failed"
-      }
-
-      "Stop the sink when the failure occurred in the downstream" in new SchedulerFixture {
-        val (_, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
-        val (_, innerSource) = specInputQueue.pull().futureValue.value
-        innerSource.runWith(Sink.ignore) // consume all incoming spec updates
-
-        stateOutputQueue.offer(StateSnapshot.empty -> Source.repeat(stateEvent)).futureValue
-
-        val stateStreamCompletionPromise = Promise[String]()
-
-        Source
-          .repeat(specEvent)
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.onComplete {
-              case Success(_) =>
-                stateStreamCompletionPromise.trySuccess("stopped")
-
-              case Failure(ex) =>
-                stateStreamCompletionPromise.trySuccess("failed")
-          })
+        val specStreamCompleted = Source
+          .repeat(deletePodSpec)
           .runWith(sink)
 
         source
           .map(_ => throw new Exception("Boom"))
-          .to(Sink.ignore)
-          .run()
-
-        stateStreamCompletionPromise.future.futureValue shouldEqual "stopped"
-      }
-
-      "Stop both sink and source when the failure occurred in the scheduler input" in new SchedulerFixture {
-        val (_, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
-        val (_, innerSource) = specInputQueue.pull().futureValue.value
-        innerSource.map(_ => throw new Exception("Boom!")).runWith(Sink.ignore) // explosion in the scheduler
-
-        stateOutputQueue.offer(StateSnapshot.empty -> Source.repeat(stateEvent)).futureValue
-
-        val stateStreamCompletionPromise = Promise[String]()
-        val specStreamCompletionPromise = Promise[String]()
-
-        Source
-          .repeat(specEvent)
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.onComplete {
-              case Success(_) =>
-                specStreamCompletionPromise.trySuccess("stopped")
-
-              case Failure(ex) =>
-                specStreamCompletionPromise.trySuccess("failed")
-          })
-          .runWith(sink)
-
-        source
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.onComplete {
-              case Success(_) =>
-                stateStreamCompletionPromise.trySuccess("stopped")
-
-              case Failure(ex) =>
-                stateStreamCompletionPromise.trySuccess("failed")
-          })
           .runWith(Sink.ignore)
 
-        specStreamCompletionPromise.future.futureValue shouldEqual "stopped"
-        stateStreamCompletionPromise.future.futureValue shouldEqual "stopped"
+        specStreamCompleted.futureValue shouldEqual Done
       }
 
-      "Stop sink and fail source when the failure occurred in the scheduler output" in new SchedulerFixture {
-        val (_, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, scheduler)
-        val (_, innerSource) = specInputQueue.pull().futureValue.value
-        innerSource.runWith(Sink.ignore)
+      "Propagates an exception to the state events output source if an exception is received from the spec events input" in {
+        val (scheduler, _, _) = newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.maybe)
+        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
 
-        stateOutputQueue
-          .offer(StateSnapshot.empty -> Source.failed(new Exception("Boom!")))
-          .futureValue
-
-        val stateStreamCompletionPromise = Promise[String]()
-        val specStreamCompletionPromise = Promise[String]()
-
+        val ex = new Exception("boom")
         Source
-          .repeat(specEvent)
-          .watchTermination()((_, terminationSignal) =>
-            terminationSignal.onComplete {
-              case Success(_) =>
-                specStreamCompletionPromise.trySuccess("stopped")
-
-              case Failure(ex) =>
-                specStreamCompletionPromise.trySuccess("failed")
-          })
+          .failed(ex)
           .runWith(sink)
 
-        source.map { e =>
-          println(e)
-        }.watchTermination()((_, terminationSignal) =>
-            terminationSignal.onComplete {
-              case Success(_) =>
-                stateStreamCompletionPromise.trySuccess("stopped")
-
-              case Failure(ex) =>
-                stateStreamCompletionPromise.trySuccess("failed")
-          })
+        val stateStreamCompleted = source
           .runWith(Sink.ignore)
 
-        specStreamCompletionPromise.future.futureValue shouldEqual "stopped"
-        stateStreamCompletionPromise.future.futureValue shouldEqual "failed"
+        stateStreamCompleted.failed.futureValue shouldEqual ex
+      }
 
+      "Stop sink and fail source when the failure occurred in the scheduler output" in {
+        val ex = new Exception("Boom!")
+        val (scheduler, _, _) =
+          newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.failed(ex))
+
+        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
+
+        val specStreamCompleted = Source
+          .repeat(deletePodSpec)
+          .runWith(sink)
+
+        val stateStreamCompleted = source
+          .runWith(Sink.ignore)
+
+        specStreamCompleted.futureValue shouldEqual Done
+        stateStreamCompleted.failed.futureValue shouldEqual ex
       }
     }
   }

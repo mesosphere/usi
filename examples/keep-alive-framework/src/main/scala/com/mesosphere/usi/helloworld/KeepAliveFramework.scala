@@ -5,8 +5,8 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{BroadcastHub, Keep, MergeHub}
+import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.usi.core.Scheduler
-import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.helloworld.runspecs.InMemoryDemoRunSpecService
 import com.mesosphere.usi.helloworld.http.Routes
 import com.mesosphere.usi.helloworld.keepalive.KeepAliveWatcher
@@ -16,18 +16,19 @@ import com.typesafe.scalalogging.StrictLogging
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Promise}
+import scala.concurrent.ExecutionContextExecutor
 
 class KeepAliveFramework(conf: Config) extends StrictLogging {
 
-  implicit val system = ActorSystem()
-  implicit val mat = ActorMaterializer()
-  implicit val ec = system.dispatcher
+  implicit val system: ActorSystem = ActorSystem()
+  implicit val mat: ActorMaterializer = ActorMaterializer()
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
 
-  val client = new KeepAliveMesosClientFactory(conf).client
+  val client: MesosClient = new KeepAliveMesosClientFactory(conf).client
 
   val podRecordRepository = InMemoryPodRecordRepository()
 
-  val (stateSnapshot, source, sink) = Scheduler.asSourceAndSink(SpecsSnapshot.empty, client, podRecordRepository)
+  val (stateSnapshot, source, sink) = Scheduler.asSourceAndSink(client, podRecordRepository)
 
   val sharableSink = MergeHub.source.to(sink).run()
 

@@ -14,23 +14,24 @@ cloud Framework {
 
     • Framework is responsible for knowing which
       services it launches
-    • Framework maps this state to unified
-      scheduler PodSpecs and ReservationSpecs.
+    • Framework submits commands to the scheduler
+      to launch and kill pods
   ]
 
   package UnifiedScheduler {
     component Scheduler [
       <b>Scheduler</b>
-      • Receives PodSpec and ReservationSpec
+      • Receives scheduler commands, such as LaunchPod and KillPod
       • Handles offer matching
-      • Reconciliation
+      • Handles task reconciliation
+      • Persists records of reservations and launched pods
       • Emits PodStatus and ReservationStatus
     ]
 
     component SchedulerStorage [
-      **SchedulerStorage**
+      <b>SchedulerStorage</b>
       • Stores data that cannot be reliably
-        recovered from Mesos
+        recovered from Mesos (PodRecord, etc)
       • Pipelined
     ]
 
