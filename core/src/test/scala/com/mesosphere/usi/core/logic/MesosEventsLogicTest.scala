@@ -90,21 +90,13 @@ class MesosEventsLogicTest extends UnitTest {
       )
     }
 
-    "acknowledge status updates for old pods (new task update)" in {
+    "acknowledges status updates for old pods (new task update)" in {
       import com.mesosphere.usi.core.protos.ProtoBuilders._
 
       val taskId = newTaskId(podWith1Cpu256Mem.id.value)
       val taskUpdate = newTaskUpdateEvent(taskStatus(taskId))
-      val podStatus = Map(
-        podWith1Cpu256Mem.id -> PodStatus(
-          podWith1Cpu256Mem.id,
-          Map(
-            TaskId(podWith1Cpu256Mem.id.value) -> taskUpdate.getUpdate.getStatus
-          )))
 
-      val events = mesosEventLogic.processEvent(
-        SchedulerState(Map.empty, podStatus, Map.empty)
-      )(taskUpdate)
+      val events = mesosEventLogic.processEvent(SchedulerState.empty)(taskUpdate)
 
       events.mesosCalls.length shouldEqual 1
       events.mesosCalls.head.getAcknowledge.getTaskId shouldEqual taskId
@@ -116,6 +108,28 @@ class MesosEventsLogicTest extends UnitTest {
       podStatusUpdate.newStatus.get.taskStatuses should contain(
         TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus
       )
+    }
+
+    "acknowledges the status update but does not emit a PodStatus update if we've already got a task status with the same UUID" in {
+      import com.mesosphere.usi.core.protos.ProtoBuilders._
+
+      val taskId = newTaskId(podWith1Cpu256Mem.id.value)
+      val taskUpdate = newTaskUpdateEvent(taskStatus(taskId))
+      val podStatuses = Map(
+        podWith1Cpu256Mem.id -> PodStatus(
+          podWith1Cpu256Mem.id,
+          Map(
+            TaskId(podWith1Cpu256Mem.id.value) -> taskUpdate.getUpdate.getStatus
+          )))
+
+      val events = mesosEventLogic.processEvent(
+        SchedulerState(Map.empty, podStatuses, Map.empty)
+      )(taskUpdate)
+
+      events.mesosCalls.length shouldEqual 1
+      events.mesosCalls.head.getAcknowledge.getTaskId shouldEqual taskId
+
+      events.stateEvents.length shouldEqual 0
     }
 
     "do not ACK status update when no UUID is set" in {

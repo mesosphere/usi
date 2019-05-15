@@ -119,29 +119,40 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
         schedulerEventsBuilder.result
 
       case UpdateEvent(taskStatus) =>
+        var b = SchedulerEventsBuilder.empty
+
         val taskId = TaskId(taskStatus.getTaskId.getValue)
+
+        if (taskStatus.hasUuid) {
+          // frameworks should accept only status updates that have UUID set
+          // http://mesos.apache.org/documentation/latest/scheduler-http-api/#acknowledge
+          b = b.withMesosCall(
+            mesosCallFactory.newAcknowledge(taskStatus.getAgentId, taskStatus.getTaskId, taskStatus.getUuid))
+        }
+
         val podId = podIdFor(taskId)
         logger.info(
           s"Received task status update from taskId $taskId and podId $podId with status ${taskStatus.getState}"
         )(LoggingArgs("taskId" -> taskId, "podId" -> podId))
 
-        val newStatus = state.podStatuses.get(podId) match {
-          case Some(oldStatus) =>
-            oldStatus.copy(taskStatuses = oldStatus.taskStatuses.updated(taskId, taskStatus))
-          case None =>
-            PodStatus(podId, Map(taskId -> taskStatus))
+        val alreadySet = state.podStatuses
+          .get(podId)
+          .flatMap { podStatus =>
+            podStatus.taskStatuses.get(taskId)
+          }
+          .exists(_.getUuid == taskStatus.getUuid)
+
+        if (!alreadySet) {
+          val newPodStatus = state.podStatuses.get(podId) match {
+            case Some(oldPodStatus) =>
+              oldPodStatus.copy(taskStatuses = oldPodStatus.taskStatuses.updated(taskId, taskStatus))
+            case None =>
+              PodStatus(podId, Map(taskId -> taskStatus))
+          }
+          b = b.withPodStatus(podId, Some(newPodStatus))
         }
 
-        SchedulerEvents(
-          stateEvents = List(PodStatusUpdatedEvent(podId, Some(newStatus))),
-          mesosCalls = if (taskStatus.hasUuid) {
-            // frameworks should accept only status updates that have UUID set
-            // http://mesos.apache.org/documentation/latest/scheduler-http-api/#acknowledge
-            List(mesosCallFactory.newAcknowledge(taskStatus.getAgentId, taskStatus.getTaskId, taskStatus.getUuid))
-          } else {
-            Nil
-          }
-        )
+        b.result
       case other =>
         logger.warn(s"No handler defined for event ${other.getType} - ${other}")
         SchedulerEvents.empty
