@@ -6,6 +6,7 @@ import akka.stream.javadsl.{Flow, Sink, Source}
 import akka.stream.{Materializer, javadsl, scaladsl}
 import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
+import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.{SchedulerCommand, StateEvent, StateEventOrSnapshot, StateSnapshot}
 import com.mesosphere.usi.core.{Scheduler => ScalaScheduler}
 import com.mesosphere.usi.repository.PodRecordRepository
@@ -32,9 +33,10 @@ object Scheduler {
     */
   def fromClient(
       client: MesosClient,
-      podRecordRepository: PodRecordRepository): javadsl.Flow[SchedulerCommand, StateOutput, NotUsed] = {
+      podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings): javadsl.Flow[SchedulerCommand, StateOutput, NotUsed] = {
     val flow = Flow.fromSinkAndSource(client.mesosSink, client.mesosSource)
-    fromFlow(client.calls, podRecordRepository, flow)
+    fromFlow(client.calls, podRecordRepository, flow, schedulerSettings)
   }
 
   /**
@@ -49,10 +51,11 @@ object Scheduler {
   def fromFlow(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
-      mesosFlow: javadsl.Flow[MesosCall, MesosEvent, NotUsed]): javadsl.Flow[SchedulerCommand, StateOutput, NotUsed] = {
+      mesosFlow: javadsl.Flow[MesosCall, MesosEvent, NotUsed],
+      schedulerSettings: SchedulerSettings): javadsl.Flow[SchedulerCommand, StateOutput, NotUsed] = {
     javadsl.Flow
       .create[SchedulerCommand]()
-      .via(ScalaScheduler.fromFlow(mesosCallFactory, podRecordRepository, mesosFlow.asScala))
+      .via(ScalaScheduler.fromFlow(mesosCallFactory, podRecordRepository, mesosFlow.asScala, schedulerSettings))
       .map {
         case (stateSnapshot: StateSnapshot, stateEvents: scaladsl.Source[StateEvent, Any]) =>
           akka.japi.Pair(stateSnapshot, stateEvents.asJava)
@@ -69,8 +72,10 @@ object Scheduler {
   def asSourceAndSink(
       client: MesosClient,
       podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings,
       materializer: Materializer): SourceAndSinkResult = {
-    val (snap, source, sink) = ScalaScheduler.asSourceAndSink(client, podRecordRepository)(materializer)
+    val (snap, source, sink) =
+      ScalaScheduler.asSourceAndSink(client, podRecordRepository, schedulerSettings)(materializer)
     new SourceAndSinkResult(
       snap.toJava.toCompletableFuture,
       source.asJava,
@@ -97,11 +102,12 @@ object Scheduler {
   def asFlow(
       client: MesosClient,
       podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings,
       materializer: Materializer): CompletableFuture[FlowResult] = {
 
     implicit val ec = ExecutionContext.Implicits.global
 
-    val flowFuture = ScalaScheduler.asFlow(client, podRecordRepository)(materializer)
+    val flowFuture = ScalaScheduler.asFlow(client, podRecordRepository, schedulerSettings)(materializer)
     flowFuture.map {
       case (snapshot, flow) =>
         new FlowResult(snapshot, flow.asJava)

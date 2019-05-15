@@ -1,5 +1,7 @@
 package com.mesosphere.usi.core
 
+import java.util.concurrent.TimeUnit
+
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Keep, Sink, Source}
 import akka.stream.{BidiShape, FlowShape, Materializer}
 import akka.{Done, NotUsed}
@@ -15,7 +17,6 @@ import com.mesosphere.usi.core.models.{
   StateSnapshot
 }
 import com.mesosphere.usi.repository.PodRecordRepository
-import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
@@ -64,14 +65,13 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 object Scheduler {
   type StateOutput = (StateSnapshot, Source[StateEvent, Any])
 
-  private val schedulerSettings = SchedulerSettings.fromConfig(ConfigFactory.load().getConfig("scheduler"))
-
-  def asFlow(client: MesosClient, podRecordRepository: PodRecordRepository)(implicit materializer: Materializer)
+  def asFlow(client: MesosClient, podRecordRepository: PodRecordRepository, schedulerSettings: SchedulerSettings)(
+      implicit materializer: Materializer)
     : Future[(StateSnapshot, Flow[SchedulerCommand, StateEventOrSnapshot, NotUsed])] = {
 
     implicit val ec = ExecutionContext.global //only for ultra-fast non-blocking map
 
-    val (snap, source, sink) = asSourceAndSink(client, podRecordRepository)
+    val (snap, source, sink) = asSourceAndSink(client, podRecordRepository, schedulerSettings)
 
     snap.map { snapshot =>
       (snapshot, Flow.fromSinkAndSourceCoupled(sink, source))
@@ -85,9 +85,12 @@ object Scheduler {
     *
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
-  def asSourceAndSink(client: MesosClient, podRecordRepository: PodRecordRepository)(implicit mat: Materializer)
+  def asSourceAndSink(
+      client: MesosClient,
+      podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings)(implicit mat: Materializer)
     : (Future[StateSnapshot], Source[StateEventOrSnapshot, NotUsed], Sink[SchedulerCommand, Future[Done]]) = {
-    val flow = fromClient(client, podRecordRepository)
+    val flow = fromClient(client, podRecordRepository, schedulerSettings)
     asSourceAndSink(flow)(mat)
   }
 
@@ -113,30 +116,36 @@ object Scheduler {
 
   private[usi] def fromClient(
       client: MesosClient,
-      podRecordRepository: PodRecordRepository): Flow[SchedulerCommand, StateOutput, NotUsed] = {
+      podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings): Flow[SchedulerCommand, StateOutput, NotUsed] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
           "Please provide a MesosClient with FrameworkInfo that has capability MULTI_ROLE")
     }
-    fromFlow(client.calls, podRecordRepository, Flow.fromSinkAndSource(client.mesosSink, client.mesosSource))
+    fromFlow(
+      client.calls,
+      podRecordRepository,
+      Flow.fromSinkAndSource(client.mesosSink, client.mesosSource),
+      schedulerSettings)
   }
 
   private[usi] def fromFlow(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
-      mesosFlow: Flow[MesosCall, MesosEvent, Any]): Flow[SchedulerCommand, StateOutput, NotUsed] = {
+      mesosFlow: Flow[MesosCall, MesosEvent, Any],
+      schedulerSettings: SchedulerSettings): Flow[SchedulerCommand, StateOutput, NotUsed] = {
     Flow.fromGraph {
-      GraphDSL.create(unconnectedGraph(mesosCallFactory, podRecordRepository), mesosFlow)((_, _) => NotUsed) {
-        implicit builder =>
-          { (graph, mesos) =>
-            import GraphDSL.Implicits._
+      GraphDSL.create(unconnectedGraph(mesosCallFactory, podRecordRepository, schedulerSettings), mesosFlow)((_, _) =>
+        NotUsed) { implicit builder =>
+        { (graph, mesos) =>
+          import GraphDSL.Implicits._
 
-            mesos ~> graph.in2
-            graph.out2 ~> mesos
+          mesos ~> graph.in2
+          graph.out2 ~> mesos
 
-            FlowShape(graph.in1, graph.out1)
-          }
+          FlowShape(graph.in1, graph.out1)
+        }
       }
     }
   }
@@ -156,9 +165,13 @@ object Scheduler {
         (stateSnapshot, stateUpdates)
     }
 
-  private[core] def unconnectedGraph(mesosCallFactory: MesosCalls, podRecordRepository: PodRecordRepository)
-    : BidiFlow[SchedulerCommand, StateOutput, MesosEvent, MesosCall, NotUsed] = {
-    val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, loadPodRecords(podRecordRepository))
+  private[core] def unconnectedGraph(
+      mesosCallFactory: MesosCalls,
+      podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings): BidiFlow[SchedulerCommand, StateOutput, MesosEvent, MesosCall, NotUsed] = {
+    val loadTimeout = Duration(schedulerSettings.persistenceLoadTimeout.getSeconds, TimeUnit.SECONDS)
+    val schedulerLogicGraph =
+      new SchedulerLogicGraph(mesosCallFactory, loadPodRecords(podRecordRepository, loadTimeout))
     BidiFlow.fromGraph {
       GraphDSL.create(schedulerLogicGraph) { implicit builder => (schedulerLogic) =>
         {
@@ -166,7 +179,7 @@ object Scheduler {
 
           val broadcast = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true))
           val stateOutputBreakout = builder.add(stateOutputBreakoutFlow)
-          val persistenceStorageFlow = builder.add(persistenceFlow(podRecordRepository))
+          val persistenceStorageFlow = builder.add(persistenceFlow(podRecordRepository, schedulerSettings))
 
           schedulerLogic.out ~> persistenceStorageFlow ~> broadcast.in
 
@@ -186,7 +199,8 @@ object Scheduler {
   }
 
   private[core] def persistenceFlow(
-      podRecordRepository: PodRecordRepository): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
+      podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
     Flow[SchedulerEvents]
       .mapConcat(persistEvents(_, podRecordRepository))
       .mapAsync(schedulerSettings.persistencePipelineLimit)(call => call())
@@ -213,9 +227,9 @@ object Scheduler {
    *
    * Block for IO - If the IO call fails or a timeout occurs, we should not make any progress.
    */
-  private def loadPodRecords(podRecordRepository: PodRecordRepository): Map[PodId, PodRecord] = {
+  private def loadPodRecords(podRecordRepository: PodRecordRepository, loadTimeout: Duration): Map[PodId, PodRecord] = {
     // Add error handling (and maybe a retry mechanism).
-    Await.result(podRecordRepository.readAll(), schedulerSettings.persistenceLoadTimeout.seconds)
+    Await.result(podRecordRepository.readAll(), loadTimeout)
   }
 
   private def isMultiRoleFramework(frameworkInfo: FrameworkInfo): Boolean =
