@@ -32,7 +32,9 @@ class MesosClientSettings private (
 
 object MesosClientSettings {
   def fromConfig(conf: Config): MesosClientSettings = {
-    val masterUrls: Seq[URL] = conf.getStringList("master-url").asScala.map(new URL(_))
+    val masterUrls: Seq[URL] = conf.getString("master-url").split(',').map { url =>
+      new URL(url.trim)
+    }
     val maxRedirects = conf.getInt("max-redirects")
 
     // we want FiniteDuration, the conversion is needed to achieve that
