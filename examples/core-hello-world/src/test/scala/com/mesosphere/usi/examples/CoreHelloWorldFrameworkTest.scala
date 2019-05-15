@@ -1,29 +1,19 @@
 package com.mesosphere.usi.examples
 
+import akka.NotUsed
+import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.testkit.{TestPublisher, TestSubscriber}
+import com.mesosphere.mesos.conf.MesosClientSettings
+import com.mesosphere.usi.core.Scheduler.StateOutput
+import com.mesosphere.usi.core.models.{PodStatusUpdatedEvent, SchedulerCommand, StateEventOrSnapshot, StateSnapshot}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
-
-import com.mesosphere.mesos.conf.MesosClientSettings
 import org.apache.mesos.v1.Protos.FrameworkID
 import org.scalatest.Inside
 
 import scala.concurrent.duration._
-import akka.NotUsed
-import akka.stream.scaladsl.Flow
-import akka.stream.scaladsl.Sink
-import akka.stream.scaladsl.Source
-import akka.stream.testkit.TestPublisher
-import akka.stream.testkit.TestSubscriber
-import com.mesosphere.usi.core.Scheduler.SpecInput
-import com.mesosphere.usi.core.Scheduler.StateOutput
-import com.mesosphere.usi.core.models.PodRecordUpdated
-import com.mesosphere.usi.core.models.PodStatusUpdated
-import com.mesosphere.usi.core.models.SpecUpdated
-import com.mesosphere.usi.core.models.SpecsSnapshot
-import com.mesosphere.usi.core.models.StateEvent
-import com.mesosphere.usi.core.models.StateSnapshot
 
 class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest with Inside {
 
@@ -58,18 +48,20 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
       frameworkInfo)
 
     And("an initial pod spec is launched")
-    val specsSnapshot = CoreHelloWorldFramework.generateSpecSnapshot
-    val (_, sub) = runGraphAndFeedSnapshot(scheduler, specsSnapshot)
+    val launchCommand = CoreHelloWorldFramework.generateLaunchCommand
+    val (pub, sub) = testScheduler(scheduler)
+    pub.sendNext(launchCommand)
 
     Then("receive an empty snapshot followed by other state events")
     inside(sub.requestNext()) { case snap: StateSnapshot => snap.podRecords shouldBe empty }
-    inside(sub.requestNext()) { case _: PodRecordUpdated => () }
-    inside(sub.requestNext()) { case podStatus: PodStatusUpdated => podStatus.newStatus shouldBe defined }
+    eventually {
+      inside(sub.requestNext()) { case podStatus: PodStatusUpdatedEvent => podStatus.newStatus shouldBe defined }
+    }
 
     And("persistence storage has correct set of records")
     val podRecords = customPersistenceStore.readAll().futureValue.values
     podRecords.size shouldBe 1
-    podRecords.head.podId shouldEqual specsSnapshot.podSpecs.head.id
+    podRecords.head.podId shouldEqual launchCommand.podId
 
     When("the scheduler is crashed")
     mesosClient.killSwitch.abort(new RuntimeException("an intentional crash"))
@@ -79,7 +71,8 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
       MesosClientSettings.load().withMasters(Seq(mesosFacade.url)),
       customPersistenceStore,
       frameworkInfo)
-    val (_, newSub) = runGraphAndFeedSnapshot(newScheduler, specsSnapshot)
+    val (newPub, newSub) = testScheduler(newScheduler)
+    newPub.sendNext(launchCommand)
     inside(newSub.requestNext()) {
       case snap: StateSnapshot => snap.podRecords should contain theSameElementsAs podRecords
     }
@@ -93,19 +86,17 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     newClient.killSwitch.shutdown()
   }
 
-  private def runGraphAndFeedSnapshot(
-      graph: Flow[SpecInput, StateOutput, NotUsed],
-      specs: SpecsSnapshot
-  ): (TestPublisher.Probe[SpecUpdated], TestSubscriber.Probe[StateEvent]) = {
-    val specUpdatePub = TestPublisher.probe[SpecUpdated]()
-    val stateEventSub = TestSubscriber.probe[StateEvent]()
-    Source.maybe
-      .prepend(Source.single(specs))
-      .map(snapshot => (snapshot, Source.fromPublisher(specUpdatePub)))
+  private def testScheduler(
+      graph: Flow[SchedulerCommand, StateOutput, NotUsed]
+  ): (TestPublisher.Probe[SchedulerCommand], TestSubscriber.Probe[StateEventOrSnapshot]) = {
+    val commandPublisher = TestPublisher.probe[SchedulerCommand]()
+    val stateEventSub = TestSubscriber.probe[StateEventOrSnapshot]()
+    Source
+      .fromPublisher(commandPublisher)
       .via(graph)
       .flatMapConcat { case (snapshot, updates) => updates.prepend(Source.single(snapshot)) }
       .runWith(Sink.fromSubscriber(stateEventSub))
-    (specUpdatePub, stateEventSub)
+    (commandPublisher, stateEventSub)
   }
 
   def withFixture(frameworkId: Option[FrameworkID.Builder] = None)(fn: Fixture => Unit): Unit = {
@@ -117,6 +108,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
   }
 
   class Fixture(existingFrameworkId: Option[FrameworkID.Builder] = None) {
-    val framework = CoreHelloWorldFramework.run(MesosClientSettings.load().withMasters(Seq(mesosFacade.url)))
+    val framework: CoreHelloWorldFramework =
+      CoreHelloWorldFramework.run(MesosClientSettings.load().withMasters(Seq(mesosFacade.url)))
   }
 }

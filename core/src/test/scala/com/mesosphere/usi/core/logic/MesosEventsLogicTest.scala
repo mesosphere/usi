@@ -2,9 +2,9 @@ package com.mesosphere.usi.core.logic
 
 import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
-import com.mesosphere.usi.core.{SchedulerState, SpecState}
+import com.mesosphere.usi.core.SchedulerState
 import com.mesosphere.usi.core.helpers.MesosMock
-import com.mesosphere.usi.core.models.{Goal, PodId, PodSpec, PodStatus, PodStatusUpdated, RunSpec, TaskId}
+import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunSpec, RunningPodSpec, TaskId}
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskStatus}
 import com.mesosphere.utils.UnitTest
@@ -14,9 +14,8 @@ class MesosEventsLogicTest extends UnitTest {
 
   private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId))
 
-  val podWith1Cpu256Mem: PodSpec = PodSpec(
+  val podWith1Cpu256Mem: RunningPodSpec = RunningPodSpec(
     PodId("mock-podId"),
-    Goal.Running,
     RunSpec(
       List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
       shellCommand = "sleep 3600",
@@ -76,16 +75,15 @@ class MesosEventsLogicTest extends UnitTest {
 
       val taskId = newTaskId(podWith1Cpu256Mem.id.value)
       val taskUpdate = newTaskUpdateEvent(taskStatus(taskId))
-      val specs = SpecState(Map(podWith1Cpu256Mem.id -> podWith1Cpu256Mem))
 
-      val events = mesosEventLogic.processEvent(specs, SchedulerState.empty, Set.empty)(taskUpdate)
+      val events = mesosEventLogic.processEvent(SchedulerState.empty)(taskUpdate)
 
       events.mesosCalls.length shouldEqual 1
       events.mesosCalls.head.getAcknowledge.getTaskId shouldEqual taskId
 
       events.stateEvents.length shouldEqual 1
-      events.stateEvents.head shouldBe a[PodStatusUpdated]
-      val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdated]
+      events.stateEvents.head shouldBe a[PodStatusUpdatedEvent]
+      val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdatedEvent]
       podStatusUpdate.newStatus shouldBe defined
       podStatusUpdate.newStatus.get.taskStatuses should contain(
         TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus
@@ -97,7 +95,6 @@ class MesosEventsLogicTest extends UnitTest {
 
       val taskId = newTaskId(podWith1Cpu256Mem.id.value)
       val taskUpdate = newTaskUpdateEvent(taskStatus(taskId))
-      val specs = SpecState(Map(podWith1Cpu256Mem.id -> podWith1Cpu256Mem))
       val podStatus = Map(
         podWith1Cpu256Mem.id -> PodStatus(
           podWith1Cpu256Mem.id,
@@ -106,17 +103,15 @@ class MesosEventsLogicTest extends UnitTest {
           )))
 
       val events = mesosEventLogic.processEvent(
-        specs,
-        SchedulerState(Map.empty, podStatus),
-        Set.empty
+        SchedulerState(Map.empty, podStatus, Map.empty)
       )(taskUpdate)
 
       events.mesosCalls.length shouldEqual 1
       events.mesosCalls.head.getAcknowledge.getTaskId shouldEqual taskId
 
       events.stateEvents.length shouldEqual 1
-      events.stateEvents.head shouldBe a[PodStatusUpdated]
-      val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdated]
+      events.stateEvents.head shouldBe a[PodStatusUpdatedEvent]
+      val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdatedEvent]
       podStatusUpdate.newStatus shouldBe defined
       podStatusUpdate.newStatus.get.taskStatuses should contain(
         TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus
@@ -128,7 +123,6 @@ class MesosEventsLogicTest extends UnitTest {
 
       val taskId = newTaskId(podWith1Cpu256Mem.id.value)
       val taskUpdateWithoutUuid = newTaskUpdateEvent(taskStatus(taskId, uuid = null))
-      val specs = SpecState(Map(podWith1Cpu256Mem.id -> podWith1Cpu256Mem))
       val podStatus = Map(
         podWith1Cpu256Mem.id -> PodStatus(
           podWith1Cpu256Mem.id,
@@ -137,9 +131,7 @@ class MesosEventsLogicTest extends UnitTest {
           )))
 
       val events = mesosEventLogic.processEvent(
-        specs,
-        SchedulerState(Map.empty, podStatus),
-        Set.empty
+        SchedulerState(Map.empty, podStatus, Map.empty)
       )(taskUpdateWithoutUuid)
 
       events.mesosCalls.isEmpty should be(true)
