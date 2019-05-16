@@ -7,6 +7,10 @@ import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import scala.concurrent.Future
 
 private[usi] object FlowHelpers {
+
+  /**
+    * Split the output and input for a flow into a corresponding source and sink
+    */
   def asSourceAndSink[A, B](flow: Flow[A, B, NotUsed])(
       implicit mat: Materializer): (Source[B, NotUsed], Sink[A, Future[Done]]) = {
 
