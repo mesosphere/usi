@@ -1,17 +1,15 @@
 package com.mesosphere.usi.examples
 
-import java.util
-
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.testkit.{TestPublisher, TestSubscriber}
+import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler.StateOutput
 import com.mesosphere.usi.core.models.{PodStatusUpdatedEvent, SchedulerCommand, StateEventOrSnapshot, StateSnapshot}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
-import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.mesos.v1.Protos.FrameworkID
 import org.scalatest.Inside
 
@@ -41,11 +39,13 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
 
   "CoreHelloWorldFramework should adhere to at most once launch guarantee during a crash-recovery" in {
     Given("a scheduler graph that uses a persistence layer")
-    val conf = loadConfig
     val frameworkInfo = CoreHelloWorldFramework.buildFrameworkInfo
     val customPersistenceStore = InMemoryPodRecordRepository()
     customPersistenceStore.readAll().futureValue.size shouldBe 0
-    val (mesosClient, scheduler) = CoreHelloWorldFramework.init(conf, customPersistenceStore, frameworkInfo)
+    val (mesosClient, scheduler) = CoreHelloWorldFramework.init(
+      MesosClientSettings.load().withMasters(Seq(mesosFacade.url)),
+      customPersistenceStore,
+      frameworkInfo)
 
     And("an initial pod spec is launched")
     val launchCommand = CoreHelloWorldFramework.generateLaunchCommand
@@ -67,7 +67,10 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     mesosClient.killSwitch.abort(new RuntimeException("an intentional crash"))
 
     Then("upon recovery, emitted snapshot should have valid information")
-    val (newClient, newScheduler) = CoreHelloWorldFramework.init(conf, customPersistenceStore, frameworkInfo)
+    val (newClient, newScheduler) = CoreHelloWorldFramework.init(
+      MesosClientSettings.load().withMasters(Seq(mesosFacade.url)),
+      customPersistenceStore,
+      frameworkInfo)
     val (newPub, newSub) = testScheduler(newScheduler)
     newPub.sendNext(launchCommand)
     inside(newSub.requestNext()) {
@@ -104,15 +107,8 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     }
   }
 
-  def loadConfig: Config = {
-    val mesosUrl = new java.net.URI(mesosFacade.url)
-    ConfigFactory
-      .parseMap(util.Collections.singletonMap("mesos-client.master-url", s"${mesosUrl.getHost}:${mesosUrl.getPort}"))
-      .withFallback(ConfigFactory.load())
-      .getConfig("mesos-client")
-  }
-
   class Fixture(existingFrameworkId: Option[FrameworkID.Builder] = None) {
-    val framework: CoreHelloWorldFramework = CoreHelloWorldFramework.run(loadConfig)
+    val framework: CoreHelloWorldFramework =
+      CoreHelloWorldFramework.run(MesosClientSettings.load().withMasters(Seq(mesosFacade.url)))
   }
 }

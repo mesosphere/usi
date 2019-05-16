@@ -14,7 +14,6 @@ import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.usi.core.models.{LaunchPod, PodId, PodStatus, PodStatusUpdatedEvent, RunSpec, SchedulerCommand}
 import com.mesosphere.usi.repository.PodRecordRepository
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
-import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo, TaskState, TaskStatus}
 
@@ -67,9 +66,9 @@ object CoreHelloWorldFramework extends StrictLogging {
   def main(args: Array[String]): Unit = {
     implicit val actorSystem: ActorSystem = ActorSystem()
     implicit val ec: ExecutionContext = actorSystem.dispatcher
-    val conf = ConfigFactory.load().getConfig("mesos-client")
+    val settings = MesosClientSettings.load()
     try {
-      run(conf).result.onComplete {
+      run(settings).result.onComplete {
         case Success(res) =>
           logger.info(s"Stream completed: $res");
           actorSystem.terminate()
@@ -115,20 +114,19 @@ object CoreHelloWorldFramework extends StrictLogging {
   }
 
   def init(
-      conf: Config,
+      clientSettings: MesosClientSettings,
       podRecordRepository: PodRecordRepository,
       frameworkInfo: FrameworkInfo
   )(
       implicit system: ActorSystem,
       materializer: Materializer): (MesosClient, Flow[SchedulerCommand, StateOutput, NotUsed]) = {
-    val clientSettings = MesosClientSettings(conf.getString("master-url"))
     val client: MesosClient = Await.result(MesosClient(clientSettings, frameworkInfo).runWith(Sink.head), 10.seconds)
     (client, Scheduler.fromClient(client, podRecordRepository))
   }
 
-  def run(conf: Config)(implicit system: ActorSystem): CoreHelloWorldFramework = {
+  def run(settings: MesosClientSettings)(implicit system: ActorSystem): CoreHelloWorldFramework = {
     implicit val mat: ActorMaterializer = ActorMaterializer()
-    val (client, schedulerFlow) = init(conf, InMemoryPodRecordRepository(), buildFrameworkInfo)
+    val (client, schedulerFlow) = init(settings, InMemoryPodRecordRepository(), buildFrameworkInfo)
 
     // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
     // which emits a materialized promise which when completed with a Some, that value will be produced downstream,

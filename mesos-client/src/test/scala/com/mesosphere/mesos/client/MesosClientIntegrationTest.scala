@@ -9,7 +9,6 @@ import akka.stream.scaladsl.{Sink, Source}
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
-import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.Event
 
@@ -104,15 +103,10 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
       .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
       .build()
 
-    val mesosUrl = new java.net.URI(mesosFacade.url)
-    val mesosHost = mesosUrl.getHost
-    val mesosPort = mesosUrl.getPort
+    lazy val mesosHost = mesosFacade.url.getHost
+    lazy val mesosPort = mesosFacade.url.getPort
 
-    val config = ConfigFactory.parseString(s"""
-         |mesos-client.master-url="${mesosUrl.getHost}:${mesosUrl.getPort}"
-    """.stripMargin).withFallback(ConfigFactory.load())
-
-    val settings = MesosClientSettings.fromConfig(config.getConfig("mesos-client"))
+    val settings = MesosClientSettings.load().withMasters(Seq(mesosFacade.url))
 
     val client = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
 

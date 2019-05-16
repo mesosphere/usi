@@ -1,25 +1,58 @@
 package com.mesosphere.mesos.conf
 
-import com.typesafe.config.Config
+import java.net.URL
+
+import com.typesafe.config.{Config, ConfigFactory}
+
+import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
-case class MesosClientSettings(
-    master: String,
-    redirectRetries: Int = 3,
-    idleTimeout: FiniteDuration = 75.seconds,
-    sourceBufferSize: Int = 10) {}
+class MesosClientSettings private (
+    val masters: Seq[URL],
+    val maxRedirects: Int,
+    val idleTimeout: FiniteDuration,
+    val sourceBufferSize: Int) {
+
+  private def copy(
+      masters: Seq[URL] = this.masters,
+      maxRedirects: Int = this.maxRedirects,
+      idleTimeout: FiniteDuration = this.idleTimeout,
+      sourceBufferSize: Int = this.sourceBufferSize) =
+    new MesosClientSettings(masters, maxRedirects, idleTimeout, sourceBufferSize)
+
+  def withMasters(urls: Iterable[URL]): MesosClientSettings = copy(masters = urls.toSeq)
+  def withMasters(urls: java.lang.Iterable[URL]): MesosClientSettings = withMasters(urls.asScala)
+
+  def withMaxRedirects(maxRedirects: Int): MesosClientSettings = copy(maxRedirects = maxRedirects)
+
+  def withIdleTimeout(timeout: FiniteDuration): MesosClientSettings = copy(idleTimeout = timeout)
+
+  def withSourceBufferSize(bufferSize: Int): MesosClientSettings = copy(sourceBufferSize = bufferSize)
+}
 
 object MesosClientSettings {
   def fromConfig(conf: Config): MesosClientSettings = {
-    val master = conf.getString("master-url")
-    val redirectRetries = conf.getInt("redirect-retries")
+    val masterUrls: Seq[URL] = conf.getString("master-url").split(',').map { url =>
+      new URL(url.trim)
+    }
+    val maxRedirects = conf.getInt("max-redirects")
 
     // we want FiniteDuration, the conversion is needed to achieve that
     val idleTimeout = Duration.fromNanos(conf.getDuration("idle-timeout").toNanos)
 
     val sourceBufferSize = conf.getInt("back-pressure.source-buffer-size")
 
-    MesosClientSettings(master, redirectRetries, idleTimeout, sourceBufferSize)
+    new MesosClientSettings(masterUrls, maxRedirects, idleTimeout, sourceBufferSize)
 
+  }
+
+  def load(): MesosClientSettings = {
+    val conf = ConfigFactory.load();
+    MesosClientSettings.fromConfig(conf.getConfig("mesos-client"))
+  }
+
+  def load(loader: ClassLoader): MesosClientSettings = {
+    val conf = ConfigFactory.load(loader);
+    MesosClientSettings.fromConfig(conf.getConfig("mesos-client"))
   }
 }

@@ -5,7 +5,6 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import com.mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
-import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -21,7 +20,7 @@ import scala.util.{Failure, Success}
   *  Good to test against local Mesos.
   *
   */
-class SimpleHelloWorldFramework(conf: Config) extends StrictLoggingFlow {
+class SimpleHelloWorldFramework(settings: MesosClientSettings) extends StrictLoggingFlow {
   implicit val system = ActorSystem()
   implicit val mat = ActorMaterializer()
   implicit val ec = system.dispatcher
@@ -35,7 +34,6 @@ class SimpleHelloWorldFramework(conf: Config) extends StrictLoggingFlow {
     * Mesos client and its settings. We wait for the client to connect to Mesos for 10 seconds. If it can't
     * the framework will exit with a [[java.util.concurrent.TimeoutException]]
     */
-  val settings = MesosClientSettings.fromConfig(conf)
   val client = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   logger.info(s"""Successfully subscribed to Mesos:
@@ -131,9 +129,8 @@ class SimpleHelloWorldFramework(conf: Config) extends StrictLoggingFlow {
 object SimpleHelloWorldFramework {
 
   def main(args: Array[String]): Unit = {
-    val conf = ConfigFactory.load().getConfig("mesos-client")
-    SimpleHelloWorldFramework(conf)
+    SimpleHelloWorldFramework(MesosClientSettings.load())
   }
 
-  def apply(conf: Config): SimpleHelloWorldFramework = new SimpleHelloWorldFramework(conf)
+  def apply(settings: MesosClientSettings): SimpleHelloWorldFramework = new SimpleHelloWorldFramework(settings)
 }

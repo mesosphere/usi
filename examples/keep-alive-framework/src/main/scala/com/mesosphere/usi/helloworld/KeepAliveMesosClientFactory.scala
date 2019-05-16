@@ -17,7 +17,7 @@ import scala.sys.SystemProperties
   */
 class KeepAliveMesosClientFactory(conf: Config)(implicit system: ActorSystem, mat: ActorMaterializer) {
 
-  val settings = MesosClientSettings(conf.getString("master-url"))
+  val settings = MesosClientSettings.fromConfig(conf)
   val frameworkInfo = FrameworkInfo
     .newBuilder()
     .setUser(
