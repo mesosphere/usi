@@ -13,7 +13,6 @@ import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.commandInputSo
 import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord, PodRecordUpdatedEvent, SchedulerCommand, StateEvent}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
-import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.scalatest._
 
@@ -38,7 +37,12 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   def mockedScheduler: Flow[SchedulerCommand, StateEvent, Future[Done]] = {
     val (_, unconnectedFlow) =
-      Scheduler.unconnectedGraph(new MesosCalls(MesosMock.mockFrameworkId), InMemoryPodRecordRepository()).futureValue
+      Scheduler
+        .unconnectedGraph(
+          new MesosCalls(MesosMock.mockFrameworkId),
+          InMemoryPodRecordRepository(),
+          SchedulerSettings.load())
+        .futureValue
     Flow.fromGraph {
       GraphDSL.create(unconnectedFlow, loggingMockMesosFlow)((_, materializedValue) => materializedValue) {
         implicit builder =>
@@ -86,7 +90,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     }
     val (pub, sub) = TestSource
       .probe[SchedulerEvents]
-      .via(Scheduler.persistenceFlow(fuzzyPodRecordRepo))
+      .via(Scheduler.persistenceFlow(fuzzyPodRecordRepo, SchedulerSettings.load()))
       .toMat(TestSink.probe[SchedulerEvents])(Keep.both)
       .run()
 
@@ -113,7 +117,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   "Persistence flow honors the pipe-lining threshold" in {
     Given("a list of persistence operations with count strictly greater than twice the pipeline limit")
-    val limit = SchedulerSettings.fromConfig(ConfigFactory.load().getConfig("scheduler")).persistencePipelineLimit
+    val limit = SchedulerSettings.load().persistencePipelineLimit
     val deleteEvents = (1 to limit * 2 + 1)
       .map(x => PodRecordUpdatedEvent(PodId("pod-" + x), None))
       .grouped(100)
@@ -124,7 +128,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     val controlledRepository = new ControlledRepository()
     val (pub, sub) = TestSource
       .probe[SchedulerEvents]
-      .via(Scheduler.persistenceFlow(controlledRepository))
+      .via(Scheduler.persistenceFlow(controlledRepository, SchedulerSettings.load()))
       .toMat(TestSink.probe[SchedulerEvents])(Keep.both)
       .run()
 

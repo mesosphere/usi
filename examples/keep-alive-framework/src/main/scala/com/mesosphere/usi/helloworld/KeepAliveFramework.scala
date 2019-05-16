@@ -6,6 +6,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Source}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.usi.core.Scheduler
+import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models._
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.{Config, ConfigFactory}
@@ -58,7 +59,8 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 
   val podRecordRepository = InMemoryPodRecordRepository()
 
-  val (stateSnapshot, source, sink) = Await.result(Scheduler.asSourceAndSink(client, podRecordRepository), 10.seconds)
+  val (stateSnapshot, source, sink) =
+    Await.result(Scheduler.asSourceAndSink(client, podRecordRepository, SchedulerSettings.load()), 10.seconds)
 
   /**
     * This is the core part of this framework. Source with SpecEvents is pushing events to the keepAliveWatcher,

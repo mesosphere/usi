@@ -7,7 +7,6 @@ import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.{PodRecordUpdatedEvent, SchedulerCommand, StateEvent, StateSnapshot}
 import com.mesosphere.usi.repository.PodRecordRepository
-import com.typesafe.config.ConfigFactory
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
@@ -53,7 +52,6 @@ import scala.concurrent.{ExecutionContext, Future}
   * }}}
   */
 object Scheduler {
-  private val schedulerSettings = SchedulerSettings.fromConfig(ConfigFactory.load().getConfig("scheduler"))
 
   /**
     * Represents the scheduler as a Sink and Source.
@@ -62,31 +60,40 @@ object Scheduler {
     *
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
-  def asSourceAndSink(client: MesosClient, podRecordRepository: PodRecordRepository)(implicit mat: Materializer)
+  def asSourceAndSink(
+      client: MesosClient,
+      podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings)(implicit mat: Materializer)
     : Future[(StateSnapshot, Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]])] = {
-    fromClient(client, podRecordRepository).map {
+    fromClient(client, podRecordRepository, schedulerSettings).map {
       case (snapshot, flow) =>
         val (source, sink) = FlowHelpers.asSourceAndSink(flow)(mat)
         (snapshot, source, sink)
     }(CallerThreadExecutionContext.context)
   }
 
-  private[usi] def fromClient(client: MesosClient, podRecordRepository: PodRecordRepository)
-    : Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
+  private[usi] def fromClient(
+      client: MesosClient,
+      podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
           "Please provide a MesosClient with FrameworkInfo that has capability MULTI_ROLE")
     }
-    fromFlow(client.calls, podRecordRepository, Flow.fromSinkAndSource(client.mesosSink, client.mesosSource))
+    fromFlow(
+      client.calls,
+      podRecordRepository,
+      Flow.fromSinkAndSource(client.mesosSink, client.mesosSource),
+      schedulerSettings)
   }
 
   private[usi] def fromFlow(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
-      mesosFlow: Flow[MesosCall, MesosEvent, Any])
-    : Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
-    unconnectedGraph(mesosCallFactory, podRecordRepository).map {
+      mesosFlow: Flow[MesosCall, MesosEvent, Any],
+      schedulerSettings: SchedulerSettings): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
+    unconnectedGraph(mesosCallFactory, podRecordRepository, schedulerSettings).map {
       case (snapshot, graph) =>
         val flow = Flow.fromGraph {
           GraphDSL.create(graph, mesosFlow)((_, _) => NotUsed) { implicit builder =>
@@ -104,7 +111,10 @@ object Scheduler {
     }(CallerThreadExecutionContext.context)
   }
 
-  private[core] def unconnectedGraph(mesosCallFactory: MesosCalls, podRecordRepository: PodRecordRepository)
+  private[core] def unconnectedGraph(
+      mesosCallFactory: MesosCalls,
+      podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings)
     : Future[(StateSnapshot, BidiFlow[SchedulerCommand, StateEvent, MesosEvent, MesosCall, NotUsed])] = {
     podRecordRepository
       .readAll()
@@ -117,7 +127,7 @@ object Scheduler {
               import GraphDSL.Implicits._
 
               val broadcast = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true))
-              val persistenceStorageFlow = builder.add(persistenceFlow(podRecordRepository))
+              val persistenceStorageFlow = builder.add(persistenceFlow(podRecordRepository, schedulerSettings))
 
               schedulerLogic.out ~> persistenceStorageFlow ~> broadcast.in
 
@@ -138,7 +148,8 @@ object Scheduler {
   }
 
   private[core] def persistenceFlow(
-      podRecordRepository: PodRecordRepository): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
+      podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
     Flow[SchedulerEvents]
       .mapConcat(persistEvents(_, podRecordRepository))
       .mapAsync(schedulerSettings.persistencePipelineLimit)(call => call())

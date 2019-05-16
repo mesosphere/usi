@@ -6,6 +6,7 @@ import akka.stream.javadsl.{Flow, Sink, Source}
 import akka.stream.{Materializer, javadsl}
 import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
+import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.{SchedulerCommand, StateEvent, StateEventOrSnapshot, StateSnapshot}
 import com.mesosphere.usi.core.{CallerThreadExecutionContext, Scheduler => ScalaScheduler}
 import com.mesosphere.usi.repository.PodRecordRepository
@@ -27,9 +28,12 @@ object Scheduler {
     * @param client The [[MesosClient]] used to interact with Mesos.
     * @return A [[javadsl]] flow from pod specs to state events.
     */
-  def fromClient(client: MesosClient, podRecordRepository: PodRecordRepository): CompletableFuture[FlowResult] = {
+  def fromClient(
+      client: MesosClient,
+      podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings): CompletableFuture[FlowResult] = {
     val flow = Flow.fromSinkAndSource(client.mesosSink, client.mesosSource)
-    fromFlow(client.calls, podRecordRepository, flow)
+    fromFlow(client.calls, podRecordRepository, flow, schedulerSettings)
   }
 
   /**
@@ -44,10 +48,11 @@ object Scheduler {
   def fromFlow(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
-      mesosFlow: javadsl.Flow[MesosCall, MesosEvent, NotUsed]): CompletableFuture[FlowResult] = {
+      mesosFlow: javadsl.Flow[MesosCall, MesosEvent, NotUsed],
+      schedulerSettings: SchedulerSettings): CompletableFuture[FlowResult] = {
 
     ScalaScheduler
-      .fromFlow(mesosCallFactory, podRecordRepository, mesosFlow.asScala)
+      .fromFlow(mesosCallFactory, podRecordRepository, mesosFlow.asScala, schedulerSettings)
       .map {
         case (snapshot, flow) =>
           new FlowResult(snapshot, flow.asJava)
@@ -66,9 +71,10 @@ object Scheduler {
   def asSourceAndSink(
       client: MesosClient,
       podRecordRepository: PodRecordRepository,
+      schedulerSettings: SchedulerSettings,
       materializer: Materializer): CompletableFuture[SourceAndSinkResult] = {
     ScalaScheduler
-      .asSourceAndSink(client, podRecordRepository)(materializer)
+      .asSourceAndSink(client, podRecordRepository, schedulerSettings)(materializer)
       .map {
         case (snap, source, sink) =>
           new SourceAndSinkResult(snap, source.asJava, sink.mapMaterializedValue(_.toJava.toCompletableFuture).asJava)

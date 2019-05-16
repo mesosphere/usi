@@ -9,6 +9,7 @@ import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
+import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.usi.core.models.{
   LaunchPod,
@@ -129,7 +130,8 @@ object CoreHelloWorldFramework extends StrictLogging {
       implicit system: ActorSystem,
       materializer: Materializer): (MesosClient, StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed]) = {
     val client: MesosClient = Await.result(MesosClient(clientSettings, frameworkInfo).runWith(Sink.head), 10.seconds)
-    val (snapshot, schedulerFlow) = Await.result(Scheduler.fromClient(client, podRecordRepository), 10.seconds)
+    val (snapshot, schedulerFlow) =
+      Await.result(Scheduler.fromClient(client, podRecordRepository, SchedulerSettings.load()), 10.seconds)
     (client, snapshot, schedulerFlow)
   }
 
