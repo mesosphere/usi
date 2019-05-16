@@ -323,8 +323,8 @@
                         <a href="ReservationStatus.html" title="">ReservationStatus</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="RunSpec.html" title="Specification used to launch a RunningPodSpec"></a>
-                        <a href="RunSpec.html" title="Specification used to launch a RunningPodSpec">RunSpec</a>
+                        <a class="class" href="RunTemplate.html" title="Launch template used to launch a pod"></a>
+                        <a href="RunTemplate.html" title="Launch template used to launch a pod">RunTemplate</a>
                       </li><li class="current-entities indented5">
                         <a class="object" href="RunningPodSpec$.html" title=""></a>
                         <a class="class" href="RunningPodSpec.html" title="Used by the scheduler to track that a pod pod should be launched (and, isn't yet.)"></a>
@@ -551,7 +551,7 @@ proto files.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Launch the specified pod at-most-once." href="LaunchPod.html"><span class="name">LaunchPod</span></a><span class="params">(<span name="podId">podId: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="RunSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunSpec">RunSpec</a></span>)</span><span class="result"> extends <a href="SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.SchedulerCommand">SchedulerCommand</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Launch the specified pod at-most-once." href="LaunchPod.html"><span class="name">LaunchPod</span></a><span class="params">(<span name="podId">podId: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.RunTemplate">RunTemplate</a></span>)</span><span class="result"> extends <a href="SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.SchedulerCommand">SchedulerCommand</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Launch the specified pod at-most-once.</p><div class="fullcomment"><div class="comment cmt"><p>Launch the specified pod at-most-once. Frameworks *SHOULD NOT* reuse podIds; if restarting a pod, kill the old and
@@ -821,10 +821,10 @@ recovery.
       </span>
       
       
-    </li><li name="com.mesosphere.usi.core.models.RunSpec" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="RunSpecextendsProductwithSerializable"></a><a id="RunSpec:RunSpec"></a>
+    </li><li name="com.mesosphere.usi.core.models.RunTemplate" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RunTemplateextendsProductwithSerializable"></a><a id="RunTemplate:RunTemplate"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/index.html#RunSpecextendsProductwithSerializable" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#RunTemplateextendsProductwithSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -833,11 +833,11 @@ recovery.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Specification used to launch a RunningPodSpec" href="RunSpec.html"><span class="name">RunSpec</span></a><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="role">role: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="fetch">fetch: <span class="extype" name="scala.Seq">Seq</span>[<a href="FetchUri.html" class="extype" name="com.mesosphere.usi.core.models.FetchUri">FetchUri</a>] = <span class="symbol">Seq.empty</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Launch template used to launch a pod" href="RunTemplate.html"><span class="name">RunTemplate</span></a><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="role">role: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="fetch">fetch: <span class="extype" name="scala.Seq">Seq</span>[<a href="FetchUri.html" class="extype" name="com.mesosphere.usi.core.models.FetchUri">FetchUri</a>] = <span class="symbol">Seq.empty</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
-      <p class="shortcomment cmt">Specification used to launch a <a href="RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a></p><div class="fullcomment"><div class="comment cmt"><p>Specification used to launch a <a href="RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a></p><p>We currently only support a shellCommand. This is primitive. We will add richer support for TaskInfo and
-TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
+      <p class="shortcomment cmt">Launch template used to launch a pod</p><div class="fullcomment"><div class="comment cmt"><p>Launch template used to launch a pod</p><p>Support is rather primitive now. We will add richer support for TaskInfo and TaskGroupInfo specification in
+(DCOS-48503, DCOS-47481)
 </p></div><dl class="paramcmts block"><dt class="param">resourceRequirements</dt><dd class="cmt"><p>a list of resource requirements for the <a href="RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a>. See <span class="extype" name="ResourceRequirement">ResourceRequirement</span>
                             class for more information</p></dd><dt class="param">shellCommand</dt><dd class="cmt"><p>tasks' shell command</p></dd><dt class="param">fetch</dt><dd class="cmt"><p>a list of artifact URIs that are passed to Mesos fetcher module and resolved at runtime</p></dd></dl></div>
     </li><li name="com.mesosphere.usi.core.models.RunningPodSpec" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
@@ -852,7 +852,7 @@ TaskGroupInfo specification in (DCOS-48503, DCOS-47481)
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Used by the scheduler to track that a pod pod should be launched (and, isn't yet.)" href="RunningPodSpec.html"><span class="name">RunningPodSpec</span></a><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="RunSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunSpec">RunSpec</a></span>)</span><span class="result"> extends <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Used by the scheduler to track that a pod pod should be launched (and, isn't yet.)" href="RunningPodSpec.html"><span class="name">RunningPodSpec</span></a><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.RunTemplate">RunTemplate</a></span>)</span><span class="result"> extends <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Used by the scheduler to track that a pod pod should be launched (and, isn't yet.)</p><div class="fullcomment"><div class="comment cmt"><p>Used by the scheduler to track that a pod pod should be launched (and, isn't yet.)</p><p>Pods are launched at-most-once.

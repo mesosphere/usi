@@ -253,9 +253,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(snap:java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.models.StateSnapshot],source:akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEventOrSnapshot,akka.NotUsed],sink:akka.stream.javadsl.Sink[com.mesosphere.usi.core.models.SchedulerCommand,java.util.concurrent.CompletableFuture[akka.Done]]):com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult"></a><a id="&lt;init&gt;:SourceAndSinkResult"></a>
+      <a id="&lt;init&gt;(snap:com.mesosphere.usi.core.models.StateSnapshot,source:akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEvent,akka.NotUsed],sink:akka.stream.javadsl.Sink[com.mesosphere.usi.core.models.SchedulerCommand,java.util.concurrent.CompletableFuture[akka.Done]]):com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult"></a><a id="&lt;init&gt;:SourceAndSinkResult"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$$SourceAndSinkResult.html#&lt;init&gt;(snap:java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.models.StateSnapshot],source:akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEventOrSnapshot,akka.NotUsed],sink:akka.stream.javadsl.Sink[com.mesosphere.usi.core.models.SchedulerCommand,java.util.concurrent.CompletableFuture[akka.Done]]):com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$$SourceAndSinkResult.html#&lt;init&gt;(snap:com.mesosphere.usi.core.models.StateSnapshot,source:akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEvent,akka.NotUsed],sink:akka.stream.javadsl.Sink[com.mesosphere.usi.core.models.SchedulerCommand,java.util.concurrent.CompletableFuture[akka.Done]]):com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -264,7 +264,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">SourceAndSinkResult</span><span class="params">(<span name="snap">snap: <span class="extype" name="java.util.concurrent.CompletableFuture">CompletableFuture</span>[<a href="../models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a>]</span>, <span name="source">source: <span class="extype" name="akka.stream.javadsl.Source">Source</span>[<a href="../models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>, <span name="sink">sink: <span class="extype" name="akka.stream.javadsl.Sink">Sink</span>[<a href="../models/SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.SchedulerCommand">SchedulerCommand</a>, <span class="extype" name="java.util.concurrent.CompletableFuture">CompletableFuture</span>[<span class="extype" name="akka.Done">Done</span>]]</span>)</span>
+        <span class="name">SourceAndSinkResult</span><span class="params">(<span name="snap">snap: <a href="../models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a></span>, <span name="source">source: <span class="extype" name="akka.stream.javadsl.Source">Source</span>[<a href="../models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>, <span name="sink">sink: <span class="extype" name="akka.stream.javadsl.Sink">Sink</span>[<a href="../models/SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.SchedulerCommand">SchedulerCommand</a>, <span class="extype" name="java.util.concurrent.CompletableFuture">CompletableFuture</span>[<span class="extype" name="akka.Done">Done</span>]]</span>)</span>
       </span>
       
       
@@ -456,9 +456,9 @@
       
       
     </li><li name="com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult#getSnapshot" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getSnapshot:java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.models.StateSnapshot]"></a><a id="getSnapshot:CompletableFuture[StateSnapshot]"></a>
+      <a id="getSnapshot:com.mesosphere.usi.core.models.StateSnapshot"></a><a id="getSnapshot:StateSnapshot"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$$SourceAndSinkResult.html#getSnapshot:java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.models.StateSnapshot]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$$SourceAndSinkResult.html#getSnapshot:com.mesosphere.usi.core.models.StateSnapshot" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -467,14 +467,14 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">getSnapshot</span><span class="result">: <span class="extype" name="java.util.concurrent.CompletableFuture">CompletableFuture</span>[<a href="../models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a>]</span>
+        <span class="name">getSnapshot</span><span class="result">: <a href="../models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a></span>
       </span>
       
       
     </li><li name="com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult#getSource" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="getSource:akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEventOrSnapshot,akka.NotUsed]"></a><a id="getSource:Source[StateEventOrSnapshot,NotUsed]"></a>
+      <a id="getSource:akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEvent,akka.NotUsed]"></a><a id="getSource:Source[StateEvent,NotUsed]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$$SourceAndSinkResult.html#getSource:akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEventOrSnapshot,akka.NotUsed]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$$SourceAndSinkResult.html#getSource:akka.stream.javadsl.Source[com.mesosphere.usi.core.models.StateEvent,akka.NotUsed]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -483,7 +483,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">getSource</span><span class="result">: <span class="extype" name="akka.stream.javadsl.Source">Source</span>[<a href="../models/StateEventOrSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateEventOrSnapshot">StateEventOrSnapshot</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">getSource</span><span class="result">: <span class="extype" name="akka.stream.javadsl.Source">Source</span>[<a href="../models/StateEvent.html" class="extype" name="com.mesosphere.usi.core.models.StateEvent">StateEvent</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
       </span>
       
       

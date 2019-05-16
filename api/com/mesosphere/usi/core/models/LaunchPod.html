@@ -259,8 +259,8 @@
                         <a href="ReservationStatus.html" title="">ReservationStatus</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="RunSpec.html" title="Specification used to launch a RunningPodSpec"></a>
-                        <a href="RunSpec.html" title="Specification used to launch a RunningPodSpec">RunSpec</a>
+                        <a class="class" href="RunTemplate.html" title="Launch template used to launch a pod"></a>
+                        <a href="RunTemplate.html" title="Launch template used to launch a pod">RunTemplate</a>
                       </li><li class="current-entities indented5">
                         <a class="object" href="RunningPodSpec$.html" title=""></a>
                         <a class="class" href="RunningPodSpec.html" title="Used by the scheduler to track that a pod pod should be launched (and, isn't yet.)"></a>
@@ -316,7 +316,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">LaunchPod</span><span class="params">(<span name="podId">podId: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="RunSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunSpec">RunSpec</a></span>)</span><span class="result"> extends <a href="SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.SchedulerCommand">SchedulerCommand</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">LaunchPod</span><span class="params">(<span name="podId">podId: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.RunTemplate">RunTemplate</a></span>)</span><span class="result"> extends <a href="SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.SchedulerCommand">SchedulerCommand</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -377,9 +377,9 @@ is a no-op.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.core.models.LaunchPod#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.RunSpec):com.mesosphere.usi.core.models.LaunchPod"></a><a id="&lt;init&gt;:LaunchPod"></a>
+      <a id="&lt;init&gt;(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.RunTemplate):com.mesosphere.usi.core.models.LaunchPod"></a><a id="&lt;init&gt;:LaunchPod"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/LaunchPod.html#&lt;init&gt;(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.RunSpec):com.mesosphere.usi.core.models.LaunchPod" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/LaunchPod.html#&lt;init&gt;(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.RunTemplate):com.mesosphere.usi.core.models.LaunchPod" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -388,7 +388,7 @@ is a no-op.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">LaunchPod</span><span class="params">(<span name="podId">podId: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="RunSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunSpec">RunSpec</a></span>)</span>
+        <span class="name">LaunchPod</span><span class="params">(<span name="podId">podId: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.RunTemplate">RunTemplate</a></span>)</span>
       </span>
       
       
@@ -634,9 +634,9 @@ is a no-op.
       
       
     </li><li name="com.mesosphere.usi.core.models.LaunchPod#runSpec" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="runSpec:com.mesosphere.usi.core.models.RunSpec"></a><a id="runSpec:RunSpec"></a>
+      <a id="runSpec:com.mesosphere.usi.core.models.RunTemplate"></a><a id="runSpec:RunTemplate"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/LaunchPod.html#runSpec:com.mesosphere.usi.core.models.RunSpec" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/LaunchPod.html#runSpec:com.mesosphere.usi.core.models.RunTemplate" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -645,7 +645,7 @@ is a no-op.
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">runSpec</span><span class="result">: <a href="RunSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunSpec">RunSpec</a></span>
+        <span class="name">runSpec</span><span class="result">: <a href="RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.RunTemplate">RunTemplate</a></span>
       </span>
       
       
