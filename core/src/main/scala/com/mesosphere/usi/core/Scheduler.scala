@@ -1,6 +1,6 @@
 package com.mesosphere.usi.core
 
-import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Keep, Sink, Source}
+import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, Source}
 import akka.stream.{BidiShape, FlowShape, Materializer}
 import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
@@ -66,20 +66,9 @@ object Scheduler {
     : Future[(StateSnapshot, Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]])] = {
     fromClient(client, podRecordRepository).map {
       case (snapshot, flow) =>
-        val (source, sink) = asSourceAndSink(flow)(mat)
+        val (source, sink) = FlowHelpers.asSourceAndSink(flow)(mat)
         (snapshot, source, sink)
     }(CallerThreadExecutionContext.context)
-  }
-
-  def asSourceAndSink[A, B](schedulerFlow: Flow[A, B, NotUsed])(
-      implicit mat: Materializer): (Source[B, NotUsed], Sink[A, Future[Done]]) = {
-
-    val ((commandInputSubscriber, subscriberCompleted), commandInputSource) =
-      Source.asSubscriber[A].watchTermination()(Keep.both).preMaterialize()
-
-    val stateEvents = commandInputSource.via(schedulerFlow)
-
-    (stateEvents, Sink.fromSubscriber(commandInputSubscriber).mapMaterializedValue(_ => subscriberCompleted))
   }
 
   private[usi] def fromClient(client: MesosClient, podRecordRepository: PodRecordRepository)
