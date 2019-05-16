@@ -15,6 +15,6 @@ private[usi] object FlowHelpers {
 
     val source = inputSource.via(flow)
 
-    (stateEvents, Sink.fromSubscriber(commandInputSubscriber).mapMaterializedValue(_ => subscriberCompleted))
+    (source, Sink.fromSubscriber(inputSubscriber).mapMaterializedValue(_ => subscriberCompleted))
   }
 }
