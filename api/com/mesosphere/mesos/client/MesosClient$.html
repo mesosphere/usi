@@ -146,10 +146,6 @@
                         <a class="class" href="MesosClientImpl.html" title=""></a>
                         <a href="MesosClientImpl.html" title="">MesosClientImpl</a>
                       </li><li class="current-entities indented4">
-                        <a class="object" href="MesosConnectionContext$.html" title=""></a>
-                        <a class="class" href="MesosConnectionContext.html" title=""></a>
-                        <a href="MesosConnectionContext.html" title="">MesosConnectionContext</a>
-                      </li><li class="current-entities indented4">
                         <span class="separator"></span>
                         <a class="trait" href="StrictLoggingFlow.html" title=""></a>
                         <a href="StrictLoggingFlow.html" title="">StrictLoggingFlow</a>
@@ -247,7 +243,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="" href="MesosClient$$ConnectionInfo.html"><span class="name">ConnectionInfo</span></a><span class="params">(<span name="url">url: <span class="extype" name="java.net.URI">URI</span></span>, <span name="streamId">streamId: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="" href="MesosClient$$ConnectionInfo.html"><span class="name">ConnectionInfo</span></a><span class="params">(<span name="url">url: <span class="extype" name="java.net.URL">URL</span></span>, <span name="streamId">streamId: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
@@ -263,7 +259,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="" href="MesosClient$$MesosRedirectException.html"><span class="name">MesosRedirectException</span></a><span class="params">(<span name="leader">leader: <span class="extype" name="java.net.URI">URI</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Exception">Exception</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="" href="MesosClient$$MesosRedirectException.html"><span class="name">MesosRedirectException</span></a><span class="params">(<span name="leader">leader: <span class="extype" name="java.net.URL">URL</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Exception">Exception</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
@@ -437,7 +433,7 @@ v
 +---------------+</p><p>1. Http Connection: mesos-v1-client uses the Akka-http low-level <code>Http.outgoingConnection()</code> to <code>POST</code> a
    [SUBSCRIBE](http://mesos.apache.org/documentation/latest/scheduler-http-api/#subscribe-1) request to Mesos
    <code>api/v1/scheduler</code> endpoint, providing framework info as requested. The HTTP response is a stream in RecordIO
-   format which is handled by the later stages.</p><p>   If we connect to a non-leader Mesos master, we automatically follow the redirect up to <code>conf.redirectRetries</code>.</p><p>   When we receive the HTTP response headers from the master connection, we set aside the <code>Mesos-Stream-Id</code>(see
+   format which is handled by the later stages.</p><p>   If we connect to a non-leader Mesos master, we automatically follow the redirect up to <code>conf.maxRedirects</code>.</p><p>   When we receive the HTTP response headers from the master connection, we set aside the <code>Mesos-Stream-Id</code>(see
    the description of the
    [SUBSCRIBE](http://mesos.apache.org/documentation/latest/scheduler-http-api/#subscribe-1) call) for later use
    in mesosClient.mesosSink. Schedulers are expected to make HTTP requests to the leading master. If requests are
