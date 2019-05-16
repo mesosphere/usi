@@ -9,10 +9,18 @@ import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
-import com.mesosphere.usi.core.Scheduler.StateOutput
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
-import com.mesosphere.usi.core.models.{LaunchPod, PodId, PodStatus, PodStatusUpdatedEvent, RunSpec, SchedulerCommand}
+import com.mesosphere.usi.core.models.{
+  LaunchPod,
+  PodId,
+  PodStatus,
+  PodStatusUpdatedEvent,
+  RunTemplate,
+  SchedulerCommand,
+  StateEvent,
+  StateSnapshot
+}
 import com.mesosphere.usi.repository.PodRecordRepository
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.scalalogging.StrictLogging
@@ -106,7 +114,7 @@ object CoreHelloWorldFramework extends StrictLogging {
     // - a RunSpec with minimal resource requirements and hello-world shell command
     // - a snapshot containing our PodSpec
     val podId = PodId(s"hello-world.${UUID.randomUUID()}")
-    val runSpec = RunSpec(
+    val runSpec = RunTemplate(
       resourceRequirements = List(ScalarRequirement.cpus(0.1), ScalarRequirement.memory(32)),
       shellCommand = """echo "Hello, world" && sleep 123456789""",
       role = "test"
@@ -120,14 +128,16 @@ object CoreHelloWorldFramework extends StrictLogging {
       frameworkInfo: FrameworkInfo
   )(
       implicit system: ActorSystem,
-      materializer: Materializer): (MesosClient, Flow[SchedulerCommand, StateOutput, NotUsed]) = {
+      materializer: Materializer): (MesosClient, StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed]) = {
     val client: MesosClient = Await.result(MesosClient(clientSettings, frameworkInfo).runWith(Sink.head), 10.seconds)
-    (client, Scheduler.fromClient(client, podRecordRepository, SchedulerSettings.load()))
+    val (snapshot, schedulerFlow) =
+      Await.result(Scheduler.fromClient(client, podRecordRepository, SchedulerSettings.load()), 10.seconds)
+    (client, snapshot, schedulerFlow)
   }
 
   def run(settings: MesosClientSettings)(implicit system: ActorSystem): CoreHelloWorldFramework = {
     implicit val mat: ActorMaterializer = ActorMaterializer()
-    val (client, schedulerFlow) = init(settings, InMemoryPodRecordRepository(), buildFrameworkInfo)
+    val (client, _, schedulerFlow) = init(settings, InMemoryPodRecordRepository(), buildFrameworkInfo)
 
     // A trick to make our stream run, even after the initial element (snapshot) is consumed. We use Source.maybe
     // which emits a materialized promise which when completed with a Some, that value will be produced downstream,
@@ -141,13 +151,6 @@ object CoreHelloWorldFramework extends StrictLogging {
       .prepend(Source.single(generateLaunchCommand))
       // Here our initial snapshot is going to the scheduler flow
       .via(schedulerFlow)
-      // We flatten the output of the scheduler flow which is a tuple of an initial snapshot and a source of all
-      // later updates, into one stream where the first element is the snapshot and all later elements are single
-      // state events. This makes the event handling a simple match-case
-      .flatMapConcat {
-        case (snapshot, updates) =>
-          updates.prepend(Source.single(snapshot))
-      }
       .map {
         // Main state event handler. We log happy events and exit if something goes wrong
         case PodStatusUpdatedEvent(id, Some(PodStatus(_, taskStatuses))) =>

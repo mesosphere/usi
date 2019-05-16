@@ -4,7 +4,7 @@ import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.SchedulerState
 import com.mesosphere.usi.core.helpers.MesosMock
-import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunSpec, RunningPodSpec, TaskId}
+import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunTemplate, RunningPodSpec, TaskId}
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskStatus}
 import com.mesosphere.utils.UnitTest
@@ -16,7 +16,7 @@ class MesosEventsLogicTest extends UnitTest {
 
   val podWith1Cpu256Mem: RunningPodSpec = RunningPodSpec(
     PodId("mock-podId"),
-    RunSpec(
+    RunTemplate(
       List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
       shellCommand = "sleep 3600",
       "test")

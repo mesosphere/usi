@@ -13,7 +13,8 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.{Await, ExecutionContextExecutor}
+import scala.concurrent.duration._
 
 class KeepAliveFramework(conf: Config) extends StrictLogging {
 
@@ -23,7 +24,7 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 
   val client: MesosClient = new KeepAliveMesosClientFactory(conf).client
 
-  val runSpec: RunSpec = KeepAlivePodSpecHelper.runSpec
+  val runSpec: RunTemplate = KeepAlivePodSpecHelper.runSpec
 
   val specsSnapshot: List[RunningPodSpec] =
     KeepAlivePodSpecHelper.specsSnapshot(conf.getInt("keep-alive-framework.tasks-started"))
@@ -58,7 +59,8 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 
   val podRecordRepository = InMemoryPodRecordRepository()
 
-  val (stateSnapshot, source, sink) = Scheduler.asSourceAndSink(client, podRecordRepository, SchedulerSettings.load())
+  val (stateSnapshot, source, sink) =
+    Await.result(Scheduler.asSourceAndSink(client, podRecordRepository, SchedulerSettings.load()), 10.seconds)
 
   /**
     * This is the core part of this framework. Source with SpecEvents is pushing events to the keepAliveWatcher,
