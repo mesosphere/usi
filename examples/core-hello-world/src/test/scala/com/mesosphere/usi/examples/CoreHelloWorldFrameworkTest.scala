@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.testkit.{TestPublisher, TestSubscriber}
 import com.mesosphere.mesos.conf.MesosClientSettings
-import com.mesosphere.usi.core.models.{PodStatusUpdatedEvent, SchedulerCommand, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.{PodStatusUpdatedEvent, SchedulerCommand, StateEvent}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
@@ -52,7 +52,6 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     pub.sendNext(launchCommand)
 
     Then("receive an empty snapshot followed by other state events")
-    inside(sub.requestNext()) { case snap: StateSnapshot => snap.podRecords shouldBe empty }
     eventually {
       inside(sub.requestNext()) { case podStatus: PodStatusUpdatedEvent => podStatus.newStatus shouldBe defined }
     }
@@ -72,9 +71,6 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
       frameworkInfo)
     val (newPub, newSub) = testScheduler(newScheduler)
     newPub.sendNext(launchCommand)
-    inside(newSub.requestNext()) {
-      case snap: StateSnapshot => snap.podRecords should contain theSameElementsAs podRecords
-    }
 
     And("no new pod records have been created")
     val newPodRecords = customPersistenceStore.readAll().futureValue.values
