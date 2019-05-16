@@ -1,10 +1,9 @@
 package com.mesosphere.usi.core
 
-import java.time.Instant
 import java.util.UUID
 
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.KillSwitches
+import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.{Done, NotUsed}
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
@@ -44,9 +43,8 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
   }
 
   def newMockedScheduler[M, O](
-      snapshot: StateSnapshot = StateSnapshot.empty,
       commandInputSink: Sink[SchedulerCommand, M],
-      stateEventsSource: Source[StateEvent, O]): (Flow[SchedulerCommand, Scheduler.StateOutput, NotUsed], M, O) = {
+      stateEventsSource: Source[StateEvent, O]): (Flow[SchedulerCommand, StateEvent, NotUsed], M, O) = {
 
     val (m, preMaterializedCommandInput) =
       Flow[SchedulerCommand]
@@ -57,8 +55,6 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
       stateEventsSource.preMaterialize()
 
     val flow = fromSinkAndSourceWithSharedFate(preMaterializedCommandInput, preMaterializedStateEvents)
-      .prefixAndTail(0)
-      .map { case (_, events) => snapshot -> events }
 
     (flow, m, o)
   }
@@ -76,20 +72,10 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
 
   "SchedulerFactory" when {
     "materialized as Source and Sink" should {
-      "Complete the snapshot promise once it's available" in {
-        val stateSnapshot = StateSnapshot(List(PodRecord(podSpec.id, Instant.now, AgentId("lol"))), Nil)
-        val (scheduler, _, _) =
-          newMockedScheduler(snapshot = stateSnapshot, commandInputSink = Sink.ignore, stateEventsSource = Source.maybe)
-
-        val (snapshotF, source, _) = Scheduler.asSourceAndSink(scheduler)
-
-        snapshotF.futureValue shouldEqual stateSnapshot
-      }
-
       "Push the SpecUpdatedEvents downstream" in {
         val (scheduler, firstSpec, _) =
           newMockedScheduler(commandInputSink = Sink.head, stateEventsSource = Source.maybe)
-        val (_, _, sink) = Scheduler.asSourceAndSink(scheduler)
+        val (_, sink) = Scheduler.asSourceAndSink(scheduler)
 
         Source.repeat(deletePodSpec).runWith(sink)
 
@@ -99,7 +85,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
       "Push the events from scheduler to the provided Source" in {
         val (scheduler, _, _) =
           newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.repeat(deletePodStatus))
-        val (_, source, _) = Scheduler.asSourceAndSink(scheduler)
+        val (source, _) = Scheduler.asSourceAndSink(scheduler)
 
         source.runWith(Sink.head).futureValue shouldEqual deletePodStatus
       }
@@ -107,7 +93,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
       "Complete both sink and source when the event stream coming to scheduler is cancelled by the scheduler" in {
         val (scheduler, _, _) =
           newMockedScheduler(commandInputSink = Sink.head, stateEventsSource = Source.repeat(deletePodStatus))
-        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
+        val (source, sink) = Scheduler.asSourceAndSink(scheduler)
 
         val specStreamCompleted = Source
           .repeat(deletePodSpec)
@@ -127,7 +113,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
       "Complete both sink and source when the event stream coming to scheduler is cancelled by the client" in {
         val (scheduler, _, _) =
           newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.repeat(deletePodStatus))
-        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
+        val (source, sink) = Scheduler.asSourceAndSink(scheduler)
 
         val specStreamCompleted = Source
           .single(deletePodSpec) // issue single spec update and then cancel the stream
@@ -145,7 +131,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
         val (scheduler, _, _) =
           newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.single(deletePodStatus))
 
-        val (snapshot, source, sink) = Scheduler.asSourceAndSink(scheduler)
+        val (source, sink) = Scheduler.asSourceAndSink(scheduler)
 
         val specStreamCompleted = Source
           .repeat(deletePodSpec)
@@ -156,7 +142,6 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
         val stateStreamCompleted = source
           .runWith(Sink.ignore)
 
-        snapshot.futureValue shouldBe StateSnapshot.empty
         specStreamCompleted.futureValue shouldBe Done
         stateStreamCompleted.futureValue shouldBe Done
       }
@@ -165,7 +150,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
         val (scheduler, _, _) =
           newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.repeat(deletePodStatus))
 
-        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
+        val (source, sink) = Scheduler.asSourceAndSink(scheduler)
 
         val specStreamCompleted =
           Source
@@ -186,7 +171,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
         val (scheduler, _, _) =
           newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.repeat(deletePodStatus))
 
-        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
+        val (source, sink) = Scheduler.asSourceAndSink(scheduler)
 
         val ex = new RuntimeException("Boom!")
 
@@ -206,7 +191,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
       "Cancels the commandInput sink when the failure occurred in the downstream" in {
         val (scheduler, _, _) =
           newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.repeat(deletePodStatus))
-        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
+        val (source, sink) = Scheduler.asSourceAndSink(scheduler)
 
         val specStreamCompleted = Source
           .repeat(deletePodSpec)
@@ -221,7 +206,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
 
       "Propagates an exception to the state events output source if an exception is received from the spec events input" in {
         val (scheduler, _, _) = newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.maybe)
-        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
+        val (source, sink) = Scheduler.asSourceAndSink(scheduler)
 
         val ex = new Exception("boom")
         Source
@@ -239,7 +224,7 @@ class SchedulerFactoryTest extends AkkaUnitTest with Inside {
         val (scheduler, _, _) =
           newMockedScheduler(commandInputSink = Sink.ignore, stateEventsSource = Source.failed(ex))
 
-        val (_, source, sink) = Scheduler.asSourceAndSink(scheduler)
+        val (source, sink) = Scheduler.asSourceAndSink(scheduler)
 
         val specStreamCompleted = Source
           .repeat(deletePodSpec)

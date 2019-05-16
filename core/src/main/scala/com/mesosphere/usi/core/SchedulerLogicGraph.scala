@@ -3,7 +3,7 @@ package com.mesosphere.usi.core
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
 import com.mesosphere.mesos.client.MesosCalls
-import com.mesosphere.usi.core.models.{PodId, PodRecord, SchedulerCommand, StateSnapshot}
+import com.mesosphere.usi.core.models.{SchedulerCommand, StateSnapshot}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
 import scala.collection.mutable
@@ -41,7 +41,7 @@ object SchedulerLogicGraph {
   * It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
   * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
-private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialPodRecords: Map[PodId, PodRecord])
+private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialState: StateSnapshot)
     extends GraphStage[FanInShape2[SchedulerCommand, MesosEvent, SchedulerEvents]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
@@ -56,7 +56,7 @@ private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialPod
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
 
     new GraphStageLogic(shape) {
-      private[this] var handler: SchedulerLogicHandler = _
+      private[this] val handler: SchedulerLogicHandler = new SchedulerLogicHandler(mesosCallFactory, initialState)
 
       val pendingEffects: mutable.Queue[SchedulerEvents] = mutable.Queue.empty
 
@@ -82,18 +82,6 @@ private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialPod
           }
         }
       })
-
-      override def preStart(): Unit = {
-        handler = new SchedulerLogicHandler(mesosCallFactory, initialPodRecords)
-        // Publish the initial state snapshot event; podStatuses will not be in the snapshot in the future
-        pushOrQueueIntents(
-          SchedulerEvents(
-            List(
-              StateSnapshot(
-                podRecords = initialPodRecords.values.toSeq,
-                agentRecords = Nil
-              ))))
-      }
 
       def pushOrQueueIntents(effects: SchedulerEvents): Unit = {
         if (isAvailable(frameResultOutlet)) {

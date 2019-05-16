@@ -19,7 +19,7 @@ import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
   */
 case class FrameResultBuilder(
     state: SchedulerState,
-    appliedStateEvents: List[StateEventOrSnapshot],
+    appliedStateEvents: List[StateEvent],
     mesosCalls: List[MesosCall],
     dirtyPodIds: Set[PodId]) {
   private def applyAndAccumulate(schedulerEvents: SchedulerEvents): FrameResultBuilder = {
@@ -27,12 +27,10 @@ case class FrameResultBuilder(
       this
     else {
       val newDirty: Set[PodId] = dirtyPodIds ++ schedulerEvents.stateEvents.iterator
-        .collect[Set[PodId]] {
-          case podEvent: PodStateEvent => Set(podEvent.id)
-          // We need to handle status snapshots with a mechanism to signal that all cache should be recomputed
-          case snapshot: StateSnapshot => snapshot.podRecords.map(_.podId).toSet
+        .collect[PodId] {
+          case podEvent: PodStateEvent => podEvent.id
         }
-        .flatten
+        .toSet
 
       copy(
         state = state.applyStateIntents(schedulerEvents.stateEvents),
