@@ -10,7 +10,7 @@ private[usi] object FlowHelpers {
   def asSourceAndSink[A, B](flow: Flow[A, B, NotUsed])(
       implicit mat: Materializer): (Source[B, NotUsed], Sink[A, Future[Done]]) = {
 
-    val ((commandInputSubscriber, subscriberCompleted), commandInputSource) =
+    val ((inputSubscriber, subscriberCompleted), inputSource) =
       Source.asSubscriber[A].watchTermination()(Keep.both).preMaterialize()
 
     val source = inputSource.via(flow)
