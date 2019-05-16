@@ -1,8 +1,7 @@
 package com.mesosphere.usi.core.helpers
 import akka.stream.OverflowStrategy
-import akka.stream.scaladsl.{Flow, Keep, Sink, SinkQueueWithCancel, Source, SourceQueueWithComplete}
-import com.mesosphere.usi.core.Scheduler
-import com.mesosphere.usi.core.models.{SchedulerCommand, StateEventOrSnapshot}
+import akka.stream.scaladsl.{Source, SourceQueueWithComplete}
+import com.mesosphere.usi.core.models.SchedulerCommand
 
 /**
   * It's a little difficult to deal with the subscription input and output types; these methods provide helpers to more
@@ -13,12 +12,4 @@ object SchedulerStreamTestHelpers {
     Source
       .queue[SchedulerCommand](32, OverflowStrategy.fail)
   }
-
-  def outputFlatteningSink: Sink[Scheduler.StateOutput, SinkQueueWithCancel[StateEventOrSnapshot]] = {
-    Flow[Scheduler.StateOutput].flatMapConcat {
-      case (snapshot, updates) =>
-        updates.prepend(Source.single(snapshot))
-    }.toMat(Sink.queue())(Keep.right)
-  }
-
 }

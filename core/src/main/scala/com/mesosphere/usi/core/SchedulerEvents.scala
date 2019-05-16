@@ -8,11 +8,11 @@ import com.mesosphere.usi.core.models.{
   PodSpecUpdatedEvent,
   PodStatus,
   PodStatusUpdatedEvent,
-  StateEventOrSnapshot
+  StateEvent
 }
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall}
 
-case class SchedulerEvents(stateEvents: List[StateEventOrSnapshot] = Nil, mesosCalls: List[MesosCall] = Nil)
+case class SchedulerEvents(stateEvents: List[StateEvent] = Nil, mesosCalls: List[MesosCall] = Nil)
 object SchedulerEvents {
   val empty = SchedulerEvents()
 }
@@ -28,7 +28,7 @@ object SchedulerEvents {
   * Note, SchedulerEventsBuilder will accumulate state events. The scheduler logic loop happens to consume this.
   */
 case class SchedulerEventsBuilder(
-    reverseStateEvents: List[StateEventOrSnapshot] = Nil,
+    reverseStateEvents: List[StateEvent] = Nil,
     reverseMesosCalls: List[MesosCall] = Nil) {
   lazy val result = SchedulerEvents(reverseStateEvents.reverse, reverseMesosCalls.reverse)
 
@@ -65,7 +65,7 @@ case class SchedulerEventsBuilder(
   def withPodSpec(id: PodId, newPodSpec: Option[PodSpec]): SchedulerEventsBuilder =
     withStateEvent(PodSpecUpdatedEvent(id, newPodSpec))
 
-  def withStateEvent(event: StateEventOrSnapshot): SchedulerEventsBuilder =
+  def withStateEvent(event: StateEvent): SchedulerEventsBuilder =
     copy(reverseStateEvents = event :: reverseStateEvents)
 
   /**

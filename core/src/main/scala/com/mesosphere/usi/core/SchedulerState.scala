@@ -61,4 +61,10 @@ case class SchedulerState(
 
 object SchedulerState {
   val empty = SchedulerState(Map.empty, Map.empty, Map.empty)
+  def fromSnapshot(snapshot: StateSnapshot): SchedulerState = {
+    apply(
+      podStatuses = Map.empty,
+      podRecords = snapshot.podRecords.map(record => record.podId -> record)(collection.breakOut),
+      podSpecs = Map.empty)
+  }
 }
