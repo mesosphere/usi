@@ -13,7 +13,7 @@ private[usi] object FlowHelpers {
     val ((commandInputSubscriber, subscriberCompleted), commandInputSource) =
       Source.asSubscriber[A].watchTermination()(Keep.both).preMaterialize()
 
-    val stateEvents = commandInputSource.via(flow)
+    val source = inputSource.via(flow)
 
     (stateEvents, Sink.fromSubscriber(commandInputSubscriber).mapMaterializedValue(_ => subscriberCompleted))
   }
