@@ -83,6 +83,11 @@ private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialSta
         }
       })
 
+      override def preStart(): Unit = {
+        // start the graph off
+        maybePull()
+      }
+
       def pushOrQueueIntents(effects: SchedulerEvents): Unit = {
         if (isAvailable(frameResultOutlet)) {
           if (pendingEffects.nonEmpty) {

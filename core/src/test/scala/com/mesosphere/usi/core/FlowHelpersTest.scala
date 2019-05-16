@@ -62,8 +62,9 @@ class FlowHelpersTest extends AkkaUnitTest {
     "Push the input elements downstream" in {
       val (flow, firstElement, _) =
         newMockedFlow(inputSink = Sink.head, outputSource = Source.maybe)
-      val (_, sink) = FlowHelpers.asSourceAndSink(flow)
+      val (source, sink) = FlowHelpers.asSourceAndSink(flow)
 
+      source.runWith(Sink.ignore)
       Source.repeat(inputElement).runWith(sink)
 
       firstElement.futureValue shouldEqual inputElement

@@ -51,10 +51,6 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
       ))
 
     inside(output.pull().futureValue) {
-      case Some(snapshot: StateSnapshot) =>
-        snapshot shouldBe StateSnapshot.empty
-    }
-    inside(output.pull().futureValue) {
       case Some(specUpdated: PodSpecUpdatedEvent) =>
         specUpdated.id shouldBe podId
     }
