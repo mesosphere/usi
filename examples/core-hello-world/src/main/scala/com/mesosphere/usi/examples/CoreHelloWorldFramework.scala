@@ -10,6 +10,7 @@ import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.Scheduler.StateOutput
+import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.usi.core.models.{LaunchPod, PodId, PodStatus, PodStatusUpdatedEvent, RunSpec, SchedulerCommand}
 import com.mesosphere.usi.repository.PodRecordRepository
@@ -121,7 +122,7 @@ object CoreHelloWorldFramework extends StrictLogging {
       implicit system: ActorSystem,
       materializer: Materializer): (MesosClient, Flow[SchedulerCommand, StateOutput, NotUsed]) = {
     val client: MesosClient = Await.result(MesosClient(clientSettings, frameworkInfo).runWith(Sink.head), 10.seconds)
-    (client, Scheduler.fromClient(client, podRecordRepository))
+    (client, Scheduler.fromClient(client, podRecordRepository, SchedulerSettings.load()))
   }
 
   def run(settings: MesosClientSettings)(implicit system: ActorSystem): CoreHelloWorldFramework = {

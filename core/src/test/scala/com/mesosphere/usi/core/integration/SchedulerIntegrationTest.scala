@@ -5,7 +5,8 @@ import akka.stream.scaladsl.{Keep, Sink}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
-import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{outputFlatteningSink, commandInputSource}
+import com.mesosphere.usi.core.conf.SchedulerSettings
+import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.{commandInputSource, outputFlatteningSink}
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.core.models.resources.{RangeRequirement, ScalarRequirement}
 import com.mesosphere.utils.AkkaUnitTest
@@ -28,7 +29,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     .build()
 
   lazy val mesosClient: MesosClient = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
-  lazy val schedulerFlow = Scheduler.fromClient(mesosClient, InMemoryPodRecordRepository())
+  lazy val schedulerFlow = Scheduler.fromClient(mesosClient, InMemoryPodRecordRepository(), SchedulerSettings.load())
   lazy val (input, output) = commandInputSource
     .via(schedulerFlow)
     .toMat(outputFlatteningSink)(Keep.both)

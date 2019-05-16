@@ -39,7 +39,10 @@ class SchedulerTest extends AkkaUnitTest with Inside {
   def mockedScheduler: Flow[SchedulerCommand, Scheduler.StateOutput, Future[Done]] = {
     Flow.fromGraph {
       GraphDSL.create(
-        Scheduler.unconnectedGraph(new MesosCalls(MesosMock.mockFrameworkId), InMemoryPodRecordRepository()),
+        Scheduler.unconnectedGraph(
+          new MesosCalls(MesosMock.mockFrameworkId),
+          InMemoryPodRecordRepository(),
+          SchedulerSettings.load()),
         loggingMockMesosFlow)((_, materializedValue) => materializedValue) { implicit builder =>
         { (graph, mockMesos) =>
           import GraphDSL.Implicits._
@@ -85,7 +88,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     }
     val (pub, sub) = TestSource
       .probe[SchedulerEvents]
-      .via(Scheduler.persistenceFlow(fuzzyPodRecordRepo))
+      .via(Scheduler.persistenceFlow(fuzzyPodRecordRepo, SchedulerSettings.load()))
       .toMat(TestSink.probe[SchedulerEvents])(Keep.both)
       .run()
 
@@ -123,7 +126,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     val controlledRepository = new ControlledRepository()
     val (pub, sub) = TestSource
       .probe[SchedulerEvents]
-      .via(Scheduler.persistenceFlow(controlledRepository))
+      .via(Scheduler.persistenceFlow(controlledRepository, SchedulerSettings.load()))
       .toMat(TestSink.probe[SchedulerEvents])(Keep.both)
       .run()
 
