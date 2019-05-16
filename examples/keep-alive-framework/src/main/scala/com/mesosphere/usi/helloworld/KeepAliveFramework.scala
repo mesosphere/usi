@@ -23,7 +23,7 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 
   val client: MesosClient = new KeepAliveMesosClientFactory(conf).client
 
-  val runSpec: RunSpec = KeepAlivePodSpecHelper.runSpec
+  val runSpec: RunTemplate = KeepAlivePodSpecHelper.runSpec
 
   val specsSnapshot: List[RunningPodSpec] =
     KeepAlivePodSpecHelper.specsSnapshot(conf.getInt("keep-alive-framework.tasks-started"))

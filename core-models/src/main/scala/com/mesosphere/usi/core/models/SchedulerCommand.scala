@@ -26,7 +26,7 @@ sealed trait SchedulerCommand
   * @param podId
   * @param runSpec
   */
-case class LaunchPod(podId: PodId, runSpec: RunSpec) extends SchedulerCommand
+case class LaunchPod(podId: PodId, runSpec: RunTemplate) extends SchedulerCommand
 
 /**
   * Send a kill for tasks associated with the specified podId.

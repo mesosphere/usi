@@ -15,7 +15,7 @@ import com.mesosphere.usi.core.models.{
   PodId,
   PodStatus,
   PodStatusUpdatedEvent,
-  RunSpec,
+  RunTemplate,
   SchedulerCommand,
   StateEvent,
   StateSnapshot
@@ -113,7 +113,7 @@ object CoreHelloWorldFramework extends StrictLogging {
     // - a RunSpec with minimal resource requirements and hello-world shell command
     // - a snapshot containing our PodSpec
     val podId = PodId(s"hello-world.${UUID.randomUUID()}")
-    val runSpec = RunSpec(
+    val runSpec = RunTemplate(
       resourceRequirements = List(ScalarRequirement.cpus(0.1), ScalarRequirement.memory(32)),
       shellCommand = """echo "Hello, world" && sleep 123456789""",
       role = "test"

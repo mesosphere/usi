@@ -44,7 +44,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     input.offer(
       LaunchPod(
         podId,
-        RunSpec(
+        RunTemplate(
           resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
           shellCommand = "sleep 3600",
           "test")
@@ -74,7 +74,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     input.offer(
       LaunchPod(
         podId,
-        RunSpec(
+        RunTemplate(
           resourceRequirements =
             List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256), RangeRequirement.ports(Seq(0))),
           shellCommand = "sleep 3600",
