@@ -9,7 +9,7 @@ import org.apache.mesos.v1.{Protos => Mesos}
   * If we have a [[PodRecord]] without a [[PodStatus]], then this means the task request was launched but we've not
   * heard back yet.
   *
-  * If we have a [[PodStatus]] without a [[PodRecord]], then this means we have discovered a spurious pod for which
+  * If we have a [[PodStatus]] without a [[PodRecord]], then this means we have discovered a unrecognized pod for which
   * there is no specification.
   */
 case class PodStatus(id: PodId, taskStatuses: Map[TaskId, Mesos.TaskStatus]) {
