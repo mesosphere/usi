@@ -42,8 +42,8 @@ object StateSnapshot {
 sealed trait UserError extends PodStateEvent
 
 /**
-  * The RunSpec submitted from a [[LaunchPod]] command had obvious errors that would prevent it from launching. If the
-  * implementation framework receive these, then it should be considered a bug.
+  * The [[RunTemplate]]c submitted from a [[LaunchPod]] command had obvious errors that would prevent it from launching.
+  * If the implementation framework receive these, then it should be considered a bug.
   *
   * @param id The podId for which the errors were detected
   * @param errors Text description of the errors
@@ -82,3 +82,10 @@ case class PodRecordUpdatedEvent(id: PodId, newRecord: Option[PodRecord])
 case class AgentRecordUpdatedEvent(id: PodId, newRecord: Option[AgentRecord])
     extends PersistedStateUpdatedEvent
     with PodStateEvent
+
+/**
+  * Sent when USI receives a task status update from Mesos but there is no [[PodSpec]] nor [[PodRecord]].
+  *
+  * @param status The status received from Mesos.
+  */
+case class UnrecognizedPod(status: PodStatus) extends StateEvent

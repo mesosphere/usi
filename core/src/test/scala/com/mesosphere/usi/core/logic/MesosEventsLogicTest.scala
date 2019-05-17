@@ -4,7 +4,7 @@ import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.SchedulerState
 import com.mesosphere.usi.core.helpers.MesosMock
-import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunTemplate, RunningPodSpec, TaskId}
+import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskStatus}
 import com.mesosphere.utils.UnitTest
@@ -85,7 +85,7 @@ class MesosEventsLogicTest extends UnitTest {
       events.stateEvents.head shouldBe a[PodStatusUpdatedEvent]
       val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdatedEvent]
       podStatusUpdate.newStatus shouldBe defined
-      podStatusUpdate.newStatus.get.taskStatuses should contain(
+      podStatusUpdate.newStatus.value.taskStatuses should contain(
         TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus
       )
     }
@@ -113,7 +113,7 @@ class MesosEventsLogicTest extends UnitTest {
       events.stateEvents.head shouldBe a[PodStatusUpdatedEvent]
       val podStatusUpdate = events.stateEvents.head.asInstanceOf[PodStatusUpdatedEvent]
       podStatusUpdate.newStatus shouldBe defined
-      podStatusUpdate.newStatus.get.taskStatuses should contain(
+      podStatusUpdate.newStatus.value.taskStatuses should contain(
         TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus
       )
     }
@@ -135,6 +135,25 @@ class MesosEventsLogicTest extends UnitTest {
       )(taskUpdateWithoutUuid)
 
       events.mesosCalls.isEmpty should be(true)
+    }
+
+    "emit an unrecognized pod event" in {
+      import com.mesosphere.usi.core.protos.ProtoBuilders._
+
+      val taskId = newTaskId(podWith1Cpu256Mem.id.value)
+      val taskUpdate = newTaskUpdateEvent(taskStatus(taskId))
+
+      val events = mesosEventLogic.processEvent(SchedulerState.empty)(taskUpdate)
+
+      events.mesosCalls.length shouldEqual 1
+      events.mesosCalls.head.getAcknowledge.getTaskId shouldEqual taskId
+
+      events.stateEvents.length shouldEqual 1
+      events.stateEvents.head shouldBe a[UnrecognizedPod]
+      val event = events.stateEvents.head.asInstanceOf[UnrecognizedPod]
+      event.status.taskStatuses should contain(
+        TaskId(taskId.getValue) -> taskUpdate.getUpdate.getStatus
+      )
     }
   }
 

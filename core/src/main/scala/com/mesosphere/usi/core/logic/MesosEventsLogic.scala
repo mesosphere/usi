@@ -132,8 +132,14 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
             PodStatus(podId, Map(taskId -> taskStatus))
         }
 
+        // Decided whether this pod is known or not, ie no records nor specs.
+        val unknown = !state.podSpecs.contains(podId) && !state.podRecords.contains(podId)
+        val stateEvent: StateEvent =
+          if (unknown) UnrecognizedPod(newStatus)
+          else PodStatusUpdatedEvent(podId, Some(newStatus))
+
         SchedulerEvents(
-          stateEvents = List(PodStatusUpdatedEvent(podId, Some(newStatus))),
+          stateEvents = List(stateEvent),
           mesosCalls = if (taskStatus.hasUuid) {
             // frameworks should accept only status updates that have UUID set
             // http://mesos.apache.org/documentation/latest/scheduler-http-api/#acknowledge
