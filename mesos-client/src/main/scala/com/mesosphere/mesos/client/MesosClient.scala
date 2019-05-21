@@ -37,7 +37,7 @@ trait MesosClient {
     * Note: MesosClient will disconnect on Mesos Master failover. It is the resposibility of the consumer as such to
     * reconnect to Mesos in such an event. As such, this information will be current, so long as we are connected.
     */
-  def connectionInfo: MesosClient.ConnectionInfo
+  def session: MesosClient.Session
 
   /**
     * Set of helper factory methods that can be used for constructing various calls that the framework will make, to be
@@ -122,7 +122,26 @@ trait MesosClient {
 object MesosClient extends StrictLogging with StrictLoggingFlow {
   case class MesosRedirectException(leader: URL) extends Exception(s"New mesos leader available at $leader")
 
-  case class ConnectionInfo(url: URL, streamId: String)
+  case class Session(url: URL, streamId: String, authorization: Option[Authorization] = None) {
+    lazy val isSecured: Boolean = url.getProtocol == "https"
+
+    def postRequest(bytes: Array[Byte]): HttpRequest =
+      HttpRequest(
+        HttpMethods.POST,
+        uri = Uri(s"${url}/api/v1/scheduler"),
+        entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
+        headers = MesosClient.MesosStreamIdHeader(streamId) :: authorization.map(_.header()).toList)
+
+    def httpConnection(implicit system: ActorSystem): Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] = {
+      val connection = if (isSecured) {
+        Http().outgoingConnectionHttps(host = url.getHost, port = url.getPort)
+      } else {
+        Http().outgoingConnection(host = url.getHost, port = url.getPort)
+      }
+
+      connection
+    }
+  }
 
   val MesosStreamIdHeaderName = "Mesos-Stream-Id"
   def MesosStreamIdHeader(streamId: String) =
@@ -158,14 +177,15 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
   private val eventDeserializer: Flow[ByteString, Event, NotUsed] =
     Flow[ByteString].map(bytes => Event.parseFrom(bytes.toArray))
 
-  private def connectionSource(frameworkInfo: FrameworkInfo, url: URL)(implicit as: ActorSystem) = {
+  private def connectionSource(frameworkInfo: FrameworkInfo, url: URL, authorization: Option[Authorization])(implicit as: ActorSystem) = {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
     val request = HttpRequest(
       HttpMethods.POST,
       uri = Uri("/api/v1/scheduler"),
       entity = HttpEntity(ProtobufMediaType, body),
-      headers = List(headers.Accept(ProtobufMediaType)))
+      headers = headers.Accept(ProtobufMediaType) :: authorization.map(_.header()).toList
+    )
 
     val httpConnection = Http().outgoingConnection(url.getHost, url.getPort)
 
@@ -176,14 +196,14 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       .via(info("HttpResponse: "))
   }
 
-  private def mesosHttpConnection(frameworkInfo: FrameworkInfo, urls: List[URL], maxRedirects: Int)(
+  private def mesosHttpConnection(frameworkInfo: FrameworkInfo, urls: List[URL], maxRedirects: Int, authorization: Option[Authorization])(
       implicit mat: Materializer,
-      as: ActorSystem): Source[(HttpResponse, ConnectionInfo), NotUsed] =
+      as: ActorSystem): Source[(HttpResponse, Session), NotUsed] =
     urls match {
       case Nil => throw new IOException(s"Failed to connect to Mesos: List of master urls exhausted.")
       case url :: rest =>
         logger.info(s"Connecting to Mesos master $url")
-        connectionSource(frameworkInfo, url).map { response =>
+        connectionSource(frameworkInfo, url, authorization).map { response =>
           response.status match {
             case StatusCodes.OK =>
               logger.info(s"Connected successfully to $url");
@@ -191,7 +211,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
                 .find(h => h.is(MesosStreamIdHeaderName.toLowerCase))
                 .getOrElse(throw new IllegalStateException(s"Missing MesosStreamId header in ${response.headers}"))
 
-              (response, ConnectionInfo(url, streamId.value()))
+              (response, Session(url, streamId.value(), authorization))
             case StatusCodes.TemporaryRedirect =>
               val leader = new URL(response.header[headers.Location].get.value())
               logger.warn(s"New Mesos leader available at $leader")
@@ -207,12 +227,12 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           1, {
             case ex @ MesosRedirectException(leader) =>
               if (maxRedirects > 0)
-                mesosHttpConnection(frameworkInfo, (leader :: rest).distinct, maxRedirects - 1)
+                mesosHttpConnection(frameworkInfo, (leader :: rest).distinct, maxRedirects - 1, authorization)
               else
                 throw new IOException("Failed to connect to Mesos: Too many redirects.", ex)
             case ex =>
               logger.warn(s"Failed to connect to Mesos $url", ex)
-              mesosHttpConnection(frameworkInfo, rest, maxRedirects)
+              mesosHttpConnection(frameworkInfo, rest, maxRedirects, authorization)
           }
         )
     }
@@ -308,13 +328,13 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     *    available via the materializable-once source, `.mesosSource`, which DOES NOT include the earlier-consumed
     *    SUBSCRIBED event.
     */
-  def apply(conf: MesosClientSettings, frameworkInfo: FrameworkInfo)(
+  def apply(conf: MesosClientSettings, frameworkInfo: FrameworkInfo, authorization: Option[Authorization] = None)(
       implicit
       system: ActorSystem,
       materializer: Materializer): Source[MesosClient, NotUsed] = {
 
-    val httpConnection: Source[(HttpResponse, ConnectionInfo), NotUsed] =
-      mesosHttpConnection(frameworkInfo, conf.masters.toList, conf.maxRedirects)
+    val httpConnection: Source[(HttpResponse, Session), NotUsed] =
+      mesosHttpConnection(frameworkInfo, conf.masters.toList, conf.maxRedirects, authorization)
 
     val eventReader = Flow[ByteString]
       .via(RecordIOFraming.scanner())
@@ -324,9 +344,9 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       .buffer(conf.sourceBufferSize, OverflowStrategy.backpressure)
 
     httpConnection.flatMapConcat {
-      case (httpResponse, connectionInfo) =>
+      case (httpResponse, session) =>
         val sharedKillSwitch =
-          KillSwitches.shared(s"MesosClient-${connectionInfo.url}")
+          KillSwitches.shared(s"MesosClient-${session.url}")
         httpResponse.entity.withoutSizeLimit.dataBytes
           .via(eventReader)
           .via(sharedKillSwitch.flow)
@@ -334,7 +354,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           .map {
             case (Seq(subscribedEvent), events) if subscribedEvent.getType == Event.Type.SUBSCRIBED =>
               val subscribed = subscribedEvent.getSubscribed
-              new MesosClientImpl(frameworkInfo, sharedKillSwitch, subscribed, connectionInfo, events)
+              new MesosClientImpl(frameworkInfo, sharedKillSwitch, subscribed, session, events)
             case (other, _) =>
               throw new RuntimeException(s"Expected subscribed event, got $other")
           }
@@ -349,7 +369,7 @@ class MesosClientImpl(
     val frameworkInfo: FrameworkInfo,
     sharedKillSwitch: SharedKillSwitch,
     val subscribed: Event.Subscribed,
-    val connectionInfo: MesosClient.ConnectionInfo,
+    val session: MesosClient.Session,
     /**
       * Events from Mesos scheduler, sans initial Subscribed event.
       */
@@ -367,9 +387,9 @@ class MesosClientImpl(
     Sink.foreach[HttpResponse] { response =>
       response.status match {
         case status if status.isFailure() =>
-          logger.info(s"A request to mesos failed with response: ${response}")
+          logger.info(s"A request to Mesos failed with response: ${response}")
           response.discardEntityBytes()
-          throw new IllegalStateException(s"Failed to send a call to mesos")
+          throw new IllegalStateException(s"Failed to send a call to Mesos")
         case _ =>
           logger.debug(s"Mesos call response: $response")
           response.discardEntityBytes()
@@ -379,19 +399,7 @@ class MesosClientImpl(
   private val callSerializer: Flow[Call, Array[Byte], NotUsed] = Flow[Call]
     .map(call => call.toByteArray)
 
-  private val requestBuilder: Flow[Array[Byte], HttpRequest, NotUsed] =
-    Flow[Array[Byte]]
-      .map(
-        bytes =>
-          HttpRequest(
-            HttpMethods.POST,
-            uri = Uri(s"${connectionInfo.url}/api/v1/scheduler"),
-            entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
-            headers = List(MesosClient.MesosStreamIdHeader(connectionInfo.streamId))
-        ))
-
-  def httpConnection: Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] =
-    Http().outgoingConnection(host = connectionInfo.url.getHost, port = connectionInfo.url.getPort)
+  private val requestBuilder: Flow[Array[Byte], HttpRequest, NotUsed] = Flow[Array[Byte]].map(bytes => session.postRequest(bytes))
 
   override val mesosSink: Sink[Call, Future[Done]] =
     Flow[Call]
@@ -399,6 +407,6 @@ class MesosClientImpl(
       .via(debug("Sending "))
       .via(callSerializer)
       .via(requestBuilder)
-      .via(httpConnection)
+      .via(session.httpConnection)
       .toMat(responseHandler)(Keep.right)
 }
