@@ -130,9 +130,11 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
         HttpMethods.POST,
         uri = Uri(s"${url}/api/v1/scheduler"),
         entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
-        headers = MesosClient.MesosStreamIdHeader(streamId) :: authorization.map(_.header()).toList)
+        headers = MesosClient.MesosStreamIdHeader(streamId) :: authorization.map(_.header()).toList
+      )
 
-    def httpConnection(implicit system: ActorSystem): Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] = {
+    def httpConnection(
+        implicit system: ActorSystem): Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] = {
       val connection = if (isSecured) {
         Http().outgoingConnectionHttps(host = url.getHost, port = url.getPort)
       } else {
@@ -177,7 +179,8 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
   private val eventDeserializer: Flow[ByteString, Event, NotUsed] =
     Flow[ByteString].map(bytes => Event.parseFrom(bytes.toArray))
 
-  private def connectionSource(frameworkInfo: FrameworkInfo, url: URL, authorization: Option[CredentialsProvider])(implicit as: ActorSystem) = {
+  private def connectionSource(frameworkInfo: FrameworkInfo, url: URL, authorization: Option[CredentialsProvider])(
+      implicit as: ActorSystem) = {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
     val request = HttpRequest(
@@ -196,7 +199,11 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       .via(info("HttpResponse: "))
   }
 
-  private def mesosHttpConnection(frameworkInfo: FrameworkInfo, urls: List[URL], maxRedirects: Int, authorization: Option[CredentialsProvider])(
+  private def mesosHttpConnection(
+      frameworkInfo: FrameworkInfo,
+      urls: List[URL],
+      maxRedirects: Int,
+      authorization: Option[CredentialsProvider])(
       implicit mat: Materializer,
       as: ActorSystem): Source[(HttpResponse, Session), NotUsed] =
     urls match {
@@ -399,7 +406,8 @@ class MesosClientImpl(
   private val callSerializer: Flow[Call, Array[Byte], NotUsed] = Flow[Call]
     .map(call => call.toByteArray)
 
-  private val requestBuilder: Flow[Array[Byte], HttpRequest, NotUsed] = Flow[Array[Byte]].map(bytes => session.postRequest(bytes))
+  private val requestBuilder: Flow[Array[Byte], HttpRequest, NotUsed] =
+    Flow[Array[Byte]].map(bytes => session.postRequest(bytes))
 
   override val mesosSink: Sink[Call, Future[Done]] =
     Flow[Call]

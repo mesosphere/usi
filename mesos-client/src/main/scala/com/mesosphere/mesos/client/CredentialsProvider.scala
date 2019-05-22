@@ -15,17 +15,11 @@ import pdi.jwt.JwtAlgorithm.RS256
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 
-trait CredentialsProvider{
+trait CredentialsProvider {
 
   def credentials(): HttpCredentials
   def header(): headers.Authorization = headers.Authorization(credentials())
   def refresh(): Unit = ???
-}
-
-case class JwtHttpCredentials(token: String) extends HttpCredentials {
-
-  override def scheme: String = "token"
-  override def params: Map[String, String] = Map.empty
 }
 
 case class JwtProvider(privateKey: String, root: String) extends CredentialsProvider {
@@ -38,7 +32,10 @@ case class JwtProvider(privateKey: String, root: String) extends CredentialsProv
   def claim() = JObject(("uid", 1), ("exp", expirationIn(5.minutes)))
 
   // Should probably be a flow at some point
-  def getToken()(implicit system: ActorSystem, context: ExecutionContext, materializer: ActorMaterializer): Future[String] = {
+  def getToken()(
+      implicit system: ActorSystem,
+      context: ExecutionContext,
+      materializer: ActorMaterializer): Future[String] = {
     val token = JwtJson4s.encode(claim(), privateKey, RS256)
     val data: String = compact(render(JObject(("uid", 1), ("token", token))))
 
@@ -54,7 +51,7 @@ case class JwtProvider(privateKey: String, root: String) extends CredentialsProv
     }
   }
 
-  override def credentials(): HttpCredentials = JwtHttpCredentials(token)
+  override def credentials(): HttpCredentials = ???
 }
 
 object JwtProvider {
@@ -64,7 +61,7 @@ object JwtProvider {
     implicit val system = ActorSystem("test")
     implicit val materializer = ActorMaterializer()
 
-    Await.result(JwtProvider(privateKey, root).getToken(), 10.minutes)
+    Await.result(JwtProvider("some key", "http://example.com").getToken(), 10.minutes)
   }
 }
 
