@@ -122,7 +122,7 @@ trait MesosClient {
 object MesosClient extends StrictLogging with StrictLoggingFlow {
   case class MesosRedirectException(leader: URL) extends Exception(s"New mesos leader available at $leader")
 
-  case class Session(url: URL, streamId: String, authorization: Option[Authorization] = None) {
+  case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None) {
     lazy val isSecured: Boolean = url.getProtocol == "https"
 
     def postRequest(bytes: Array[Byte]): HttpRequest =
@@ -177,7 +177,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
   private val eventDeserializer: Flow[ByteString, Event, NotUsed] =
     Flow[ByteString].map(bytes => Event.parseFrom(bytes.toArray))
 
-  private def connectionSource(frameworkInfo: FrameworkInfo, url: URL, authorization: Option[Authorization])(implicit as: ActorSystem) = {
+  private def connectionSource(frameworkInfo: FrameworkInfo, url: URL, authorization: Option[CredentialsProvider])(implicit as: ActorSystem) = {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
     val request = HttpRequest(
@@ -196,7 +196,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       .via(info("HttpResponse: "))
   }
 
-  private def mesosHttpConnection(frameworkInfo: FrameworkInfo, urls: List[URL], maxRedirects: Int, authorization: Option[Authorization])(
+  private def mesosHttpConnection(frameworkInfo: FrameworkInfo, urls: List[URL], maxRedirects: Int, authorization: Option[CredentialsProvider])(
       implicit mat: Materializer,
       as: ActorSystem): Source[(HttpResponse, Session), NotUsed] =
     urls match {
@@ -328,7 +328,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     *    available via the materializable-once source, `.mesosSource`, which DOES NOT include the earlier-consumed
     *    SUBSCRIBED event.
     */
-  def apply(conf: MesosClientSettings, frameworkInfo: FrameworkInfo, authorization: Option[Authorization] = None)(
+  def apply(conf: MesosClientSettings, frameworkInfo: FrameworkInfo, authorization: Option[CredentialsProvider] = None)(
       implicit
       system: ActorSystem,
       materializer: Materializer): Source[MesosClient, NotUsed] = {
