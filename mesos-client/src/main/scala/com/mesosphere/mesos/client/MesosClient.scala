@@ -125,23 +125,27 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
 
   case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None) {
     lazy val isSecured: Boolean = url.getProtocol == "https"
+    lazy val port = if(url.getPort == -1) url.getDefaultPort else url.getPort
 
-    def postRequest(bytes: Array[Byte]): HttpRequest =
+    def createPostRequest(bytes: Array[Byte]): HttpRequest =
       HttpRequest(
         HttpMethods.POST,
-        uri = Uri(s"${url}/api/v1/scheduler"),
+        uri = Uri(s"${url.getPath}/api/v1/scheduler"),
         entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
         headers = MesosClient.MesosStreamIdHeader(streamId) :: authorization.map(_.header()).toList
       )
 
+    val post: Flow[Array[Byte], HttpRequest, NotUsed] =
+      Flow[Array[Byte]].map(bytes => createPostRequest(bytes))
+
+    // TODO: Should we really create a new flow each time?
     def httpConnection(
         implicit system: ActorSystem): Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] = {
       val connection = if (isSecured) {
-        Http().outgoingConnectionHttps(host = url.getHost, port = url.getDefaultPort)
+        Http().outgoingConnectionHttps(host = url.getHost, port = port)
       } else {
-        Http().outgoingConnection(host = url.getHost, port = url.getPort)
+        Http().outgoingConnection(host = url.getHost, port = port)
       }
-
       connection
     }
   }
@@ -185,16 +189,16 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
     val authHeader = authorization.map(_.header()).toList
-    println(authHeader.head)
     val request = HttpRequest(
       HttpMethods.POST,
-      uri = Uri(s"${url}/api/v1/scheduler"),
+      uri = Uri(s"${url.getPath}/api/v1/scheduler"),
       entity = HttpEntity(ProtobufMediaType, body),
       headers = headers.Accept(ProtobufMediaType) :: authHeader
     )
 
-    // TODO: infer port if not set
-    val httpConnection = Http().outgoingConnectionHttps(url.getHost, url.getDefaultPort)
+    // TODO: Probably should already create session.
+    val port = if(url.getPort == -1) url.getDefaultPort else url.getPort
+    val httpConnection = Http().outgoingConnectionHttps(url.getHost, port)
 
     Source
       .single(request)
@@ -412,15 +416,12 @@ class MesosClientImpl(
   private val callSerializer: Flow[Call, Array[Byte], NotUsed] = Flow[Call]
     .map(call => call.toByteArray)
 
-  private val requestBuilder: Flow[Array[Byte], HttpRequest, NotUsed] =
-    Flow[Array[Byte]].map(bytes => session.postRequest(bytes))
-
   override val mesosSink: Sink[Call, Future[Done]] =
     Flow[Call]
       .via(sharedKillSwitch.flow[Call])
       .via(debug("Sending "))
       .via(callSerializer)
-      .via(requestBuilder)
+      .via(session.post)
       .via(session.httpConnection)
       .toMat(responseHandler)(Keep.right)
 }
