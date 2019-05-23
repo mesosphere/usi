@@ -323,7 +323,7 @@
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Describes the task statuses of some pod. Note, this is a separate piece of data from a <a href="PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>. USI manages
 <a href="PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a> for persistent recovery of pod facts, and <a href="" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a> is the status as directly reported from Mesos.</p><p>If we have a <a href="PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a> without a <a href="" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a>, then this means the task request was launched but we've not
-heard back yet.</p><p>If we have a <a href="" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a> without a <a href="PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>, then this means we have discovered a spurious pod for which
+heard back yet.</p><p>If we have a <a href="" class="extype" name="com.mesosphere.usi.core.models.PodStatus">PodStatus</a> without a <a href="PodRecord.html" class="extype" name="com.mesosphere.usi.core.models.PodRecord">PodRecord</a>, then this means we have discovered a unrecognized pod for which
 there is no specification.
 </p></div><div class="toggleContainer block">
           <span class="toggle">
