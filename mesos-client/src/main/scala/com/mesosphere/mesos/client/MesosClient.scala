@@ -7,6 +7,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.MediaType.Compressible
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.alpakka.recordio.scaladsl.RecordIOFraming
 import akka.stream.scaladsl._
 import akka.stream.{Materializer, OverflowStrategy, _}
@@ -17,7 +18,7 @@ import com.mesosphere.mesos.conf.MesosClientSettings
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 
 trait MesosClient {
 
@@ -136,7 +137,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     def httpConnection(
         implicit system: ActorSystem): Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] = {
       val connection = if (isSecured) {
-        Http().outgoingConnectionHttps(host = url.getHost, port = url.getPort)
+        Http().outgoingConnectionHttps(host = url.getHost, port = url.getDefaultPort)
       } else {
         Http().outgoingConnection(host = url.getHost, port = url.getPort)
       }
@@ -183,14 +184,17 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       implicit as: ActorSystem) = {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
+    val authHeader = authorization.map(_.header()).toList
+    println(authHeader.head)
     val request = HttpRequest(
       HttpMethods.POST,
-      uri = Uri("/api/v1/scheduler"),
+      uri = Uri(s"${url}/api/v1/scheduler"),
       entity = HttpEntity(ProtobufMediaType, body),
-      headers = headers.Accept(ProtobufMediaType) :: authorization.map(_.header()).toList
+      headers = headers.Accept(ProtobufMediaType) :: authHeader
     )
 
-    val httpConnection = Http().outgoingConnection(url.getHost, url.getPort)
+    // TODO: infer port if not set
+    val httpConnection = Http().outgoingConnectionHttps(url.getHost, url.getDefaultPort)
 
     Source
       .single(request)
@@ -228,7 +232,9 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
               throw MesosRedirectException(leader)
             case _ =>
               response.discardEntityBytes()
-              throw new IllegalArgumentException(s"Mesos server error: $response")
+              import scala.concurrent.duration._
+              val error = Await.result(Unmarshal(response.entity).to[String], 1.minutes)
+              throw new IllegalArgumentException(s"Mesos server error: ${response.status}: $error")
           }
         }.recoverWithRetries(
           1, {

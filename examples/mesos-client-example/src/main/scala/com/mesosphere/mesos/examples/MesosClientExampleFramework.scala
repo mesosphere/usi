@@ -1,11 +1,12 @@
 package com.mesosphere.mesos.examples
 
+import java.net.URL
 import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
-import com.mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
+import com.mesosphere.mesos.client.{CredentialsProvider, JwtProvider, MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
 import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.Event
@@ -24,13 +25,12 @@ import scala.collection.JavaConverters._
   *  Not much, but shows the basic idea. Good to test against local Mesos.
   *
   */
-class MesosClientExampleFramework(settings: MesosClientSettings) extends StrictLoggingFlow {
-  implicit val system = ActorSystem()
-  implicit val materializer = ActorMaterializer()
+class MesosClientExampleFramework(settings: MesosClientSettings, authorization: Option[CredentialsProvider])(implicit system: ActorSystem, materializer: ActorMaterializer) extends StrictLoggingFlow {
   implicit val executionContext = system.dispatcher
 
   val frameworkInfo = FrameworkInfo
     .newBuilder()
+    .setPrincipal("strict-usi")
     .setUser("example")
     .setName("MesosClientExample")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
@@ -41,7 +41,7 @@ class MesosClientExampleFramework(settings: MesosClientSettings) extends StrictL
     .setFailoverTimeout(0d)
     .build()
 
-  val client = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
+  val client = Await.result(MesosClient(settings, frameworkInfo, authorization).runWith(Sink.head), 10.seconds)
 
   client.mesosSource
     .runWith(Sink.foreach { event =>
@@ -73,9 +73,35 @@ class MesosClientExampleFramework(settings: MesosClientSettings) extends StrictL
 
 object MesosClientExampleFramework {
 
+  /**
+    * Strict mode demo:
+    *
+    * 1. Launch strict cluster.
+    * 2. Create key pair:
+    *   {{{dcos security org service-accounts keypair usi.private.pem usi.pub.pem}}}
+    * 3. Create user strict-usi:
+    *   {{{dcos security org service-accounts create -p usi.pub.pem -d "For testing USI on strict" strict-usi}}}
+    * 4. Grant strict-usi access:
+    *   {{{curl -L -X PUT -k -H "Authorization: token=$(dcos config show core.dcos_acs_token)" "$(dcos config show core.dcos_url)/acs/api/v1/acls/dcos:superuser/users/strict-usi/full"}}}
+    * 5. Download SSL certs:
+    *   {{{wget --no-check-certificate -O dcos-ca.crt "$(dcos config show core.dcos_url)/ca/dcos-ca.crt"}}}
+    * 6. Replace {{{dcosRoot}}} with public IP of cluster.
+    * 7. Run!
+    */
   def main(args: Array[String]): Unit = {
-    MesosClientExampleFramework(MesosClientSettings.load())
+
+    implicit val system = ActorSystem()
+    implicit val materializer = ActorMaterializer()
+    implicit val context = system.dispatcher
+
+    val dcosRoot = "https://34.209.126.195"
+    val privateKey = scala.io.Source.fromFile("/Users/kjeschkies/Projects/usi/usi.private.pem").mkString
+    val provider = JwtProvider("strict-usi", privateKey, dcosRoot)
+
+    val mesosUrl = new URL(s"$dcosRoot/mesos")
+    val clientSettings = MesosClientSettings.load().withMasters(Seq(mesosUrl))
+    new MesosClientExampleFramework(clientSettings, Some(provider))
   }
 
-  def apply(settings: MesosClientSettings): MesosClientExampleFramework = new MesosClientExampleFramework(settings)
+//  def apply(settings: MesosClientSettings): MesosClientExampleFramework = new MesosClientExampleFramework(settings)
 }
