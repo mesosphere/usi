@@ -123,7 +123,7 @@ trait MesosClient {
 object MesosClient extends StrictLogging with StrictLoggingFlow {
   case class MesosRedirectException(leader: URL) extends Exception(s"New mesos leader available at $leader")
 
-  case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None) {
+  case class Session(url: URL, streamId: String, credentials: Option[CredentialsProvider] = None) {
     lazy val isSecured: Boolean = url.getProtocol == "https"
     lazy val port = if(url.getPort == -1) url.getDefaultPort else url.getPort
 
@@ -132,8 +132,9 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
         HttpMethods.POST,
         uri = Uri(s"${url.getPath}/api/v1/scheduler"),
         entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
-        headers = MesosClient.MesosStreamIdHeader(streamId) :: authorization.map(_.header()).toList
+        headers = MesosClient.MesosStreamIdHeader(streamId) :: credentials.map(_.header()).toList
       )
+
 
     val post: Flow[Array[Byte], HttpRequest, NotUsed] =
       Flow[Array[Byte]].map(bytes => createPostRequest(bytes))
