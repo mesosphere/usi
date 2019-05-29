@@ -79,7 +79,7 @@ object MesosClientExampleFramework {
   /**
     * Strict mode demo:
     *
-    * 1. Launch strict cluster.
+    * 1. Launch strict cluster and setup the DC/OS CLI.
     * 2. Create key pair:
     *   {{{dcos security org service-accounts keypair usi.private.pem usi.pub.pem}}}
     * 3. Create user strict-usi:
@@ -97,7 +97,7 @@ object MesosClientExampleFramework {
     implicit val materializer = ActorMaterializer()
     implicit val context = system.dispatcher
 
-    val dcosRoot = "https://34.209.126.195"
+    val dcosRoot = new URL("https://52.12.108.67")
     val privateKey = scala.io.Source.fromFile("/Users/kjeschkies/Projects/usi/usi.private.pem").mkString
     val provider = JwtProvider("strict-usi", privateKey, dcosRoot)
 

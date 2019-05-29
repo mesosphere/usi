@@ -31,7 +31,7 @@ case class JwtProvider(uid: String, privateKey: String, root: URL)(
   import JsonMethods.{parse, render, compact}
 
   private def expireIn(duration: Duration): Long = Instant.now.getEpochSecond + duration.toSeconds
-  private val claim = JObject("uid" -> uid, "exp" -> expireIn(60.minutes)) // TODO: configure token expiration.
+  private val claim = JObject("uid" -> uid, "exp" -> expireIn(5.minutes)) // TODO: configure token expiration.
 
   val acsTokenRequest: HttpRequest = {
     val token = JwtJson4s.encode(claim, privateKey, RS256)
@@ -39,7 +39,7 @@ case class JwtProvider(uid: String, privateKey: String, root: URL)(
 
     HttpRequest(
       method = HttpMethods.POST,
-      uri = Uri(s"${root.getPath}/acs/api/v1/auth/login"),
+      uri = Uri(s"$root/acs/api/v1/auth/login"),
       entity = HttpEntity(ContentTypes.`application/json`, data)
     )
   }

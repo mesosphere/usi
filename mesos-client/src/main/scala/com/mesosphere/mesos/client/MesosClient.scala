@@ -155,6 +155,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
               token = Some(nextToken)
               pull(callsInlet)
             case Failure(ex) =>
+              logger.error("Could not fetch session token", ex)
               this.failStage(ex)
           }
 
@@ -170,7 +171,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           })
           setHandler(requestsOutlet, new OutHandler {
             override def onPull(): Unit = {
-              pull(callsInlet)
+              if(token.isDefined) pull(callsInlet)
             }
           })
         }
