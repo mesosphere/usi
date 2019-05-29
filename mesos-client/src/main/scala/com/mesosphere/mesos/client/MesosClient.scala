@@ -185,6 +185,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     // TODO: Should we really create a new flow each time?
     def httpConnection(
         implicit system: ActorSystem): Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] = {
+      logger.info("Create new connection.")
       val connection = if (isSecured) {
         Http().outgoingConnectionHttps(host = url.getHost, port = port)
       } else {
