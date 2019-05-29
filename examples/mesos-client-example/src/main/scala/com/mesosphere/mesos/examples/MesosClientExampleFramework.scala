@@ -44,25 +44,25 @@ class MesosClientExampleFramework(settings: MesosClientSettings) extends StrictL
   val client = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
 
   client.mesosSource
-    .runWith(Sink.foreach { event =>
+    .mapConcat { event =>
       if (event.getType == Event.Type.SUBSCRIBED) {
         logger.info("Successfully subscribed to mesos")
+        List.empty
       } else if (event.getType == Event.Type.OFFERS) {
-
-        val offerIds = event.getOffers.getOffersList.asScala.map(_.getId).toList
-
-        Source(offerIds)
-          .via(info(s"Declining offer with id = ")) // Decline all offers
-          .map(
-            oId =>
-              client.calls.newDecline(
-                offerIds = Seq(oId),
-                filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build())
-            ))
-          .runWith(client.mesosSink)
+        event.getOffers.getOffersList.asScala.map(_.getId).toList
+      } else {
+        logger.info(s"Ignoring event $event")
+        List.empty
       }
-
-    })
+    }
+    .via(info(s"Declining offer with id = ")) // Decline all offers
+    .map(
+      oId =>
+        client.calls.newDecline(
+          offerIds = Seq(oId),
+          filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build())
+        ))
+    .runWith(client.mesosSink)
     .onComplete {
       case Success(res) =>
         logger.info(s"Stream completed: $res"); system.terminate()
