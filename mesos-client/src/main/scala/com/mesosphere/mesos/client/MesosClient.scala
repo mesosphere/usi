@@ -7,9 +7,11 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.MediaType.Compressible
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.alpakka.recordio.scaladsl.RecordIOFraming
 import akka.stream.scaladsl._
+import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.stream.{Materializer, OverflowStrategy, _}
 import akka.util.ByteString
 import akka.{Done, NotUsed}
@@ -19,6 +21,8 @@ import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 
 import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
+import scala.util.{Failure, Success, Try}
 
 trait MesosClient {
 
@@ -125,19 +129,55 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
 
   case class Session(url: URL, streamId: String, credentials: Option[CredentialsProvider] = None) {
     lazy val isSecured: Boolean = url.getProtocol == "https"
-    lazy val port = if(url.getPort == -1) url.getDefaultPort else url.getPort
+    lazy val port = if (url.getPort == -1) url.getDefaultPort else url.getPort
 
-    def createPostRequest(bytes: Array[Byte]): HttpRequest =
+    def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest =
       HttpRequest(
         HttpMethods.POST,
         uri = Uri(s"${url.getPath}/api/v1/scheduler"),
         entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
-        headers = MesosClient.MesosStreamIdHeader(streamId) :: credentials.map(_.header()).toList
+        headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
       )
 
+    case class SessionFlow() extends GraphStage[FlowShape[Array[Byte], HttpRequest]] {
 
-    val post: Flow[Array[Byte], HttpRequest, NotUsed] =
-      Flow[Array[Byte]].map(bytes => createPostRequest(bytes))
+      private val callsInlet = Inlet[Array[Byte]]("specs")
+      private val requestsOutlet = Outlet[HttpRequest]("effects")
+      override val shape = FlowShape.of(callsInlet, requestsOutlet)
+
+      override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
+        new GraphStageLogic(shape) {
+
+          var token = Option.empty[HttpCredentials]
+
+          val startGraph = this.getAsyncCallback[Try[HttpCredentials]] {
+            case Success(nextToken) =>
+              token = Some(nextToken)
+              pull(callsInlet)
+            case Failure(ex) =>
+              this.failStage(ex)
+          }
+
+          override def preStart(): Unit = {
+            import scala.concurrent.ExecutionContext.Implicits.global
+            credentials.get.nextToken().onComplete(startGraph.invoke)
+          }
+
+          setHandler(callsInlet, new InHandler {
+            override def onPush(): Unit = {
+              push(requestsOutlet, createPostRequest(grab(callsInlet), token))
+            }
+          })
+          setHandler(requestsOutlet, new OutHandler {
+            override def onPull(): Unit = {
+              pull(callsInlet)
+            }
+          })
+        }
+      }
+    }
+
+    val post: Flow[Array[Byte], HttpRequest, NotUsed] = Flow[Array[Byte]].via(SessionFlow())
 
     // TODO: Should we really create a new flow each time?
     def httpConnection(
@@ -189,7 +229,10 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       implicit as: ActorSystem) = {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
-    val authHeader = authorization.map(_.header()).toList
+    val authHeader = authorization.map { provider =>
+      val creds = Await.result(provider.nextToken(), 2.minutes)
+      Authorization(creds)
+    }.toList
     val request = HttpRequest(
       HttpMethods.POST,
       uri = Uri(s"${url.getPath}/api/v1/scheduler"),
@@ -198,7 +241,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     )
 
     // TODO: Probably should already create session.
-    val port = if(url.getPort == -1) url.getDefaultPort else url.getPort
+    val port = if (url.getPort == -1) url.getDefaultPort else url.getPort
     val httpConnection = Http().outgoingConnectionHttps(url.getHost, port)
 
     Source

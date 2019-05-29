@@ -25,7 +25,10 @@ import scala.collection.JavaConverters._
   *  Not much, but shows the basic idea. Good to test against local Mesos.
   *
   */
-class MesosClientExampleFramework(settings: MesosClientSettings, authorization: Option[CredentialsProvider])(implicit system: ActorSystem, materializer: ActorMaterializer) extends StrictLoggingFlow {
+class MesosClientExampleFramework(settings: MesosClientSettings, authorization: Option[CredentialsProvider])(
+    implicit system: ActorSystem,
+    materializer: ActorMaterializer)
+    extends StrictLoggingFlow {
   implicit val executionContext = system.dispatcher
 
   val frameworkInfo = FrameworkInfo
