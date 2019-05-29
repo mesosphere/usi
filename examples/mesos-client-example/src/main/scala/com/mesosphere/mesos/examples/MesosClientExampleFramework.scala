@@ -5,9 +5,10 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.Sink
 import com.mesosphere.mesos.client.{CredentialsProvider, JwtProvider, MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
+import org.apache.mesos.v1.Protos
 import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.Event
 
@@ -47,25 +48,25 @@ class MesosClientExampleFramework(settings: MesosClientSettings, authorization: 
   val client = Await.result(MesosClient(settings, frameworkInfo, authorization).runWith(Sink.head), 10.seconds)
 
   client.mesosSource
-    .runWith(Sink.foreach { event =>
+    .mapConcat[Protos.OfferID] { event =>
       if (event.getType == Event.Type.SUBSCRIBED) {
         logger.info("Successfully subscribed to mesos")
+        List.empty
       } else if (event.getType == Event.Type.OFFERS) {
-
-        val offerIds = event.getOffers.getOffersList.asScala.map(_.getId).toList
-
-        Source(offerIds)
-          .via(info(s"Declining offer with id = ")) // Decline all offers
-          .map(
-            oId =>
-              client.calls.newDecline(
-                offerIds = Seq(oId),
-                filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build())
-            ))
-          .runWith(client.mesosSink)
+        event.getOffers.getOffersList.asScala.map(_.getId).toList
+      } else {
+        logger.info(s"Ignoring event $event")
+        List.empty
       }
-
-    })
+    }
+    .via(info(s"Declining offer with id = ")) // Decline all offers
+    .map { oId =>
+      client.calls.newDecline(
+        offerIds = Seq(oId),
+        filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build())
+      )
+    }
+    .runWith(client.mesosSink)
     .onComplete {
       case Success(res) =>
         logger.info(s"Stream completed: $res"); system.terminate()

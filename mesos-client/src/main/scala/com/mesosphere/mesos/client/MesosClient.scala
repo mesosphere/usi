@@ -160,6 +160,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           }
 
           override def preStart(): Unit = {
+            logger.info("Starting stage")
             import scala.concurrent.ExecutionContext.Implicits.global
             credentials.get.nextToken().onComplete(startGraph.invoke)
           }
@@ -178,7 +179,8 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       }
     }
 
-    val post: Flow[Array[Byte], HttpRequest, NotUsed] = Flow[Array[Byte]].via(SessionFlow())
+    val sessionFlow = SessionFlow()
+    val post: Flow[Array[Byte], HttpRequest, NotUsed] = Flow[Array[Byte]].via(sessionFlow)
 
     // TODO: Should we really create a new flow each time?
     def httpConnection(

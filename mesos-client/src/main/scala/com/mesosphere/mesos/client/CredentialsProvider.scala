@@ -45,6 +45,7 @@ case class JwtProvider(uid: String, privateKey: String, root: URL)(
   }
 
   override def nextToken(): Future[HttpCredentials] = {
+    println("Fetching next token")
     Http().singleRequest(acsTokenRequest).flatMap { response =>
       // TODO: Use json unmarshaller directly.
       Unmarshal(response.entity).to[String].map { body =>
