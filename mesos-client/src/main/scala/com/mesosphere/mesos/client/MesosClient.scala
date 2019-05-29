@@ -173,6 +173,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           setHandler(requestsOutlet, new OutHandler {
             override def onPull(): Unit = {
               if(token.isDefined) pull(callsInlet)
+              else logger.info("no token")
             }
           })
         }
