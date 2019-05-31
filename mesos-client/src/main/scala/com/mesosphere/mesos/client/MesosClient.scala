@@ -134,7 +134,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest =
       HttpRequest(
         HttpMethods.POST,
-        uri = Uri(s"${url.getPath}/api/v1/scheduler"),
+        uri = Uri(s"$url/api/v1/scheduler"),
         entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
         headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
       )
@@ -150,10 +150,13 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
 
           var token = Option.empty[HttpCredentials]
 
+          def isInitialized(): Boolean = token.isDefined // && credentialsRequired
+
           val startGraph = this.getAsyncCallback[Try[HttpCredentials]] {
             case Success(nextToken) =>
               token = Some(nextToken)
-              pull(callsInlet)
+              logger.info(s"Got pulled: ${isAvailable(requestsOutlet)} in startGraph")
+              if(isAvailable(requestsOutlet)) pull(callsInlet)
             case Failure(ex) =>
               logger.error("Could not fetch session token", ex)
               this.failStage(ex)
@@ -172,18 +175,22 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           })
           setHandler(requestsOutlet, new OutHandler {
             override def onPull(): Unit = {
-              if(token.isDefined) pull(callsInlet)
+              if(isInitialized()) pull(callsInlet)
               else logger.info("no token")
+            }
+
+            override def onDownstreamFinish(): Unit = {
+              logger.info("Downstream finished")
+              super.onDownstreamFinish()
             }
           })
         }
       }
     }
 
-    val sessionFlow = SessionFlow()
+    val sessionFlow = Flow.fromGraph(SessionFlow())
     val post: Flow[Array[Byte], HttpRequest, NotUsed] = Flow[Array[Byte]].via(sessionFlow)
 
-    // TODO: Should we really create a new flow each time?
     def httpConnection(
         implicit system: ActorSystem): Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] = {
       logger.info("Create new connection.")
@@ -457,7 +464,7 @@ class MesosClientImpl(
           response.discardEntityBytes()
           throw new IllegalStateException(s"Failed to send a call to Mesos")
         case _ =>
-          logger.debug(s"Mesos call response: $response")
+          logger.debug(s"Mesos call response: ${response.status}")
           response.discardEntityBytes()
       }
     }
@@ -471,6 +478,9 @@ class MesosClientImpl(
       .via(debug("Sending "))
       .via(callSerializer)
       .via(session.post)
-      .via(session.httpConnection)
+      .mapAsync(1) { request =>
+        Http().singleRequest(request)
+      }
+//      .via(session.httpConnection)
       .toMat(responseHandler)(Keep.right)
 }
