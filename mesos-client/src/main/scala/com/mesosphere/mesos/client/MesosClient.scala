@@ -165,6 +165,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
     val authHeader = authorization.map { provider =>
+      // TODO: do not block.
       val creds = Await.result(provider.nextToken(), 2.minutes)
       Authorization(creds)
     }.toList
