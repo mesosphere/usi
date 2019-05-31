@@ -5,6 +5,7 @@ import java.net.URL
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.Http.HostConnectionPool
 import akka.http.scaladsl.model.MediaType.Compressible
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
@@ -191,15 +192,12 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     val sessionFlow = Flow.fromGraph(SessionFlow())
     val post: Flow[Array[Byte], HttpRequest, NotUsed] = Flow[Array[Byte]].via(sessionFlow)
 
-    def httpConnection(
-        implicit system: ActorSystem): Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] = {
-      logger.info("Create new connection.")
-      val connection = if (isSecured) {
-        Http().outgoingConnectionHttps(host = url.getHost, port = port)
+    def connectionPool(implicit system: ActorSystem): Flow[(HttpRequest, NotUsed), (Try[HttpResponse], NotUsed), HostConnectionPool] = {
+      if (isSecured) {
+        Http().cachedHostConnectionPoolHttps(host = url.getHost, port = port)
       } else {
-        Http().outgoingConnection(host = url.getHost, port = port)
+        Http().cachedHostConnectionPool(host = url.getHost, port = port)
       }
-      connection
     }
   }
 
@@ -456,17 +454,20 @@ class MesosClientImpl(
 
   override def killSwitch: KillSwitch = sharedKillSwitch
 
-  private val responseHandler: Sink[HttpResponse, Future[Done]] =
-    Sink.foreach[HttpResponse] { response =>
-      response.status match {
-        case status if status.isFailure() =>
-          logger.info(s"A request to Mesos failed with response: ${response}")
+  private val responseHandler: Sink[(Try[HttpResponse], NotUsed), Future[Done]] =
+    Sink.foreach[(Try[HttpResponse], NotUsed)] {
+      case (Success(response), NotUsed) =>
+        if(response.status.isFailure()) {
+          val body = Await.result(Unmarshal(response.entity).to[String], 10.seconds)
+          logger.info(s"A request to Mesos failed with response: ${response.status}: $body")
+          throw new IllegalStateException(s"Failed to send a call to Mesos: $body")
+        } else {
+          logger.info(s"Headers ${response.headers}")
+          logger.debug(s"Mesos call response: $response")
           response.discardEntityBytes()
-          throw new IllegalStateException(s"Failed to send a call to Mesos")
-        case _ =>
-          logger.debug(s"Mesos call response: ${response.status}")
-          response.discardEntityBytes()
-      }
+        }
+      case (Failure(e), NotUsed) =>
+        throw new IllegalStateException("Connection pool failed.", e)
     }
 
   private val callSerializer: Flow[Call, Array[Byte], NotUsed] = Flow[Call]
@@ -478,9 +479,7 @@ class MesosClientImpl(
       .via(debug("Sending "))
       .via(callSerializer)
       .via(session.post)
-      .mapAsync(1) { request =>
-        Http().singleRequest(request)
-      }
-//      .via(session.httpConnection)
+      .map(request => (request, NotUsed))
+      .via(session.connectionPool)
       .toMat(responseHandler)(Keep.right)
 }
