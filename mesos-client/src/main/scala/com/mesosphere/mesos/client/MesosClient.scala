@@ -189,7 +189,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       }
     }
 
-    val post: Flow[Array[Byte], HttpRequest, NotUsed] = Flow[Array[Byte]].via(SessionFlow())
+    val post: Flow[Array[Byte], HttpRequest, NotUsed] = RestartFlow.withBackoff(1.seconds, 1.seconds, 1)(() => Flow.fromGraph(SessionFlow()))
 
     def connectionPool(implicit system: ActorSystem): Flow[(HttpRequest, NotUsed), (Try[HttpResponse], NotUsed), HostConnectionPool] = {
       if (isSecured) {
