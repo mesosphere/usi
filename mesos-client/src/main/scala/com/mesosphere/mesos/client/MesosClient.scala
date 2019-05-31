@@ -5,14 +5,12 @@ import java.net.URL
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.Http.HostConnectionPool
 import akka.http.scaladsl.model.MediaType.Compressible
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
+import akka.http.scaladsl.model.headers.Authorization
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.alpakka.recordio.scaladsl.RecordIOFraming
 import akka.stream.scaladsl._
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.stream.{Materializer, OverflowStrategy, _}
 import akka.util.ByteString
 import akka.{Done, NotUsed}
@@ -127,78 +125,6 @@ trait MesosClient {
 
 object MesosClient extends StrictLogging with StrictLoggingFlow {
   case class MesosRedirectException(leader: URL) extends Exception(s"New mesos leader available at $leader")
-
-  case class Session(url: URL, streamId: String, credentials: Option[CredentialsProvider] = None) {
-    lazy val isSecured: Boolean = url.getProtocol == "https"
-    lazy val port = if (url.getPort == -1) url.getDefaultPort else url.getPort
-
-    def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest =
-      HttpRequest(
-        HttpMethods.POST,
-        uri = Uri(s"$url/api/v1/scheduler"),
-        entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
-        headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
-      )
-
-    case class SessionFlow() extends GraphStage[FlowShape[Array[Byte], HttpRequest]] {
-
-      private val callsInlet = Inlet[Array[Byte]]("specs")
-      private val requestsOutlet = Outlet[HttpRequest]("effects")
-      override val shape = FlowShape.of(callsInlet, requestsOutlet)
-
-      override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
-        new GraphStageLogic(shape) {
-
-          var token = Option.empty[HttpCredentials]
-
-          def isInitialized(): Boolean = token.isDefined // && credentialsRequired
-
-          val startGraph = this.getAsyncCallback[Try[HttpCredentials]] {
-            case Success(nextToken) =>
-              token = Some(nextToken)
-              logger.info(s"Got pulled: ${isAvailable(requestsOutlet)} in startGraph")
-              if(isAvailable(requestsOutlet)) pull(callsInlet)
-            case Failure(ex) =>
-              logger.error("Could not fetch session token", ex)
-              this.failStage(ex)
-          }
-
-          override def preStart(): Unit = {
-            logger.info("Starting stage")
-            import scala.concurrent.ExecutionContext.Implicits.global
-            credentials.get.nextToken().onComplete(startGraph.invoke)
-          }
-
-          setHandler(callsInlet, new InHandler {
-            override def onPush(): Unit = {
-              push(requestsOutlet, createPostRequest(grab(callsInlet), token))
-            }
-          })
-          setHandler(requestsOutlet, new OutHandler {
-            override def onPull(): Unit = {
-              if(isInitialized()) pull(callsInlet)
-              else logger.info("no token")
-            }
-
-            override def onDownstreamFinish(): Unit = {
-              logger.info("Downstream finished")
-              super.onDownstreamFinish()
-            }
-          })
-        }
-      }
-    }
-
-    val post: Flow[Array[Byte], HttpRequest, NotUsed] = RestartFlow.withBackoff(1.seconds, 1.seconds, 1)(() => Flow.fromGraph(SessionFlow()))
-
-    def connectionPool(implicit system: ActorSystem): Flow[(HttpRequest, NotUsed), (Try[HttpResponse], NotUsed), HostConnectionPool] = {
-      if (isSecured) {
-        Http().cachedHostConnectionPoolHttps(host = url.getHost, port = port)
-      } else {
-        Http().cachedHostConnectionPool(host = url.getHost, port = port)
-      }
-    }
-  }
 
   val MesosStreamIdHeaderName = "Mesos-Stream-Id"
   def MesosStreamIdHeader(streamId: String) =
@@ -439,7 +365,7 @@ class MesosClientImpl(
     val frameworkInfo: FrameworkInfo,
     sharedKillSwitch: SharedKillSwitch,
     val subscribed: Event.Subscribed,
-    val session: MesosClient.Session,
+    val session: Session,
     /**
       * Events from Mesos scheduler, sans initial Subscribed event.
       */
