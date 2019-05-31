@@ -189,8 +189,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       }
     }
 
-    val sessionFlow = Flow.fromGraph(SessionFlow())
-    val post: Flow[Array[Byte], HttpRequest, NotUsed] = Flow[Array[Byte]].via(sessionFlow)
+    val post: Flow[Array[Byte], HttpRequest, NotUsed] = Flow[Array[Byte]].via(SessionFlow())
 
     def connectionPool(implicit system: ActorSystem): Flow[(HttpRequest, NotUsed), (Try[HttpResponse], NotUsed), HostConnectionPool] = {
       if (isSecured) {
@@ -458,6 +457,7 @@ class MesosClientImpl(
     Sink.foreach[(Try[HttpResponse], NotUsed)] {
       case (Success(response), NotUsed) =>
         if(response.status.isFailure()) {
+          // TODO: Do not block.
           val body = Await.result(Unmarshal(response.entity).to[String], 10.seconds)
           logger.info(s"A request to Mesos failed with response: ${response.status}: $body")
           throw new IllegalStateException(s"Failed to send a call to Mesos: $body")
