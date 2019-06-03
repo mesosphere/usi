@@ -53,7 +53,7 @@ case class JwtProvider(uid: String, privateKey: String, root: URL)(
 
   val acsTokenRequest: HttpRequest = {
     val token = JwtJson4s.encode(claim, privateKey, RS256)
-    val data: String = compact(render(JObject(("uid", uid), ("token", token))))
+    val data: String = compact(render(JObject("uid" -> uid, "token" -> token)))
 
     HttpRequest(
       method = HttpMethods.POST,
