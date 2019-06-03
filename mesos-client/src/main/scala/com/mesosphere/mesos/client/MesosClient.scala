@@ -7,7 +7,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.MediaType.Compressible
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.Authorization
+import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.alpakka.recordio.scaladsl.RecordIOFraming
 import akka.stream.scaladsl._
@@ -164,17 +164,13 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       implicit as: ActorSystem) = {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
-    val authHeader = authorization.map { provider =>
-      // TODO: do not block.
-      val creds = Await.result(provider.nextToken(), 2.minutes)
-      Authorization(creds)
-    }.toList
-    val request = HttpRequest(
-      HttpMethods.POST,
-      uri = Uri(s"${url.getPath}/api/v1/scheduler"),
-      entity = HttpEntity(ProtobufMediaType, body),
-      headers = headers.Accept(ProtobufMediaType) :: authHeader
-    )
+    def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest =
+      HttpRequest(
+        HttpMethods.POST,
+        uri = Uri(s"${url.getPath}/api/v1/scheduler"),
+        entity = HttpEntity(ProtobufMediaType, bytes),
+        headers = headers.Accept(ProtobufMediaType) :: maybeCredentials.map(Authorization(_)).toList
+      )
 
     // TODO: Probably should already create session.
     val port = if (url.getPort == -1) url.getDefaultPort else url.getPort
@@ -182,8 +178,15 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     val httpConnection =
       if (isSecured) Http().outgoingConnectionHttps(url.getHost, port) else Http().outgoingConnection(url.getHost, port)
 
-    Source
-      .single(request)
+    val requestSource = authorization match {
+      case Some(provider) =>
+        Source.fromFuture(provider.nextToken()).map { token =>
+          createPostRequest(body, Some(token))
+        }
+      case None => Source.single(createPostRequest(body, None))
+    }
+
+    requestSource
       .via(info(s"Connecting to the new leader: $url "))
       .via(httpConnection)
       .via(info("HttpResponse: "))

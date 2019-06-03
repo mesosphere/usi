@@ -28,7 +28,7 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
   def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest =
     HttpRequest(
       HttpMethods.POST,
-      uri = Uri(s"$url/api/v1/scheduler"),
+      uri = Uri(s"${url.getPath}/api/v1/scheduler"),
       entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
       headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
     )
