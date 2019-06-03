@@ -35,13 +35,15 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     * @param maybeCredentials The session token if required.
     * @return The [[HttpRequest]] with proper headers and body.
     */
-  def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest =
+  def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest = {
+    println(s"Body: ${bytes.map(_.toChar).mkString}")
     HttpRequest(
       HttpMethods.POST,
       uri = Uri(s"${url.getPath}/api/v1/scheduler"),
       entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
       headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
     )
+  }
 
   // Fail and trigger restart if the call was unauthorized.
   def handleRejection(response: Try[HttpResponse]): Try[HttpResponse] = {
@@ -53,16 +55,17 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
   }
 
   /** @return A flow that transforms serialized Mesos calls to proper HTTP requests. */
-  def post(implicit system: ActorSystem): Flow[Array[Byte], Try[HttpResponse], NotUsed] = authorization match {
+  def post(connection: Flow[HttpRequest, Try[HttpResponse], NotUsed]): Flow[Array[Byte], Try[HttpResponse], NotUsed] = authorization match {
     case Some(credentialsProvider) =>
       RestartFlow.withBackoff(1.second, 1.second, 1, 3)(() =>
-        Flow.fromGraph(SessionFlow(credentialsProvider, createPostRequest)).via(connectionPool).map(handleRejection))
+        Flow.fromGraph(SessionFlow(credentialsProvider, createPostRequest)).via(connection).map(handleRejection))
     case None =>
-      Flow[Array[Byte]].map(createPostRequest(_, None)).via(connectionPool)
+      Flow[Array[Byte]].map(createPostRequest(_, None)).via(connection)
   }
 
   /** @return The connection pool for this session. */
   def connectionPool(implicit system: ActorSystem): Flow[HttpRequest, Try[HttpResponse], NotUsed] = {
+    // Disable pipelining.
     val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
     if (isSecured) {
       Flow[HttpRequest]

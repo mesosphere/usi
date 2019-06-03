@@ -1,33 +1,36 @@
 package com.mesosphere.mesos.client
+import java.net.URL
+
 import akka.NotUsed
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
+import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
 import akka.http.scaladsl.model.headers.{BasicHttpCredentials, HttpCredentials}
-import akka.stream.Supervision
-import akka.stream.scaladsl.{Flow, RestartFlow, Source}
+import akka.stream.scaladsl.{Flow, Source}
 import com.mesosphere.utils.AkkaUnitTest
 
 import scala.concurrent.Future
-import scala.concurrent.duration._
+import scala.util.{Success, Try}
 
 class SessionFlowTest extends AkkaUnitTest {
 
   "The Session flow" should {
-    "restart" ignore {
+    "restart" in {
       val f = new Fixture()
       val calls = List(
         "first".toCharArray.map(_.toByte),
         "second".toCharArray.map(_.toByte),
-        "first".toCharArray.map(_.toByte),
-        "second".toCharArray.map(_.toByte))
-      val flow: Flow[Array[Byte], HttpResponse, NotUsed] =
-        Flow.fromGraph(SessionFlow(f.credentialsProvider, f.createRequest)).zipWithIndex.map {
+        "third".toCharArray.map(_.toByte),
+        "fourth".toCharArray.map(_.toByte),
+        "fifth".toCharArray.map(_.toByte))
+
+      val connection: Flow[HttpRequest, Try[HttpResponse], NotUsed] =
+        Flow[HttpRequest].zipWithIndex.map {
           case (request, index) =>
             logger.info(s"Processing $index")
-            if (index % 2 == 0) throw new IllegalStateException(s"Failed on $index")
-            HttpResponse()
+            if (index % 2 == 1)  Success(HttpResponse(StatusCodes.Unauthorized))
+            else Success(HttpResponse())
         }
       Source(calls)
-        .via(RestartFlow.withBackoff(1.second, 1.second, 1.0, 3)(() => flow))
+        .via(f.session.post(connection))
         .runForeach(println)
         .futureValue
     }
@@ -41,12 +44,7 @@ class SessionFlowTest extends AkkaUnitTest {
       }
     }
 
-    def createRequest(body: Array[Byte], creds: Option[HttpCredentials]) = HttpRequest()
-
-    val decider: Supervision.Decider = {
-      case _: IllegalStateException => Supervision.Restart
-      case _ => Supervision.Stop
-    }
+    val session = Session(new URL("https://example.com"), "streamdid", Some(credentialsProvider))
 
   }
 }
