@@ -43,12 +43,23 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
       headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
     )
 
-  // A flow that transforms serialized Mesos calls to proper HTTP requests.
-  val post: Flow[Array[Byte], HttpRequest, NotUsed] = RestartFlow.withBackoff(1.seconds, 1.seconds, 1)(() =>
-    authorization match {
-      case Some(credentialsProvider) => Flow.fromGraph(SessionFlow(credentialsProvider, createPostRequest))
-      case None => Flow[Array[Byte]].map(createPostRequest(_, None))
-  })
+  // Fail and trigger restart if the call was unauthorized.
+  def handleRejection(response: Try[HttpResponse]): Try[HttpResponse] = {
+    response match {
+      case Success(r) if r.status == StatusCodes.Unauthorized =>
+        throw new IllegalStateException("Session token expired.")
+      case id => id
+    }
+  }
+
+  /** @return A flow that transforms serialized Mesos calls to proper HTTP requests. */
+  def post(implicit system: ActorSystem): Flow[Array[Byte], Try[HttpResponse], NotUsed] = authorization match {
+    case Some(credentialsProvider) =>
+      RestartFlow.withBackoff(1.second, 1.second, 1, 3)(() =>
+        Flow.fromGraph(SessionFlow(credentialsProvider, createPostRequest)).via(connectionPool).map(handleRejection))
+    case None =>
+      Flow[Array[Byte]].map(createPostRequest(_, None)).via(connectionPool)
+  }
 
   /** @return The connection pool for this session. */
   def connectionPool(implicit system: ActorSystem): Flow[HttpRequest, Try[HttpResponse], NotUsed] = {
@@ -61,7 +72,7 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     } else {
       Flow[HttpRequest]
         .map(_ -> NotUsed)
-        .via(Http().cachedHostConnectionPool(host = url.getHost, port = port))
+        .via(Http().cachedHostConnectionPool(host = url.getHost, port = port, settings = poolSettings))
         .map(_._1)
     }
   }

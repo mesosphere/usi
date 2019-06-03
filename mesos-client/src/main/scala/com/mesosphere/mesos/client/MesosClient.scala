@@ -410,6 +410,5 @@ class MesosClientImpl(
       .via(debug("Sending "))
       .via(callSerializer)
       .via(session.post)
-      .via(session.connectionPool)
       .toMat(responseHandler)(Keep.right)
 }
