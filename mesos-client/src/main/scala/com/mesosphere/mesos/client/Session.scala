@@ -4,9 +4,9 @@ import java.net.URL
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.Http.HostConnectionPool
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.stream.scaladsl.{Flow, RestartFlow}
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
@@ -33,7 +33,8 @@ case class Session(url: URL, streamId: String, credentials: Option[CredentialsPr
       headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
     )
 
-  case class SessionFlow(credentialsProvider: CredentialsProvider) extends GraphStage[FlowShape[Array[Byte], HttpRequest]] {
+  case class SessionFlow(credentialsProvider: CredentialsProvider)
+      extends GraphStage[FlowShape[Array[Byte], HttpRequest]] {
 
     private val callsInlet = Inlet[Array[Byte]]("mesosCalls")
     private val requestsOutlet = Outlet[HttpRequest]("httpRequests")
@@ -52,7 +53,7 @@ case class Session(url: URL, streamId: String, credentials: Option[CredentialsPr
           case Success(nextToken) =>
             logger.debug("Initialized session flow.")
             token = Some(nextToken)
-            if(isAvailable(requestsOutlet)) pull(callsInlet)
+            if (isAvailable(requestsOutlet)) pull(callsInlet)
           case Failure(ex) =>
             logger.error("Could not fetch session token", ex)
             this.failStage(ex)
@@ -82,7 +83,7 @@ case class Session(url: URL, streamId: String, credentials: Option[CredentialsPr
           */
         setHandler(requestsOutlet, new OutHandler {
           override def onPull(): Unit = {
-            if(isInitialized) pull(callsInlet)
+            if (isInitialized) pull(callsInlet)
             else logger.debug("Received pull while not initialized.")
           }
         })
@@ -95,15 +96,21 @@ case class Session(url: URL, streamId: String, credentials: Option[CredentialsPr
     credentials match {
       case Some(credentialsProvider) => Flow.fromGraph(SessionFlow(credentialsProvider))
       case None => Flow[Array[Byte]].map(createPostRequest(_, None))
-    }
-  )
+  })
 
   /** @return The connection pool for this session. */
-  def connectionPool(implicit system: ActorSystem): Flow[(HttpRequest, NotUsed), (Try[HttpResponse], NotUsed), HostConnectionPool] = {
+  def connectionPool(implicit system: ActorSystem): Flow[HttpRequest, Try[HttpResponse], NotUsed] = {
+    val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
     if (isSecured) {
-      Http().cachedHostConnectionPoolHttps(host = url.getHost, port = port)
+      Flow[HttpRequest]
+        .map(_ -> NotUsed)
+        .via(Http().cachedHostConnectionPoolHttps(host = url.getHost, port = port, settings = poolSettings))
+        .map(_._1)
     } else {
-      Http().cachedHostConnectionPool(host = url.getHost, port = port)
+      Flow[HttpRequest]
+        .map(_ -> NotUsed)
+        .via(Http().cachedHostConnectionPool(host = url.getHost, port = port))
+        .map(_._1)
     }
   }
 }

@@ -4,7 +4,7 @@ import java.net.URL
 import java.util.UUID
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.Sink
 import com.mesosphere.mesos.client.{CredentialsProvider, JwtProvider, MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
@@ -26,9 +26,9 @@ import scala.collection.JavaConverters._
   *  Not much, but shows the basic idea. Good to test against local Mesos.
   *
   */
-class MesosClientExampleFramework(settings: MesosClientSettings, authorization: Option[CredentialsProvider])(
+class MesosClientExampleFramework(settings: MesosClientSettings, authorization: Option[CredentialsProvider] = None)(
     implicit system: ActorSystem,
-    materializer: ActorMaterializer)
+    materializer: Materializer)
     extends StrictLoggingFlow {
   implicit val executionContext = system.dispatcher
 
@@ -107,5 +107,7 @@ object MesosClientExampleFramework {
     new MesosClientExampleFramework(clientSettings, Some(provider))
   }
 
-//  def apply(settings: MesosClientSettings): MesosClientExampleFramework = new MesosClientExampleFramework(settings)
+  def apply(settings: MesosClientSettings)(
+      implicit system: ActorSystem,
+      materializer: Materializer): MesosClientExampleFramework = new MesosClientExampleFramework(settings)
 }

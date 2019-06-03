@@ -36,12 +36,12 @@ trait MesosClient {
   def frameworkInfo: FrameworkInfo
 
   /**
-    * The information about the current Mesos Master to which this client is connected.
+    * The information about the current connection to Mesos Master.
     *
-    * Note: MesosClient will disconnect on Mesos Master failover. It is the resposibility of the consumer as such to
+    * Note: MesosClient will disconnect on Mesos Master failover. It is the responsibility of the consumer as such to
     * reconnect to Mesos in such an event. As such, this information will be current, so long as we are connected.
     */
-  def session: MesosClient.Session
+  def session: Session
 
   /**
     * Set of helper factory methods that can be used for constructing various calls that the framework will make, to be
@@ -380,10 +380,10 @@ class MesosClientImpl(
 
   override def killSwitch: KillSwitch = sharedKillSwitch
 
-  private val responseHandler: Sink[(Try[HttpResponse], NotUsed), Future[Done]] =
-    Sink.foreach[(Try[HttpResponse], NotUsed)] {
-      case (Success(response), NotUsed) =>
-        if(response.status.isFailure()) {
+  private val responseHandler: Sink[Try[HttpResponse], Future[Done]] =
+    Sink.foreach[Try[HttpResponse]] {
+      case Success(response) =>
+        if (response.status.isFailure()) {
           // TODO: Do not block.
           val body = Await.result(Unmarshal(response.entity).to[String], 10.seconds)
           logger.info(s"A request to Mesos failed with response: ${response.status}: $body")
@@ -393,7 +393,7 @@ class MesosClientImpl(
           logger.debug(s"Mesos call response: $response")
           response.discardEntityBytes()
         }
-      case (Failure(e), NotUsed) =>
+      case Failure(e) =>
         throw new IllegalStateException("Connection pool failed.", e)
     }
 
@@ -406,7 +406,6 @@ class MesosClientImpl(
       .via(debug("Sending "))
       .via(callSerializer)
       .via(session.post)
-      .map(request => (request, NotUsed))
       .via(session.connectionPool)
       .toMat(responseHandler)(Keep.right)
 }

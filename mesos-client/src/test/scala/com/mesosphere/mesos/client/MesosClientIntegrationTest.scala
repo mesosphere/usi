@@ -23,7 +23,7 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
 
     And("connection context should be initialized")
     f.client.session.url.getHost shouldBe f.mesosHost
-    f.client.session.url.getPort shouldBe f.mesosPort
+    f.client.session.port shouldBe f.mesosPort
     f.client.session.streamId.length should be > 1
     f.client.frameworkId.getValue.length should be > 1
   }
