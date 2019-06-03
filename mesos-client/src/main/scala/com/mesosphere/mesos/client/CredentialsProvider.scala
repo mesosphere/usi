@@ -49,9 +49,20 @@ case class JwtProvider(uid: String, privateKey: String, root: URL)(
   import JsonMethods.{parse, render, compact}
 
   private def expireIn(duration: Duration): Long = Instant.now.getEpochSecond + duration.toSeconds
-  private val claim = JObject("uid" -> uid, "exp" -> expireIn(20.seconds)) // TODO: configure token expiration.
 
-  val acsTokenRequest: HttpRequest = {
+  /**
+    * Construct a claim to authenticate and retrieve a session token. The timeout is for this token ''not'' the session
+    * token that we are requesting. That means if ou login request takes more than twenty seconds the authentication will
+    * fail.
+    *
+    * @return a claim for the user that expires in twenty seconds.
+    */
+  private def claim: JObject = JObject("uid" -> uid, "exp" -> expireIn(20.seconds))
+
+  /** @return a new request for a session token. */
+  def acsTokenRequest: HttpRequest = {
+
+    // Tokenize the claim.
     val token = JwtJson4s.encode(claim, privateKey, RS256)
     val data: String = compact(render(JObject("uid" -> uid, "token" -> token)))
 
