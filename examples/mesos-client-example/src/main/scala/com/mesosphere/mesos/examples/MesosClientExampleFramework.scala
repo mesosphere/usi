@@ -98,7 +98,7 @@ object MesosClientExampleFramework {
     implicit val materializer = ActorMaterializer()
     implicit val context = system.dispatcher
 
-    val dcosRoot = new URL("https://54.201.254.4")
+    val dcosRoot = new URL("https://18.237.132.83")
     val privateKey = scala.io.Source.fromFile("/Users/kjeschkies/Projects/usi/usi.private.pem").mkString
     val provider = JwtProvider("strict-usi", privateKey, dcosRoot)
 
