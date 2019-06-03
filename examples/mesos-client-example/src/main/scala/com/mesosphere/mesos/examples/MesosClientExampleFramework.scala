@@ -95,8 +95,6 @@ object MesosClientExampleFramework {
 
     require(args.length == 2, "Too many arguments")
 
-    println(System.getProperty("akka.ssl-config.trustManager.stores.0"))
-
     implicit val system = ActorSystem()
     implicit val materializer = ActorMaterializer()
     implicit val context = system.dispatcher
