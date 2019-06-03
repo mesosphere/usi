@@ -42,7 +42,8 @@ case class JwtProvider(uid: String, privateKey: String, root: URL)(
     implicit system: ActorSystem,
     materializer: ActorMaterializer,
     context: ExecutionContext)
-    extends CredentialsProvider with StrictLogging {
+    extends CredentialsProvider
+    with StrictLogging {
   import org.json4s._
   import org.json4s.JsonDSL._
   import JsonMethods.{parse, render, compact}

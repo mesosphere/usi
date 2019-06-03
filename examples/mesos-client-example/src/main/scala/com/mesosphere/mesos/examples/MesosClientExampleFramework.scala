@@ -89,17 +89,18 @@ object MesosClientExampleFramework {
     *   {{{curl -L -X PUT -k -H "Authorization: token=$(dcos config show core.dcos_acs_token)" "$(dcos config show core.dcos_url)/acs/api/v1/acls/dcos:superuser/users/strict-usi/full"}}}
     * 5. Download SSL certs:
     *   {{{wget --no-check-certificate -O dcos-ca.crt "$(dcos config show core.dcos_url)/ca/dcos-ca.crt"}}}
-    * 6. Replace {{{dcosRoot}}} with public IP of cluster.
-    * 7. Run!
+    * 6. Run with {{{./gradlew :mesos-client-example:run --stacktrace --args "https://<DC/OS IP> path/to/usi.private.pem"}}}
     */
   def main(args: Array[String]): Unit = {
+
+    require(args.length == 2, "Too many arguments")
 
     implicit val system = ActorSystem()
     implicit val materializer = ActorMaterializer()
     implicit val context = system.dispatcher
 
-    val dcosRoot = new URL("https://18.237.132.83")
-    val privateKey = scala.io.Source.fromFile("/Users/kjeschkies/Projects/usi/usi.private.pem").mkString
+    val dcosRoot = new URL(args(0))
+    val privateKey = scala.io.Source.fromFile(args(1)).mkString
     val provider = JwtProvider("strict-usi", privateKey, dcosRoot)
 
     val mesosUrl = new URL(s"$dcosRoot/mesos")
