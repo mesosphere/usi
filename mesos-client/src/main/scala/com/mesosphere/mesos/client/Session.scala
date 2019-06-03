@@ -15,12 +15,12 @@ import com.typesafe.scalalogging.StrictLogging
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
-case class Session(url: URL, streamId: String, credentials: Option[CredentialsProvider] = None) {
+case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None) {
   lazy val isSecured: Boolean = url.getProtocol == "https"
   lazy val port = if (url.getPort == -1) url.getDefaultPort else url.getPort
 
   /**
-    * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of credentials, ie session token.
+    * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
     * @param bytes The bytes of the serialized Mesos call.
     * @param maybeCredentials The session token if required.
     * @return The [[HttpRequest]] with proper headers and body.
@@ -93,7 +93,7 @@ case class Session(url: URL, streamId: String, credentials: Option[CredentialsPr
 
   // A flow that transforms serialized Mesos calls to proper HTTP requests.
   val post: Flow[Array[Byte], HttpRequest, NotUsed] = RestartFlow.withBackoff(1.seconds, 1.seconds, 1)(() =>
-    credentials match {
+    authorization match {
       case Some(credentialsProvider) => Flow.fromGraph(SessionFlow(credentialsProvider))
       case None => Flow[Array[Byte]].map(createPostRequest(_, None))
   })

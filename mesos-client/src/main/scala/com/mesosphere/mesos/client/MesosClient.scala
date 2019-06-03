@@ -178,7 +178,9 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
 
     // TODO: Probably should already create session.
     val port = if (url.getPort == -1) url.getDefaultPort else url.getPort
-    val httpConnection = Http().outgoingConnectionHttps(url.getHost, port)
+    val isSecured: Boolean = url.getProtocol == "https"
+    val httpConnection =
+      if (isSecured) Http().outgoingConnectionHttps(url.getHost, port) else Http().outgoingConnection(url.getHost, port)
 
     Source
       .single(request)
