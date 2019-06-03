@@ -394,7 +394,6 @@ class MesosClientImpl(
           logger.info(s"A request to Mesos failed with response: ${response.status}: $body")
           throw new IllegalStateException(s"Failed to send a call to Mesos: $body")
         } else {
-          logger.info(s"Headers ${response.headers}")
           logger.debug(s"Mesos call response: $response")
           response.discardEntityBytes()
         }

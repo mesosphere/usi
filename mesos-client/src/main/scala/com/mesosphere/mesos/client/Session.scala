@@ -15,6 +15,16 @@ import com.typesafe.scalalogging.StrictLogging
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
+/**
+  * A session captures the connection information with Mesos. This is among other things the URL and credentials providers.
+  *
+  * It behaves similar to Python Request's [[https://2.python-requests.org/en/master/user/advanced/#session-objects Session object]].
+  * Thus it provides methods to construct and connect to Mesos.
+  *
+  * @param url The Mesos master URL.
+  * @param streamId The Mesos stream ID. See the [[http://mesos.apache.org/documentation/latest/scheduler-http-api/#calls docs]] for details.
+  * @param authorization A [[CredentialsProvider]] if the connection is secured.
+  */
 case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None) {
   lazy val isSecured: Boolean = url.getProtocol == "https"
   lazy val port = if (url.getPort == -1) url.getDefaultPort else url.getPort
@@ -33,68 +43,10 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
       headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
     )
 
-  case class SessionFlow(credentialsProvider: CredentialsProvider)
-      extends GraphStage[FlowShape[Array[Byte], HttpRequest]] {
-
-    private val callsInlet = Inlet[Array[Byte]]("mesosCalls")
-    private val requestsOutlet = Outlet[HttpRequest]("httpRequests")
-    override val shape = FlowShape.of(callsInlet, requestsOutlet)
-
-    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
-      new GraphStageLogic(shape) with StrictLogging {
-
-        var token = Option.empty[HttpCredentials]
-
-        /** @return whether the session flow is initialized and has a sessions token set. */
-        def isInitialized: Boolean = token.isDefined
-
-        // Handle session token request and start pulling if downstream is ready.
-        val startGraph = this.getAsyncCallback[Try[HttpCredentials]] {
-          case Success(nextToken) =>
-            logger.debug("Initialized session flow.")
-            token = Some(nextToken)
-            if (isAvailable(requestsOutlet)) pull(callsInlet)
-          case Failure(ex) =>
-            logger.error("Could not fetch session token", ex)
-            this.failStage(ex)
-        }
-
-        /**
-          * Initialize session flow by fetching the next session token. The session flow will back pressure until the
-          * first token is set.
-          */
-        override def preStart(): Unit = {
-          logger.debug("Initializing session flow.")
-          import scala.concurrent.ExecutionContext.Implicits.global
-          credentialsProvider.nextToken().onComplete(startGraph.invoke)
-        }
-
-        /**
-          * Map serialized calls to [[HttpRequest]] with attached token.
-          */
-        setHandler(callsInlet, new InHandler {
-          override def onPush(): Unit = {
-            push(requestsOutlet, createPostRequest(grab(callsInlet), token))
-          }
-        })
-
-        /**
-          * Forward pull or back pressure if no session token is available.
-          */
-        setHandler(requestsOutlet, new OutHandler {
-          override def onPull(): Unit = {
-            if (isInitialized) pull(callsInlet)
-            else logger.debug("Received pull while not initialized.")
-          }
-        })
-      }
-    }
-  }
-
   // A flow that transforms serialized Mesos calls to proper HTTP requests.
   val post: Flow[Array[Byte], HttpRequest, NotUsed] = RestartFlow.withBackoff(1.seconds, 1.seconds, 1)(() =>
     authorization match {
-      case Some(credentialsProvider) => Flow.fromGraph(SessionFlow(credentialsProvider))
+      case Some(credentialsProvider) => Flow.fromGraph(SessionFlow(credentialsProvider, createPostRequest))
       case None => Flow[Array[Byte]].map(createPostRequest(_, None))
   })
 
@@ -111,6 +63,66 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
         .map(_ -> NotUsed)
         .via(Http().cachedHostConnectionPool(host = url.getHost, port = port))
         .map(_._1)
+    }
+  }
+}
+
+case class SessionFlow(
+    credentialsProvider: CredentialsProvider,
+    requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest)
+    extends GraphStage[FlowShape[Array[Byte], HttpRequest]] {
+
+  private val callsInlet = Inlet[Array[Byte]]("mesosCalls")
+  private val requestsOutlet = Outlet[HttpRequest]("httpRequests")
+  override val shape = FlowShape.of(callsInlet, requestsOutlet)
+
+  override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
+    new GraphStageLogic(shape) with StrictLogging {
+
+      var token = Option.empty[HttpCredentials]
+
+      /** @return whether the session flow is initialized and has a sessions token set. */
+      def isInitialized: Boolean = token.isDefined
+
+      // Handle session token request and start pulling if downstream is ready.
+      val startGraph = this.getAsyncCallback[Try[HttpCredentials]] {
+        case Success(nextToken) =>
+          logger.debug("Initialized session flow.")
+          token = Some(nextToken)
+          if (isAvailable(requestsOutlet)) pull(callsInlet)
+        case Failure(ex) =>
+          logger.error("Could not fetch session token", ex)
+          this.failStage(ex)
+      }
+
+      /**
+        * Initialize session flow by fetching the next session token. The session flow will back pressure until the
+        * first token is set.
+        */
+      override def preStart(): Unit = {
+        logger.debug("Initializing session flow.")
+        import scala.concurrent.ExecutionContext.Implicits.global
+        credentialsProvider.nextToken().onComplete(startGraph.invoke)
+      }
+
+      /**
+        * Map serialized calls to [[HttpRequest]] with attached token.
+        */
+      setHandler(callsInlet, new InHandler {
+        override def onPush(): Unit = {
+          push(requestsOutlet, requestFactory(grab(callsInlet), token))
+        }
+      })
+
+      /**
+        * Forward pull or back pressure if no session token is available.
+        */
+      setHandler(requestsOutlet, new OutHandler {
+        override def onPull(): Unit = {
+          if (isInitialized) pull(callsInlet)
+          else logger.debug("Received pull while not initialized.")
+        }
+      })
     }
   }
 }
