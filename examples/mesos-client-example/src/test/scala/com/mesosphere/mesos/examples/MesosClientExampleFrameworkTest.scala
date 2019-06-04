@@ -12,7 +12,7 @@ class MesosClientExampleFrameworkTest extends AkkaUnitTest with MesosClusterTest
   override lazy val akkaConfig: Config = ConfigFactory.parseString(s"""
     |akka.test.default-timeout=${patienceConfig.timeout.millisPart}
     |akka.ssl-config.trustManager.stores = [ { path: $${java.home}/lib/security/cacerts } ]
-    """.stripMargin).withFallback(ConfigFactory.load())
+    """.stripMargin).withFallback(ConfigFactory.load()).resolve()
 
   "MesosClientExampleFramework should successfully connect to Mesos" in withFixture() { f =>
     Then("once example framework is connected, Mesos should return it's framework Id")
