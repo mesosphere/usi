@@ -6,19 +6,27 @@ import com.mesosphere.usi.core.models.{
   ExpungePod,
   LaunchPod,
   PodId,
+  PodRecordUpdatedEvent,
   PodStatus,
   PodStatusUpdatedEvent,
   SchedulerCommand,
   StateEventOrSnapshot,
   StateSnapshot
 }
-import com.mesosphere.usi.helloworld.runspecs.{RunSpecInstanceId, RunSpecService}
+import com.mesosphere.usi.helloworld.runspecs.{
+  InstanceStatus,
+  InstanceTracker,
+  ServiceController,
+  ServiceSpecInstanceId
+}
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class KeepAliveWatcher(appsService: RunSpecService)(implicit val ec: ExecutionContext) extends LazyLogging {
+class KeepAliveWatcher(appsService: ServiceController, instanceTracker: InstanceTracker)(
+    implicit val ec: ExecutionContext)
+    extends LazyLogging {
 
   // KeepAliveWatcher looks for a terminal task and then restarts the whole pod.
   val flow: Flow[StateEventOrSnapshot, SchedulerCommand, NotUsed] = Flow[StateEventOrSnapshot].map {
@@ -27,7 +35,20 @@ class KeepAliveWatcher(appsService: RunSpecService)(implicit val ec: ExecutionCo
       logger.info(s"Initial state snapshot: $s")
       DoNothing
 
-    case PodStatusUpdatedEvent(id, Some(PodStatus(_, taskStatuses))) =>
+    case e @ PodRecordUpdatedEvent(id, Some(_)) =>
+      instanceTracker.processUpdate(e)
+
+    case e @ PodStatusUpdatedEvent(id, Some(PodStatus(_, taskStatuses))) =>
+      instanceTracker.processUpdate(e)
+      val serviceInstanceId = ServiceSpecInstanceId.fromPodId(id)
+      val maybeServiceState = instanceTracker.serviceState(serviceInstanceId.serviceSpecId)
+
+      maybeServiceState.map {
+        _.instances.values.map(_.status).find {
+          case _: InstanceStatus.TerminalInstance => true
+        }
+      }
+
       import TaskState._
       def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
       // We're only interested in the bad task statuses for our pod
@@ -48,10 +69,10 @@ class KeepAliveWatcher(appsService: RunSpecService)(implicit val ec: ExecutionCo
         Future.successful(Nil)
 
       case SpawnNewIncarnation(podId) =>
-        val instanceId = RunSpecInstanceId.fromPodId(podId)
+        val instanceId = ServiceSpecInstanceId.fromPodId(podId)
         val newPodId = instanceId.nextIncarnation.toPodId
 
-        appsService.findRunSpec(instanceId.runSpecId).map {
+        appsService.findRunSpec(instanceId.serviceSpecId).map {
           // AppInfo found
           case Some(appInfo) =>
             List(

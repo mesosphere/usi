@@ -29,10 +29,10 @@ import org.apache.mesos.v1.Protos.TaskState._
   * @param mat
   * @param ec
   */
-class InMemoryDemoRunSpecService(
+class InMemoryServiceController(
     specSink: Sink[SchedulerCommand, NotUsed],
     stateSource: Source[StateEventOrSnapshot, NotUsed])(implicit mat: Materializer, ec: ExecutionContext)
-    extends RunSpecService
+    extends ServiceController
     with LazyLogging {
 
   private val specUpdateQueue = Source
@@ -41,8 +41,8 @@ class InMemoryDemoRunSpecService(
     .to(specSink)
     .run()
 
-  private val database: ConcurrentHashMap[RunSpecId, RunSpecState] =
-    new ConcurrentHashMap[RunSpecId, RunSpecState]()
+  private val state: ConcurrentHashMap[ServiceSpecId, RunSpecState] =
+    new ConcurrentHashMap[ServiceSpecId, RunSpecState]()
 
   stateSource.runForeach {
     case event: StateEventOrSnapshot =>
@@ -66,9 +66,9 @@ class InMemoryDemoRunSpecService(
             }
             .getOrElse(Finished) // no tasks found
 
-          val appId = RunSpecInstanceId.fromPodId(id).runSpecId
+          val appId = ServiceSpecInstanceId.fromPodId(id).serviceSpecId
 
-          database.computeIfPresent(appId, { (appId, state) =>
+          state.computeIfPresent(appId, { (appId, state) =>
             state.copy(status = newPodStaus)
           })
 
@@ -77,21 +77,21 @@ class InMemoryDemoRunSpecService(
 
   }
 
-  override def launchRunSpec(id: RunSpecId, runSpec: RunSpec): Future[LaunchResult] = {
+  override def launchServiceFromSpec(id: ServiceSpecId, runSpec: RunSpec): Future[LaunchResult] = {
 
-    if (database.containsKey(id)) {
+    if (state.containsKey(id)) {
       Future.successful(LaunchResults.AlreadyExist)
     } else {
 
       val incarnation = 1
-      val runSpecInstanceId = RunSpecInstanceId(id, UUID.randomUUID(), incarnation)
+      val runSpecInstanceId = ServiceSpecInstanceId(id, InstanceId(UUID.randomUUID()), incarnation)
 
       val specUpdated = LaunchPod(runSpecInstanceId.toPodId, runSpec)
 
       specUpdateQueue.offer(specUpdated :: Nil).map {
         case QueueOfferResult.Enqueued =>
           val applicationState = RunSpecState(runSpecInstanceId, runSpec, Staging)
-          database.putIfAbsent(id, applicationState)
+          state.putIfAbsent(id, applicationState)
           LaunchResults.Launched(runSpecInstanceId)
 
         case QueueOfferResult.Dropped =>
@@ -108,24 +108,24 @@ class InMemoryDemoRunSpecService(
   }
 
   override def listRunSpecs(): Future[Vector[RunSpecInfo]] = {
-    val results = database.elements().asScala.map(state2appInfo).toVector
+    val results = state.elements().asScala.map(state2appInfo).toVector
 
     Future.successful(results)
   }
 
-  override def findRunSpec(id: RunSpecId): Future[Option[RunSpecInfo]] = {
-    database.get(id) match {
+  override def findRunSpec(id: ServiceSpecId): Future[Option[RunSpecInfo]] = {
+    state.get(id) match {
       case null => Future.successful(None)
       case state => Future.successful(Some(state2appInfo(state)))
     }
   }
 
-  override def wipeRunspec(id: RunSpecId): Future[WipeResult] = {
-    if (!database.containsKey(id)) {
+  override def wipeRunspec(id: ServiceSpecId): Future[WipeResult] = {
+    if (!state.containsKey(id)) {
       Future.successful(WipeResults.Wiped)
     } else {
 
-      val appState = database.get(id)
+      val appState = state.get(id)
 
       val podId = appState.runSpecInstanceId.toPodId
 
@@ -134,7 +134,7 @@ class InMemoryDemoRunSpecService(
       specUpdateQueue.offer(killPod :: expungePod :: Nil).map {
         case QueueOfferResult.Enqueued =>
           // TODO remove it once USI will provide the needed events.
-          database.remove(id)
+          state.remove(id)
           WipeResults.Wiped
 
         case QueueOfferResult.Dropped =>
@@ -150,7 +150,7 @@ class InMemoryDemoRunSpecService(
   }
 
   private def state2appInfo(state: RunSpecState): RunSpecInfo = {
-    RunSpecInfo(state.runSpecInstanceId.runSpecId, state.runSpec, state.status.toString)
+    RunSpecInfo(state.runSpecInstanceId.serviceSpecId, state.runSpec, state.status.toString)
   }
 }
 
@@ -158,4 +158,4 @@ private[runspecs] sealed trait Status
 private[runspecs] case object Staging extends Status
 private[runspecs] case object Running extends Status
 private[runspecs] case object Finished extends Status
-private[runspecs] case class RunSpecState(runSpecInstanceId: RunSpecInstanceId, runSpec: RunSpec, status: Status)
+private[runspecs] case class RunSpecState(runSpecInstanceId: ServiceSpecInstanceId, runSpec: RunSpec, status: Status)

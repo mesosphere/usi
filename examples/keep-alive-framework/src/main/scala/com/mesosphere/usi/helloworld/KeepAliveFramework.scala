@@ -7,9 +7,9 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{BroadcastHub, Keep, MergeHub}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.usi.core.Scheduler
-import com.mesosphere.usi.helloworld.runspecs.InMemoryDemoRunSpecService
 import com.mesosphere.usi.helloworld.http.Routes
 import com.mesosphere.usi.helloworld.keepalive.KeepAliveWatcher
+import com.mesosphere.usi.helloworld.runspecs.{InMemoryInstanceTracker, InMemoryServiceController}
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
@@ -34,9 +34,11 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 
   val sharableSource = source.toMat(BroadcastHub.sink)(Keep.right).run()
 
-  val appsService = new InMemoryDemoRunSpecService(sharableSink, sharableSource)
+  val instanceTracker = new InMemoryInstanceTracker
 
-  val keepAliveFlow = new KeepAliveWatcher(appsService)
+  val appsService = new InMemoryServiceController(sharableSink, sharableSource)
+
+  val keepAliveFlow = new KeepAliveWatcher(appsService, instanceTracker)
 
   val stopped = Promise[Done]()
 

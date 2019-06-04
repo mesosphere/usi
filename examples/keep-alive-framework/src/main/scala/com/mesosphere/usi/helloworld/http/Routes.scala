@@ -8,16 +8,16 @@ import JsonDTO._
 import com.mesosphere.usi.core.models.RunSpec
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.usi.helloworld.Configuration
-import com.mesosphere.usi.helloworld.runspecs.{RunSpecId, RunSpecInfo, RunSpecService, LaunchResults}
+import com.mesosphere.usi.helloworld.runspecs.{ServiceSpecId, RunSpecInfo, ServiceController, LaunchResults}
 
-class Routes(appsService: RunSpecService) {
+class Routes(appsService: ServiceController) {
 
   val root =
     pathPrefix("v0") {
       pathPrefix("start") {
         post {
           entity(as[JsonRunSpecDefinition]) { jsonApp =>
-            val id = RunSpecId(jsonApp.id)
+            val id = ServiceSpecId(jsonApp.id)
 
             val requirements = List(
               ScalarRequirement(ResourceType.CPUS, jsonApp.cpus),
@@ -31,7 +31,7 @@ class Routes(appsService: RunSpecService) {
               Configuration.role
             )
 
-            onSuccess(appsService.launchRunSpec(id, runSpec)) {
+            onSuccess(appsService.launchServiceFromSpec(id, runSpec)) {
               case LaunchResults.AlreadyExist =>
                 complete(StatusCodes.Conflict -> "runspec already exists")
 
@@ -58,7 +58,7 @@ class Routes(appsService: RunSpecService) {
         } ~
         pathPrefix("remove" / Segment) { appId =>
           post {
-            onSuccess(appsService.wipeRunspec(RunSpecId(appId))) { _ =>
+            onSuccess(appsService.wipeRunspec(ServiceSpecId(appId))) { _ =>
               complete(StatusCodes.OK)
             }
           }
