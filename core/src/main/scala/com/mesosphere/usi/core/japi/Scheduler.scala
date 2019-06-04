@@ -32,7 +32,7 @@ object Scheduler {
       client: MesosClient,
       podRecordRepository: PodRecordRepository,
       schedulerSettings: SchedulerSettings): CompletableFuture[FlowResult] = {
-    val flow = Flow.fromSinkAndSource(client.mesosSink, client.mesosSource)
+    val flow = Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource)
     fromFlow(client.calls, podRecordRepository, flow, schedulerSettings)
   }
 
