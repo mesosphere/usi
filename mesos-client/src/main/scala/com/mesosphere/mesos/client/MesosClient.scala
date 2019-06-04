@@ -409,6 +409,7 @@ class MesosClientImpl(
       .via(sharedKillSwitch.flow[Call])
       .via(debug("Sending "))
       .via(callSerializer)
-      .via(session.post(session.connectionPool))
+      .via(session.postSimple)
+//      .via(session.post(session.connectionPool))
       .toMat(responseHandler)(Keep.right)
 }

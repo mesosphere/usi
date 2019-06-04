@@ -20,13 +20,14 @@ class SessionFlowTest extends AkkaUnitTest {
         "second".toCharArray.map(_.toByte),
         "third".toCharArray.map(_.toByte),
         "fourth".toCharArray.map(_.toByte),
-        "fifth".toCharArray.map(_.toByte))
+        "fifth".toCharArray.map(_.toByte)
+      )
 
       val connection: Flow[HttpRequest, Try[HttpResponse], NotUsed] =
         Flow[HttpRequest].zipWithIndex.map {
           case (request, index) =>
             logger.info(s"Processing $index")
-            if (index % 2 == 1)  Success(HttpResponse(StatusCodes.Unauthorized))
+            if (index % 2 == 1) Success(HttpResponse(StatusCodes.Unauthorized))
             else Success(HttpResponse())
         }
       Source(calls)

@@ -1,8 +1,8 @@
 package com.mesosphere.mesos.client
 import java.net.URL
 
-import akka.NotUsed
-import akka.actor.ActorSystem
+import akka.{NotUsed, util}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props, Stash, Status}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
@@ -39,7 +39,7 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     println(s"Body: ${bytes.map(_.toChar).mkString}")
     HttpRequest(
       HttpMethods.POST,
-      uri = Uri(s"${url.getPath}/api/v1/scheduler"),
+      uri = Uri(s"$url/api/v1/scheduler"),
       entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
       headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
     )
@@ -55,13 +55,24 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
   }
 
   /** @return A flow that transforms serialized Mesos calls to proper HTTP requests. */
-  def post(connection: Flow[HttpRequest, Try[HttpResponse], NotUsed]): Flow[Array[Byte], Try[HttpResponse], NotUsed] = authorization match {
-    case Some(credentialsProvider) =>
-      RestartFlow.withBackoff(1.second, 1.second, 1, 3)(() =>
-        Flow.fromGraph(SessionFlow(credentialsProvider, createPostRequest)).via(connection).map(handleRejection))
-    case None =>
-      Flow[Array[Byte]].map(createPostRequest(_, None)).via(connection)
-  }
+  def post(connection: Flow[HttpRequest, Try[HttpResponse], NotUsed]): Flow[Array[Byte], Try[HttpResponse], NotUsed] =
+    authorization match {
+      case Some(credentialsProvider) =>
+        RestartFlow.withBackoff(1.second, 1.second, 1, 3)(() =>
+          Flow.fromGraph(SessionFlow(credentialsProvider, createPostRequest)).via(connection).map(handleRejection))
+      case None =>
+        Flow[Array[Byte]].map(createPostRequest(_, None)).via(connection)
+    }
+
+  def postSimple(implicit system: ActorSystem): Flow[Array[Byte], Try[HttpResponse], NotUsed] =
+    authorization match {
+      case Some(credentialsProvider) =>
+        implicit val askTimeout = util.Timeout(20.seconds)
+        val sessionActor = system.actorOf(SessionActor.props(credentialsProvider, createPostRequest))
+        Flow[Array[Byte]].ask[HttpResponse](1)(sessionActor).map(Success(_))
+      case None =>
+        Flow[Array[Byte]].map(createPostRequest(_, None)).mapAsync(1)(Http().singleRequest(_)).map(Success(_))
+    }
 
   /** @return The connection pool for this session. */
   def connectionPool(implicit system: ActorSystem): Flow[HttpRequest, Try[HttpResponse], NotUsed] = {
@@ -78,6 +89,73 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
         .via(Http().cachedHostConnectionPool(host = url.getHost, port = port, settings = poolSettings))
         .map(_._1)
     }
+  }
+}
+
+object SessionActor {
+  def props(
+      credentialsProvider: CredentialsProvider,
+      requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest): Props = {
+    Props(new SessionActor(credentialsProvider, requestFactory))
+  }
+}
+
+class SessionActor(
+    credentialsProvider: CredentialsProvider,
+    requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest)
+    extends Actor
+    with Stash
+    with StrictLogging {
+  import akka.pattern.pipe
+  import scala.concurrent.ExecutionContext.Implicits.global
+
+  case class Response(originalCall: Array[Byte], originalSender: ActorRef, response: HttpResponse)
+
+  override def preStart(): Unit = {
+    super.preStart()
+    credentialsProvider.nextToken().pipeTo(self)
+  }
+
+  override def receive: Receive = initializing
+
+  def initializing: Receive = {
+    // TODO: Handle nextToken errors.
+    case credentials: HttpCredentials =>
+      logger.info("Retrieved token")
+      context.become(initialized(credentials))
+      unstashAll()
+    case _ => stash()
+  }
+
+  def initialized(credentials: HttpCredentials): Receive = {
+    case call: Array[Byte] =>
+      val request = requestFactory(call, Some(credentials))
+      val originalSender = sender()
+      logger.info("Processing next call.")
+      Http()(context.system)
+        .singleRequest(request)
+        .onComplete {
+          case Success(response) =>
+            logger.info(s"HTTP response: ${response.status}")
+            self ! Response(call, originalSender, response)
+          case Failure(ex) =>
+            logger.error("HTTP request failed", ex)
+            // Fail stream.
+            originalSender ! Status.Failure(ex)
+        }
+    case Response(originalCall, originalSender, response) =>
+      logger.info(s"Call replied with ${response.status}")
+      if (response.status == StatusCodes.Unauthorized) {
+        logger.info("Refreshing token")
+
+        context.become(initializing)
+        credentialsProvider.nextToken().pipeTo(self)
+
+        // Queue current call again.
+        self ! originalCall
+      } else {
+        originalSender ! response
+      }
   }
 }
 
