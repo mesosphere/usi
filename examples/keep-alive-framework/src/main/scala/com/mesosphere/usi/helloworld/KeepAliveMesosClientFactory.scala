@@ -25,7 +25,7 @@ class KeepAliveMesosClientFactory(settings: MesosClientSettings, authorization: 
         .get("user.name")
         .getOrElse("root"))
     .setName("KeepAliveFramework")
-    .addRoles("*")
+    .addRoles("slave_public")
     .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .setFailoverTimeout(0d)
     .build()

@@ -13,7 +13,7 @@ object KeepAlivePodSpecHelper {
   val runSpec: RunTemplate = RunTemplate(
     resourceRequirements = List(ScalarRequirement(ResourceType.CPUS, 0.001), ScalarRequirement(ResourceType.MEM, 32)),
     shellCommand = """echo "Hello, world" && sleep 30""",
-    role = "test"
+    role = "slave_public"
   )
 
   def generatePodSpec(): RunningPodSpec = {
