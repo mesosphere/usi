@@ -37,7 +37,6 @@ class FCFSOfferMatcher extends OfferMatcher {
   }
 
   @tailrec private def matchPodSpecsTaskRecords(
-      offer: Mesos.Offer,
       remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
       result: Map[RunningPodSpec, List[Mesos.Resource]],
       pendingLaunchPodSpecs: List[RunningPodSpec]): Map[RunningPodSpec, List[Mesos.Resource]] = {
@@ -49,9 +48,9 @@ class FCFSOfferMatcher extends OfferMatcher {
       case podSpec :: rest =>
         maybeMatchPodSpec(remainingResources, Nil, podSpec.runSpec.resourceRequirements.toList) match {
           case Some((matchedResources, newRemainingResources)) =>
-            matchPodSpecsTaskRecords(offer, newRemainingResources, result.updated(podSpec, matchedResources), rest)
+            matchPodSpecsTaskRecords(newRemainingResources, result.updated(podSpec, matchedResources), rest)
           case None =>
-            matchPodSpecsTaskRecords(offer, remainingResources, result, rest)
+            matchPodSpecsTaskRecords(remainingResources, result, rest)
         }
     }
   }
@@ -60,6 +59,6 @@ class FCFSOfferMatcher extends OfferMatcher {
       offer: Mesos.Offer,
       podSpecs: Iterable[RunningPodSpec]): Map[RunningPodSpec, List[Mesos.Resource]] = {
     val groupedResources = offer.getResourcesList.asScala.groupBy(r => ResourceType.fromName(r.getName))
-    matchPodSpecsTaskRecords(offer, groupedResources, Map.empty, podSpecs.toList)
+    matchPodSpecsTaskRecords(groupedResources, Map.empty, podSpecs.toList)
   }
 }
