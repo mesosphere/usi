@@ -1,0 +1,60 @@
+{
+  "env": {
+  },
+  "id": "/usi/keep-alive-framework",
+  "backoffFactor": 1.15,
+  "backoffSeconds": 1,
+  "cmd": "export JAVA_HOME=$(ls -d $MESOS_SANDBOX/jdk*/jre/); export JAVA_HOME=${JAVA_HOME%/}; export PATH=$(ls -d $JAVA_HOME/bin):$PATH && export JAVA_OPTS=\"-Xms256M -Xmx512M\"; export DCOS_CERT=\"$MESOS_SANDBOX/.ssl/ca-bundle.crt\" && ./keep-alive-framework-0.1/bin/keep-alive-framework https://34.220.172.49 $MESOS_SANDBOX/private_key.pem",
+  "container": {
+    "type": "MESOS",
+    "volumes": [
+      {
+        "containerPath": "private_key.pem",
+        "secret": "private_key"
+      }
+    ]
+  },
+  "cpus": 0.5,
+  "disk": 0,
+  "fetch": [
+    {
+      "uri": "https://s3-us-west-2.amazonaws.com/usi-builds/mesosphere/usi/ad/artifacts/keep-alive-framework-0.1.tar",
+      "extract": true,
+      "executable": false,
+      "cache": false
+    },
+    {
+      "uri": "https://downloads.mesosphere.com/java/server-jre-8u192-linux-x64.tar.gz",
+      "extract": true,
+      "executable": false,
+      "cache": true
+    }
+  ],
+  "instances": 1,
+  "maxLaunchDelaySeconds": 3600,
+  "mem": 1024,
+  "gpus": 0,
+  "networks": [
+    {
+      "mode": "host"
+    }
+  ],
+  "portDefinitions": [],
+  "requirePorts": false,
+  "upgradeStrategy": {
+    "maximumOverCapacity": 1,
+    "minimumHealthCapacity": 1
+  },
+  "killSelection": "YOUNGEST_FIRST",
+  "unreachableStrategy": {
+    "inactiveAfterSeconds": 0,
+    "expungeAfterSeconds": 0
+  },
+  "healthChecks": [],
+  "constraints": [],
+  "secrets": {
+    "private_key": {
+      "source": "usi_private"
+    }
+  }
+}
