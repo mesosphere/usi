@@ -9,7 +9,6 @@ import org.apache.mesos.v1.Protos.FrameworkInfo
 
 import scala.concurrent.duration._
 import scala.concurrent.Await
-import scala.sys.SystemProperties
 
 /**
   * Helper that builds a Mesos client that can be used by USI
@@ -20,10 +19,7 @@ class KeepAliveMesosClientFactory(settings: MesosClientSettings, authorization: 
 
   val frameworkInfo = FrameworkInfo
     .newBuilder()
-    .setUser(
-      new SystemProperties()
-        .get("user.name")
-        .getOrElse("root"))
+    .setUser("root")
     .setName("KeepAliveFramework")
     .addRoles("slave_public")
     .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
