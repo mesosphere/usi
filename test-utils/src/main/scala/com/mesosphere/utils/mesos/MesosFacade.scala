@@ -1,5 +1,7 @@
 package com.mesosphere.utils.mesos
 
+import java.net.URL
+
 import akka.actor.ActorSystem
 import akka.http.scaladsl.client.RequestBuilding.{Get, Post}
 import akka.http.scaladsl.model.{HttpEntity, HttpResponse}
@@ -95,7 +97,7 @@ object MesosFacade {
       unregistered_frameworks: Seq[ITFramework])
 }
 
-class MesosFacade(val url: String, val waitTime: FiniteDuration = 30.seconds)(
+class MesosFacade(val url: URL, val waitTime: FiniteDuration = 30.seconds)(
     implicit val system: ActorSystem,
     materializer: Materializer)
     extends PlayJsonSupport
@@ -128,7 +130,7 @@ class MesosFacade(val url: String, val waitTime: FiniteDuration = 30.seconds)(
     result(request(Post(s"$url/teardown", HttpEntity(s"frameworkId=$frameworkId"))), waitTime).value
   }
 
-  def redirect(leader: String = url): HttpResponse = {
+  def redirect(leader: URL = url): HttpResponse = {
     result(request(Get(s"$leader/redirect")), waitTime).value
   }
 }

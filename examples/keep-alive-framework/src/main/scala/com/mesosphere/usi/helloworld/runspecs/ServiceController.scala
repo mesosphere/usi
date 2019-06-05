@@ -2,12 +2,12 @@ package com.mesosphere.usi.helloworld.runspecs
 
 import java.util.UUID
 
-import com.mesosphere.usi.core.models.{PodId, RunSpec}
+import com.mesosphere.usi.core.models.{PodId, RunTemplate}
 
 import scala.concurrent.Future
 
 trait ServiceController {
-  def launchServiceFromSpec(id: ServiceSpecId, runSpec: RunSpec): Future[LaunchResult]
+  def launchServiceFromSpec(id: ServiceSpecId, runSpec: RunTemplate): Future[LaunchResult]
   def listRunSpecs(): Future[Vector[RunSpecInfo]]
   def findRunSpec(id: ServiceSpecId): Future[Option[RunSpecInfo]]
   def wipeRunspec(id: ServiceSpecId): Future[WipeResult]
@@ -43,7 +43,7 @@ case class ServiceSpecId(value: String)
 case class InstanceId(value: UUID)
 case class DeploymentId(value: String)
 
-case class RunSpecInfo(id: ServiceSpecId, runSpec: RunSpec, status: String)
+case class RunSpecInfo(id: ServiceSpecId, runSpec: RunTemplate, status: String)
 
 /**
   * ServiceSpecInstanceId identifies the pod that is launched for a specific instance of the service spec

@@ -10,7 +10,7 @@ import com.mesosphere.usi.core.models.{
   KillPod,
   LaunchPod,
   PodStatusUpdatedEvent,
-  RunSpec,
+  RunTemplate,
   SchedulerCommand,
   StateEventOrSnapshot
 }
@@ -77,7 +77,7 @@ class InMemoryServiceController(
 
   }
 
-  override def launchServiceFromSpec(id: ServiceSpecId, runSpec: RunSpec): Future[LaunchResult] = {
+  override def launchServiceFromSpec(id: ServiceSpecId, runSpec: RunTemplate): Future[LaunchResult] = {
 
     if (state.containsKey(id)) {
       Future.successful(LaunchResults.AlreadyExist)
@@ -158,4 +158,7 @@ private[runspecs] sealed trait Status
 private[runspecs] case object Staging extends Status
 private[runspecs] case object Running extends Status
 private[runspecs] case object Finished extends Status
-private[runspecs] case class RunSpecState(runSpecInstanceId: ServiceSpecInstanceId, runSpec: RunSpec, status: Status)
+private[runspecs] case class RunSpecState(
+    runSpecInstanceId: ServiceSpecInstanceId,
+    runSpec: RunTemplate,
+    status: Status)

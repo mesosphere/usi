@@ -5,10 +5,10 @@ import akka.http.scaladsl.server.Directives._
 import io.circe.generic.auto._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import JsonDTO._
-import com.mesosphere.usi.core.models.RunSpec
+import com.mesosphere.usi.core.models.RunTemplate
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.usi.helloworld.Configuration
-import com.mesosphere.usi.helloworld.runspecs.{ServiceSpecId, RunSpecInfo, ServiceController, LaunchResults}
+import com.mesosphere.usi.helloworld.runspecs.{LaunchResults, RunSpecInfo, ServiceController, ServiceSpecId}
 
 class Routes(appsService: ServiceController) {
 
@@ -25,7 +25,7 @@ class Routes(appsService: ServiceController) {
               ScalarRequirement(ResourceType.DISK, jsonApp.disk)
             )
 
-            val runSpec = RunSpec(
+            val runSpec = RunTemplate(
               requirements,
               jsonApp.command,
               Configuration.role

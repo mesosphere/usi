@@ -6,12 +6,12 @@ import com.mesosphere.usi.core.models.{
   LaunchPod,
   PodId,
   PodInvalid,
-  PodRecord,
   PodSpec,
   PodSpecUpdatedEvent,
   PodStatusUpdatedEvent,
   RunningPodSpec,
-  SchedulerCommand
+  SchedulerCommand,
+  StateSnapshot
 }
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
 
@@ -72,7 +72,7 @@ import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
   * that a Mesos call will not be processed until after we store the associated PodRecord recording the offer chosen for
   * a given RunningPodSpec
   */
-private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialPodRecords: Map[PodId, PodRecord]) {
+private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialState: StateSnapshot) {
 
   private val schedulerLogic = new SpecLogic(mesosCallFactory)
   private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory)
@@ -80,8 +80,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialP
   /**
     * State managed by the SchedulerLogicHandler. Statuses are derived from Mesos events.
     */
-  private var state: SchedulerState =
-    SchedulerState(podStatuses = Map.empty, podRecords = initialPodRecords, podSpecs = Map.empty)
+  private var state: SchedulerState = SchedulerState.fromSnapshot(initialState)
 
   def validateCommand(msg: SchedulerCommand): Seq[PodInvalid] = msg match {
     case LaunchPod(id, runSpec) =>
