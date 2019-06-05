@@ -1,10 +1,13 @@
 package com.mesosphere.usi.helloworld
 
+import java.net.URL
+
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Source}
-import com.mesosphere.mesos.client.MesosClient
+import com.mesosphere.mesos.client.{CredentialsProvider, JwtProvider, MesosClient}
+import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models._
@@ -16,18 +19,22 @@ import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}
 import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
 
-class KeepAliveFramework(conf: Config) extends StrictLogging {
+case class KeepAliveFrameWorkSettings(clientSettings: MesosClientSettings, numberOfTasks: Int) {
+  def this(config: Config) =
+    this(MesosClientSettings.fromConfig(config), config.getInt("keep-alive-framework.tasks-started"))
+}
 
-  implicit val system: ActorSystem = ActorSystem()
-  implicit val mat: ActorMaterializer = ActorMaterializer()
-  implicit val ec: ExecutionContextExecutor = system.dispatcher
+class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Option[CredentialsProvider] = None)(
+    implicit system: ActorSystem,
+    mat: ActorMaterializer)
+    extends StrictLogging {
 
-  val client: MesosClient = new KeepAliveMesosClientFactory(conf).client
+  val client: MesosClient = new KeepAliveMesosClientFactory(settings.clientSettings, authorization).client
 
   val runSpec: RunTemplate = KeepAlivePodSpecHelper.runSpec
 
   val specsSnapshot: List[RunningPodSpec] =
-    KeepAlivePodSpecHelper.specsSnapshot(conf.getInt("keep-alive-framework.tasks-started"))
+    KeepAlivePodSpecHelper.specsSnapshot(settings.numberOfTasks)
 
   // KeepAliveWatcher looks for a terminal task and then restarts the whole pod.
   val keepAliveWatcher: Flow[StateEventOrSnapshot, SchedulerCommand, NotUsed] = Flow[StateEventOrSnapshot].mapConcat {
@@ -104,9 +111,23 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 object KeepAliveFramework {
 
   def main(args: Array[String]): Unit = {
+
+    implicit val system: ActorSystem = ActorSystem()
+    implicit val mat: ActorMaterializer = ActorMaterializer()
+    implicit val ec: ExecutionContextExecutor = system.dispatcher
+
+    val dcosRoot = new URL(args(0))
+    val mesosUrl = new URL(s"$dcosRoot/mesos")
+    val privateKey = scala.io.Source.fromFile(args(1)).mkString
+    val provider = JwtProvider("strict-us", privateKey, dcosRoot)
+
     val conf = ConfigFactory.load().getConfig("mesos-client").withFallback(ConfigFactory.load())
-    KeepAliveFramework(conf)
+    val settings = KeepAliveFrameWorkSettings(
+      MesosClientSettings.fromConfig(conf).withMasters(Seq(mesosUrl)),
+      conf.getInt("keep-alive-framework.tasks-started"))
+    new KeepAliveFramework(settings, Some(provider))
   }
 
-  def apply(conf: Config): KeepAliveFramework = new KeepAliveFramework(conf)
+  def apply(conf: Config)(implicit system: ActorSystem, mat: ActorMaterializer): KeepAliveFramework =
+    new KeepAliveFramework(new KeepAliveFrameWorkSettings(conf))
 }
