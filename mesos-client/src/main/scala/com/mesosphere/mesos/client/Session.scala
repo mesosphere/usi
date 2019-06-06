@@ -6,14 +6,11 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props, Stash, Status}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.settings.ConnectionPoolSettings
-import akka.stream.scaladsl.{Flow, RestartFlow}
-import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
+import akka.stream.scaladsl.Flow
 import com.typesafe.scalalogging.StrictLogging
 
 import scala.concurrent.duration._
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 /**
   * A session captures the connection information with Mesos. This is among other things the URL and credentials providers.
@@ -45,51 +42,16 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     )
   }
 
-  // Fail and trigger restart if the call was unauthorized.
-  def handleRejection(response: Try[HttpResponse]): Try[HttpResponse] = {
-    response match {
-      case Success(r) if r.status == StatusCodes.Unauthorized =>
-        throw new IllegalStateException("Session token expired.")
-      case id => id
-    }
-  }
-
-  /** @return A flow that transforms serialized Mesos calls to proper HTTP requests. */
-  def post(connection: Flow[HttpRequest, Try[HttpResponse], NotUsed]): Flow[Array[Byte], Try[HttpResponse], NotUsed] =
-    authorization match {
-      case Some(credentialsProvider) =>
-        RestartFlow.withBackoff(1.second, 1.second, 1, 3)(() =>
-          Flow.fromGraph(SessionFlow(credentialsProvider, createPostRequest)).via(connection).map(handleRejection))
-      case None =>
-        Flow[Array[Byte]].map(createPostRequest(_, None)).via(connection)
-    }
-
-  def postSimple(implicit system: ActorSystem): Flow[Array[Byte], Try[HttpResponse], NotUsed] =
+  /** @return A flow that makes Mesos calls and outputs HTTP responses. */
+  def post(implicit system: ActorSystem): Flow[Array[Byte], HttpResponse, NotUsed] =
     authorization match {
       case Some(credentialsProvider) =>
         implicit val askTimeout = util.Timeout(20.seconds)
         val sessionActor = system.actorOf(SessionActor.props(credentialsProvider, createPostRequest))
-        Flow[Array[Byte]].ask[HttpResponse](1)(sessionActor).map(Success(_))
+        Flow[Array[Byte]].ask[HttpResponse](1)(sessionActor)
       case None =>
-        Flow[Array[Byte]].map(createPostRequest(_, None)).mapAsync(1)(Http().singleRequest(_)).map(Success(_))
+        Flow[Array[Byte]].map(createPostRequest(_, None)).mapAsync(1)(Http().singleRequest(_))
     }
-
-  /** @return The connection pool for this session. */
-  def connectionPool(implicit system: ActorSystem): Flow[HttpRequest, Try[HttpResponse], NotUsed] = {
-    // Disable pipelining.
-    val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
-    if (isSecured) {
-      Flow[HttpRequest]
-        .map(_ -> NotUsed)
-        .via(Http().cachedHostConnectionPoolHttps(host = url.getHost, port = port, settings = poolSettings))
-        .map(_._1)
-    } else {
-      Flow[HttpRequest]
-        .map(_ -> NotUsed)
-        .via(Http().cachedHostConnectionPool(host = url.getHost, port = port, settings = poolSettings))
-        .map(_._1)
-    }
-  }
 }
 
 object SessionActor {
@@ -100,6 +62,13 @@ object SessionActor {
   }
 }
 
+/**
+  * An actor makes requests to Mesos using credentials from a [[CredentialsProvider]].
+  *
+  * @param credentialsProvider The provider used to fetch the credentials, ie a session token.
+  * @param requestFactory The factory method that creates a [[HttpRequest]] from a serialized Mesos call. It should
+  *                       capture the [[Session.streamId]] and [[Session.url]].
+  */
 class SessionActor(
     credentialsProvider: CredentialsProvider,
     requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest)
@@ -156,65 +125,5 @@ class SessionActor(
       } else {
         originalSender ! response
       }
-  }
-}
-
-case class SessionFlow(
-    credentialsProvider: CredentialsProvider,
-    requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest)
-    extends GraphStage[FlowShape[Array[Byte], HttpRequest]] {
-
-  private val callsInlet = Inlet[Array[Byte]]("mesosCalls")
-  private val requestsOutlet = Outlet[HttpRequest]("httpRequests")
-  override val shape = FlowShape.of(callsInlet, requestsOutlet)
-
-  override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
-    new GraphStageLogic(shape) with StrictLogging {
-
-      var token = Option.empty[HttpCredentials]
-
-      /** @return whether the session flow is initialized and has a sessions token set. */
-      def isInitialized: Boolean = token.isDefined
-
-      // Handle session token request and start pulling if downstream is ready.
-      val startGraph = this.getAsyncCallback[Try[HttpCredentials]] {
-        case Success(nextToken) =>
-          logger.debug("Initialized session flow.")
-          token = Some(nextToken)
-          if (isAvailable(requestsOutlet)) pull(callsInlet)
-        case Failure(ex) =>
-          logger.error("Could not fetch session token", ex)
-          this.failStage(ex)
-      }
-
-      /**
-        * Initialize session flow by fetching the next session token. The session flow will back pressure until the
-        * first token is set.
-        */
-      override def preStart(): Unit = {
-        logger.debug("Initializing session flow.")
-        import scala.concurrent.ExecutionContext.Implicits.global
-        credentialsProvider.nextToken().onComplete(startGraph.invoke)
-      }
-
-      /**
-        * Map serialized calls to [[HttpRequest]] with attached token.
-        */
-      setHandler(callsInlet, new InHandler {
-        override def onPush(): Unit = {
-          push(requestsOutlet, requestFactory(grab(callsInlet), token))
-        }
-      })
-
-      /**
-        * Forward pull or back pressure if no session token is available.
-        */
-      setHandler(requestsOutlet, new OutHandler {
-        override def onPull(): Unit = {
-          if (isInitialized) pull(callsInlet)
-          else logger.debug("Received pull while not initialized.")
-        }
-      })
-    }
   }
 }

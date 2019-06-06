@@ -21,7 +21,6 @@ import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
-import scala.util.{Failure, Success, Try}
 
 trait MesosClient {
 
@@ -385,20 +384,17 @@ class MesosClientImpl(
 
   override def killSwitch: KillSwitch = sharedKillSwitch
 
-  private val responseHandler: Sink[Try[HttpResponse], Future[Done]] =
-    Sink.foreach[Try[HttpResponse]] {
-      case Success(response) =>
-        if (response.status.isFailure()) {
-          // TODO: Do not block.
-          val body = Await.result(Unmarshal(response.entity).to[String], 10.seconds)
-          logger.info(s"A request to Mesos failed with response: ${response.status}: $body")
-          throw new IllegalStateException(s"Failed to send a call to Mesos: $body")
-        } else {
-          logger.debug(s"Mesos call response: $response")
-          response.discardEntityBytes()
-        }
-      case Failure(e) =>
-        throw new IllegalStateException("Connection pool failed.", e)
+  private val responseHandler: Sink[HttpResponse, Future[Done]] =
+    Sink.foreach[HttpResponse] { response =>
+      if (response.status.isFailure()) {
+        // TODO: Do not block.
+        val body = Await.result(Unmarshal(response.entity).to[String], 10.seconds)
+        logger.info(s"A request to Mesos failed with response: ${response.status}: $body")
+        throw new IllegalStateException(s"Failed to send a call to Mesos: $body")
+      } else {
+        logger.debug(s"Mesos call response: $response")
+        response.discardEntityBytes()
+      }
     }
 
   private val callSerializer: Flow[Call, Array[Byte], NotUsed] = Flow[Call]
@@ -409,7 +405,6 @@ class MesosClientImpl(
       .via(sharedKillSwitch.flow[Call])
       .via(debug("Sending "))
       .via(callSerializer)
-      .via(session.postSimple)
-//      .via(session.post(session.connectionPool))
+      .via(session.post)
       .toMat(responseHandler)(Keep.right)
 }
