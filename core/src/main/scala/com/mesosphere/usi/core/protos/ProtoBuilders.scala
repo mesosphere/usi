@@ -275,11 +275,11 @@ private[usi] object ProtoBuilders {
       .build()
   }
 
-  def newDockerImage(imageName: String): Image = {
+  def newDockerImage(dockerImageName: String): Image = {
     Image
       .newBuilder()
       .setType(Image.Type.DOCKER)
-      .setDocker(Image.Docker.newBuilder().setName(imageName))
+      .setDocker(Image.Docker.newBuilder().setName(dockerImageName))
       .build()
   }
 
