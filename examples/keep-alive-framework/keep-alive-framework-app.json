@@ -18,7 +18,7 @@
   "disk": 0,
   "fetch": [
     {
-      "uri": "https://s3-us-west-2.amazonaws.com/usi-builds/mesosphere/usi/ad/artifacts/keep-alive-framework-0.1.tar",
+      "uri": "https://s3-us-west-2.amazonaws.com/usi-builds/mesosphere/usi/artifacts/keep-alive-framework-0.1.tar",
       "extract": true,
       "executable": false,
       "cache": false
