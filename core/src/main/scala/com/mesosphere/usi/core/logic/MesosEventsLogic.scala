@@ -94,7 +94,8 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
         name = podSpec.id.value.replaceAll("[^a-zA-Z0-9-]", ""),
         agentId = agentId,
         command = newCommandInfo(podSpec.runSpec.shellCommand, podSpec.runSpec.fetch),
-        resources = resources
+        resources = resources,
+        container = newContainerInfo(podSpec.runSpec.imageName)
       )
     }(collection.breakOut)
   }

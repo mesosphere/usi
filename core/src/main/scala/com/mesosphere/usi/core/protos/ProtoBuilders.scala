@@ -1,6 +1,9 @@
 package com.mesosphere.usi.core.protos
 import com.google.protobuf.ByteString
 import com.mesosphere.usi.core.models.FetchUri
+import org.apache.mesos.Protos
+import org.apache.mesos.Protos.ContainerInfo.DockerInfo
+import org.apache.mesos.v1.Protos.{ContainerInfo, Image}
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
@@ -271,6 +274,22 @@ private[usi] object ProtoBuilders {
     MesosEvent
       .newBuilder()
       .setOffers(MesosEvent.Offers.newBuilder().addOffers(offer))
+      .build()
+  }
+
+  def newDockerImage(imageName: String): Image = {
+    Image
+      .newBuilder()
+      .setType(Image.Type.DOCKER)
+      .setDocker(Image.Docker.newBuilder().setName(imageName))
+      .build()
+  }
+
+
+  def newContainerInfo(imageName: String) : Mesos.ContainerInfo= {
+    ContainerInfo.newBuilder()
+      .setType(Mesos.ContainerInfo.Type.MESOS)
+      .setMesos(ContainerInfo.MesosInfo.newBuilder().setImage(newDockerImage(imageName)))
       .build()
   }
 }

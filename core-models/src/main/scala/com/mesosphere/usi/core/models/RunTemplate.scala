@@ -12,9 +12,11 @@ import com.mesosphere.usi.core.models.resources.ResourceRequirement
   *                             class for more information
   * @param shellCommand         tasks' shell command
   * @param fetch                a list of artifact URIs that are passed to Mesos fetcher module and resolved at runtime
+  * @param imageName            an image to pull down and run.
   */
 case class RunTemplate(
     resourceRequirements: Seq[ResourceRequirement],
     shellCommand: String,
     role: String,
-    fetch: Seq[FetchUri] = Seq.empty)
+    fetch: Seq[FetchUri] = Seq.empty,
+    imageName: String)
