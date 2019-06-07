@@ -19,4 +19,4 @@ case class RunTemplate(
     shellCommand: String,
     role: String,
     fetch: Seq[FetchUri] = Seq.empty,
-    dockerImageName: String = null)
+    dockerImageName: Option[String] = None)

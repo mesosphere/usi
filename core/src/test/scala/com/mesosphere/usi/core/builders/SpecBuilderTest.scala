@@ -51,7 +51,7 @@ class SpecBuilderTest extends UnitTest {
 
     "build Mesos proto from RunSpec when dockerImageName is defined" in {
       Given("a PodSpec with a RunSpec with dockerImageName defined")
-      val containerName = "foo/bar:tag"
+      val containerName = Option("foo/bar:tag")
       val pod: RunningPodSpec = RunningPodSpec(
         PodId("mock-podId"),
         RunTemplate(
@@ -76,7 +76,7 @@ class SpecBuilderTest extends UnitTest {
 
       val imageName = taskInfo.head.getContainer.getMesos.getImage.getDocker.getName
 
-      imageName shouldBe containerName
+      imageName shouldBe containerName.get
     }
   }
 }
