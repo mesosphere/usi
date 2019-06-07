@@ -10,7 +10,6 @@ import com.mesosphere.usi.core.models._
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
 import SchedulerLogicHelpers._
-import org.apache.mesos.v1.Protos.Image
 
 import scala.collection.JavaConverters._
 

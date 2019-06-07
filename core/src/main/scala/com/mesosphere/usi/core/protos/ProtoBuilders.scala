@@ -203,7 +203,7 @@ private[usi] object ProtoBuilders {
       agentId: Mesos.AgentID,
       command: Mesos.CommandInfo,
       check: Mesos.CheckInfo = null,
-      container: Mesos.ContainerInfo = null,
+      container: Option[Mesos.ContainerInfo],
       data: ByteString = null,
       discovery: Mesos.DiscoveryInfo = null,
       executor: Mesos.ExecutorInfo = null,
@@ -222,7 +222,7 @@ private[usi] object ProtoBuilders {
 
     resources.foreach(b.addResources)
     if (check != null) b.setCheck(check)
-    if (container != null) b.setContainer(container)
+    if (container != None) b.setContainer(container.get)
     if (data != null) b.setData(data)
     if (discovery != null) b.setDiscovery(discovery)
     if (executor != null) b.setExecutor(executor)
@@ -283,16 +283,17 @@ private[usi] object ProtoBuilders {
       .build()
   }
 
-  def newContainerInfo(imageName: String): Mesos.ContainerInfo = {
+  def newContainerInfo(imageName: String): Option[Mesos.ContainerInfo] = {
     imageName match {
+      case null =>
+        None
       case imageName =>
-        ContainerInfo
-          .newBuilder()
-          .setType(Mesos.ContainerInfo.Type.MESOS)
-          .setMesos(ContainerInfo.MesosInfo.newBuilder().setImage(newDockerImage(imageName)).build())
-          .build()
-      case _ =>
-        null
+        Some(
+          ContainerInfo
+            .newBuilder()
+            .setType(Mesos.ContainerInfo.Type.MESOS)
+            .setMesos(ContainerInfo.MesosInfo.newBuilder().setImage(newDockerImage(imageName)).build())
+            .build())
     }
   }
 }
