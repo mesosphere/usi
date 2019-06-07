@@ -283,11 +283,16 @@ private[usi] object ProtoBuilders {
       .build()
   }
 
-
-  def newContainerInfo(imageName: String) : Mesos.ContainerInfo= {
-    ContainerInfo.newBuilder()
-      .setType(Mesos.ContainerInfo.Type.MESOS)
-      .setMesos(ContainerInfo.MesosInfo.newBuilder().setImage(newDockerImage(imageName)))
-      .build()
+  def newContainerInfo(imageName: String): Mesos.ContainerInfo = {
+    imageName match {
+      case imageName =>
+        ContainerInfo
+          .newBuilder()
+          .setType(Mesos.ContainerInfo.Type.MESOS)
+          .setMesos(ContainerInfo.MesosInfo.newBuilder().setImage(newDockerImage(imageName)).build())
+          .build()
+      case _ =>
+        null
+    }
   }
 }

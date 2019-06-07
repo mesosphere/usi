@@ -10,6 +10,7 @@ import com.mesosphere.usi.core.models._
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
 import SchedulerLogicHelpers._
+import org.apache.mesos.v1.Protos.Image
 
 import scala.collection.JavaConverters._
 
@@ -95,7 +96,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
         agentId = agentId,
         command = newCommandInfo(podSpec.runSpec.shellCommand, podSpec.runSpec.fetch),
         resources = resources,
-        container = newContainerInfo(podSpec.runSpec.imageName)
+        container = newContainerInfo(podSpec.runSpec.dockerImageName)
       )
     }(collection.breakOut)
   }
