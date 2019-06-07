@@ -80,7 +80,6 @@ class SpecBuilderTest extends UnitTest {
       val containerType = taskInfo.head.getContainer.getType
 
       imageName shouldBe containerName
-      containerType shouldBe ContainerInfo.Type.MESOS
     }
   }
 }
