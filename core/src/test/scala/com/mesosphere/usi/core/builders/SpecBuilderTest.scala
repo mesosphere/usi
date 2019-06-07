@@ -11,8 +11,6 @@ import com.mesosphere.usi.core.protos.ProtoConversions._
 import com.mesosphere.usi.core.protos.ProtoBuilders.{newResource, newResourceAllocationInfo}
 import java.net.URI
 
-import org.apache.mesos.Protos.ContainerInfo
-
 class SpecBuilderTest extends UnitTest {
 
   private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId))
@@ -77,7 +75,6 @@ class SpecBuilderTest extends UnitTest {
       )
 
       val imageName = taskInfo.head.getContainer.getMesos.getImage.getDocker.getName
-      val containerType = taskInfo.head.getContainer.getType
 
       imageName shouldBe containerName
     }
