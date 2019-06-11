@@ -170,7 +170,6 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
         headers = headers.Accept(ProtobufMediaType) :: maybeCredentials.map(Authorization(_)).toList
       )
 
-    // TODO: Probably should already create session.
     val port = if (url.getPort == -1) url.getDefaultPort else url.getPort
     val isSecured: Boolean = url.getProtocol == "https"
     val httpConnection =
