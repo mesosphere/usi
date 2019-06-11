@@ -6,7 +6,9 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props, Stash, Status}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
-import akka.stream.scaladsl.{Flow}
+import akka.http.scaladsl.settings.ConnectionPoolSettings
+import akka.stream.Materializer
+import akka.stream.scaladsl.Flow
 import com.typesafe.scalalogging.StrictLogging
 
 import scala.concurrent.duration._
@@ -43,15 +45,43 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
   }
 
   /** @return A flow that makes Mesos calls and outputs HTTP responses. */
-  def post(implicit system: ActorSystem): Flow[Array[Byte], HttpResponse, NotUsed] =
+  def post(implicit system: ActorSystem, mat: Materializer): Flow[Array[Byte], HttpResponse, NotUsed] =
     authorization match {
       case Some(credentialsProvider) =>
         implicit val askTimeout = util.Timeout(20.seconds)
         val sessionActor = system.actorOf(SessionActor.props(credentialsProvider, createPostRequest))
         Flow[Array[Byte]].ask[HttpResponse](1)(sessionActor)
       case None =>
-        Flow[Array[Byte]].map(createPostRequest(_, None)).mapAsync(1)(Http().singleRequest(_))
+        Flow[Array[Byte]].map(createPostRequest(_, None)).via(connection)
     }
+
+  /**
+    * A connection flow factory that will create a flow that only processes one request at a time.
+    *
+    * It will reconnect if the server closes the connection after a successful request.
+    *
+    * @return A connection flow for single requests.
+    */
+  private def connection(implicit system: ActorSystem, mat: Materializer): Flow[HttpRequest, HttpResponse, NotUsed] = {
+    val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
+    if (isSecured) {
+      Flow[HttpRequest]
+        .map(_ -> NotUsed)
+        .via(Http().newHostConnectionPoolHttps(host = url.getHost, port = port, settings = poolSettings))
+        .map {
+          case (Success(response), NotUsed) => response
+          case (Failure(ex), NotUsed) => throw ex
+        }
+    } else {
+      Flow[HttpRequest]
+        .map(_ -> NotUsed)
+        .via(Http().newHostConnectionPool(host = url.getHost, port = port, settings = poolSettings))
+        .map {
+          case (Success(response), NotUsed) => response
+          case (Failure(ex), NotUsed) => throw ex
+        }
+    }
+  }
 }
 
 object SessionActor {
@@ -72,16 +102,15 @@ object SessionActor {
 class SessionActor(
     credentialsProvider: CredentialsProvider,
     requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest)
-//    requestFlow: Flow[HttpRequest, HttpResponse, NotUsed])
     extends Actor
     with Stash
     with StrictLogging {
+
+  import context.dispatcher
+
   import akka.pattern.pipe
-  import scala.concurrent.ExecutionContext.Implicits.global
 
   case class Response(originalCall: Array[Byte], originalSender: ActorRef, response: HttpResponse)
-
-//  val caller = Source.act
 
   override def preStart(): Unit = {
     super.preStart()
