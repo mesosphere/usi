@@ -143,6 +143,7 @@ class SessionActor(
       val request = requestFactory(call, Some(credentials))
       val originalSender = sender()
       logger.info("Processing next call.")
+      // The TLS handshake for each connection might be an overhead. We could potentially reuse a connection.
       Http()(context.system)
         .singleRequest(request)
         .onComplete {
