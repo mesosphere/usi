@@ -387,10 +387,8 @@ class MesosClientImpl(
   private val responseHandler: Sink[HttpResponse, Future[Done]] =
     Sink.foreach[HttpResponse] { response =>
       if (response.status.isFailure()) {
-        // TODO: Do not block.
-        val body = Await.result(Unmarshal(response.entity).to[String], 10.seconds)
-        logger.info(s"A request to Mesos failed with response: ${response.status}: $body")
-        throw new IllegalStateException(s"Failed to send a call to Mesos: $body")
+        logger.info(s"A request to Mesos failed with response: ${response.status}")
+        throw new IllegalStateException(s"Failed to send a call to Mesos.")
       } else {
         logger.debug(s"Mesos call response: $response")
         response.discardEntityBytes()
