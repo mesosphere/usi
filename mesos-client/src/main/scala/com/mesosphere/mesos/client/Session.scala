@@ -90,6 +90,16 @@ object SessionActor {
       requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest): Props = {
     Props(new SessionActor(credentialsProvider, requestFactory))
   }
+
+
+  /**
+    * A simple class that captures the original sender of a call and the serialized call.
+    *
+    * @param originalCall The serialized Mesos call.
+    * @param originalSender The sender from the stream.
+    * @param response The response for the call.
+    */
+  private [client] case class Response(originalCall: Array[Byte], originalSender: ActorRef, response: HttpResponse)
 }
 
 /**
@@ -109,8 +119,6 @@ class SessionActor(
   import context.dispatcher
 
   import akka.pattern.pipe
-
-  case class Response(originalCall: Array[Byte], originalSender: ActorRef, response: HttpResponse)
 
   override def preStart(): Unit = {
     super.preStart()
@@ -140,13 +148,13 @@ class SessionActor(
         .onComplete {
           case Success(response) =>
             logger.info(s"HTTP response: ${response.status}")
-            self ! Response(call, originalSender, response)
+            self ! SessionActor.Response(call, originalSender, response)
           case Failure(ex) =>
             logger.error("HTTP request failed", ex)
             // Fail stream.
             originalSender ! Status.Failure(ex)
         }
-    case Response(originalCall, originalSender, response) =>
+    case SessionActor.Response(originalCall, originalSender, response) =>
       logger.info(s"Call replied with ${response.status}")
       if (response.status == StatusCodes.Unauthorized) {
         logger.info("Refreshing token")
