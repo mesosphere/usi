@@ -13,7 +13,8 @@ class SessionActorTest extends AkkaUnitTest {
       val f = new Fixture
 
       Given("A SessionActor and an HTTP response")
-      val sessionActor = system.actorOf(SessionActor.props(BasicAuthenticationProvider("user", "password"), f.requestFactory))
+      val sessionActor =
+        system.actorOf(SessionActor.props(BasicAuthenticationProvider("user", "password"), f.requestFactory))
       val originalSender = TestProbe()
       val httpResponse = HttpResponse(entity = HttpEntity("hello"))
 

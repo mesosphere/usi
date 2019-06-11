@@ -91,7 +91,6 @@ object SessionActor {
     Props(new SessionActor(credentialsProvider, requestFactory))
   }
 
-
   /**
     * A simple class that captures the original sender of a call and the serialized call.
     *
@@ -99,7 +98,7 @@ object SessionActor {
     * @param originalSender The sender from the stream.
     * @param response The response for the call.
     */
-  private [client] case class Response(originalCall: Array[Byte], originalSender: ActorRef, response: HttpResponse)
+  private[client] case class Response(originalCall: Array[Byte], originalSender: ActorRef, response: HttpResponse)
 }
 
 /**
