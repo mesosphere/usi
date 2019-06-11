@@ -2,12 +2,11 @@ package com.mesosphere.usi.core.japi
 
 import java.util.concurrent.CompletableFuture
 
-import akka.stream.javadsl.{Flow, Sink, Source}
 import akka.stream.{Materializer, javadsl}
 import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.conf.SchedulerSettings
-import com.mesosphere.usi.core.models.{SchedulerCommand, StateEvent, StateEventOrSnapshot, StateSnapshot}
+import com.mesosphere.usi.core.models.{SchedulerCommand, StateEvent, StateSnapshot}
 import com.mesosphere.usi.core.{CallerThreadExecutionContext, Scheduler => ScalaScheduler}
 import com.mesosphere.usi.repository.PodRecordRepository
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
@@ -32,7 +31,7 @@ object Scheduler {
       client: MesosClient,
       podRecordRepository: PodRecordRepository,
       schedulerSettings: SchedulerSettings): CompletableFuture[FlowResult] = {
-    val flow = Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource)
+    val flow = javadsl.Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource)
     fromFlow(client.calls, podRecordRepository, flow, schedulerSettings)
   }
 
@@ -85,14 +84,14 @@ object Scheduler {
 
   class SourceAndSinkResult(
       snap: StateSnapshot,
-      source: Source[StateEvent, NotUsed],
-      sink: Sink[SchedulerCommand, CompletableFuture[Done]]) {
+      source: javadsl.Source[StateEvent, NotUsed],
+      sink: javadsl.Sink[SchedulerCommand, CompletableFuture[Done]]) {
 
-    def getSource: Source[StateEvent, NotUsed] = {
+    def getSource: javadsl.Source[StateEvent, NotUsed] = {
       source
     }
 
-    def getSink: Sink[SchedulerCommand, CompletableFuture[Done]] = {
+    def getSink: javadsl.Sink[SchedulerCommand, CompletableFuture[Done]] = {
       sink
     }
 
@@ -101,8 +100,8 @@ object Scheduler {
     }
   }
 
-  class FlowResult(snap: StateSnapshot, flow: Flow[SchedulerCommand, StateEventOrSnapshot, NotUsed]) {
-    def getFlow: Flow[SchedulerCommand, StateEventOrSnapshot, NotUsed] = {
+  class FlowResult(snap: StateSnapshot, flow: javadsl.Flow[SchedulerCommand, StateEvent, NotUsed]) {
+    def getFlow: javadsl.Flow[SchedulerCommand, StateEvent, NotUsed] = {
       flow
     }
 
