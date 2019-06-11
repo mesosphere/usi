@@ -316,7 +316,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">RunTemplate</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="role">role: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="fetch">fetch: <span class="extype" name="scala.Seq">Seq</span>[<a href="FetchUri.html" class="extype" name="com.mesosphere.usi.core.models.FetchUri">FetchUri</a>] = <span class="symbol">Seq.empty</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">RunTemplate</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="role">role: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="fetch">fetch: <span class="extype" name="scala.Seq">Seq</span>[<a href="FetchUri.html" class="extype" name="com.mesosphere.usi.core.models.FetchUri">FetchUri</a>] = <span class="symbol">Seq.empty</span></span>, <span name="dockerImageName">dockerImageName: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -324,7 +324,7 @@
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Launch template used to launch a pod</p><p>Support is rather primitive now. We will add richer support for TaskInfo and TaskGroupInfo specification in
 (DCOS-48503, DCOS-47481)
 </p></div><dl class="paramcmts block"><dt class="param">resourceRequirements</dt><dd class="cmt"><p>a list of resource requirements for the <a href="RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a>. See <span class="extype" name="ResourceRequirement">ResourceRequirement</span>
-                            class for more information</p></dd><dt class="param">shellCommand</dt><dd class="cmt"><p>tasks' shell command</p></dd><dt class="param">fetch</dt><dd class="cmt"><p>a list of artifact URIs that are passed to Mesos fetcher module and resolved at runtime</p></dd></dl><div class="toggleContainer block">
+                            class for more information</p></dd><dt class="param">shellCommand</dt><dd class="cmt"><p>tasks' shell command</p></dd><dt class="param">fetch</dt><dd class="cmt"><p>a list of artifact URIs that are passed to Mesos fetcher module and resolved at runtime</p></dd><dt class="param">dockerImageName</dt><dd class="cmt"><p>a Docker image to pull down and run of the form: [REGISTRY_HOST[:REGISTRY_PORT]/]REPOSITORY[:TAG|@DIGEST]</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -375,9 +375,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.core.models.RunTemplate#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement],shellCommand:String,role:String,fetch:Seq[com.mesosphere.usi.core.models.FetchUri]):com.mesosphere.usi.core.models.RunTemplate"></a><a id="&lt;init&gt;:RunTemplate"></a>
+      <a id="&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement],shellCommand:String,role:String,fetch:Seq[com.mesosphere.usi.core.models.FetchUri],dockerImageName:Option[String]):com.mesosphere.usi.core.models.RunTemplate"></a><a id="&lt;init&gt;:RunTemplate"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/RunTemplate.html#&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement],shellCommand:String,role:String,fetch:Seq[com.mesosphere.usi.core.models.FetchUri]):com.mesosphere.usi.core.models.RunTemplate" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/RunTemplate.html#&lt;init&gt;(resourceRequirements:Seq[com.mesosphere.usi.core.models.resources.ResourceRequirement],shellCommand:String,role:String,fetch:Seq[com.mesosphere.usi.core.models.FetchUri],dockerImageName:Option[String]):com.mesosphere.usi.core.models.RunTemplate" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -386,11 +386,11 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">RunTemplate</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="role">role: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="fetch">fetch: <span class="extype" name="scala.Seq">Seq</span>[<a href="FetchUri.html" class="extype" name="com.mesosphere.usi.core.models.FetchUri">FetchUri</a>] = <span class="symbol">Seq.empty</span></span>)</span>
+        <span class="name">RunTemplate</span><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="role">role: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="fetch">fetch: <span class="extype" name="scala.Seq">Seq</span>[<a href="FetchUri.html" class="extype" name="com.mesosphere.usi.core.models.FetchUri">FetchUri</a>] = <span class="symbol">Seq.empty</span></span>, <span name="dockerImageName">dockerImageName: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>)</span>
       </span>
       
       <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">resourceRequirements</dt><dd class="cmt"><p>a list of resource requirements for the <a href="RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a>. See <span class="extype" name="ResourceRequirement">ResourceRequirement</span>
-                            class for more information</p></dd><dt class="param">shellCommand</dt><dd class="cmt"><p>tasks' shell command</p></dd><dt class="param">fetch</dt><dd class="cmt"><p>a list of artifact URIs that are passed to Mesos fetcher module and resolved at runtime</p></dd></dl></div>
+                            class for more information</p></dd><dt class="param">shellCommand</dt><dd class="cmt"><p>tasks' shell command</p></dd><dt class="param">fetch</dt><dd class="cmt"><p>a list of artifact URIs that are passed to Mesos fetcher module and resolved at runtime</p></dd><dt class="param">dockerImageName</dt><dd class="cmt"><p>a Docker image to pull down and run of the form: [REGISTRY_HOST[:REGISTRY_PORT]/]REPOSITORY[:TAG|@DIGEST]</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -489,6 +489,22 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.RunTemplate#dockerImageName" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="dockerImageName:Option[String]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/RunTemplate.html#dockerImageName:Option[String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">dockerImageName</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
