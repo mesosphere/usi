@@ -12,9 +12,11 @@ import com.mesosphere.usi.core.models.resources.ResourceRequirement
   *                             class for more information
   * @param shellCommand         tasks' shell command
   * @param fetch                a list of artifact URIs that are passed to Mesos fetcher module and resolved at runtime
+  * @param dockerImageName      a Docker image to pull down and run of the form: [REGISTRY_HOST[:REGISTRY_PORT]/]REPOSITORY[:TAG|@DIGEST]
   */
 case class RunTemplate(
     resourceRequirements: Seq[ResourceRequirement],
     shellCommand: String,
     role: String,
-    fetch: Seq[FetchUri] = Seq.empty)
+    fetch: Seq[FetchUri] = Seq.empty,
+    dockerImageName: Option[String] = None)

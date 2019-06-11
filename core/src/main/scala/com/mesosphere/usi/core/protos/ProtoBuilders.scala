@@ -1,6 +1,7 @@
 package com.mesosphere.usi.core.protos
 import com.google.protobuf.ByteString
 import com.mesosphere.usi.core.models.FetchUri
+import org.apache.mesos.v1.Protos.{ContainerInfo, Image}
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
@@ -202,7 +203,7 @@ private[usi] object ProtoBuilders {
       agentId: Mesos.AgentID,
       command: Mesos.CommandInfo,
       check: Mesos.CheckInfo = null,
-      container: Mesos.ContainerInfo = null,
+      container: Option[Mesos.ContainerInfo],
       data: ByteString = null,
       discovery: Mesos.DiscoveryInfo = null,
       executor: Mesos.ExecutorInfo = null,
@@ -221,7 +222,7 @@ private[usi] object ProtoBuilders {
 
     resources.foreach(b.addResources)
     if (check != null) b.setCheck(check)
-    if (container != null) b.setContainer(container)
+    container.foreach(b.setContainer(_))
     if (data != null) b.setData(data)
     if (discovery != null) b.setDiscovery(discovery)
     if (executor != null) b.setExecutor(executor)
@@ -272,5 +273,23 @@ private[usi] object ProtoBuilders {
       .newBuilder()
       .setOffers(MesosEvent.Offers.newBuilder().addOffers(offer))
       .build()
+  }
+
+  def newDockerImage(dockerImageName: String): Image = {
+    Image
+      .newBuilder()
+      .setType(Image.Type.DOCKER)
+      .setDocker(Image.Docker.newBuilder().setName(dockerImageName).build())
+      .build()
+  }
+
+  def newContainerInfo(imageName: Option[String]): Option[Mesos.ContainerInfo] = {
+    imageName.map { name =>
+      ContainerInfo
+        .newBuilder()
+        .setType(Mesos.ContainerInfo.Type.MESOS)
+        .setMesos(ContainerInfo.MesosInfo.newBuilder().setImage(newDockerImage(name)).build())
+        .build()
+    }
   }
 }
