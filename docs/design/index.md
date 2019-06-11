@@ -90,15 +90,15 @@ If the Agent info is forgotten, the pods may still come back later (source: I te
 
 We'll store certain things about reservations, such as "reservation last seen".
 
-## Spurious reservations and spurious pods
+## Unrecognized reservations and unrecognized pods
 
-A spurious pod and spurious reservation is defined as a pod or reservation belonging to the implementation framework for which there is no persistent record (PodRecord or ReservationRecord) of it being launched.
+A unrecognized pod and unrecognized reservation is defined as a pod or reservation belonging to the implementation framework for which there is no persistent record (PodRecord or ReservationRecord) of it being launched.
 
-In the case of a spurious pod being discovered, the USI will expose a PodStatus for the spurious pod to the implementation framework.
+In the case of a unrecognized pod being discovered, the USI will expose a PodStatus for the unrecognized pod to the implementation framework.
 
-Similarly, spurious pods pertaining to the framework may surface. Rather than automatically kill these pods, the scheduler component will expose their status as best as it can, so that the framework can best decide what to do with them (PodStatus without a PodRecord).
+Similarly, unrecognized pods pertaining to the framework may surface. Rather than automatically kill these pods, the scheduler component will expose their status as best as it can, so that the framework can best decide what to do with them (PodStatus without a PodRecord).
 
-Unfortunately, Mesos does not expose task grouping information, but instead reports individual task statuses. As such, spurious tasks will be reported as PodStatuses with a task count of 1, each.not expose this information in TaskGroup.
+Unfortunately, Mesos does not expose task grouping information, but instead reports individual task statuses. As such, unrecognized tasks will be reported as PodStatuses with a task count of 1, each.not expose this information in TaskGroup.
 
 ## Constraints Application
 
@@ -209,7 +209,7 @@ Initially, the USI will be opinionated towards storing its state in Zookeeper. T
 
 ### Why not just auto-kill something for which a podRecord no longer exists?
 
-This is the behavior that Marathon has historically had, and has led to upsetting problems when the persistent state comes invalid or out-of-date (for example, a backup is restored because an upgrade failed). Preferably, how to handle spurious tasks and reservations is up to the implementation framework.
+This is the behavior that Marathon has historically had, and has led to upsetting problems when the persistent state comes invalid or out-of-date (for example, a backup is restored because an upgrade failed). Preferably, how to handle unrecognized pods and reservations is up to the implementation framework.
 
 # Relevant Resources
 

@@ -112,7 +112,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
     val runningTaskStatus =
       newTaskStatus(newTaskId(podId.value), Mesos.TaskState.TASK_RUNNING, newAgentId("testing"), uuid = taskStatusUUID)
 
-    "emits a spurious podStatus and acknowledges a task status when receiving a task status for a record-less pod" in {
+    "emits a unrecognized podStatus and acknowledges a task status when receiving a task status for a record-less pod" in {
       Given("Scheduler logic handler with empty state")
       val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), StateSnapshot.empty)
 
@@ -136,11 +136,11 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
       }
     }
 
-    "removes spurious podStatuses when they become terminal" in {
-      Given("Scheduler logic handler with a spurious podStatus state")
+    "removes unrecognized podStatuses when they become terminal" in {
+      Given("Scheduler logic handler with a unrecognized podStatus state")
       val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), StateSnapshot.empty)
 
-      When("a spurious task status update is received")
+      When("a unrecognized task status update is received")
       val resultForRunningTaskStatus = handler.handleMesosEvent(newTaskUpdateEvent(runningTaskStatus))
       resultForRunningTaskStatus.mesosCalls shouldNot be(empty)
       resultForRunningTaskStatus.stateEvents shouldNot be(empty)
@@ -169,7 +169,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
     }
 
     "removes TerminalPodSpecs when they are reported terminal" in {
-      Given("Scheduler logic handler with a spurious podStatus state")
+      Given("Scheduler logic handler with a unrecognized podStatus state")
       val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), StateSnapshot.empty)
       handler.handleMesosEvent(newTaskUpdateEvent(runningTaskStatus))
 

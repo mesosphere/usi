@@ -84,7 +84,7 @@ object Scheduler {
     fromFlow(
       client.calls,
       podRecordRepository,
-      Flow.fromSinkAndSource(client.mesosSink, client.mesosSource),
+      Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource),
       schedulerSettings)
   }
 
