@@ -222,7 +222,7 @@ private[usi] object ProtoBuilders {
 
     resources.foreach(b.addResources)
     if (check != null) b.setCheck(check)
-    if (container != None) b.setContainer(container.get)
+    container.foreach(b.setContainer(_))
     if (data != null) b.setData(data)
     if (discovery != null) b.setDiscovery(discovery)
     if (executor != null) b.setExecutor(executor)
@@ -279,20 +279,17 @@ private[usi] object ProtoBuilders {
     Image
       .newBuilder()
       .setType(Image.Type.DOCKER)
-      .setDocker(Image.Docker.newBuilder().setName(dockerImageName))
+      .setDocker(Image.Docker.newBuilder().setName(dockerImageName).build())
       .build()
   }
 
   def newContainerInfo(imageName: Option[String]): Option[Mesos.ContainerInfo] = {
-    imageName match {
-      case Some(imageName) =>
-        Some(
-          ContainerInfo
-            .newBuilder()
-            .setType(Mesos.ContainerInfo.Type.MESOS)
-            .setMesos(ContainerInfo.MesosInfo.newBuilder().setImage(newDockerImage(imageName)).build())
-            .build())
-      case _ => None
+    imageName.map { name =>
+      ContainerInfo
+        .newBuilder()
+        .setType(Mesos.ContainerInfo.Type.MESOS)
+        .setMesos(ContainerInfo.MesosInfo.newBuilder().setImage(newDockerImage(name)).build())
+        .build()
     }
   }
 }
