@@ -89,7 +89,7 @@ object MesosClientExampleFramework {
     *   {{{curl -L -X PUT -k -H "Authorization: token=$(dcos config show core.dcos_acs_token)" "$(dcos config show core.dcos_url)/acs/api/v1/acls/dcos:superuser/users/strict-usi/full"}}}
     * 5. Download SSL certs:
     *   {{{wget --no-check-certificate -O dcos-ca.crt "$(dcos config show core.dcos_url)/ca/dcos-ca.crt"}}}
-    * 6. Run with {{{DCOS_CERT=path/to/dcos-ca,crt ./gradlew :mesos-client-example:run --stacktrace --args "https://<DC/OS IP> path/to/usi.private.pem"}}}
+    * 6. Run with {{{DCOS_CERT=path/to/dcos-ca.crt ./gradlew :mesos-client-example:run --stacktrace --args "https://<DC/OS IP> path/to/usi.private.pem"}}}
     */
   def main(args: Array[String]): Unit = {
 

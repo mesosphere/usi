@@ -10,10 +10,11 @@ import akka.http.scaladsl.model.headers.{BasicHttpCredentials, GenericHttpCreden
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.StrictLogging
-import de.heikoseeberger.akkahttpjson4s.Json4sSupport
-import org.json4s.native.{JsonMethods, Serialization}
-import pdi.jwt.JwtJson4s
+import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
+import pdi.jwt.JwtJson
 import pdi.jwt.JwtAlgorithm.RS256
+import play.api.libs.json._
+import play.api.libs.json.Reads._
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,11 +46,8 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
     materializer: ActorMaterializer,
     context: ExecutionContext)
     extends CredentialsProvider
+    with PlayJsonSupport
     with StrictLogging {
-  import org.json4s._
-  import org.json4s.JsonDSL._
-  import JsonMethods.{render, compact}
-  import Json4sSupport.unmarshaller
 
   private def expireIn(duration: Duration): Long = Instant.now.getEpochSecond + duration.toSeconds
 
@@ -60,18 +58,17 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
     *
     * @return a claim for the user that expires in twenty seconds.
     */
-  private def claim: JObject = JObject("uid" -> uid, "exp" -> expireIn(20.seconds))
+  private def claim: JsObject = Json.obj("uid" -> uid, "exp" -> expireIn(20.seconds))
 
-  case class SessionToken(acsToken: String)
-  implicit val jsonFormats = DefaultFormats + FieldSerializer[SessionToken]()
-  implicit val serialization = Serialization
+  case class SessionToken(token: String)
+  implicit val sessionRead: Reads[SessionToken] = (JsPath \ "token").read[String].map(SessionToken)
 
   /** @return a new request for a session token. */
   def acsTokenRequest: HttpRequest = {
 
     // Tokenize the claim.
-    val token = JwtJson4s.encode(claim, privateKey, RS256)
-    val data: String = compact(render(JObject("uid" -> uid, "token" -> token)))
+    val token = JwtJson.encode(claim, privateKey, RS256)
+    val data: String = Json.stringify(Json.obj("uid" -> uid, "token" -> token))
 
     HttpRequest(
       method = HttpMethods.POST,

@@ -6,7 +6,7 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props, Stash, Status}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
-import akka.stream.scaladsl.Flow
+import akka.stream.scaladsl.{Flow}
 import com.typesafe.scalalogging.StrictLogging
 
 import scala.concurrent.duration._
@@ -72,6 +72,7 @@ object SessionActor {
 class SessionActor(
     credentialsProvider: CredentialsProvider,
     requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest)
+//    requestFlow: Flow[HttpRequest, HttpResponse, NotUsed])
     extends Actor
     with Stash
     with StrictLogging {
@@ -79,6 +80,8 @@ class SessionActor(
   import scala.concurrent.ExecutionContext.Implicits.global
 
   case class Response(originalCall: Array[Byte], originalSender: ActorRef, response: HttpResponse)
+
+//  val caller = Source.act
 
   override def preStart(): Unit = {
     super.preStart()
@@ -88,11 +91,13 @@ class SessionActor(
   override def receive: Receive = initializing
 
   def initializing: Receive = {
-    // TODO: Handle nextToken errors.
     case credentials: HttpCredentials =>
       logger.info("Retrieved token")
       context.become(initialized(credentials))
       unstashAll()
+    case Status.Failure(ex) =>
+      logger.error("Fetching the next token failed", ex)
+      throw ex
     case _ => stash()
   }
 
