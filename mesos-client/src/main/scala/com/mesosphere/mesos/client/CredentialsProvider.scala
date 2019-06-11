@@ -10,10 +10,12 @@ import akka.http.scaladsl.model.headers.{BasicHttpCredentials, GenericHttpCreden
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.StrictLogging
-import org.json4s.native.JsonMethods
+import de.heikoseeberger.akkahttpjson4s.Json4sSupport
+import org.json4s.native.{JsonMethods, Serialization}
 import pdi.jwt.JwtJson4s
 import pdi.jwt.JwtAlgorithm.RS256
 
+import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
@@ -46,7 +48,8 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
     with StrictLogging {
   import org.json4s._
   import org.json4s.JsonDSL._
-  import JsonMethods.{parse, render, compact}
+  import JsonMethods.{render, compact}
+  import Json4sSupport.unmarshaller
 
   private def expireIn(duration: Duration): Long = Instant.now.getEpochSecond + duration.toSeconds
 
@@ -58,6 +61,10 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
     * @return a claim for the user that expires in twenty seconds.
     */
   private def claim: JObject = JObject("uid" -> uid, "exp" -> expireIn(20.seconds))
+
+  case class SessionToken(acsToken: String)
+  implicit val jsonFormats = DefaultFormats + FieldSerializer[SessionToken]()
+  implicit val serialization = Serialization
 
   /** @return a new request for a session token. */
   def acsTokenRequest: HttpRequest = {
@@ -73,17 +80,11 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
     )
   }
 
-  override def nextToken(): Future[HttpCredentials] = {
+  override def nextToken(): Future[HttpCredentials] = async {
     logger.debug(s"Fetching next token from $root")
-    Http().singleRequest(acsTokenRequest).flatMap { response =>
-      // TODO: Use json unmarshaller directly.
-      Unmarshal(response.entity).to[String].map { body =>
-        (parse(body) \ "token") match {
-          case JString(acsToken) => GenericHttpCredentials("", Map("token" -> acsToken))
-          case _ => throw new IllegalArgumentException(s"Token is not a string in $body.")
-        }
-      }
-    }
+    val response = await(Http().singleRequest(acsTokenRequest))
+    val SessionToken(acsToken) = await(Unmarshal(response.entity).to[SessionToken])
+    GenericHttpCredentials("", Map("token" -> acsToken))
   }
 }
 

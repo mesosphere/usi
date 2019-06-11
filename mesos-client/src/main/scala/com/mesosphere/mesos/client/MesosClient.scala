@@ -20,7 +20,6 @@ import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 
 import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
 
 trait MesosClient {
 
