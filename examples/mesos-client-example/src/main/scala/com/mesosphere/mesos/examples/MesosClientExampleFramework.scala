@@ -6,7 +6,7 @@ import java.util.UUID
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.Sink
-import com.mesosphere.mesos.client.{CredentialsProvider, JwtProvider, MesosClient, StrictLoggingFlow}
+import com.mesosphere.mesos.client.{CredentialsProvider, DcosServiceAccountProvider, MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
 import org.apache.mesos.v1.Protos
 import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
@@ -101,7 +101,7 @@ object MesosClientExampleFramework {
 
     val dcosRoot = new URL(args(0))
     val privateKey = scala.io.Source.fromFile(args(1)).mkString
-    val provider = JwtProvider("strict-usi", privateKey, dcosRoot)
+    val provider = DcosServiceAccountProvider("strict-usi", privateKey, dcosRoot)
 
     val mesosUrl = new URL(s"$dcosRoot/mesos")
     val clientSettings = MesosClientSettings.load().withMasters(Seq(mesosUrl))

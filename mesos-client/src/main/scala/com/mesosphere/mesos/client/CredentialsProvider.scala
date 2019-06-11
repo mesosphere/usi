@@ -27,7 +27,7 @@ trait CredentialsProvider {
 }
 
 /**
-  * Provides DC/OS session tokens as JWT.
+  * Provides DC/OS session tokens as JWT for service accounts.
   *
   * @param uid The user id.
   * @param privateKey The JWT secret.
@@ -38,7 +38,7 @@ trait CredentialsProvider {
   * @see See [[https://docs.mesosphere.com/1.11/security/ent/iam-api/#obtaining-an-authentication-token]] for details on
   *      the protocol.
   */
-case class JwtProvider(uid: String, privateKey: String, root: URL)(
+case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL)(
     implicit system: ActorSystem,
     materializer: ActorMaterializer,
     context: ExecutionContext)
