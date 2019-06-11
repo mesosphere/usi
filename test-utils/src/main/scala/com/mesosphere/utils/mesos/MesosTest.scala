@@ -137,7 +137,8 @@ case class MesosCluster(
     Agent(
       resources = new Resources(ports = PortAllocator.portsRange(), gpus = agentsGpus),
       extraArgs = Seq(
-        s"--attributes=$renderedAttributes"
+        s"--attributes=$renderedAttributes",
+        "--image_providers=appc,docker"
       ) ++ mesosFaultDomainAgentCmdOption.map(fd => s"--domain=$fd")
     )
   }
