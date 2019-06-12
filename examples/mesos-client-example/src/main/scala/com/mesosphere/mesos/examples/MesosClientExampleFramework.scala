@@ -1,12 +1,14 @@
 package com.mesosphere.mesos.examples
 
+import java.net.URL
 import java.util.UUID
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Sink, Source}
-import com.mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
+import akka.stream.{ActorMaterializer, Materializer}
+import akka.stream.scaladsl.Sink
+import com.mesosphere.mesos.client.{CredentialsProvider, DcosServiceAccountProvider, MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
+import org.apache.mesos.v1.Protos
 import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.Event
 
@@ -24,13 +26,15 @@ import scala.collection.JavaConverters._
   *  Not much, but shows the basic idea. Good to test against local Mesos.
   *
   */
-class MesosClientExampleFramework(settings: MesosClientSettings) extends StrictLoggingFlow {
-  implicit val system = ActorSystem()
-  implicit val materializer = ActorMaterializer()
+class MesosClientExampleFramework(settings: MesosClientSettings, authorization: Option[CredentialsProvider] = None)(
+    implicit system: ActorSystem,
+    materializer: Materializer)
+    extends StrictLoggingFlow {
   implicit val executionContext = system.dispatcher
 
   val frameworkInfo = FrameworkInfo
     .newBuilder()
+    .setPrincipal("mesos-client-framework")
     .setUser("example")
     .setName("MesosClientExample")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
@@ -41,28 +45,28 @@ class MesosClientExampleFramework(settings: MesosClientSettings) extends StrictL
     .setFailoverTimeout(0d)
     .build()
 
-  val client = Await.result(MesosClient(settings, frameworkInfo).runWith(Sink.head), 10.seconds)
+  val client = Await.result(MesosClient(settings, frameworkInfo, authorization).runWith(Sink.head), 10.seconds)
 
   client.mesosSource
-    .runWith(Sink.foreach { event =>
+    .mapConcat[Protos.OfferID] { event =>
       if (event.getType == Event.Type.SUBSCRIBED) {
         logger.info("Successfully subscribed to mesos")
+        List.empty
       } else if (event.getType == Event.Type.OFFERS) {
-
-        val offerIds = event.getOffers.getOffersList.asScala.map(_.getId).toList
-
-        Source(offerIds)
-          .via(info(s"Declining offer with id = ")) // Decline all offers
-          .map(
-            oId =>
-              client.calls.newDecline(
-                offerIds = Seq(oId),
-                filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build())
-            ))
-          .runWith(client.mesosSink)
+        event.getOffers.getOffersList.asScala.map(_.getId).toList
+      } else {
+        logger.info(s"Ignoring event $event")
+        List.empty
       }
-
-    })
+    }
+    .via(info(s"Declining offer with id = ")) // Decline all offers
+    .map { oId =>
+      client.calls.newDecline(
+        offerIds = Seq(oId),
+        filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build())
+      )
+    }
+    .runWith(client.mesosSink)
     .onComplete {
       case Success(res) =>
         logger.info(s"Stream completed: $res"); system.terminate()
@@ -73,9 +77,42 @@ class MesosClientExampleFramework(settings: MesosClientSettings) extends StrictL
 
 object MesosClientExampleFramework {
 
+  /**
+    * Strict mode demo:
+    *
+    * 1. Launch strict cluster and setup the DC/OS CLI.
+    * 2. Create key pair:
+    *   {{{dcos security org service-accounts keypair usi.private.pem usi.pub.pem}}}
+    * 3. Create user strict-usi:
+    *   {{{dcos security org service-accounts create -p usi.pub.pem -d "For testing USI on strict" strict-usi}}}
+    * 4. Grant strict-usi access:
+    *   {{{curl -L -X PUT -k -H "Authorization: token=$(dcos config show core.dcos_acs_token)" "$(dcos config show core.dcos_url)/acs/api/v1/acls/dcos:superuser/users/strict-usi/full"}}}
+    * 5. Download SSL certs:
+    *   {{{wget --no-check-certificate -O dcos-ca.crt "$(dcos config show core.dcos_url)/ca/dcos-ca.crt"}}}
+    * 6. Run with {{{DCOS_CERT=path/to/dcos-ca.crt ./gradlew :mesos-client-example:run --stacktrace --args "https://<DC/OS IP> path/to/usi.private.pem"}}}
+    */
   def main(args: Array[String]): Unit = {
-    MesosClientExampleFramework(MesosClientSettings.load())
+
+    require((1 <= args.length) && (args.length <= 2), "Please provide arguments: <mesos-url> [<private-key-file>]")
+
+    implicit val system = ActorSystem()
+    implicit val materializer = ActorMaterializer()
+    implicit val context = system.dispatcher
+
+    val dcosRoot = new URL(args(0))
+    val provider = if (args.length == 2) {
+      val privateKey = scala.io.Source.fromFile(args(1)).mkString
+      Some(DcosServiceAccountProvider("strict-usi", privateKey, dcosRoot))
+    } else {
+      None
+    }
+
+    val mesosUrl = new URL(s"$dcosRoot/mesos")
+    val clientSettings = MesosClientSettings.load().withMasters(Seq(mesosUrl))
+    new MesosClientExampleFramework(clientSettings, provider)
   }
 
-  def apply(settings: MesosClientSettings): MesosClientExampleFramework = new MesosClientExampleFramework(settings)
+  def apply(settings: MesosClientSettings)(
+      implicit system: ActorSystem,
+      materializer: Materializer): MesosClientExampleFramework = new MesosClientExampleFramework(settings)
 }
