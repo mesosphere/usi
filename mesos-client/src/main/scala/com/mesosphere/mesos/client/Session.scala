@@ -1,7 +1,7 @@
 package com.mesosphere.mesos.client
 import java.net.URL
 
-import akka.{NotUsed, util}
+import akka.NotUsed
 import akka.actor.{Actor, ActorRef, ActorSystem, Props, Stash, Status}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
@@ -9,9 +9,9 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.stream.Materializer
 import akka.stream.scaladsl.Flow
+import akka.util.Timeout
 import com.typesafe.scalalogging.StrictLogging
 
-import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 /**
@@ -24,7 +24,8 @@ import scala.util.{Failure, Success}
   * @param streamId The Mesos stream ID. See the [[http://mesos.apache.org/documentation/latest/scheduler-http-api/#calls docs]] for details.
   * @param authorization A [[CredentialsProvider]] if the connection is secured.
   */
-case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None) {
+case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None)(
+    implicit askTimout: Timeout) {
 
   /**
     * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
@@ -46,7 +47,6 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
   def post(implicit system: ActorSystem, mat: Materializer): Flow[Array[Byte], HttpResponse, NotUsed] =
     authorization match {
       case Some(credentialsProvider) =>
-        implicit val askTimeout = util.Timeout(20.seconds)
         val sessionActor = system.actorOf(SessionActor.props(credentialsProvider, createPostRequest))
         Flow[Array[Byte]].ask[HttpResponse](1)(sessionActor)
       case None =>

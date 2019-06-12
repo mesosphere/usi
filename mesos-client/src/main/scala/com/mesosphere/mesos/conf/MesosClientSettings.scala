@@ -11,14 +11,16 @@ class MesosClientSettings private (
     val masters: Seq[URL],
     val maxRedirects: Int,
     val idleTimeout: FiniteDuration,
-    val sourceBufferSize: Int) {
+    val sourceBufferSize: Int,
+    val callTimeout: FiniteDuration) {
 
   private def copy(
       masters: Seq[URL] = this.masters,
       maxRedirects: Int = this.maxRedirects,
       idleTimeout: FiniteDuration = this.idleTimeout,
-      sourceBufferSize: Int = this.sourceBufferSize) =
-    new MesosClientSettings(masters, maxRedirects, idleTimeout, sourceBufferSize)
+      sourceBufferSize: Int = this.sourceBufferSize,
+      callTimeout: FiniteDuration = this.callTimeout) =
+    new MesosClientSettings(masters, maxRedirects, idleTimeout, sourceBufferSize, callTimeout)
 
   def withMasters(urls: Iterable[URL]): MesosClientSettings = copy(masters = urls.toSeq)
   def withMasters(urls: java.lang.Iterable[URL]): MesosClientSettings = withMasters(urls.asScala)
@@ -28,6 +30,8 @@ class MesosClientSettings private (
   def withIdleTimeout(timeout: FiniteDuration): MesosClientSettings = copy(idleTimeout = timeout)
 
   def withSourceBufferSize(bufferSize: Int): MesosClientSettings = copy(sourceBufferSize = bufferSize)
+
+  def withCallTimeout(timeout: FiniteDuration): MesosClientSettings = copy(callTimeout = timeout)
 }
 
 object MesosClientSettings {
@@ -39,10 +43,11 @@ object MesosClientSettings {
 
     // we want FiniteDuration, the conversion is needed to achieve that
     val idleTimeout = Duration.fromNanos(conf.getDuration("idle-timeout").toNanos)
+    val callTimeout = Duration.fromNanos(conf.getDuration("call-timeout").toNanos)
 
     val sourceBufferSize = conf.getInt("back-pressure.source-buffer-size")
 
-    new MesosClientSettings(masterUrls, maxRedirects, idleTimeout, sourceBufferSize)
+    new MesosClientSettings(masterUrls, maxRedirects, idleTimeout, sourceBufferSize, callTimeout)
 
   }
 

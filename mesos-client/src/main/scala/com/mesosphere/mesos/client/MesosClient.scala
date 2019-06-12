@@ -12,7 +12,7 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.alpakka.recordio.scaladsl.RecordIOFraming
 import akka.stream.scaladsl._
 import akka.stream.{Materializer, OverflowStrategy, _}
-import akka.util.ByteString
+import akka.util.{ByteString, Timeout}
 import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.StrictLogging
 import com.mesosphere.mesos.conf.MesosClientSettings
@@ -190,11 +190,22 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
 
   private def mesosHttpConnection(
       frameworkInfo: FrameworkInfo,
+      conf: MesosClientSettings,
+      authorization: Option[CredentialsProvider])(
+      implicit mat: Materializer,
+      as: ActorSystem,
+      askTimeout: Timeout): Source[(HttpResponse, Session), NotUsed] = {
+    mesosHttpConnection(frameworkInfo, conf.masters.toList, conf.maxRedirects, authorization)
+  }
+
+  private def mesosHttpConnection(
+      frameworkInfo: FrameworkInfo,
       urls: List[URL],
       maxRedirects: Int,
       authorization: Option[CredentialsProvider])(
       implicit mat: Materializer,
-      as: ActorSystem): Source[(HttpResponse, Session), NotUsed] =
+      as: ActorSystem,
+      askTimeout: Timeout): Source[(HttpResponse, Session), NotUsed] =
     urls match {
       case Nil => throw new IOException(s"Failed to connect to Mesos: List of master urls exhausted.")
       case url :: rest =>
@@ -331,8 +342,9 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       system: ActorSystem,
       materializer: Materializer): Source[MesosClient, NotUsed] = {
 
+    implicit val askTimeout = Timeout(conf.callTimeout)
     val httpConnection: Source[(HttpResponse, Session), NotUsed] =
-      mesosHttpConnection(frameworkInfo, conf.masters.toList, conf.maxRedirects, authorization)
+      mesosHttpConnection(frameworkInfo, conf, authorization)
 
     val eventReader = Flow[ByteString]
       .via(RecordIOFraming.scanner())
