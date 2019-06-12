@@ -161,17 +161,17 @@ class SessionActor(
         .singleRequest(request)
         .onComplete {
           case Success(response) =>
-            logger.debug(s"HTTP response: ${response.status}")
+            logger.debug(s"Mesos call HTTP response: ${response.status}")
             self ! SessionActor.Response(call, originalSender, response)
           case Failure(ex) =>
-            logger.error("HTTP request failed", ex)
+            logger.error("Mesos call HTTP request failed", ex)
             // Fail stream.
             originalSender ! Status.Failure(ex)
         }
     case SessionActor.Response(originalCall, originalSender, response) =>
       logger.debug(s"Call replied with ${response.status}")
       if (response.status == StatusCodes.Unauthorized) {
-        logger.info("Refreshing token")
+        logger.info("Refreshing IAM session token")
 
         context.become(initializing)
         credentialsProvider.nextToken().pipeTo(self)

@@ -228,9 +228,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
               throw MesosRedirectException(leader)
             case _ =>
               response.discardEntityBytes()
-              import scala.concurrent.duration._
-              val error = Await.result(Unmarshal(response.entity).to[String], 1.minutes)
-              throw new IllegalArgumentException(s"Mesos server error: ${response.status}: $error")
+              throw new IllegalArgumentException(s"Mesos server error: ${response.status}")
           }
         }.recoverWithRetries(
           1, {
