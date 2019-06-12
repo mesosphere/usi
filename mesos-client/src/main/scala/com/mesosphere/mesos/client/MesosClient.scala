@@ -8,7 +8,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.MediaType.Compressible
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
-import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.alpakka.recordio.scaladsl.RecordIOFraming
 import akka.stream.scaladsl._
 import akka.stream.{Materializer, OverflowStrategy, _}
@@ -19,7 +18,7 @@ import com.mesosphere.mesos.conf.MesosClientSettings
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 trait MesosClient {
 

@@ -177,8 +177,9 @@ class SessionActor(
         credentialsProvider.nextToken().pipeTo(self)
 
         // Queue current call again.
-        self ! originalCall
+        self.tell(originalCall, originalSender)
       } else {
+        logger.debug("Responding to original sender")
         originalSender ! response
       }
   }
