@@ -93,7 +93,7 @@ object MesosClientExampleFramework {
     */
   def main(args: Array[String]): Unit = {
 
-    require(args.length == 2, "Too many arguments")
+    require(args.length == 2, "Please provide two arguments: <mesos-url> <private-key-file>")
 
     implicit val system = ActorSystem()
     implicit val materializer = ActorMaterializer()
