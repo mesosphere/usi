@@ -85,7 +85,7 @@ class SessionActorTest extends AkkaUnitTest {
     * A simple [[CredentialsProvider]] stub that counts how many times [[CredentialsProvider.nextToken()]] was called.
     */
   class CountingCredentialsProvider() extends CredentialsProvider {
-    var calls: Int = 0
+    @volatile var calls: Int = 0
 
     private val credentials = BasicHttpCredentials("user", "password")
 
