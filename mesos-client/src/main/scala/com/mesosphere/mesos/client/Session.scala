@@ -142,7 +142,7 @@ class SessionActor(
 
   def initializing: Receive = {
     case credentials: HttpCredentials =>
-      logger.info("Retrieved token")
+      logger.info("Retrieved IAM session token")
       context.become(initialized(credentials))
       unstashAll()
     case Status.Failure(ex) =>
