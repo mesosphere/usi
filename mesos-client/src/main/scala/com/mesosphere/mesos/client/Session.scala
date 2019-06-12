@@ -64,6 +64,7 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     // Constructs the connection pool settings with defaults and overrides the max connections and pipelining limit so
     // that only one request at a time is processed. See https://doc.akka.io/docs/akka-http/current/configuration.html
     // for details.
+    // *IMPORTANT*: DO NOT CHANGE maxConnections OR pipeliningLimit! Otherwise, USI won't guarantee request order to Mesos!
     val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
 
     Flow[HttpRequest]
