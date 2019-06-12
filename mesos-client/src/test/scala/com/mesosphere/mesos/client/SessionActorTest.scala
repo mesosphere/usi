@@ -47,7 +47,9 @@ class SessionActorTest extends AkkaUnitTest {
       Unmarshal(response.entity).to[String].futureValue.toInt should be(1)
     }
 
-    "refresh the session token when the first call response is an HTTP 401" in withMesosStub(StatusCodes.Unauthorized, StatusCodes.OK) { mesos =>
+    "refresh the session token when the first call response is an HTTP 401" in withMesosStub(
+      StatusCodes.Unauthorized,
+      StatusCodes.OK) { mesos =>
       implicit val timeout = Timeout(2.seconds)
 
       Given("A SessionActor instance")
@@ -116,6 +118,7 @@ class SessionActorTest extends AkkaUnitTest {
     val binding = Http().bindAndHandle(route, "localhost", 0).futureValue
     val uri = Uri(s"http://localhost:${binding.localAddress.getPort}/mesos")
 
-    def createRequest(body: Array[Byte], credentials: Option[HttpCredentials]): HttpRequest = HttpRequest(HttpMethods.POST, uri = uri)
+    def createRequest(body: Array[Byte], credentials: Option[HttpCredentials]): HttpRequest =
+      HttpRequest(HttpMethods.POST, uri = uri)
   }
 }
