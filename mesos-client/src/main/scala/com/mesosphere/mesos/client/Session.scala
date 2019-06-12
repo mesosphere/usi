@@ -25,8 +25,6 @@ import scala.util.{Failure, Success}
   * @param authorization A [[CredentialsProvider]] if the connection is secured.
   */
 case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None) {
-  lazy val isSecured: Boolean = url.getProtocol == "https"
-  lazy val port = if (url.getPort == -1) url.getDefaultPort else url.getPort
 
   /**
     * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
@@ -64,10 +62,11 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     */
   private def connection(implicit system: ActorSystem, mat: Materializer): Flow[HttpRequest, HttpResponse, NotUsed] = {
     val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
-    if (isSecured) {
+    if (Session.isSecured(url)) {
       Flow[HttpRequest]
         .map(_ -> NotUsed)
-        .via(Http().newHostConnectionPoolHttps(host = url.getHost, port = port, settings = poolSettings))
+        .via(Http()
+          .newHostConnectionPoolHttps(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings))
         .map {
           case (Success(response), NotUsed) => response
           case (Failure(ex), NotUsed) => throw ex
@@ -75,13 +74,30 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     } else {
       Flow[HttpRequest]
         .map(_ -> NotUsed)
-        .via(Http().newHostConnectionPool(host = url.getHost, port = port, settings = poolSettings))
+        .via(
+          Http().newHostConnectionPool(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings))
         .map {
           case (Success(response), NotUsed) => response
           case (Failure(ex), NotUsed) => throw ex
         }
     }
   }
+}
+
+object Session {
+
+  /** @return whether the url defines a secured connection. */
+  def isSecured(url: URL): Boolean = {
+    url.getProtocol match {
+      case "https" => true
+      case "http" => false
+      case other =>
+        throw new IllegalArgumentException(s"$other is not a supported protocol. Only HTTPS and HTTP are supported.")
+    }
+  }
+
+  /** @return The defined port or default port for given protocol. */
+  def effectivePort(url: URL): Int = if (url.getPort == -1) url.getDefaultPort else url.getPort
 }
 
 object SessionActor {
