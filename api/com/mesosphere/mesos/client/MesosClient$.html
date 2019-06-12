@@ -135,6 +135,18 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.mesos">mesos</a></dd></dl></div>
     </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="class" href="BasicAuthenticationProvider.html" title=""></a>
+                        <a href="BasicAuthenticationProvider.html" title="">BasicAuthenticationProvider</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="trait" href="CredentialsProvider.html" title="Base credential provider for MesosClient."></a>
+                        <a href="CredentialsProvider.html" title="Base credential provider for MesosClient.">CredentialsProvider</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="DcosServiceAccountProvider$.html" title=""></a>
+                        <a class="class" href="DcosServiceAccountProvider.html" title="Provides DC/OS session tokens as JWT for service accounts."></a>
+                        <a href="DcosServiceAccountProvider.html" title="Provides DC/OS session tokens as JWT for service accounts.">DcosServiceAccountProvider</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="class" href="MesosCalls.html" title=""></a>
                         <a href="MesosCalls.html" title="">MesosCalls</a>
                       </li><li class="current-entities indented4">
@@ -145,6 +157,14 @@
                         <span class="separator"></span>
                         <a class="class" href="MesosClientImpl.html" title=""></a>
                         <a href="MesosClientImpl.html" title="">MesosClientImpl</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="Session$.html" title=""></a>
+                        <a class="class" href="Session.html" title="A session captures the connection information with Mesos."></a>
+                        <a href="Session.html" title="A session captures the connection information with Mesos.">Session</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="SessionActor$.html" title=""></a>
+                        <a class="class" href="SessionActor.html" title="An actor makes requests to Mesos using credentials from a CredentialsProvider."></a>
+                        <a href="SessionActor.html" title="An actor makes requests to Mesos using credentials from a CredentialsProvider.">SessionActor</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
                         <a class="trait" href="StrictLoggingFlow.html" title=""></a>
@@ -231,23 +251,7 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.mesosphere.mesos.client.MesosClient.ConnectionInfo" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ConnectionInfoextendsProductwithSerializable"></a><a id="ConnectionInfo:ConnectionInfo"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/MesosClient$.html#ConnectionInfoextendsProductwithSerializable" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">case class</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="MesosClient$$ConnectionInfo.html"><span class="name">ConnectionInfo</span></a><span class="params">(<span name="url">url: <span class="extype" name="java.net.URL">URL</span></span>, <span name="streamId">streamId: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.mesos.client.MesosClient.MesosRedirectException" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+              <ol><li name="com.mesosphere.mesos.client.MesosClient.MesosRedirectException" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="MesosRedirectExceptionextendsExceptionwithProductwithSerializable"></a><a id="MesosRedirectException:MesosRedirectException"></a>
       <span class="permalink">
       <a href="../../../../com/mesosphere/mesos/client/MesosClient$.html#MesosRedirectExceptionextendsExceptionwithProductwithSerializable" title="Permalink">
@@ -368,9 +372,9 @@
       
       
     </li><li name="com.mesosphere.mesos.client.MesosClient#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(conf:com.mesosphere.mesos.conf.MesosClientSettings,frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo)(implicitsystem:akka.actor.ActorSystem,implicitmaterializer:akka.stream.Materializer):akka.stream.scaladsl.Source[com.mesosphere.mesos.client.MesosClient,akka.NotUsed]"></a><a id="apply(MesosClientSettings,FrameworkInfo)(ActorSystem,Materializer):Source[MesosClient,NotUsed]"></a>
+      <a id="apply(conf:com.mesosphere.mesos.conf.MesosClientSettings,frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo,authorization:Option[com.mesosphere.mesos.client.CredentialsProvider])(implicitsystem:akka.actor.ActorSystem,implicitmaterializer:akka.stream.Materializer):akka.stream.scaladsl.Source[com.mesosphere.mesos.client.MesosClient,akka.NotUsed]"></a><a id="apply(MesosClientSettings,FrameworkInfo,Option[CredentialsProvider])(ActorSystem,Materializer):Source[MesosClient,NotUsed]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/MesosClient$.html#apply(conf:com.mesosphere.mesos.conf.MesosClientSettings,frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo)(implicitsystem:akka.actor.ActorSystem,implicitmaterializer:akka.stream.Materializer):akka.stream.scaladsl.Source[com.mesosphere.mesos.client.MesosClient,akka.NotUsed]" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/MesosClient$.html#apply(conf:com.mesosphere.mesos.conf.MesosClientSettings,frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo,authorization:Option[com.mesosphere.mesos.client.CredentialsProvider])(implicitsystem:akka.actor.ActorSystem,implicitmaterializer:akka.stream.Materializer):akka.stream.scaladsl.Source[com.mesosphere.mesos.client.MesosClient,akka.NotUsed]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -379,7 +383,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="conf">conf: <a href="../conf/MesosClientSettings.html" class="extype" name="com.mesosphere.mesos.conf.MesosClientSettings">MesosClientSettings</a></span>, <span name="frameworkInfo">frameworkInfo: <span class="extype" name="org.apache.mesos.v1.Protos.FrameworkInfo">FrameworkInfo</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="materializer">materializer: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<a href="MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">apply</span><span class="params">(<span name="conf">conf: <a href="../conf/MesosClientSettings.html" class="extype" name="com.mesosphere.mesos.conf.MesosClientSettings">MesosClientSettings</a></span>, <span name="frameworkInfo">frameworkInfo: <span class="extype" name="org.apache.mesos.v1.Protos.FrameworkInfo">FrameworkInfo</span></span>, <span name="authorization">authorization: <span class="extype" name="scala.Option">Option</span>[<a href="CredentialsProvider.html" class="extype" name="com.mesosphere.mesos.client.CredentialsProvider">CredentialsProvider</a>] = <span class="symbol">None</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="materializer">materializer: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<a href="MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
       </span>
       
       <p class="shortcomment cmt">Returns an Akka Stream Source which yields a single MesosClient.</p><div class="fullcomment"><div class="comment cmt"><p>Returns an Akka Stream Source which yields a single MesosClient.</p><p>The mesosSource method on the returned client will be closed either on connection error or connection shutdown,

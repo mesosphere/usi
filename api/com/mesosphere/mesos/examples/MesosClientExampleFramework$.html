@@ -297,9 +297,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.mesosphere.mesos.examples.MesosClientExampleFramework#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="apply(settings:com.mesosphere.mesos.conf.MesosClientSettings):com.mesosphere.mesos.examples.MesosClientExampleFramework"></a><a id="apply(MesosClientSettings):MesosClientExampleFramework"></a>
+      <a id="apply(settings:com.mesosphere.mesos.conf.MesosClientSettings)(implicitsystem:akka.actor.ActorSystem,implicitmaterializer:akka.stream.Materializer):com.mesosphere.mesos.examples.MesosClientExampleFramework"></a><a id="apply(MesosClientSettings)(ActorSystem,Materializer):MesosClientExampleFramework"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/examples/MesosClientExampleFramework$.html#apply(settings:com.mesosphere.mesos.conf.MesosClientSettings):com.mesosphere.mesos.examples.MesosClientExampleFramework" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/examples/MesosClientExampleFramework$.html#apply(settings:com.mesosphere.mesos.conf.MesosClientSettings)(implicitsystem:akka.actor.ActorSystem,implicitmaterializer:akka.stream.Materializer):com.mesosphere.mesos.examples.MesosClientExampleFramework" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -308,7 +308,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="settings">settings: <a href="../conf/MesosClientSettings.html" class="extype" name="com.mesosphere.mesos.conf.MesosClientSettings">MesosClientSettings</a></span>)</span><span class="result">: <a href="MesosClientExampleFramework.html" class="extype" name="com.mesosphere.mesos.examples.MesosClientExampleFramework">MesosClientExampleFramework</a></span>
+        <span class="name">apply</span><span class="params">(<span name="settings">settings: <a href="../conf/MesosClientSettings.html" class="extype" name="com.mesosphere.mesos.conf.MesosClientSettings">MesosClientSettings</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="materializer">materializer: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: <a href="MesosClientExampleFramework.html" class="extype" name="com.mesosphere.mesos.examples.MesosClientExampleFramework">MesosClientExampleFramework</a></span>
       </span>
       
       
@@ -460,7 +460,7 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.mesosphere.mesos.examples.MesosClientExampleFramework#main" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.mesosphere.mesos.examples.MesosClientExampleFramework#main" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="main(args:Array[String]):Unit"></a><a id="main(Array[String]):Unit"></a>
       <span class="permalink">
       <a href="../../../../com/mesosphere/mesos/examples/MesosClientExampleFramework$.html#main(args:Array[String]):Unit" title="Permalink">
@@ -475,7 +475,8 @@
         <span class="name">main</span><span class="params">(<span name="args">args: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      
+      <p class="shortcomment cmt">Strict mode demo:</p><div class="fullcomment"><div class="comment cmt"><p>Strict mode demo:</p><p>1. Launch strict cluster and setup the DC/OS CLI.
+2. Create key pair:</p><pre>dcos security org service-accounts keypair usi.<span class="kw">private</span>.pem usi.pub.pem</pre><p>3. Create user strict-usi:</p><pre>dcos security org service-accounts create -p usi.pub.pem -d <span class="lit">"For testing USI on strict"</span> strict-usi</pre><p>4. Grant strict-usi access:</p><pre>curl -L -X PUT -k -H <span class="lit">"Authorization: token=$(dcos config show core.dcos_acs_token)"</span> <span class="lit">"$(dcos config show core.dcos_url)/acs/api/v1/acls/dcos:superuser/users/strict-usi/full"</span></pre><p>5. Download SSL certs:</p><pre>wget --no-check-certificate -O dcos-ca.crt <span class="lit">"$(dcos config show core.dcos_url)/ca/dcos-ca.crt"</span></pre><p>6. Run with </p><pre>DCOS_CERT=path/to/dcos-ca.crt ./gradlew :mesos-client-example:run --stacktrace --args <span class="lit">"https://<DC/OS IP> path/to/usi.private.pem"</span></pre></div></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">

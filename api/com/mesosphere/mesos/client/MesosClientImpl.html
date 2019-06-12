@@ -135,6 +135,18 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.mesos">mesos</a></dd></dl></div>
     </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="class" href="BasicAuthenticationProvider.html" title=""></a>
+                        <a href="BasicAuthenticationProvider.html" title="">BasicAuthenticationProvider</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="trait" href="CredentialsProvider.html" title="Base credential provider for MesosClient."></a>
+                        <a href="CredentialsProvider.html" title="Base credential provider for MesosClient.">CredentialsProvider</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="DcosServiceAccountProvider$.html" title=""></a>
+                        <a class="class" href="DcosServiceAccountProvider.html" title="Provides DC/OS session tokens as JWT for service accounts."></a>
+                        <a href="DcosServiceAccountProvider.html" title="Provides DC/OS session tokens as JWT for service accounts.">DcosServiceAccountProvider</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="class" href="MesosCalls.html" title=""></a>
                         <a href="MesosCalls.html" title="">MesosCalls</a>
                       </li><li class="current-entities indented4">
@@ -145,6 +157,14 @@
                         <span class="separator"></span>
                         <a class="class" href="" title=""></a>
                         <a href="" title="">MesosClientImpl</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="Session$.html" title=""></a>
+                        <a class="class" href="Session.html" title="A session captures the connection information with Mesos."></a>
+                        <a href="Session.html" title="A session captures the connection information with Mesos.">Session</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="SessionActor$.html" title=""></a>
+                        <a class="class" href="SessionActor.html" title="An actor makes requests to Mesos using credentials from a CredentialsProvider."></a>
+                        <a href="SessionActor.html" title="An actor makes requests to Mesos using credentials from a CredentialsProvider.">SessionActor</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
                         <a class="trait" href="StrictLoggingFlow.html" title=""></a>
@@ -228,9 +248,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.mesos.client.MesosClientImpl#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo,sharedKillSwitch:akka.stream.SharedKillSwitch,subscribed:org.apache.mesos.v1.scheduler.Protos.Event.Subscribed,connectionInfo:com.mesosphere.mesos.client.MesosClient.ConnectionInfo,mesosSource:akka.stream.scaladsl.Source[org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed])(implicitas:akka.actor.ActorSystem,implicitm:akka.stream.Materializer):com.mesosphere.mesos.client.MesosClientImpl"></a><a id="&lt;init&gt;:MesosClientImpl"></a>
+      <a id="&lt;init&gt;(frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo,sharedKillSwitch:akka.stream.SharedKillSwitch,subscribed:org.apache.mesos.v1.scheduler.Protos.Event.Subscribed,session:com.mesosphere.mesos.client.Session,mesosSource:akka.stream.scaladsl.Source[org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed])(implicitas:akka.actor.ActorSystem,implicitm:akka.stream.Materializer):com.mesosphere.mesos.client.MesosClientImpl"></a><a id="&lt;init&gt;:MesosClientImpl"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/MesosClientImpl.html#&lt;init&gt;(frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo,sharedKillSwitch:akka.stream.SharedKillSwitch,subscribed:org.apache.mesos.v1.scheduler.Protos.Event.Subscribed,connectionInfo:com.mesosphere.mesos.client.MesosClient.ConnectionInfo,mesosSource:akka.stream.scaladsl.Source[org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed])(implicitas:akka.actor.ActorSystem,implicitm:akka.stream.Materializer):com.mesosphere.mesos.client.MesosClientImpl" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/MesosClientImpl.html#&lt;init&gt;(frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo,sharedKillSwitch:akka.stream.SharedKillSwitch,subscribed:org.apache.mesos.v1.scheduler.Protos.Event.Subscribed,session:com.mesosphere.mesos.client.Session,mesosSource:akka.stream.scaladsl.Source[org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed])(implicitas:akka.actor.ActorSystem,implicitm:akka.stream.Materializer):com.mesosphere.mesos.client.MesosClientImpl" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -239,7 +259,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">MesosClientImpl</span><span class="params">(<span name="frameworkInfo">frameworkInfo: <span class="extype" name="org.apache.mesos.v1.Protos.FrameworkInfo">FrameworkInfo</span></span>, <span name="sharedKillSwitch">sharedKillSwitch: <span class="extype" name="akka.stream.SharedKillSwitch">SharedKillSwitch</span></span>, <span name="subscribed">subscribed: <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event.Subscribed">Subscribed</span></span>, <span name="connectionInfo">connectionInfo: <a href="MesosClient$$ConnectionInfo.html" class="extype" name="com.mesosphere.mesos.client.MesosClient.ConnectionInfo">ConnectionInfo</a></span>, <span name="mesosSource">mesosSource: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="as">as: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="m">m: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span>
+        <span class="name">MesosClientImpl</span><span class="params">(<span name="frameworkInfo">frameworkInfo: <span class="extype" name="org.apache.mesos.v1.Protos.FrameworkInfo">FrameworkInfo</span></span>, <span name="sharedKillSwitch">sharedKillSwitch: <span class="extype" name="akka.stream.SharedKillSwitch">SharedKillSwitch</span></span>, <span name="subscribed">subscribed: <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event.Subscribed">Subscribed</span></span>, <span name="session">session: <a href="Session.html" class="extype" name="com.mesosphere.mesos.client.Session">Session</a></span>, <span name="mesosSource">mesosSource: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="as">as: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="m">m: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span>
       </span>
       
       
@@ -361,24 +381,6 @@ them in the instantiated call. **Note** none of the methods in this factory obje
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client.MesosClientImpl#connectionInfo" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="connectionInfo:com.mesosphere.mesos.client.MesosClient.ConnectionInfo"></a><a id="connectionInfo:ConnectionInfo"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/MesosClientImpl.html#connectionInfo:com.mesosphere.mesos.client.MesosClient.ConnectionInfo" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">connectionInfo</span><span class="result">: <a href="MesosClient$$ConnectionInfo.html" class="extype" name="com.mesosphere.mesos.client.MesosClient.ConnectionInfo">ConnectionInfo</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">The information about the current Mesos Master to which this client is connected.</p><div class="fullcomment"><div class="comment cmt"><p>The information about the current Mesos Master to which this client is connected.</p><p>Note: MesosClient will disconnect on Mesos Master failover. It is the resposibility of the consumer as such to
-reconnect to Mesos in such an event. As such, this information will be current, so long as we are connected.
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.mesos.client.MesosClientImpl">MesosClientImpl</a> → <a href="MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></dd></dl></div>
     </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#debug" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="debug[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="debug[T](String):Flow[T,T,NotUsed]"></a>
       <span class="permalink">
@@ -537,22 +539,6 @@ reconnect to Mesos in such an event. As such, this information will be current, 
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client.MesosClientImpl#httpConnection" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="httpConnection:akka.stream.scaladsl.Flow[akka.http.scaladsl.model.HttpRequest,akka.http.scaladsl.model.HttpResponse,scala.concurrent.Future[akka.http.scaladsl.Http.OutgoingConnection]]"></a><a id="httpConnection:Flow[HttpRequest,HttpResponse,Future[OutgoingConnection]]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/MesosClientImpl.html#httpConnection:akka.stream.scaladsl.Flow[akka.http.scaladsl.model.HttpRequest,akka.http.scaladsl.model.HttpResponse,scala.concurrent.Future[akka.http.scaladsl.Http.OutgoingConnection]]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">httpConnection</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="akka.http.scaladsl.model.HttpRequest">HttpRequest</span>, <span class="extype" name="akka.http.scaladsl.model.HttpResponse">HttpResponse</span>, <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="akka.http.scaladsl.Http.OutgoingConnection">OutgoingConnection</span>]]</span>
-      </span>
-      
-      
     </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#info" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="info[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="info[T](String):Flow[T,T,NotUsed]"></a>
       <span class="permalink">
@@ -757,6 +743,24 @@ handle reconnection at this layer.
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.mesos.client.MesosClientImpl#session" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="session:com.mesosphere.mesos.client.Session"></a><a id="session:Session"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/MesosClientImpl.html#session:com.mesosphere.mesos.client.Session" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">session</span><span class="result">: <a href="Session.html" class="extype" name="com.mesosphere.mesos.client.Session">Session</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">The information about the current connection to Mesos Master.</p><div class="fullcomment"><div class="comment cmt"><p>The information about the current connection to Mesos Master.</p><p>Note: MesosClient will disconnect on Mesos Master failover. It is the responsibility of the consumer as such to
+reconnect to Mesos in such an event. As such, this information will be current, so long as we are connected.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.mesos.client.MesosClientImpl">MesosClientImpl</a> → <a href="MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></dd></dl></div>
     </li><li name="com.mesosphere.mesos.client.MesosClientImpl#subscribed" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="subscribed:org.apache.mesos.v1.scheduler.Protos.Event.Subscribed"></a><a id="subscribed:Subscribed"></a>
       <span class="permalink">

@@ -135,6 +135,18 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.mesos">mesos</a></dd></dl></div>
     </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="class" href="BasicAuthenticationProvider.html" title=""></a>
+                        <a href="BasicAuthenticationProvider.html" title="">BasicAuthenticationProvider</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="trait" href="CredentialsProvider.html" title="Base credential provider for MesosClient."></a>
+                        <a href="CredentialsProvider.html" title="Base credential provider for MesosClient.">CredentialsProvider</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="DcosServiceAccountProvider$.html" title=""></a>
+                        <a class="class" href="DcosServiceAccountProvider.html" title="Provides DC/OS session tokens as JWT for service accounts."></a>
+                        <a href="DcosServiceAccountProvider.html" title="Provides DC/OS session tokens as JWT for service accounts.">DcosServiceAccountProvider</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="class" href="MesosCalls.html" title=""></a>
                         <a href="MesosCalls.html" title="">MesosCalls</a>
                       </li><li class="current-entities indented4">
@@ -145,6 +157,14 @@
                         <span class="separator"></span>
                         <a class="class" href="MesosClientImpl.html" title=""></a>
                         <a href="MesosClientImpl.html" title="">MesosClientImpl</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="Session$.html" title=""></a>
+                        <a class="class" href="Session.html" title="A session captures the connection information with Mesos."></a>
+                        <a href="Session.html" title="A session captures the connection information with Mesos.">Session</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="SessionActor$.html" title=""></a>
+                        <a class="class" href="SessionActor.html" title="An actor makes requests to Mesos using credentials from a CredentialsProvider."></a>
+                        <a href="SessionActor.html" title="An actor makes requests to Mesos using credentials from a CredentialsProvider.">SessionActor</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
                         <a class="trait" href="StrictLoggingFlow.html" title=""></a>
@@ -244,7 +264,57 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.mesosphere.mesos.client.MesosCalls" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+              <ol><li name="com.mesosphere.mesos.client.BasicAuthenticationProvider" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BasicAuthenticationProviderextendsCredentialsProviderwithProductwithSerializable"></a><a id="BasicAuthenticationProvider:BasicAuthenticationProvider"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/index.html#BasicAuthenticationProviderextendsCredentialsProviderwithProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="BasicAuthenticationProvider.html"><span class="name">BasicAuthenticationProvider</span></a><span class="params">(<span name="user">user: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="password">password: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="CredentialsProvider.html" class="extype" name="com.mesosphere.mesos.client.CredentialsProvider">CredentialsProvider</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.mesos.client.CredentialsProvider" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="CredentialsProviderextendsAnyRef"></a><a id="CredentialsProvider:CredentialsProvider"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/index.html#CredentialsProviderextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Base credential provider for MesosClient." href="CredentialsProvider.html"><span class="name">CredentialsProvider</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Base credential provider for <a href="MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a>.</p>
+    </li><li name="com.mesosphere.mesos.client.DcosServiceAccountProvider" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DcosServiceAccountProviderextendsCredentialsProviderwithPlayJsonSupportwithStrictLoggingwithProductwithSerializable"></a><a id="DcosServiceAccountProvider:DcosServiceAccountProvider"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/index.html#DcosServiceAccountProviderextendsCredentialsProviderwithPlayJsonSupportwithStrictLoggingwithProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="Provides DC/OS session tokens as JWT for service accounts." href="DcosServiceAccountProvider.html"><span class="name">DcosServiceAccountProvider</span></a><span class="params">(<span name="uid">uid: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="privateKey">privateKey: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="root">root: <span class="extype" name="java.net.URL">URL</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="materializer">materializer: <span class="extype" name="akka.stream.ActorMaterializer">ActorMaterializer</span></span>, <span name="context">context: <span class="extype" name="scala.concurrent.ExecutionContext">ExecutionContext</span></span>)</span><span class="result"> extends <a href="CredentialsProvider.html" class="extype" name="com.mesosphere.mesos.client.CredentialsProvider">CredentialsProvider</a> with <span class="extype" name="de.heikoseeberger.akkahttpplayjson.PlayJsonSupport">PlayJsonSupport</span> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Provides DC/OS session tokens as JWT for service accounts.</p><div class="fullcomment"><div class="comment cmt"><p>Provides DC/OS session tokens as JWT for service accounts.
+</p></div><dl class="paramcmts block"><dt class="param">uid</dt><dd class="cmt"><p>The user id.</p></dd><dt class="param">privateKey</dt><dd class="cmt"><p>The JWT secret.</p></dd><dt class="param">root</dt><dd class="cmt"><p>The DC/OS root URL.</p></dd><dt class="param">system</dt><dd class="cmt"><p>The <span class="extype" name="ActorSystem">ActorSystem</span> used for HTTP requests.</p></dd><dt class="param">materializer</dt><dd class="cmt"><p>The <span class="extype" name="ActorMaterializer">ActorMaterializer</span> use to unmarshal HTTP responses.</p></dd><dt class="param">context</dt><dd class="cmt"><p>The execution context for transforming the future HTTP response.</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>See <a href="https://docs.mesosphere.com/1.11/security/ent/iam-api/#obtaining-an-authentication-token" target="_blank">https://docs.mesosphere.com/1.11/security/ent/iam-api/#obtaining-an-authentication-token</a> for details on
+     the protocol.</p></span></dd></dl></div>
+    </li><li name="com.mesosphere.mesos.client.MesosCalls" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="MesosCallsextendsAnyRef"></a><a id="MesosCalls:MesosCalls"></a>
       <span class="permalink">
       <a href="../../../../com/mesosphere/mesos/client/index.html#MesosCallsextendsAnyRef" title="Permalink">
@@ -292,6 +362,40 @@
       </span>
       
       <p class="shortcomment cmt"></p>
+    </li><li name="com.mesosphere.mesos.client.Session" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SessionextendsProductwithSerializable"></a><a id="Session:Session"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/index.html#SessionextendsProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="A session captures the connection information with Mesos." href="Session.html"><span class="name">Session</span></a><span class="params">(<span name="url">url: <span class="extype" name="java.net.URL">URL</span></span>, <span name="streamId">streamId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="authorization">authorization: <span class="extype" name="scala.Option">Option</span>[<a href="CredentialsProvider.html" class="extype" name="com.mesosphere.mesos.client.CredentialsProvider">CredentialsProvider</a>] = <span class="symbol">None</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="askTimout">askTimout: <span class="extype" name="akka.util.Timeout">Timeout</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">A session captures the connection information with Mesos.</p><div class="fullcomment"><div class="comment cmt"><p>A session captures the connection information with Mesos. This is among other things the URL and credentials providers.</p><p>It behaves similar to Python Request's <a href="https://2.python-requests.org/en/master/user/advanced/#session-objects" target="_blank">Session object</a>.
+Thus it provides methods to construct and connect to Mesos.
+</p></div><dl class="paramcmts block"><dt class="param">url</dt><dd class="cmt"><p>The Mesos master URL.</p></dd><dt class="param">streamId</dt><dd class="cmt"><p>The Mesos stream ID. See the <a href="http://mesos.apache.org/documentation/latest/scheduler-http-api/#calls" target="_blank">docs</a> for details.</p></dd><dt class="param">authorization</dt><dd class="cmt"><p>A <a href="CredentialsProvider.html" class="extype" name="com.mesosphere.mesos.client.CredentialsProvider">CredentialsProvider</a> if the connection is secured.</p></dd></dl></div>
+    </li><li name="com.mesosphere.mesos.client.SessionActor" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SessionActorextendsActorwithStashwithStrictLogging"></a><a id="SessionActor:SessionActor"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/index.html#SessionActorextendsActorwithStashwithStrictLogging" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="An actor makes requests to Mesos using credentials from a CredentialsProvider." href="SessionActor.html"><span class="name">SessionActor</span></a><span class="result"> extends <span class="extype" name="akka.actor.Actor">Actor</span> with <span class="extype" name="akka.actor.Stash">Stash</span> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">An actor makes requests to Mesos using credentials from a <a href="CredentialsProvider.html" class="extype" name="com.mesosphere.mesos.client.CredentialsProvider">CredentialsProvider</a>.</p>
     </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="StrictLoggingFlowextendsStrictLogging"></a><a id="StrictLoggingFlow:StrictLoggingFlow"></a>
       <span class="permalink">
@@ -316,7 +420,23 @@
         <div class="values members">
               <h3>Value Members</h3>
               <ol>
-                <li name="com.mesosphere.mesos.client.MesosClient" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+                <li name="com.mesosphere.mesos.client.DcosServiceAccountProvider" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DcosServiceAccountProvider"></a><a id="DcosServiceAccountProvider:DcosServiceAccountProvider"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/index.html#DcosServiceAccountProvider" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="DcosServiceAccountProvider$.html"><span class="name">DcosServiceAccountProvider</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.mesos.client.MesosClient" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="MesosClient"></a><a id="MesosClient:MesosClient"></a>
       <span class="permalink">
       <a href="../../../../com/mesosphere/mesos/client/index.html#MesosClient" title="Permalink">
@@ -329,6 +449,38 @@
       </span>
       <span class="symbol">
         <a title="" href="MesosClient$.html"><span class="name">MesosClient</span></a><span class="result"> extends <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span> with <a href="StrictLoggingFlow.html" class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow">StrictLoggingFlow</a></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.mesos.client.Session" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Session"></a><a id="Session:Session"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/index.html#Session" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="Session$.html"><span class="name">Session</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.mesos.client.SessionActor" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SessionActor"></a><a id="SessionActor:SessionActor"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/index.html#SessionActor" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="SessionActor$.html"><span class="name">SessionActor</span></a>
       </span>
       
       

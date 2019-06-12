@@ -135,6 +135,18 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.mesos">mesos</a></dd></dl></div>
     </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="class" href="BasicAuthenticationProvider.html" title=""></a>
+                        <a href="BasicAuthenticationProvider.html" title="">BasicAuthenticationProvider</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="trait" href="CredentialsProvider.html" title="Base credential provider for MesosClient."></a>
+                        <a href="CredentialsProvider.html" title="Base credential provider for MesosClient.">CredentialsProvider</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="DcosServiceAccountProvider$.html" title=""></a>
+                        <a class="class" href="DcosServiceAccountProvider.html" title="Provides DC/OS session tokens as JWT for service accounts."></a>
+                        <a href="DcosServiceAccountProvider.html" title="Provides DC/OS session tokens as JWT for service accounts.">DcosServiceAccountProvider</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="class" href="MesosCalls.html" title=""></a>
                         <a href="MesosCalls.html" title="">MesosCalls</a>
                       </li><li class="current-entities indented4">
@@ -145,6 +157,14 @@
                         <span class="separator"></span>
                         <a class="class" href="MesosClientImpl.html" title=""></a>
                         <a href="MesosClientImpl.html" title="">MesosClientImpl</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="Session$.html" title=""></a>
+                        <a class="class" href="Session.html" title="A session captures the connection information with Mesos."></a>
+                        <a href="Session.html" title="A session captures the connection information with Mesos.">Session</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="SessionActor$.html" title=""></a>
+                        <a class="class" href="SessionActor.html" title="An actor makes requests to Mesos using credentials from a CredentialsProvider."></a>
+                        <a href="SessionActor.html" title="An actor makes requests to Mesos using credentials from a CredentialsProvider.">SessionActor</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
                         <a class="trait" href="StrictLoggingFlow.html" title=""></a>
@@ -257,24 +277,6 @@
 send to Mesos via the <code>mesosSink</code>.</p><div class="fullcomment"><div class="comment cmt"><p>Set of helper factory methods that can be used for constructing various calls that the framework will make, to be
 send to Mesos via the <code>mesosSink</code>. These calls will have the Frameworks FrameworkID and will automatically include
 them in the instantiated call. **Note** none of the methods in this factory object have side effects.
-</p></div></div>
-    </li><li name="com.mesosphere.mesos.client.MesosClient#connectionInfo" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="connectionInfo:com.mesosphere.mesos.client.MesosClient.ConnectionInfo"></a><a id="connectionInfo:ConnectionInfo"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/MesosClient.html#connectionInfo:com.mesosphere.mesos.client.MesosClient.ConnectionInfo" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">connectionInfo</span><span class="result">: <a href="MesosClient$$ConnectionInfo.html" class="extype" name="com.mesosphere.mesos.client.MesosClient.ConnectionInfo">ConnectionInfo</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">The information about the current Mesos Master to which this client is connected.</p><div class="fullcomment"><div class="comment cmt"><p>The information about the current Mesos Master to which this client is connected.</p><p>Note: MesosClient will disconnect on Mesos Master failover. It is the resposibility of the consumer as such to
-reconnect to Mesos in such an event. As such, this information will be current, so long as we are connected.
 </p></div></div>
     </li><li name="com.mesosphere.mesos.client.MesosClient#frameworkId" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="frameworkId:org.apache.mesos.v1.Protos.FrameworkID"></a><a id="frameworkId:FrameworkID"></a>
@@ -409,6 +411,24 @@ terminate, for any reason, that the entire MesosClient is terminated.
       
       <p class="shortcomment cmt">Materializable-once source containing a stream of events from the currently connected Mesos Master.</p><div class="fullcomment"><div class="comment cmt"><p>Materializable-once source containing a stream of events from the currently connected Mesos Master.</p><p>This stream will terminate if the connection is lost the Mesos Master. There are no attempts to automatically
 handle reconnection at this layer.
+</p></div></div>
+    </li><li name="com.mesosphere.mesos.client.MesosClient#session" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="session:com.mesosphere.mesos.client.Session"></a><a id="session:Session"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/MesosClient.html#session:com.mesosphere.mesos.client.Session" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">session</span><span class="result">: <a href="Session.html" class="extype" name="com.mesosphere.mesos.client.Session">Session</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">The information about the current connection to Mesos Master.</p><div class="fullcomment"><div class="comment cmt"><p>The information about the current connection to Mesos Master.</p><p>Note: MesosClient will disconnect on Mesos Master failover. It is the responsibility of the consumer as such to
+reconnect to Mesos in such an event. As such, this information will be current, so long as we are connected.
 </p></div></div>
     </li></ol>
             </div>

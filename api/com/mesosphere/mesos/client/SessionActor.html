@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1 API  - com.mesosphere.mesos.client.StrictLoggingFlow</title>
-          <meta name="description" content="usi 0.1 API - com.mesosphere.mesos.client.StrictLoggingFlow" />
-          <meta name="keywords" content="usi 0.1 API com.mesosphere.mesos.client.StrictLoggingFlow" />
+          <title>usi 0.1 API  - com.mesosphere.mesos.client.SessionActor</title>
+          <meta name="description" content="usi 0.1 API - com.mesosphere.mesos.client.SessionActor" />
+          <meta name="keywords" content="usi 0.1 API com.mesosphere.mesos.client.SessionActor" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -163,51 +163,49 @@
                         <a href="Session.html" title="A session captures the connection information with Mesos.">Session</a>
                       </li><li class="current-entities indented4">
                         <a class="object" href="SessionActor$.html" title=""></a>
-                        <a class="class" href="SessionActor.html" title="An actor makes requests to Mesos using credentials from a CredentialsProvider."></a>
-                        <a href="SessionActor.html" title="An actor makes requests to Mesos using credentials from a CredentialsProvider.">SessionActor</a>
+                        <a class="class" href="" title="An actor makes requests to Mesos using credentials from a CredentialsProvider."></a>
+                        <a href="" title="An actor makes requests to Mesos using credentials from a CredentialsProvider.">SessionActor</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="trait" href="" title=""></a>
-                        <a href="" title="">StrictLoggingFlow</a>
+                        <a class="trait" href="StrictLoggingFlow.html" title=""></a>
+                        <a href="StrictLoggingFlow.html" title="">StrictLoggingFlow</a>
                       </li>
               </ul>
             </div>
           </div>
           <div id="content">
-            <body class="trait type">
+            <body class="class type">
       <div id="definition">
-        <div class="big-circle trait">t</div>
+        <a href="SessionActor$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
         <p id="owner"><a href="../../../index.html" class="extype" name="com">com</a>.<a href="../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../index.html" class="extype" name="com.mesosphere.mesos">mesos</a>.<a href="index.html" class="extype" name="com.mesosphere.mesos.client">client</a></p>
-        <h1>StrictLoggingFlow<span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html" title="Permalink">
+        <h1><a href="SessionActor$.html" title="See companion object">SessionActor</a><span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"></span></h3>
+        <h3><span class="morelinks"><div>
+            Companion <a href="SessionActor$.html" title="See companion object">object SessionActor</a>
+          </div></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">trait</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">StrictLoggingFlow</span><span class="result"> extends <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></span>
+        <span class="name">SessionActor</span><span class="result"> extends <span class="extype" name="akka.actor.Actor">Actor</span> with <span class="extype" name="akka.actor.Stash">Stash</span> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>An actor makes requests to Mesos using credentials from a <a href="CredentialsProvider.html" class="extype" name="com.mesosphere.mesos.client.CredentialsProvider">CredentialsProvider</a>.
+</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
-        </div><div class="toggleContainer block">
-            <span class="toggle">
-              Known Subclasses
-            </span>
-            <div class="subClasses hiddenContent"><a href="MesosClient$.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a>, <a href="MesosClientImpl.html" class="extype" name="com.mesosphere.mesos.client.MesosClientImpl">MesosClientImpl</a>, <a href="../examples/MesosClientExampleFramework.html" class="extype" name="com.mesosphere.mesos.examples.MesosClientExampleFramework">MesosClientExampleFramework</a>, <a href="../examples/SimpleHelloWorldFramework.html" class="extype" name="com.mesosphere.mesos.examples.SimpleHelloWorldFramework">SimpleHelloWorldFramework</a></div>
-          </div></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span>, <span class="extype" name="akka.actor.Stash">Stash</span>, <span class="extype" name="akka.dispatch.RequiresMessageQueue">RequiresMessageQueue</span>[<span class="extype" name="akka.dispatch.DequeBasedMessageQueueSemantics">DequeBasedMessageQueueSemantics</span>], <span class="extype" name="akka.actor.UnrestrictedStash">UnrestrictedStash</span>, <span class="extype" name="akka.actor.StashSupport">StashSupport</span>, <span class="extype" name="akka.actor.Actor">Actor</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
         
 
       <div id="mbrsel">
@@ -232,7 +230,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.mesos.client.StrictLoggingFlow"><span>StrictLoggingFlow</span></li><li class="in" name="com.typesafe.scalalogging.StrictLogging"><span>StrictLogging</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.mesos.client.SessionActor"><span>SessionActor</span></li><li class="in" name="com.typesafe.scalalogging.StrictLogging"><span>StrictLogging</span></li><li class="in" name="akka.actor.Stash"><span>Stash</span></li><li class="in" name="akka.dispatch.RequiresMessageQueue"><span>RequiresMessageQueue</span></li><li class="in" name="akka.actor.UnrestrictedStash"><span>UnrestrictedStash</span></li><li class="in" name="akka.actor.StashSupport"><span>StashSupport</span></li><li class="in" name="akka.actor.Actor"><span>Actor</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -250,9 +248,48 @@
 
       <div id="template">
         <div id="allMembers">
-        
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="com.mesosphere.mesos.client.SessionActor#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(credentialsProvider:com.mesosphere.mesos.client.CredentialsProvider,requestFactory:(Array[Byte],Option[akka.http.scaladsl.model.headers.HttpCredentials])=&gt;akka.http.scaladsl.model.HttpRequest):com.mesosphere.mesos.client.SessionActor"></a><a id="&lt;init&gt;:SessionActor"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#&lt;init&gt;(credentialsProvider:com.mesosphere.mesos.client.CredentialsProvider,requestFactory:(Array[Byte],Option[akka.http.scaladsl.model.headers.HttpCredentials])=&gt;akka.http.scaladsl.model.HttpRequest):com.mesosphere.mesos.client.SessionActor" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">SessionActor</span><span class="params">(<span name="credentialsProvider">credentialsProvider: <a href="CredentialsProvider.html" class="extype" name="com.mesosphere.mesos.client.CredentialsProvider">CredentialsProvider</a></span>, <span name="requestFactory">requestFactory: (<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>], <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="akka.http.scaladsl.model.headers.HttpCredentials">HttpCredentials</span>]) ⇒ <span class="extype" name="akka.http.scaladsl.model.HttpRequest">HttpRequest</span></span>)</span>
+      </span>
+      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">credentialsProvider</dt><dd class="cmt"><p>The provider used to fetch the credentials, ie a session token.</p></dd><dt class="param">requestFactory</dt><dd class="cmt"><p>The factory method that creates a <span class="extype" name="HttpRequest">HttpRequest</span> from a serialized Mesos call. It should
+                      capture the <a href="Session.html#streamId:String" class="extmbr" name="com.mesosphere.mesos.client.Session#streamId">Session.streamId</a> and <a href="Session.html#url:java.net.URL" class="extmbr" name="com.mesosphere.mesos.client.Session#url">Session.url</a>.</p></dd></dl></div>
+    </li></ol>
+            </div>
 
-        
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="akka.actor.Actor.Receive" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Receive=akka.actor.Actor.Receive"></a><a id="Receive:Receive"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#Receive=akka.actor.Actor.Receive" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Receive</span><span class="result alias"> = <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="scala.Any">Any</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li></ol>
+            </div>
 
         
 
@@ -262,7 +299,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -278,7 +315,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html###():Int" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -294,7 +331,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -307,10 +344,105 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPostRestart" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPostRestart(reason:Throwable):Unit"></a><a id="aroundPostRestart(Throwable):Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#aroundPostRestart(reason:Throwable):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPostRestart</span><span class="params">(<span name="reason">reason: <span class="extype" name="scala.Throwable">Throwable</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../akka/index.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@InternalApi</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPostStop" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPostStop():Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#aroundPostStop():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPostStop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../akka/index.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@InternalApi</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPreRestart" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPreRestart(reason:Throwable,message:Option[Any]):Unit"></a><a id="aroundPreRestart(Throwable,Option[Any]):Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#aroundPreRestart(reason:Throwable,message:Option[Any]):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPreRestart</span><span class="params">(<span name="reason">reason: <span class="extype" name="scala.Throwable">Throwable</span></span>, <span name="message">message: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../akka/index.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@InternalApi</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPreStart" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPreStart():Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#aroundPreStart():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPreStart</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../akka/index.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@InternalApi</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundReceive" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundReceive(receive:akka.actor.Actor.Receive,msg:Any):Unit"></a><a id="aroundReceive(akka.actor.Actor.Receive,Any):Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#aroundReceive(receive:akka.actor.Actor.Receive,msg:Any):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundReceive</span><span class="params">(<span name="receive">receive: <span class="extype" name="akka.actor.Actor.Receive">akka.actor.Actor.Receive</span></span>, <span name="msg">msg: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../akka/index.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@InternalApi</span><span class="args">()</span>
+              
+        </dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -326,7 +458,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#clone():Object" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -347,26 +479,26 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#debug" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="debug[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="debug[T](String):Flow[T,T,NotUsed]"></a>
+    </li><li name="akka.actor.Actor#context" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="context:akka.actor.ActorContext"></a><a id="context:ActorContext"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#debug[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#context:akka.actor.ActorContext" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="modifier">implicit </span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">debug</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.debug.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.debug.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">context</span><span class="result">: <span class="extype" name="akka.actor.ActorContext">ActorContext</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -382,7 +514,7 @@
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -395,26 +527,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#error" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="error[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="error[T](String):Flow[T,T,NotUsed]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#error[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">error</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.error.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.error.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#finalize():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -436,7 +552,7 @@
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -455,7 +571,7 @@
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#hashCode():Int" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -471,10 +587,10 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#info" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="info[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="info[T](String):Flow[T,T,NotUsed]"></a>
+    </li><li name="com.mesosphere.mesos.client.SessionActor#initialized" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="initialized(credentials:akka.http.scaladsl.model.headers.HttpCredentials):SessionActor.this.Receive"></a><a id="initialized(HttpCredentials):Receive"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#info[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#initialized(credentials:akka.http.scaladsl.model.headers.HttpCredentials):SessionActor.this.Receive" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -483,14 +599,30 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">info</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.info.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.info.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+        <span class="name">initialized</span><span class="params">(<span name="credentials">credentials: <span class="extype" name="akka.http.scaladsl.model.headers.HttpCredentials">HttpCredentials</span></span>)</span><span class="result">: <a href="#Receive=akka.actor.Actor.Receive" class="extmbr" name="com.mesosphere.mesos.client.SessionActor.Receive">Receive</a></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      
+    </li><li name="com.mesosphere.mesos.client.SessionActor#initializing" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="initializing:SessionActor.this.Receive"></a><a id="initializing:Receive"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#initializing:SessionActor.this.Receive" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">initializing</span><span class="result">: <a href="#Receive=akka.actor.Actor.Receive" class="extmbr" name="com.mesosphere.mesos.client.SessionActor.Receive">Receive</a></span>
+      </span>
+      
+      
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -506,7 +638,7 @@
     </li><li name="com.typesafe.scalalogging.StrictLogging#logger" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="logger:com.typesafe.scalalogging.Logger"></a><a id="logger:Logger"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#logger:com.typesafe.scalalogging.Logger" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#logger:com.typesafe.scalalogging.Logger" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -522,7 +654,7 @@
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -538,7 +670,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#notify():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -557,7 +689,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -573,10 +705,160 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="akka.actor.Actor#postRestart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="postRestart(reason:Throwable):Unit"></a><a id="postRestart(Throwable):Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#postRestart(reason:Throwable):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">postRestart</span><span class="params">(<span name="reason">reason: <span class="extype" name="scala.Throwable">Throwable</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Exception]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.UnrestrictedStash#postStop" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="postStop():Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#postStop():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">postStop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>UnrestrictedStash → Actor</dd></dl></div>
+    </li><li name="akka.actor.UnrestrictedStash#preRestart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="preRestart(reason:Throwable,message:Option[Any]):Unit"></a><a id="preRestart(Throwable,Option[Any]):Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#preRestart(reason:Throwable,message:Option[Any]):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">preRestart</span><span class="params">(<span name="reason">reason: <span class="extype" name="scala.Throwable">Throwable</span></span>, <span name="message">message: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>UnrestrictedStash → Actor</dd></dl></div>
+    </li><li name="com.mesosphere.mesos.client.SessionActor#preStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="preStart():Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#preStart():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">preStart</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.mesos.client.SessionActor">SessionActor</a> → Actor</dd></dl></div>
+    </li><li name="com.mesosphere.mesos.client.SessionActor#receive" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="receive:SessionActor.this.Receive"></a><a id="receive:Receive"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#receive:SessionActor.this.Receive" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">receive</span><span class="result">: <a href="#Receive=akka.actor.Actor.Receive" class="extmbr" name="com.mesosphere.mesos.client.SessionActor.Receive">Receive</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.mesos.client.SessionActor">SessionActor</a> → Actor</dd></dl></div>
+    </li><li name="akka.actor.Actor#self" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="self:akka.actor.ActorRef"></a><a id="self:ActorRef"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#self:akka.actor.ActorRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">implicit final </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">self</span><span class="result">: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="akka.actor.Actor#sender" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sender():akka.actor.ActorRef"></a><a id="sender():ActorRef"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#sender():akka.actor.ActorRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sender</span><span class="params">()</span><span class="result">: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="akka.actor.StashSupport#stash" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="stash():Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#stash():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stash</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>StashSupport</dd></dl></div>
+    </li><li name="akka.actor.Actor#supervisorStrategy" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="supervisorStrategy:akka.actor.SupervisorStrategy"></a><a id="supervisorStrategy:SupervisorStrategy"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#supervisorStrategy:akka.actor.SupervisorStrategy" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">supervisorStrategy</span><span class="result">: <span class="extype" name="akka.actor.SupervisorStrategy">SupervisorStrategy</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -592,7 +874,7 @@
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#toString():String" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -605,10 +887,42 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="akka.actor.Actor#unhandled" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unhandled(message:Any):Unit"></a><a id="unhandled(Any):Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#unhandled(message:Any):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">unhandled</span><span class="params">(<span name="message">message: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="akka.actor.StashSupport#unstashAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unstashAll():Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#unstashAll():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">unstashAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>StashSupport</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#wait():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -630,7 +944,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -652,7 +966,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/SessionActor.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -673,22 +987,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.mesos.client.StrictLoggingFlow#warn" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="warn[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]"></a><a id="warn[T](String):Flow[T,T,NotUsed]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/StrictLoggingFlow.html#warn[T](prefix:String):akka.stream.scaladsl.Flow[T,T,akka.NotUsed]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">warn</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="prefix">prefix: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.warn.T">T</span>, <span class="extype" name="com.mesosphere.mesos.client.StrictLoggingFlow.warn.T">T</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li>
               </ol>
             </div>
@@ -701,6 +999,16 @@
         <div id="inheritedMembers">
         <div class="parent" name="com.typesafe.scalalogging.StrictLogging">
               <h3>Inherited from <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></h3>
+            </div><div class="parent" name="akka.actor.Stash">
+              <h3>Inherited from <span class="extype" name="akka.actor.Stash">Stash</span></h3>
+            </div><div class="parent" name="akka.dispatch.RequiresMessageQueue">
+              <h3>Inherited from <span class="extype" name="akka.dispatch.RequiresMessageQueue">RequiresMessageQueue</span>[<span class="extype" name="akka.dispatch.DequeBasedMessageQueueSemantics">DequeBasedMessageQueueSemantics</span>]</h3>
+            </div><div class="parent" name="akka.actor.UnrestrictedStash">
+              <h3>Inherited from <span class="extype" name="akka.actor.UnrestrictedStash">UnrestrictedStash</span></h3>
+            </div><div class="parent" name="akka.actor.StashSupport">
+              <h3>Inherited from <span class="extype" name="akka.actor.StashSupport">StashSupport</span></h3>
+            </div><div class="parent" name="akka.actor.Actor">
+              <h3>Inherited from <span class="extype" name="akka.actor.Actor">Actor</span></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
