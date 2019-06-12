@@ -53,12 +53,12 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
 
   /**
     * Construct a claim to authenticate and retrieve a session token. The timeout is for this token ''not'' the session
-    * token that we are requesting. That means if ou login request takes more than twenty seconds the authentication will
-    * fail.
+    * token that we are requesting. That means if ou login request takes more than [[DcosServiceAccountProvider.CLAIM_LIFETIME]]
+    * seconds the authentication will fail.
     *
     * @return a claim for the user that expires in twenty seconds.
     */
-  private def claim: JsObject = Json.obj("uid" -> uid, "exp" -> expireIn(20.seconds))
+  private def claim: JsObject = Json.obj("uid" -> uid, "exp" -> expireIn(DcosServiceAccountProvider.CLAIM_LIFETIME))
 
   case class SessionToken(token: String)
   implicit val sessionRead: Reads[SessionToken] = (JsPath \ "token").read[String].map(SessionToken)
@@ -83,6 +83,10 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
     val SessionToken(acsToken) = await(Unmarshal(response.entity).to[SessionToken])
     GenericHttpCredentials("", Map("token" -> acsToken))
   }
+}
+
+object DcosServiceAccountProvider {
+  val CLAIM_LIFETIME = 20.seconds
 }
 
 case class BasicAuthenticationProvider(user: String, password: String) extends CredentialsProvider {

@@ -93,19 +93,23 @@ object MesosClientExampleFramework {
     */
   def main(args: Array[String]): Unit = {
 
-    require(args.length == 2, "Please provide two arguments: <mesos-url> <private-key-file>")
+    require((1 <= args.length) && (args.length <= 2), "Please provide arguments: <mesos-url> [<private-key-file>]")
 
     implicit val system = ActorSystem()
     implicit val materializer = ActorMaterializer()
     implicit val context = system.dispatcher
 
     val dcosRoot = new URL(args(0))
-    val privateKey = scala.io.Source.fromFile(args(1)).mkString
-    val provider = DcosServiceAccountProvider("strict-usi", privateKey, dcosRoot)
+    val provider = if (args.length == 2) {
+      val privateKey = scala.io.Source.fromFile(args(1)).mkString
+      Some(DcosServiceAccountProvider("strict-usi", privateKey, dcosRoot))
+    } else {
+      None
+    }
 
     val mesosUrl = new URL(s"$dcosRoot/mesos")
     val clientSettings = MesosClientSettings.load().withMasters(Seq(mesosUrl))
-    new MesosClientExampleFramework(clientSettings, Some(provider))
+    new MesosClientExampleFramework(clientSettings, provider)
   }
 
   def apply(settings: MesosClientSettings)(
