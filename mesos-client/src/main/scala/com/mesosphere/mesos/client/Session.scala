@@ -146,7 +146,7 @@ class SessionActor(
       context.become(initialized(credentials))
       unstashAll()
     case Status.Failure(ex) =>
-      logger.error("Fetching the next token failed", ex)
+      logger.error("Fetching the next IAM session token failed", ex)
       throw ex
     case _ => stash()
   }
