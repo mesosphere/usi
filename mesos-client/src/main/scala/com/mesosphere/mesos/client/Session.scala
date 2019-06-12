@@ -147,7 +147,7 @@ class SessionActor(
         .singleRequest(request)
         .onComplete {
           case Success(response) =>
-            logger.info(s"HTTP response: ${response.status}")
+            logger.debug(s"HTTP response: ${response.status}")
             self ! SessionActor.Response(call, originalSender, response)
           case Failure(ex) =>
             logger.error("HTTP request failed", ex)
