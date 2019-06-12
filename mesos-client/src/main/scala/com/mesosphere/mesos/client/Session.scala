@@ -61,6 +61,9 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     * @return A connection flow for single requests.
     */
   private def connection(implicit system: ActorSystem, mat: Materializer): Flow[HttpRequest, HttpResponse, NotUsed] = {
+    // Constructs the connection pool settings with defaults an overrides the max connections and pipelining limit so
+    // that only one request at a time is processed. See https://doc.akka.io/docs/akka-http/current/configuration.html
+    // for details.
     val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
     if (Session.isSecured(url)) {
       Flow[HttpRequest]
