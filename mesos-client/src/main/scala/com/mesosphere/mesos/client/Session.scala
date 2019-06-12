@@ -155,7 +155,7 @@ class SessionActor(
     case call: Array[Byte] =>
       val request = requestFactory(call, Some(credentials))
       val originalSender = sender()
-      logger.debug("Processing next call.")
+      logger.debug("Processing next Mesos call.")
       // The TLS handshake for each connection might be an overhead. We could potentially reuse a connection.
       Http()(context.system)
         .singleRequest(request)
