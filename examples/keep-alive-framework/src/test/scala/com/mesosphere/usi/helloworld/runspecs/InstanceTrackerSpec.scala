@@ -4,18 +4,8 @@ import java.time.Instant
 import java.util.UUID
 
 import com.google.protobuf.ByteString
-import com.mesosphere.usi.core.models.{
-  AgentId,
-  PodId,
-  PodRecord,
-  PodRecordUpdatedEvent,
-  PodSpecUpdatedEvent,
-  PodStatus,
-  PodStatusUpdatedEvent,
-  TaskId,
-  TerminalPodSpec
-}
-import com.mesosphere.usi.helloworld.runspecs.InstanceStatus.{RunningInstance, StagingInstance, TerminalInstance}
+import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord, PodRecordUpdatedEvent, PodSpecUpdatedEvent, PodStatus, PodStatusUpdatedEvent, TaskId, TerminalPodSpec}
+import com.mesosphere.usi.helloworld.runspecs.InstanceStatus.{RunningInstance, SentToMesos, StagingInstance, TerminalInstance, UnreachableInstance}
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.{Protos => Mesos}
 
@@ -67,6 +57,15 @@ class InstanceTrackerSpec extends UnitTest {
       }
     }
 
+    "make a transition from SentToMesos state to Unreachable" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: UnreachableInstance if s.lastSeenInstanceState.isInstanceOf[SentToMesos] =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+
     "make a transition from Staging state to Running" in new Fixture {
       tracker.processUpdate(podRecordUpdatedEvent)
       tracker.processUpdate(stagingStateUpdate())
@@ -82,6 +81,15 @@ class InstanceTrackerSpec extends UnitTest {
       tracker.processUpdate(terminalStateUpdate())
       tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
         case _: TerminalInstance =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+    "make a transition from Staging state to Unreachable" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: UnreachableInstance if s.lastSeenInstanceState.isInstanceOf[StagingInstance] =>
         case other => fail(s"Excepted staging but found $other")
       }
     }
@@ -111,6 +119,16 @@ class InstanceTrackerSpec extends UnitTest {
       tracker.processUpdate(terminalStateUpdate())
       tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
         case _: TerminalInstance =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+    "make a transition from Running state to Unreachable" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.processUpdate(runningStateUpdate())
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: UnreachableInstance if s.lastSeenInstanceState.isInstanceOf[RunningInstance] =>
         case other => fail(s"Excepted staging but found $other")
       }
     }
@@ -160,6 +178,139 @@ class InstanceTrackerSpec extends UnitTest {
         case other => fail(s"Excepted staging but found $other")
       }
     }
+
+    "ignore a transition from Unreachable state to Unreachable" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: UnreachableInstance if s.lastSeenInstanceState.isInstanceOf[SentToMesos] =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+
+    "make a transition from Unreachable(SentToMesos) state to Staging" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: StagingInstance =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+
+    "make a transition from Unreachable(SentToMesos) state to Running" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(runningStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: RunningInstance =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+
+    "make a transition from Unreachable(SentToMesos) state to Terminal" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(terminalStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: TerminalInstance =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+
+    "make a transition from Unreachable(Staging) state to Staging" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: StagingInstance =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+
+    "make a transition from Unreachable(Staging) state to Running" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(runningStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: RunningInstance =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+
+    "make a transition from Unreachable(Staging) state to Terminal" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(terminalStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: TerminalInstance =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+
+    "ignore a transition from Unreachable(Staging) state to SentToMesos" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: UnreachableInstance if s.lastSeenInstanceState.isInstanceOf[StagingInstance] =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+
+    "make a transition from Unreachable(Running) state to Running" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.processUpdate(runningStateUpdate())
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(runningStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: RunningInstance =>
+        case other => fail(s"Excepted staging but found $other")
+      }
+    }
+
+    "make a transition from Unreachable(Running) state to Terminal" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.processUpdate(runningStateUpdate())
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(terminalStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: TerminalInstance =>
+        case other => fail(s"Excepted Terminal but found $other")
+      }
+    }
+
+    "ignore a transition from Unreachable(Running) state to Staging" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.processUpdate(runningStateUpdate())
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: UnreachableInstance if s.lastSeenInstanceState.isInstanceOf[RunningInstance] =>
+        case other => fail(s"Excepted UnreachableInstance but found $other")
+      }
+    }
+
+    "ignore a transition from Unreachable(Running) state to SentToMesos" in new Fixture {
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.processUpdate(stagingStateUpdate())
+      tracker.processUpdate(runningStateUpdate())
+      tracker.processUpdate(unreachableStateUpdate())
+      tracker.processUpdate(podRecordUpdatedEvent)
+      tracker.serviceState(serviceSpecInstanceId.serviceSpecId).get.instances.head._2.status match {
+        case s: UnreachableInstance if s.lastSeenInstanceState.isInstanceOf[RunningInstance] =>
+        case other => fail(s"Excepted UnreachableInstance but found $other")
+      }
+    }
+
 
     "pick a new incarnation id if detected by the event" in new Fixture {
       tracker.processUpdate(podRecordUpdatedEvent)
@@ -245,6 +396,12 @@ class Fixture {
     PodStatusUpdatedEvent(
       podId,
       Some(PodStatus(podId, Map(TaskId("taskId") -> taskStatus(state = Mesos.TaskState.TASK_FINISHED)))))
+  }
+
+  def unreachableStateUpdate(podId: PodId = podID) = {
+    PodStatusUpdatedEvent(
+      podId,
+      Some(PodStatus(podId, Map(TaskId("taskId") -> taskStatus(state = Mesos.TaskState.TASK_UNREACHABLE)))))
   }
 
   def podRecordUpdatedEvent = {

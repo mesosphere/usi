@@ -14,9 +14,11 @@ import com.mesosphere.usi.helloworld.runspecs.InstanceStatus._
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.mesos.v1.Protos.TaskState
 
+import scala.collection.JavaConverters._
+
 /**
   * Service tracker keeps a consistent view of all services that we run.
-  * It can process updates in an idempotent way and maintain a correct picture of the
+  * It can process updates in an idempotent way and maintain a correct snapshot of the state.
   */
 trait InstanceTracker {
 
@@ -24,9 +26,18 @@ trait InstanceTracker {
 
   def serviceState(id: ServiceSpecId): Option[ServiceState]
 
+  def listStates(): Vector[ServiceState]
+
 }
 
+/**
+  * Thread-safe in-memory implementation of the instance tracker.
+  */
 class InMemoryInstanceTracker extends InstanceTracker with LazyLogging {
+
+  override def listStates(): Vector[ServiceState] = {
+    instanceMap.values().asScala.toVector
+  }
 
   override def serviceState(id: ServiceSpecId): Option[ServiceState] = {
     Option(instanceMap.get(id))
@@ -39,8 +50,8 @@ class InMemoryInstanceTracker extends InstanceTracker with LazyLogging {
     val instanceId = serviceSpecInstanceId.instanceId
     instanceMap.compute(
       serviceSpecId,
-      (a, b) => {
-        val serviceState = Option(b).getOrElse(ServiceState(serviceSpecId, Map.empty))
+      (_, state) => {
+        val serviceState = Option(state).getOrElse(ServiceState(serviceSpecId, Map.empty))
 
         // find the required instance state
         val oldInstanceState = serviceState.instances.get(instanceId)
@@ -101,12 +112,12 @@ class InMemoryInstanceTracker extends InstanceTracker with LazyLogging {
             }
             val newIncarnationId = ServiceSpecInstanceId.fromPodId(event.id)
             val newState = s.copy(id = newIncarnationId, status = newInstanceStatus)
-            terminateIfNeeded(newState)
+            clearStateIfNeeded(newState)
 
           // updates for the current incarnation
           case PodStatusUpdatedEvent(_, Some(podStatus)) if podUpdateIncarnation == stateIncarnation =>
             val newState = tryUpdatePodStatus(s, podStatus)
-            terminateIfNeeded(newState)
+            clearStateIfNeeded(newState)
 
           // We found that there was a command to kill the pod, it means that the instance is no longer
           // important and we're going to remove it from state as soon as we receive the terminal status.
@@ -124,7 +135,7 @@ class InMemoryInstanceTracker extends InstanceTracker with LazyLogging {
     }
   }
 
-  private def terminateIfNeeded(newState: ServiceInstanceState): StateChangeResult = {
+  private def clearStateIfNeeded(newState: ServiceInstanceState): StateChangeResult = {
     newState.status match {
       // If the instance state is terminal after the update and we were terminating -
       // we should remove it
@@ -155,11 +166,14 @@ class InMemoryInstanceTracker extends InstanceTracker with LazyLogging {
     TaskState.TASK_FINISHED,
     TaskState.TASK_FAILED,
     TaskState.TASK_KILLED,
-    TaskState.TASK_LOST,
     TaskState.TASK_ERROR,
     TaskState.TASK_DROPPED,
     TaskState.TASK_GONE,
-    TaskState.TASK_UNKNOWN,
+  )
+
+  val unreachable = Set(
+    TaskState.TASK_UNREACHABLE,
+    TaskState.TASK_LOST,
   )
 
   def taskState(podStatus: PodStatus): TaskState = {
@@ -176,6 +190,10 @@ class InMemoryInstanceTracker extends InstanceTracker with LazyLogging {
     def unapply(state: TaskState): Boolean = terminal(state)
   }
 
+  object UnreachableTask {
+    def unapply(state: TaskState): Boolean = unreachable(state)
+  }
+
   // TODO support multiple pods per instance
   def tryUpdatePodStatus(state: ServiceInstanceState, podStatus: PodStatus): ServiceInstanceState = {
     def IgnoreUpdate = state.status
@@ -185,20 +203,52 @@ class InMemoryInstanceTracker extends InstanceTracker with LazyLogging {
           case StagingTask() => s.toStaging(podStatus)
           case RunningTask() => s.toRunning(podStatus)
           case TerminalTask() => s.toTerminal(podStatus)
+          case UnreachableTask() => s.toUnreachable(podStatus)
         }
 
       case s: StagingInstance =>
         taskState(podStatus) match {
           case StagingTask() => IgnoreUpdate
-          case RunningTask() => s.toRunning
-          case TerminalTask() => s.toTerminal
+          case RunningTask() => s.toRunning(podStatus)
+          case TerminalTask() => s.toTerminal(podStatus)
+          case UnreachableTask() => s.toUnreachable(podStatus)
         }
 
       case s: RunningInstance =>
         taskState(podStatus) match {
           case StagingTask() => IgnoreUpdate
           case RunningTask() => IgnoreUpdate
-          case TerminalTask() => s.toTerminal
+          case TerminalTask() => s.toTerminal(podStatus)
+          case UnreachableTask() => s.toUnreachable(podStatus)
+        }
+
+      case UnreachableInstance(podRecord, status, lastSeenStatus) =>
+        lastSeenStatus match {
+          case _: SentToMesos =>
+            taskState(podStatus) match {
+              case StagingTask() => StagingInstance(podRecord, podStatus)
+              case RunningTask() => RunningInstance(podRecord, podStatus)
+              case TerminalTask() => TerminalInstance(podRecord, podStatus)
+              case UnreachableTask() => IgnoreUpdate
+            }
+
+          case _: StagingInstance =>
+            taskState(podStatus) match {
+              case StagingTask() => StagingInstance(podRecord, podStatus)
+              case RunningTask() => RunningInstance(podRecord, podStatus)
+              case TerminalTask() => TerminalInstance(podRecord, podStatus)
+              case UnreachableTask() => IgnoreUpdate
+            }
+
+          case _: RunningInstance =>
+            taskState(podStatus) match {
+              case StagingTask() =>
+                logger.warn("Ignoring unexpected transition to staging after being Unreachable(running)")
+                IgnoreUpdate
+              case RunningTask() => RunningInstance(podRecord, podStatus)
+              case TerminalTask() => TerminalInstance(podRecord, podStatus)
+              case UnreachableTask() => IgnoreUpdate
+            }
         }
 
       case _: TerminalInstance => IgnoreUpdate
@@ -223,20 +273,35 @@ trait InstanceStatus {
 object InstanceStatus {
 
   case class SentToMesos(podRecord: PodRecord) extends InstanceStatus {
-    def toStaging(podStatus: PodStatus): StagingInstance = StagingInstance(podRecord, podStatus)
-    def toRunning(podStatus: PodStatus): RunningInstance = RunningInstance(podRecord, podStatus)
-    def toTerminal(podStatus: PodStatus): TerminalInstance = TerminalInstance(podRecord, podStatus)
+    def toStaging(status: PodStatus): StagingInstance = StagingInstance(podRecord, status)
+    def toRunning(status: PodStatus): RunningInstance = RunningInstance(podRecord, status)
+    def toTerminal(status: PodStatus): TerminalInstance = TerminalInstance(podRecord, status)
+    def toUnreachable(status: PodStatus): UnreachableInstance = UnreachableInstance(podRecord, status, this)
   }
 
   case class StagingInstance(podRecord: PodRecord, podStatus: PodStatus) extends InstanceStatus {
-    def toRunning: RunningInstance = RunningInstance(podRecord, podStatus)
-    def toTerminal: TerminalInstance = TerminalInstance(podRecord, podStatus)
+    def toRunning(status: PodStatus): RunningInstance = RunningInstance(podRecord, podStatus)
+    def toTerminal(status: PodStatus): TerminalInstance = TerminalInstance(podRecord, podStatus)
+    def toUnreachable(status: PodStatus): UnreachableInstance = UnreachableInstance(podRecord, status, this)
   }
 
   case class RunningInstance(podRecord: PodRecord, podStatus: PodStatus) extends InstanceStatus {
-    def toTerminal: TerminalInstance = TerminalInstance(podRecord, podStatus)
+    def toTerminal(status: PodStatus): TerminalInstance = TerminalInstance(podRecord, status)
+    def toUnreachable(status: PodStatus): UnreachableInstance = UnreachableInstance(podRecord, status, this)
   }
 
   case class TerminalInstance(podRecord: PodRecord, podStatus: PodStatus) extends InstanceStatus
+
+  case class UnreachableInstance(podRecord: PodRecord, podStatus: PodStatus, lastSeenInstanceState: InstanceStatus)
+      extends InstanceStatus {
+    // check against possible bugs
+    require {
+      lastSeenInstanceState match {
+        case _: TerminalInstance => false
+        case _: UnreachableInstance => false
+        case _ => true
+      }
+    }
+  }
 
 }

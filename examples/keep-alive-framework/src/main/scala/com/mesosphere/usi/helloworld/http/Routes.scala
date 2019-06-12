@@ -4,7 +4,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import io.circe.generic.auto._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
-import JsonDTO._
+import DTO._
 import com.mesosphere.usi.core.models.RunTemplate
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.usi.helloworld.Configuration
@@ -16,7 +16,7 @@ class Routes(appsService: ServiceController) {
     pathPrefix("v0") {
       pathPrefix("start") {
         post {
-          entity(as[JsonRunSpecDefinition]) { jsonApp =>
+          entity(as[ServiceSpecDefinition]) { jsonApp =>
             val id = ServiceSpecId(jsonApp.id)
 
             val requirements = List(
@@ -25,13 +25,13 @@ class Routes(appsService: ServiceController) {
               ScalarRequirement(ResourceType.DISK, jsonApp.disk)
             )
 
-            val runSpec = RunTemplate(
+            val runTemplate = RunTemplate(
               requirements,
               jsonApp.command,
               Configuration.role
             )
 
-            onSuccess(appsService.launchServiceFromSpec(id, runSpec)) {
+            onSuccess(appsService.launchServiceFromSpec(id, runTemplate)) {
               case LaunchResults.AlreadyExist =>
                 complete(StatusCodes.Conflict -> "runspec already exists")
 
@@ -65,19 +65,19 @@ class Routes(appsService: ServiceController) {
         }
     }
 
-  def appInfo2Json(appInfo: RunSpecInfo): JsonAppInfo = {
+  def appInfo2Json(appInfo: RunSpecInfo): ServiceInfo = {
     val jsonRequirements = appInfo.runSpec.resourceRequirements.map {
       case ScalarRequirement(resource, amount) =>
-        JsonResourceRequirement(resource.name, amount)
+        ResourceRequirement(resource.name, amount)
 
       case _ => ???
     }
 
-    val runSpec = JsonRunSpec(
+    val runSpec = ServiceSpec(
       jsonRequirements,
       appInfo.runSpec.shellCommand,
     )
-    JsonAppInfo(appInfo.id.value, runSpec, appInfo.status)
+    ServiceInfo(appInfo.id.value, runSpec, appInfo.status)
   }
 
 }
