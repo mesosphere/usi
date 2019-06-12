@@ -3,12 +3,13 @@ package com.mesosphere.mesos.client
 import akka.pattern.ask
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.HttpCredentials
+import akka.http.scaladsl.model.headers.{BasicHttpCredentials, HttpCredentials}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.testkit.TestProbe
 import akka.util.Timeout
 import com.mesosphere.utils.AkkaUnitTest
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class SessionActorTest extends AkkaUnitTest {
@@ -34,8 +35,9 @@ class SessionActorTest extends AkkaUnitTest {
       implicit val timeout = Timeout(2.seconds)
 
       Given("A simple Mesos API stub and a SessionActor instance")
+      val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
-        system.actorOf(SessionActor.props(BasicAuthenticationProvider("user", "password"), mesos.createRequest))
+        system.actorOf(SessionActor.props(credentialsProvider, mesos.createRequest))
 
       When("we make a call through the session actor")
       val response = (sessionActor ? Array.empty[Byte]).futureValue.asInstanceOf[HttpResponse]
@@ -45,6 +47,9 @@ class SessionActorTest extends AkkaUnitTest {
 
       And("Mesos was called only once")
       Unmarshal(response.entity).to[String].futureValue.toInt should be(1)
+
+      And("the session token was fetched only once")
+      credentialsProvider.calls should be(1)
     }
 
     "refresh the session token when the first call response is an HTTP 401" in withMesosStub(
@@ -53,8 +58,9 @@ class SessionActorTest extends AkkaUnitTest {
       implicit val timeout = Timeout(2.seconds)
 
       Given("A SessionActor instance")
+      val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
-        system.actorOf(SessionActor.props(BasicAuthenticationProvider("user", "password"), mesos.createRequest))
+        system.actorOf(SessionActor.props(credentialsProvider, mesos.createRequest))
 
       When("we make a call through the session actor")
       val response = (sessionActor ? Array.empty[Byte]).futureValue.asInstanceOf[HttpResponse]
@@ -64,13 +70,29 @@ class SessionActorTest extends AkkaUnitTest {
 
       And("Mesos was called twice: one declined call and one with the fresh token")
       Unmarshal(response.entity).to[String].futureValue.toInt should be(2)
+
+      And("the session token was fetched twice")
+      credentialsProvider.calls should be(2)
     }
   }
 
   class Fixture() {
 
     def requestFactory(body: Array[Byte], credentials: Option[HttpCredentials]): HttpRequest = ???
+  }
 
+  /**
+    * A simple [[CredentialsProvider]] stub that counts how many times [[CredentialsProvider.nextToken()]] was called.
+    */
+  class CountingCredentialsProvider() extends CredentialsProvider {
+    var calls: Int = 0
+
+    private val credentials = BasicHttpCredentials("user", "password")
+
+    override def nextToken(): Future[HttpCredentials] = {
+      calls += 1
+      Future.successful(credentials)
+    }
   }
 
   /**
@@ -96,10 +118,10 @@ class SessionActorTest extends AkkaUnitTest {
     *
     * @param responseCodes The HTTP codes the stub will use for [[responseCodes.length]] requests.
     */
-  case class MesosStub(var responseCodes: List[StatusCode]) {
+  case class MesosStub(@volatile var responseCodes: List[StatusCode]) {
     import akka.http.scaladsl.server.Directives._
 
-    var calls: Int = 0
+    @volatile var calls: Int = 0
 
     val route =
       path("mesos") {
