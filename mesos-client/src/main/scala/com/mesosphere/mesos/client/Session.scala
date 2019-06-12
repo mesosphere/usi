@@ -61,29 +61,23 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     * @return A connection flow for single requests.
     */
   private def connection(implicit system: ActorSystem, mat: Materializer): Flow[HttpRequest, HttpResponse, NotUsed] = {
-    // Constructs the connection pool settings with defaults an overrides the max connections and pipelining limit so
+    // Constructs the connection pool settings with defaults and overrides the max connections and pipelining limit so
     // that only one request at a time is processed. See https://doc.akka.io/docs/akka-http/current/configuration.html
     // for details.
     val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
-    if (Session.isSecured(url)) {
-      Flow[HttpRequest]
-        .map(_ -> NotUsed)
-        .via(Http()
-          .newHostConnectionPoolHttps(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings))
-        .map {
-          case (Success(response), NotUsed) => response
-          case (Failure(ex), NotUsed) => throw ex
-        }
-    } else {
-      Flow[HttpRequest]
-        .map(_ -> NotUsed)
-        .via(
-          Http().newHostConnectionPool(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings))
-        .map {
-          case (Success(response), NotUsed) => response
-          case (Failure(ex), NotUsed) => throw ex
-        }
-    }
+
+    Flow[HttpRequest]
+      .map(_ -> NotUsed)
+      .via(if (Session.isSecured(url)) {
+        Http()
+          .newHostConnectionPoolHttps(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings)
+      } else {
+        Http().newHostConnectionPool(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings)
+      })
+      .map {
+        case (Success(response), NotUsed) => response
+        case (Failure(ex), NotUsed) => throw ex
+      }
   }
 }
 
