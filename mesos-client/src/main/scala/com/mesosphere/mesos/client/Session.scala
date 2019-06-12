@@ -154,7 +154,7 @@ class SessionActor(
     case call: Array[Byte] =>
       val request = requestFactory(call, Some(credentials))
       val originalSender = sender()
-      logger.info("Processing next call.")
+      logger.debug("Processing next call.")
       // The TLS handshake for each connection might be an overhead. We could potentially reuse a connection.
       Http()(context.system)
         .singleRequest(request)
@@ -168,7 +168,7 @@ class SessionActor(
             originalSender ! Status.Failure(ex)
         }
     case SessionActor.Response(originalCall, originalSender, response) =>
-      logger.info(s"Call replied with ${response.status}")
+      logger.debug(s"Call replied with ${response.status}")
       if (response.status == StatusCodes.Unauthorized) {
         logger.info("Refreshing token")
 
