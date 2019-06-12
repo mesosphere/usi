@@ -34,7 +34,7 @@ class MesosClientExampleFramework(settings: MesosClientSettings, authorization: 
 
   val frameworkInfo = FrameworkInfo
     .newBuilder()
-    .setPrincipal("strict-usi")
+    .setPrincipal("mesos-client-framework")
     .setUser("example")
     .setName("MesosClientExample")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
