@@ -62,7 +62,7 @@ class SessionActorTest extends AkkaUnitTest {
       Then("we receive an HTTP 200")
       response.status should be(StatusCodes.OK)
 
-      And("Mesos was called only once")
+      And("Mesos was called twice: one declined call and one with the fresh token")
       Unmarshal(response.entity).to[String].futureValue.toInt should be(2)
     }
   }
