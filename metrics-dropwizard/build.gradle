@@ -1,3 +1,5 @@
+apply plugin: 'java'
+
 dependencies {
     implementation project(':metrics')
     testCompile project(':test-utils')
