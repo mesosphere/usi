@@ -4,8 +4,24 @@ import java.time.Instant
 import java.util.UUID
 
 import com.google.protobuf.ByteString
-import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord, PodRecordUpdatedEvent, PodSpecUpdatedEvent, PodStatus, PodStatusUpdatedEvent, TaskId, TerminalPodSpec}
-import com.mesosphere.usi.helloworld.runspecs.InstanceStatus.{RunningInstance, SentToMesos, StagingInstance, TerminalInstance, UnreachableInstance}
+import com.mesosphere.usi.core.models.{
+  AgentId,
+  PodId,
+  PodRecord,
+  PodRecordUpdatedEvent,
+  PodSpecUpdatedEvent,
+  PodStatus,
+  PodStatusUpdatedEvent,
+  TaskId,
+  TerminalPodSpec
+}
+import com.mesosphere.usi.helloworld.runspecs.InstanceStatus.{
+  RunningInstance,
+  SentToMesos,
+  StagingInstance,
+  TerminalInstance,
+  UnreachableInstance
+}
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.{Protos => Mesos}
 
@@ -310,7 +326,6 @@ class InstanceTrackerSpec extends UnitTest {
         case other => fail(s"Excepted UnreachableInstance but found $other")
       }
     }
-
 
     "pick a new incarnation id if detected by the event" in new Fixture {
       tracker.processUpdate(podRecordUpdatedEvent)
