@@ -60,15 +60,15 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
     */
   private def claim: JsObject = Json.obj("uid" -> uid, "exp" -> expireIn(DcosServiceAccountProvider.CLAIM_LIFETIME))
 
-  case class SessionToken(token: String)
-  implicit val sessionRead: Reads[SessionToken] = (JsPath \ "token").read[String].map(SessionToken)
+  case class AuthenticationToken(token: String)
+  implicit val authenticationTokenRead: Reads[AuthenticationToken] = (JsPath \ "token").read[String].map(AuthenticationToken)
 
-  /** @return a new request for a session token. */
-  def acsTokenRequest: HttpRequest = {
+  /** @return a new request for an authentication token. */
+  def loginRequest: HttpRequest = {
 
     // Tokenize the claim.
-    val token = JwtJson.encode(claim, privateKey, RS256)
-    val data: String = Json.stringify(Json.obj("uid" -> uid, "token" -> token))
+    val serviceLoginToken = JwtJson.encode(claim, privateKey, RS256)
+    val data: String = Json.stringify(Json.obj("uid" -> uid, "token" -> serviceLoginToken))
 
     HttpRequest(
       method = HttpMethods.POST,
@@ -78,9 +78,9 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
   }
 
   override def nextToken(): Future[HttpCredentials] = async {
-    logger.info(s"Fetching next token from $root")
-    val response = await(Http().singleRequest(acsTokenRequest))
-    val SessionToken(acsToken) = await(Unmarshal(response.entity).to[SessionToken])
+    logger.info(s"Fetching next authentication token from $root")
+    val response = await(Http().singleRequest(loginRequest))
+    val AuthenticationToken(acsToken) = await(Unmarshal(response.entity).to[AuthenticationToken])
     GenericHttpCredentials("", Map("token" -> acsToken))
   }
 }
