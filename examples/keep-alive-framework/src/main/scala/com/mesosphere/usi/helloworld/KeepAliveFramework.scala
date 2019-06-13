@@ -6,7 +6,7 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Source}
-import com.mesosphere.mesos.client.{CredentialsProvider, JwtProvider, MesosClient}
+import com.mesosphere.mesos.client.{CredentialsProvider, DcosServiceAccountProvider, MesosClient}
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.conf.SchedulerSettings
@@ -112,20 +112,28 @@ object KeepAliveFramework {
 
   def main(args: Array[String]): Unit = {
 
+    require(
+      (2 == args.length) || (args.length == 4),
+      "Please provide arguments: <dcos-url> <mesos-url> [<private-key-file> <iam-uid>]")
+
     implicit val system: ActorSystem = ActorSystem()
     implicit val mat: ActorMaterializer = ActorMaterializer()
     implicit val ec: ExecutionContextExecutor = system.dispatcher
 
     val dcosRoot = new URL(args(0))
-    val mesosUrl = new URL(s"$dcosRoot/mesos")
-    val privateKey = scala.io.Source.fromFile(args(1)).mkString
-    val provider = JwtProvider("strict-us", privateKey, dcosRoot)
+    val mesosUrl = new URL(args(1))
+    val provider = if (args.length == 3) {
+      val privateKey = scala.io.Source.fromFile(args(2)).mkString
+      Some(DcosServiceAccountProvider(args(3), privateKey, dcosRoot))
+    } else {
+      None
+    }
 
     val conf = ConfigFactory.load().getConfig("mesos-client").withFallback(ConfigFactory.load())
     val settings = KeepAliveFrameWorkSettings(
       MesosClientSettings.fromConfig(conf).withMasters(Seq(mesosUrl)),
       conf.getInt("keep-alive-framework.tasks-started"))
-    new KeepAliveFramework(settings, Some(provider))
+    new KeepAliveFramework(settings, provider)
   }
 
   def apply(conf: Config)(implicit system: ActorSystem, mat: ActorMaterializer): KeepAliveFramework =
