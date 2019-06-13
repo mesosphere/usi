@@ -8,6 +8,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.Sink
 import com.mesosphere.mesos.client.{CredentialsProvider, DcosServiceAccountProvider, MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
+import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.mesos.v1.Protos
 import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.Event
@@ -89,19 +90,25 @@ object MesosClientExampleFramework {
     *   {{{curl -L -X PUT -k -H "Authorization: token=$(dcos config show core.dcos_acs_token)" "$(dcos config show core.dcos_url)/acs/api/v1/acls/dcos:superuser/users/strict-usi/full"}}}
     * 5. Download SSL certs:
     *   {{{wget --no-check-certificate -O dcos-ca.crt "$(dcos config show core.dcos_url)/ca/dcos-ca.crt"}}}
-    * 6. Run with {{{DCOS_CERT=path/to/dcos-ca.crt ./gradlew :mesos-client-example:run --stacktrace --args "https://<DC/OS IP> path/to/usi.private.pem"}}}
+    * 6. Run with {{{./gradlew :mesos-client-example:run --stacktrace --args "https://<DC/OS IP> path/to/dcos-ca.crt path/to/usi.private.pem"}}}
     */
   def main(args: Array[String]): Unit = {
 
-    require((1 <= args.length) && (args.length <= 2), "Please provide arguments: <mesos-url> [<private-key-file>]")
+    require((1 <= args.length) && (args.length <= 3), "Please provide arguments: <mesos-url> [<dcos-ca.crt>] [<private-key-file>]")
 
-    implicit val system = ActorSystem()
+    val akkaConfig: Config = ConfigFactory.parseString(s"""
+      |akka.ssl-config.trustManager.stores = [
+      | { type: "PEM", path: ${args(1)} }
+      |]
+      """.stripMargin).withFallback(ConfigFactory.load())
+
+    implicit val system = ActorSystem("client-example", akkaConfig)
     implicit val materializer = ActorMaterializer()
     implicit val context = system.dispatcher
 
     val dcosRoot = new URL(args(0))
-    val provider = if (args.length == 2) {
-      val privateKey = scala.io.Source.fromFile(args(1)).mkString
+    val provider = if (args.length == 3) {
+      val privateKey = scala.io.Source.fromFile(args(2)).mkString
       Some(DcosServiceAccountProvider("strict-usi", privateKey, dcosRoot))
     } else {
       None

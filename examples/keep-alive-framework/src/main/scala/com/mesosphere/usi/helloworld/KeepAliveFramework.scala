@@ -113,25 +113,35 @@ object KeepAliveFramework {
   /**
     * Set ups the same way as [[MesosClientExampleFramework.main]] and run with
     * {{{
-    *   DCOS_CERT="$(pwd)/dcos-ca.crt" ./gradlew :keep-alive-framework:run --stacktrace \
-    *     --args "$(dcos config show core.dcos_url) $(dcos config show core.dcos_url)/mesos $(pwd)/usi.private.pem strict-usi"
+    *   ./gradlew :keep-alive-framework:run --stacktrace --args "\
+    *     $(dcos config show core.dcos_url) \
+    *     $(dcos config show core.dcos_url)/mesos \
+    *     $(pwd)/dcos-ca.crt \
+    *     $(pwd)/usi.private.pem strict-usi"
     * }}}
     */
   def main(args: Array[String]): Unit = {
 
     require(
-      (2 == args.length) || (args.length == 4),
-      "Please provide arguments: <dcos-url> <mesos-url> [<private-key-file> <iam-uid>]")
+      (2 == args.length) || (args.length == 3) || (args.length == 5),
+      "Please provide arguments: <dcos-url> <mesos-url> [<dcos-ca.cert>] [<private-key-file> <iam-uid>]"
+    )
 
-    implicit val system: ActorSystem = ActorSystem()
+    val akkaConfig: Config = ConfigFactory.parseString(s"""
+      |akka.ssl-config.trustManager.stores = [
+      | { type: "PEM", path: ${args(2)} }
+      |]
+      """.stripMargin).withFallback(ConfigFactory.load())
+
+    implicit val system: ActorSystem = ActorSystem("keep-alive", akkaConfig)
     implicit val mat: ActorMaterializer = ActorMaterializer()
     implicit val ec: ExecutionContextExecutor = system.dispatcher
 
     val dcosRoot = new URL(args(0))
     val mesosUrl = new URL(args(1))
-    val provider = if (args.length == 4) {
-      val privateKey = scala.io.Source.fromFile(args(2)).mkString
-      Some(DcosServiceAccountProvider(args(3), privateKey, dcosRoot))
+    val provider = if (args.length == 5) {
+      val privateKey = scala.io.Source.fromFile(args(3)).mkString
+      Some(DcosServiceAccountProvider(args(4), privateKey, dcosRoot))
     } else {
       None
     }
