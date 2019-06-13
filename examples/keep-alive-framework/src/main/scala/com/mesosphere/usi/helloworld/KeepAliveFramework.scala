@@ -110,6 +110,13 @@ class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Op
 
 object KeepAliveFramework {
 
+  /**
+    * Set ups the same way as [[MesosClientExampleFramework.main]] and run with
+    * {{{
+    *   DCOS_CERT="$(pwd)/dcos-ca.crt" ./gradlew :keep-alive-framework:run --stacktrace \
+    *     --args "$(dcos config show core.dcos_url) $(dcos config show core.dcos_url)/mesos $(pwd)/usi.private.pem strict-usi"
+    * }}}
+    */
   def main(args: Array[String]): Unit = {
 
     require(
@@ -122,7 +129,7 @@ object KeepAliveFramework {
 
     val dcosRoot = new URL(args(0))
     val mesosUrl = new URL(args(1))
-    val provider = if (args.length == 3) {
+    val provider = if (args.length == 4) {
       val privateKey = scala.io.Source.fromFile(args(2)).mkString
       Some(DcosServiceAccountProvider(args(3), privateKey, dcosRoot))
     } else {
