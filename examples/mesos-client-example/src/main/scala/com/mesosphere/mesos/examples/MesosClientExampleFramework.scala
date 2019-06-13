@@ -94,7 +94,9 @@ object MesosClientExampleFramework {
     */
   def main(args: Array[String]): Unit = {
 
-    require((1 <= args.length) && (args.length <= 3), "Please provide arguments: <mesos-url> [<dcos-ca.crt>] [<private-key-file>]")
+    require(
+      (1 <= args.length) && (args.length <= 3),
+      "Please provide arguments: <mesos-url> [<dcos-ca.crt>] [<private-key-file>]")
 
     val akkaConfig: Config = ConfigFactory.parseString(s"""
       |akka.ssl-config.trustManager.stores = [
