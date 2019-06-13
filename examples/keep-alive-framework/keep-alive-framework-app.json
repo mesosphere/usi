@@ -4,7 +4,7 @@
   "id": "/usi/keep-alive-framework",
   "backoffFactor": 1.15,
   "backoffSeconds": 1,
-  "cmd": "export JAVA_HOME=$(ls -d $MESOS_SANDBOX/jdk*/jre/); export JAVA_HOME=${JAVA_HOME%/}; export PATH=$(ls -d $JAVA_HOME/bin):$PATH && export JAVA_OPTS=\"-Xms256M -Xmx512M\"; ./keep-alive-framework-0.1/bin/keep-alive-framework https://34.220.172.49 https://34.220.172.49/master $MESOS_SANDBOX/.ssl/ca-bundle.crt $MESOS_SANDBOX/private_key.pem strict-usi",
+  "cmd": "export JAVA_HOME=$(ls -d $MESOS_SANDBOX/jdk*/jre/); export JAVA_HOME=${JAVA_HOME%/}; export PATH=$(ls -d $JAVA_HOME/bin):$PATH && export JAVA_OPTS=\"-Xms256M -Xmx512M\"; ./keep-alive-framework-0.1/bin/keep-alive-framework https://master.mesos https://leader.mesos:5050 $MESOS_SANDBOX/.ssl/ca-bundle.crt $MESOS_SANDBOX/private_key.pem strict-usi",
   "container": {
     "type": "MESOS",
     "volumes": [
