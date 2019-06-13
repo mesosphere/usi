@@ -19,7 +19,7 @@ class KeepAliveMesosClientFactory(settings: MesosClientSettings, authorization: 
 
   val frameworkInfo = FrameworkInfo
     .newBuilder()
-    .setUser("root")
+    .setUser("nobody")
     .setName("KeepAliveFramework")
     .addRoles("test")
     .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
