@@ -61,7 +61,8 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
   private def claim: JsObject = Json.obj("uid" -> uid, "exp" -> expireIn(DcosServiceAccountProvider.CLAIM_LIFETIME))
 
   case class AuthenticationToken(token: String)
-  implicit val authenticationTokenRead: Reads[AuthenticationToken] = (JsPath \ "token").read[String].map(AuthenticationToken)
+  implicit val authenticationTokenRead: Reads[AuthenticationToken] =
+    (JsPath \ "token").read[String].map(AuthenticationToken)
 
   /** @return a new request for an authentication token. */
   def loginRequest: HttpRequest = {
