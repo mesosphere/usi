@@ -53,22 +53,24 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
 
   /**
     * Construct a claim to authenticate and retrieve a session token. The timeout is for this token ''not'' the session
-    * token that we are requesting. That means if ou login request takes more than [[DcosServiceAccountProvider.CLAIM_LIFETIME]]
+    * token that we are requesting. That means if ou login request takes more than [[DcosServiceAccountProvider.SERVICE_LOGIN_TOKEN_LIFETIME]]
     * seconds the authentication will fail.
     *
-    * @return a claim for the user that expires in twenty seconds.
+    * @return a claim for the user that expires in [[DcosServiceAccountProvider.SERVICE_LOGIN_TOKEN_LIFETIME]] seconds.
     */
-  private def claim: JsObject = Json.obj("uid" -> uid, "exp" -> expireIn(DcosServiceAccountProvider.CLAIM_LIFETIME))
+  private def claim: JsObject =
+    Json.obj("uid" -> uid, "exp" -> expireIn(DcosServiceAccountProvider.SERVICE_LOGIN_TOKEN_LIFETIME))
 
-  case class SessionToken(token: String)
-  implicit val sessionRead: Reads[SessionToken] = (JsPath \ "token").read[String].map(SessionToken)
+  case class AuthenticationToken(token: String)
+  implicit val authenticationTokenRead: Reads[AuthenticationToken] =
+    (JsPath \ "token").read[String].map(AuthenticationToken)
 
-  /** @return a new request for a session token. */
-  def acsTokenRequest: HttpRequest = {
+  /** @return a new request for an authentication token. */
+  def loginRequest: HttpRequest = {
 
     // Tokenize the claim.
-    val token = JwtJson.encode(claim, privateKey, RS256)
-    val data: String = Json.stringify(Json.obj("uid" -> uid, "token" -> token))
+    val serviceLoginToken = JwtJson.encode(claim, privateKey, RS256)
+    val data: String = Json.stringify(Json.obj("uid" -> uid, "token" -> serviceLoginToken))
 
     HttpRequest(
       method = HttpMethods.POST,
@@ -78,15 +80,15 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
   }
 
   override def nextToken(): Future[HttpCredentials] = async {
-    logger.info(s"Fetching next token from $root")
-    val response = await(Http().singleRequest(acsTokenRequest))
-    val SessionToken(acsToken) = await(Unmarshal(response.entity).to[SessionToken])
+    logger.info(s"Fetching next authentication token from $root")
+    val response = await(Http().singleRequest(loginRequest))
+    val AuthenticationToken(acsToken) = await(Unmarshal(response.entity).to[AuthenticationToken])
     GenericHttpCredentials("", Map("token" -> acsToken))
   }
 }
 
 object DcosServiceAccountProvider {
-  val CLAIM_LIFETIME = 20.seconds
+  val SERVICE_LOGIN_TOKEN_LIFETIME = 20.seconds
 }
 
 case class BasicAuthenticationProvider(user: String, password: String) extends CredentialsProvider {
