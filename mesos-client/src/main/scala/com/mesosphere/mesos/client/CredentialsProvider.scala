@@ -58,7 +58,8 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
     *
     * @return a claim for the user that expires in [[DcosServiceAccountProvider.SERVICE_LOGIN_TOKEN_LIFETIME]] seconds.
     */
-  private def claim: JsObject = Json.obj("uid" -> uid, "exp" -> expireIn(DcosServiceAccountProvider.SERVICE_LOGIN_TOKEN_LIFETIME))
+  private def claim: JsObject =
+    Json.obj("uid" -> uid, "exp" -> expireIn(DcosServiceAccountProvider.SERVICE_LOGIN_TOKEN_LIFETIME))
 
   case class AuthenticationToken(token: String)
   implicit val authenticationTokenRead: Reads[AuthenticationToken] =
