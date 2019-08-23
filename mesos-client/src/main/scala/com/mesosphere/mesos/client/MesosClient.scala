@@ -131,7 +131,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
 
   /**
     * This is the first step in the communication process between the scheduler and the master. This is also to be
-    * considered as subscription to the “/scheduler” event stream. To subscribe with the master, the scheduler sends
+    * considered as subscription to the "/scheduler" event stream. To subscribe with the master, the scheduler sends
     * an HTTP POST with a SUBSCRIBE message including the required FrameworkInfo. Note that if
     * `subscribe.framework_info.id` is not set, master considers the scheduler as a new one and subscribes it by
     * assigning it a FrameworkID. The HTTP response is a stream in RecordIO format; the event stream begins with a
