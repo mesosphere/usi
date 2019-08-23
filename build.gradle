@@ -1,4 +1,3 @@
-
 import java.nio.file.Paths
 
 plugins {
@@ -32,6 +31,7 @@ allprojects {
 
     apply plugin: "scala"
     apply plugin: 'cz.alenkacz.gradle.scalafmt'
+    apply plugin: 'maven-publish'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -84,6 +84,28 @@ allprojects {
         reports.html.enabled = false
     }
     check {}
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId project.group
+                version project.version
+
+                from components.java
+            }
+        }
+        repositories {
+            maven {
+                def snapshotsRepoUrl = 's3://downloads.mesosphere.io/maven-snapshot/'
+                def releaseRepoUrl = 's3://downloads.mesosphere.io/maven/'
+                url = version.endsWith('-SNAPSHOT') ? snapshotsRepoUrl : releaseRepoUrl
+                authentication {
+                    awsIm(AwsImAuthentication)
+                }
+            }
+        }
+    }
+
 }
 
 apply from: 'ci.gradle'
