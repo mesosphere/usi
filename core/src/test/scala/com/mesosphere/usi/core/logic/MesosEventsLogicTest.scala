@@ -4,7 +4,7 @@ import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.SchedulerState
 import com.mesosphere.usi.core.helpers.MesosMock
-import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunTemplate, RunningPodSpec, TaskId}
+import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunningPodSpec, SimpleRunTemplate, TaskId}
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskStatus}
 import com.mesosphere.utils.UnitTest
@@ -14,12 +14,14 @@ class MesosEventsLogicTest extends UnitTest {
 
   private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId))
 
+  val podWith1Cpu256MemTpl = SimpleRunTemplate(
+    List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
+    shellCommand = "sleep 3600",
+    "test")
+
   val podWith1Cpu256Mem: RunningPodSpec = RunningPodSpec(
     PodId("mock-podId"),
-    RunTemplate(
-      List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
-      shellCommand = "sleep 3600",
-      "test")
+    podWith1Cpu256MemTpl
   )
 
   "MesosEventsLogic" should {
@@ -41,7 +43,7 @@ class MesosEventsLogicTest extends UnitTest {
         insufficientOffer,
         Seq(
           podWith1Cpu256Mem.copy(
-            runSpec = podWith1Cpu256Mem.runSpec.copy(
+            runSpec = podWith1Cpu256MemTpl.copy(
               resourceRequirements = Seq(ScalarRequirement(ResourceType.CPUS, Integer.MAX_VALUE))
             )))
       )

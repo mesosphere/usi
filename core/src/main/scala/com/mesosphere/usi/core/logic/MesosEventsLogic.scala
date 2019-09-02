@@ -2,14 +2,15 @@ package com.mesosphere.usi.core.logic
 
 import java.time.Instant
 
-import com.mesosphere.{ImplicitStrictLogging, LoggingArgs}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
+import com.mesosphere.usi.core.logic.SchedulerLogicHelpers._
 import com.mesosphere.usi.core.matching.{FCFSOfferMatcher, OfferMatcher}
 import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.core.protos.ProtoBuilders
+import com.mesosphere.{ImplicitStrictLogging, LoggingArgs}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
-import SchedulerLogicHelpers._
 
 import scala.collection.JavaConverters._
 
@@ -19,68 +20,104 @@ import scala.collection.JavaConverters._
 private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher: OfferMatcher = new FCFSOfferMatcher())
     extends ImplicitStrictLogging {
 
+  private val MDC_MESOS_OP = "mesosOperation"
+  private val MDC_OFFER_ID = "offerId"
+
   private[core] def matchOffer(
       offer: Mesos.Offer,
       specs: Iterable[RunningPodSpec]): (Set[PodId], SchedulerEventsBuilder) = {
-    import com.mesosphere.usi.core.protos.ProtoBuilders._
     import com.mesosphere.usi.core.protos.ProtoConversions._
 
     val matchedSpecs: Map[RunningPodSpec, scala.List[Mesos.Resource]] = offerMatcher.matchOffer(offer, specs)
-    val taskInfos = matchedSpecs.map {
-      case (spec, resources) => spec.id -> buildTaskInfos(spec, offer.getAgentId, resources)
+    val launchOps = matchedSpecs.map {
+      case (spec, resources) =>
+        spec.id -> buildLaunchOperation(spec, offer.getAgentId, resources) //buildTaskInfos(spec, offer.getAgentId, resources)
     }
 
-    val eventsBuilder = taskInfos.keys.foldLeft(SchedulerEventsBuilder.empty) { (events, podId) =>
+    val eventsBuilder = launchOps.keys.foldLeft(SchedulerEventsBuilder.empty) { (events, podId) =>
       // Add pod record for all matched pods, and remove the pod spec for the newly launched pod
       events
         .withPodRecord(podId, Some(PodRecord(podId, Instant.now(), offer.getAgentId.asModel)))
         .withPodSpec(podId, None)
     }
 
-    val offerEvent = if (taskInfos.isEmpty) {
+    val offerEvent = if (launchOps.isEmpty) {
       logger.info(
         s"Declining offer with id [{}] {}",
         offer.getId.getValue,
         if (specs.isEmpty) "as there are no specs to be launched"
         else s"due to unmet requirement for pods : [${specs.map(_.id.value).mkString(", ")}]"
       )(
-        LoggingArgs("offerId" -> offer.getId.getValue).and("mesosOperation" -> "DECLINE")
+        LoggingArgs(MDC_OFFER_ID -> offer.getId.getValue).and(MDC_MESOS_OP -> "DECLINE")
       )
       mesosCallFactory.newDecline(Seq(offer.getId))
     } else {
-      val op = newOfferOperation(
-        Mesos.Offer.Operation.Type.LAUNCH,
-        launch = newOfferOperationLaunch(taskInfos.values.flatten)
-      )
-      logger.info(
-        s"Launching taskId${if (op.getLaunch.getTaskInfosCount > 1) "s"} : [{}] for offerId {}",
-        op.getLaunch.getTaskInfosList.asScala.map(_.getTaskId.getValue).mkString(", "),
-        offer.getId.getValue
-      )(
-        LoggingArgs("offerId" -> offer.getId.getValue).and("mesosOperation" -> "LAUNCH")
-      )
+      launchOps.values.foreach(launchOp => {
+        logger.info(
+          "Launching taskIds: [{}] for offerId {}",
+          launchOp.getLaunch.getTaskInfosList.asScala.map(_.getTaskId.getValue).mkString(", "),
+          offer.getId.getValue)
+        LoggingArgs(MDC_OFFER_ID -> offer.getId.getValue).and(MDC_MESOS_OP -> "LAUNCH")
+      })
+
       mesosCallFactory.newAccept(
         MesosCall.Accept
           .newBuilder()
-          .addOperations(op)
+          .addAllOperations(launchOps.values.asJava)
           .addOfferIds(offer.getId)
           .build()
       )
     }
 
-    (taskInfos.keySet, eventsBuilder.withMesosCall(offerEvent))
+    (launchOps.keySet, eventsBuilder.withMesosCall(offerEvent))
   }
 
-  /**
-    * Given a [[RunningPodSpec]], an [[Mesos.AgentID]] and a list of matched resources return a list of [[Mesos.TaskInfo]]s
-    *
-    * @param podSpec podSpec
-    * @param agentId agentId from the offer
-    * @param resources list of matched resources
-    * @return
-    */
-  def buildTaskInfos(
+  def buildLaunchOperation(
       podSpec: RunningPodSpec,
+      agentId: Mesos.AgentID,
+      resources: List[Mesos.Resource]): Mesos.Offer.Operation = {
+
+    podSpec.runSpec match {
+      case runTemplate: SimpleRunTemplate =>
+        val taskInfo = buildTaskInfosSimple(podSpec, runTemplate, agentId, resources)
+        ProtoBuilders.newOfferOperation(
+          Mesos.Offer.Operation.Type.LAUNCH,
+          launch = ProtoBuilders.newOfferOperationLaunch(taskInfo))
+      case runTemplate: TaskRunTemplate =>
+        val taskInfo = buildTaskInfosApp(runTemplate, agentId)
+        ProtoBuilders.newOfferOperation(
+          Mesos.Offer.Operation.Type.LAUNCH,
+          launch = ProtoBuilders.newOfferOperationLaunch(taskInfo))
+      case runTemplate: TaskGroupRunTemplate =>
+        val taskGroupInfo = buildTaskInfosPod(runTemplate, agentId)
+        ProtoBuilders.newOfferOperation(
+          Mesos.Offer.Operation.Type.LAUNCH,
+          launchGroup = ProtoBuilders.newOfferOperationLaunchGroup(taskGroupInfo))
+    }
+  }
+
+  private[this] def buildTaskInfosApp(runTemplate: TaskRunTemplate, agentId: Mesos.AgentID): List[Mesos.TaskInfo] = {
+    List(
+      runTemplate.task.toBuilder
+        .setAgentId(agentId)
+        .build()
+    )
+  }
+
+  private[this] def buildTaskInfosPod(
+      runTemplate: TaskGroupRunTemplate,
+      agentId: Mesos.AgentID): Mesos.TaskGroupInfo = {
+
+    val tgBuilder = runTemplate.taskGroup.toBuilder
+
+    tgBuilder.getTasksBuilderList.forEach(taskBuilder => taskBuilder.setAgentId(agentId))
+
+    tgBuilder.build()
+  }
+
+  private[this] def buildTaskInfosSimple(
+      podSpec: RunningPodSpec,
+      runTemplate: SimpleRunTemplate,
       agentId: Mesos.AgentID,
       resources: List[Mesos.Resource]): List[Mesos.TaskInfo] = {
     import com.mesosphere.usi.core.protos.ProtoBuilders._
@@ -93,7 +130,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
         // we use sanitized podId as the task name for now
         name = podSpec.id.value.replaceAll("[^a-zA-Z0-9-]", ""),
         agentId = agentId,
-        command = newCommandInfo(podSpec.runSpec.shellCommand, podSpec.runSpec.fetch),
+        command = newCommandInfo(runTemplate.shellCommand, runTemplate.fetch),
         resources = resources
       )
     }(collection.breakOut)

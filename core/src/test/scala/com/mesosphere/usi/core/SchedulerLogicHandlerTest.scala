@@ -4,16 +4,7 @@ import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
-import com.mesosphere.usi.core.models.{
-  LaunchPod,
-  PodId,
-  PodRecordUpdatedEvent,
-  PodSpecUpdatedEvent,
-  PodStatusUpdatedEvent,
-  RunTemplate,
-  StateEventOrSnapshot,
-  StateSnapshot
-}
+import com.mesosphere.usi.core.models.{LaunchPod, PodId, PodRecordUpdatedEvent, PodSpecUpdatedEvent, PodStatusUpdatedEvent, SimpleRunTemplate, StateEventOrSnapshot, StateSnapshot}
 import com.mesosphere.usi.core.protos.ProtoBuilders
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.scheduler.Protos.Call
@@ -21,7 +12,7 @@ import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest.Inside
 
 class SchedulerLogicHandlerTest extends UnitTest with Inside {
-  val testRoleRunSpec = RunTemplate(Seq.empty, "", "test-role")
+  val testRoleRunSpec = SimpleRunTemplate(Seq.empty, "", "test-role")
 
   def declineCallsIn(calls: Seq[Call]): Seq[Call.Decline] = calls.collect {
     case call if call.hasDecline => call.getDecline
@@ -52,7 +43,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
       newTaskStatus(newTaskId(podId.value), Mesos.TaskState.TASK_RUNNING, newAgentId("testing"), uuid = taskStatusUUID)
     val launchPod = LaunchPod(
       podId,
-      RunTemplate(
+      SimpleRunTemplate(
         resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
         shellCommand = "sleep 3600",
         "test")

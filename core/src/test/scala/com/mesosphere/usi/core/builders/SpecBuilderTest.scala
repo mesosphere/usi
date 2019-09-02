@@ -1,16 +1,16 @@
 package com.mesosphere.usi.core.builders
 
+import java.net.URI
+
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.logic.MesosEventsLogic
-import com.mesosphere.usi.core.models.{FetchUri, PodId, RunningPodSpec, RunTemplate}
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
+import com.mesosphere.usi.core.models.{FetchUri, PodId, RunningPodSpec, SimpleRunTemplate}
+import com.mesosphere.usi.core.protos.ProtoBuilders.{newResource, newResourceAllocationInfo}
+import com.mesosphere.usi.core.protos.ProtoConversions._
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.{Protos => Mesos}
-import com.mesosphere.usi.core.protos.ProtoConversions._
-import com.mesosphere.usi.core.protos.ProtoBuilders.{newResource, newResourceAllocationInfo}
-
-import java.net.URI
 
 class SpecBuilderTest extends UnitTest {
 
@@ -22,7 +22,7 @@ class SpecBuilderTest extends UnitTest {
       val fetchMe = "http://foo.bar"
       val pod: RunningPodSpec = RunningPodSpec(
         PodId("mock-podId"),
-        RunTemplate(
+        SimpleRunTemplate(
           resourceRequirements = List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 32)),
           shellCommand = "sleep 3600",
           role = "test",
@@ -31,7 +31,7 @@ class SpecBuilderTest extends UnitTest {
       )
 
       Then("taskInfo built from the RunSpec should contain fetch Uri")
-      val taskInfo = mesosEventLogic.buildTaskInfos(
+      val launchOp = mesosEventLogic.buildLaunchOperation(
         pod,
         MesosMock.mockAgentId.asProto,
         resources = List(
@@ -42,7 +42,12 @@ class SpecBuilderTest extends UnitTest {
             scalar = 4d.asProtoScalar))
       )
 
-      val uri = taskInfo.head.getCommand.getUris(0)
+      launchOp.getType shouldBe Mesos.Offer.Operation.Type.LAUNCH
+      launchOp.getLaunch.getTaskInfosCount shouldBe 1
+
+      val taskInfo = launchOp.getLaunch.getTaskInfos(0)
+
+      val uri = taskInfo.getCommand.getUris(0)
 
       uri.getValue shouldBe fetchMe
       uri.getExtract shouldBe false

@@ -42,6 +42,7 @@ case class RandomSelection(randomGenerator: Random) extends ValueSelectionPolicy
 
 sealed trait RequestedValue
 case class ExactValue(value: Int) extends RequestedValue
+case class RangeValue(begin: Int, end: Int) extends RequestedValue
 case object RandomValue extends RequestedValue
 
 object RangeRequirement {

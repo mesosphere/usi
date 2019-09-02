@@ -196,6 +196,12 @@ private[usi] object ProtoBuilders {
     b.build()
   }
 
+  def newOfferOperationLaunchGroup(taskInfos: Mesos.TaskGroupInfo): Mesos.Offer.Operation.LaunchGroup = {
+    val b = Mesos.Offer.Operation.LaunchGroup.newBuilder()
+    b.setTaskGroup(taskInfos)
+    b.build()
+  }
+
   def newTaskInfo(
       taskId: Mesos.TaskID,
       name: String,
