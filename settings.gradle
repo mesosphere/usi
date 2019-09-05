@@ -1,5 +1,6 @@
 rootProject.name = 'usi'
 
+include 'cli'
 include 'core'
 include 'core-models'
 include 'mesos-client'
