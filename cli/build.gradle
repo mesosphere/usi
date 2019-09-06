@@ -1,19 +1,14 @@
 plugins {
     id 'application'
-    id 'com.palantir.graal' version '0.4.0'
 }
 dependencies {
     compile project(':core')
     compile project(':mesos-client')
-    
+
     compile "de.heikoseeberger:akka-http-play-json_$scalaVersion:1.26.0"
+    compile "ch.qos.logback:logback-classic:1.2.3"
 }
 
 application {
     mainClassName = 'com.mesosphere.usi.cli.Main'
-}
-
-graal {
-    mainClass 'com.mesosphere.usi.cli.Main'
-    outputName 'usi'
 }

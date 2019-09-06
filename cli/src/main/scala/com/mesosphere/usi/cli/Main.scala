@@ -9,13 +9,13 @@ import akka.stream.{ActorMaterializer, IOResult, Materializer}
 import akka.util.ByteString
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.core.models.resources.{ResourceRequirement, ResourceType, ScalarRequirement}
+import com.typesafe.scalalogging.StrictLogging
 import play.api.libs.json._
 
 import scala.concurrent.Future
 
-object Main {
+object Main extends StrictLogging {
   def main(args: Array[String]): Unit = {
-    println("Hello")
 
     implicit val sys: ActorSystem = ActorSystem("UsiCli")
     implicit val mat: Materializer = ActorMaterializer()
@@ -31,14 +31,16 @@ object Main {
     stdinSource
       .via(parser)
       .map(parseCommand)
+      .log("command")
       .map { cmd =>
-        println(s"Processing: $cmd")
+        logger.info(s"Processing: $cmd")
         ByteString("done.")
       }
       .runWith(stdoutSink)
   }
 
   def parseCommand(event: ServerSentEvent): SchedulerCommand = {
+    logger.info(s"parsing $event")
     event.eventType
       .getOrElse(throw new IllegalArgumentException("Command did not include event type"))
       .toLowerCase match {
