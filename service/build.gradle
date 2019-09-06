@@ -1,0 +1,30 @@
+plugins {
+    id 'application'
+    id "com.lightbend.akka.grpc.gradle" version "0.7.1"
+}
+
+configurations {
+    alpnagent
+}
+
+dependencies {
+    compile project(':core')
+    compile project(':mesos-client')
+    
+    // Configuration for modules that use Jetty ALPN agent
+    alpnagent 'org.mortbay.jetty.alpn:jetty-alpn-agent:2.0.9'
+
+    compile "ch.qos.logback:logback-classic:1.2.3"
+}
+
+akkaGrpc {
+    language = "Scala"
+    generateClient = false
+    generateServer = true
+}
+
+task server(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.mesosphere.usi.service.GreeterServer'
+    jvmArgs "-javaagent:" + configurations.alpnagent.asPath
+}
