@@ -15,10 +15,20 @@ ext {
     akkaVersion = '2.5.19'
 }
 
+def readCurrentVersion = {
+  def out = new ByteArrayOutputStream()
+
+  exec{
+      commandLine "./version"
+      standardOutput = out;
+  }
+  out.toString().replaceAll("\\s", "");
+}
+
 allprojects {
 
     group = 'com.mesosphere.usi'
-    version = '0.1'
+    version = readCurrentVersion()
 
     apply plugin: "scala"
     apply plugin: 'cz.alenkacz.gradle.scalafmt'
