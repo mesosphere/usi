@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 # Version script for USI
 #
 MAJOR=0
