@@ -10,12 +10,14 @@ import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.conf.SchedulerSettings
-import com.mesosphere.usi.core.models.resources.ScalarRequirement
-import com.mesosphere.usi.core.models.{LaunchPod, PodId, PodStatus, PodStatusUpdatedEvent, SchedulerCommand, SimpleRunTemplate, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
+import com.mesosphere.usi.core.models.{LaunchPod, PodId, PodStatus, PodStatusUpdatedEvent, SchedulerCommand, SimpleRunTemplate, StateEvent, StateSnapshot, TaskGroupRunTemplate, TaskRunTemplate}
 import com.mesosphere.usi.repository.PodRecordRepository
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.scalalogging.StrictLogging
-import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo, TaskState, TaskStatus}
+import org.apache.mesos.v1.Protos
+import org.apache.mesos.v1.Protos.Value.Scalar
+import org.apache.mesos.v1.Protos.{CommandInfo, FrameworkID, FrameworkInfo, TaskGroupInfo, TaskInfo, TaskState, TaskStatus}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -113,6 +115,42 @@ object CoreHelloWorldFramework extends StrictLogging {
     LaunchPod(podId, runSpec = runSpec)
   }
 
+  def generateProtoLaunchCommand: LaunchPod = {
+    val podId = PodId(s"hello-world-proto.${UUID.randomUUID()}")
+    val runSpec = TaskRunTemplate(
+      task = TaskInfo.newBuilder()
+        .addResources(Protos.Resource.newBuilder().setName(ResourceType.CPUS.name).setType(Protos.Value.Type.SCALAR).setScalar(Scalar.newBuilder().setValue(0.1)))
+        .addResources(Protos.Resource.newBuilder().setName(ResourceType.MEM.name).setType(Protos.Value.Type.SCALAR).setScalar(Scalar.newBuilder().setValue(32)))
+        .setCommand(CommandInfo.newBuilder().setShell(true).setValue("""echo "Hello, world" && sleep 123""")),
+      role = "test"
+    )
+    LaunchPod(podId, runSpec = runSpec)
+  }
+
+  def generateProtoLaunchCommandGroup: LaunchPod = {
+    val podId = PodId(s"hello-world-group.${UUID.randomUUID()}")
+
+    val taskGroupInfo = TaskGroupInfo.newBuilder()
+
+    val task1 = taskGroupInfo.addTasksBuilder()
+    task1
+      .addResources(Protos.Resource.newBuilder().setName(ResourceType.CPUS.name).setType(Protos.Value.Type.SCALAR).setScalar(Scalar.newBuilder().setValue(0.1)))
+      .addResources(Protos.Resource.newBuilder().setName(ResourceType.MEM.name).setType(Protos.Value.Type.SCALAR).setScalar(Scalar.newBuilder().setValue(32)))
+      .setCommand(CommandInfo.newBuilder().setShell(true).setValue("""echo "Hello, world from Pod1" && sleep 99"""))
+
+    val task2 = taskGroupInfo.addTasksBuilder()
+    task2
+      .addResources(Protos.Resource.newBuilder().setName(ResourceType.CPUS.name).setType(Protos.Value.Type.SCALAR).setScalar(Scalar.newBuilder().setValue(0.1)))
+      .addResources(Protos.Resource.newBuilder().setName(ResourceType.MEM.name).setType(Protos.Value.Type.SCALAR).setScalar(Scalar.newBuilder().setValue(32)))
+      .setCommand(CommandInfo.newBuilder().setShell(true).setValue("""echo "Hello, world from Pod2" && sleep 133"""))
+
+    val runSpec = TaskGroupRunTemplate(
+      taskGroup = taskGroupInfo,
+      role = "test"
+    )
+    LaunchPod(podId, runSpec = runSpec)
+  }
+
   def init(
       clientSettings: MesosClientSettings,
       podRecordRepository: PodRecordRepository,
@@ -139,7 +177,7 @@ object CoreHelloWorldFramework extends StrictLogging {
     // to the scheduler. We're making our lives easier by ignoring this part for now - all we care about is to start
     // a "hello-world" task once.
     val completed: Future[Done] = Source.maybe
-      .prepend(Source.single(generateLaunchCommand))
+      .prepend(Source.single(generateProtoLaunchCommandGroup))
       // Here our initial snapshot is going to the scheduler flow
       .via(schedulerFlow)
       .map {

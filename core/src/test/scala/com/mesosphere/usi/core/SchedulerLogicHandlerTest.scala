@@ -4,7 +4,16 @@ import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
-import com.mesosphere.usi.core.models.{LaunchPod, PodId, PodRecordUpdatedEvent, PodSpecUpdatedEvent, PodStatusUpdatedEvent, SimpleRunTemplate, StateEventOrSnapshot, StateSnapshot}
+import com.mesosphere.usi.core.models.{
+  LaunchPod,
+  PodId,
+  PodRecordUpdatedEvent,
+  PodSpecUpdatedEvent,
+  PodStatusUpdatedEvent,
+  SimpleRunTemplate,
+  StateEventOrSnapshot,
+  StateSnapshot
+}
 import com.mesosphere.usi.core.protos.ProtoBuilders
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.scheduler.Protos.Call

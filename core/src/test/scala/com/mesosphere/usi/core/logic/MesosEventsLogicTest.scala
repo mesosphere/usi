@@ -4,10 +4,12 @@ import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.SchedulerState
 import com.mesosphere.usi.core.helpers.MesosMock
-import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunningPodSpec, SimpleRunTemplate, TaskId}
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
+import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunningPodSpec, SimpleRunTemplate, TaskId, TaskRunTemplate}
 import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskStatus}
 import com.mesosphere.utils.UnitTest
+import org.apache.mesos.v1.Protos.{CommandInfo, TaskInfo}
+import org.apache.mesos.v1.Protos.Value.Scalar
 import org.apache.mesos.v1.{Protos => Mesos}
 
 class MesosEventsLogicTest extends UnitTest {
@@ -23,6 +25,20 @@ class MesosEventsLogicTest extends UnitTest {
     PodId("mock-podId"),
     podWith1Cpu256MemTpl
   )
+
+  val protoPodWith1Cpu256MemTpl = TaskRunTemplate(
+    task = TaskInfo.newBuilder()
+      .addResources(Mesos.Resource.newBuilder().setName(ResourceType.CPUS.name).setType(Mesos.Value.Type.SCALAR).setScalar(Scalar.newBuilder().setValue(1)))
+      .addResources(Mesos.Resource.newBuilder().setName(ResourceType.MEM.name).setType(Mesos.Value.Type.SCALAR).setScalar(Scalar.newBuilder().setValue(256)))
+      .setCommand(CommandInfo.newBuilder().setShell(true).setValue("sleep 3600")),
+    role = "foo"
+  )
+
+  val protoPodWith1Cpu256Mem: RunningPodSpec = RunningPodSpec(
+    PodId("mock-proto-podId"),
+    protoPodWith1Cpu256MemTpl
+  )
+
 
   "MesosEventsLogic" should {
     "decline an offer when there is no PodSpec to launch" in {
@@ -51,6 +67,27 @@ class MesosEventsLogicTest extends UnitTest {
       val declines = schedulerEventsBuilder.result.mesosCalls.head.getDecline.getOfferIdsList
       declines.size() shouldBe 1
       declines.get(0) shouldEqual insufficientOffer.getId
+    }
+
+    "accept an offer when some ProtoPodSpec's resource requirements are met" in {
+      val offer = MesosMock.createMockOffer(cpus = 1, mem = 256)
+      val (matchedPodIds, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
+        offer,
+        Seq(
+          protoPodWith1Cpu256Mem
+        )
+      )
+      schedulerEventsBuilder.result.mesosCalls.size shouldBe 1
+      val accepts = schedulerEventsBuilder.result.mesosCalls.head.getAccept.getOfferIdsList
+      accepts.size() shouldBe 1
+      accepts.get(0) shouldEqual offer.getId
+      matchedPodIds.size shouldEqual 1
+
+      val ops = schedulerEventsBuilder.result.mesosCalls.head.getAccept.getOperationsList
+      ops.size() shouldBe 1
+      ops.get(0).hasLaunch shouldBe true
+      ops.get(0).getLaunch.getTaskInfosList.size() shouldBe 1
+      ops.get(0).getLaunch.getTaskInfosList.get(0).getAgentId shouldBe offer.getAgentId
     }
 
     "accept an offer when some PodSpec's resource requirements are met" in {

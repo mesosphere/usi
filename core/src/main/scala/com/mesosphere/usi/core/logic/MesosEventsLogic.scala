@@ -9,6 +9,7 @@ import com.mesosphere.usi.core.matching.{FCFSOfferMatcher, OfferMatcher}
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.core.protos.ProtoBuilders
 import com.mesosphere.{ImplicitStrictLogging, LoggingArgs}
+import org.apache.mesos.v1.Protos.{ExecutorID, ExecutorInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
 
@@ -30,8 +31,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
 
     val matchedSpecs: Map[RunningPodSpec, scala.List[Mesos.Resource]] = offerMatcher.matchOffer(offer, specs)
     val launchOps = matchedSpecs.map {
-      case (spec, resources) =>
-        spec.id -> buildLaunchOperation(spec, offer.getAgentId, resources) //buildTaskInfos(spec, offer.getAgentId, resources)
+      case (spec, resources) => spec.id -> buildLaunchOperation(spec, offer.getAgentId, offer.getFrameworkId, resources)
     }
 
     val eventsBuilder = launchOps.keys.foldLeft(SchedulerEventsBuilder.empty) { (events, podId) =>
@@ -72,68 +72,65 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
     (launchOps.keySet, eventsBuilder.withMesosCall(offerEvent))
   }
 
+  private[this] def buildLaunchTaskOperation(podSpec: RunningPodSpec,
+                                             agentId: Mesos.AgentID,
+                                             frameworkId: Mesos.FrameworkID,
+                                             taskRunTemplate: TaskRunTemplateType) = {
+    import com.mesosphere.usi.core.protos.ProtoConversions._
+
+    val taskInfoBuilder = taskRunTemplate.protoBuilder
+    // TBD: Do we want to set meaningful defaults, or throw an error if it's not set?
+    if (!taskInfoBuilder.hasTaskId) taskInfoBuilder.setTaskId(TaskId(podSpec.id.value).asProto)
+    if (!taskInfoBuilder.hasName) taskInfoBuilder.setName(podSpec.id.value.replaceAll("[^a-zA-Z0-9-]", ""))
+    taskInfoBuilder.setAgentId(agentId)
+
+    val taskInfos = Seq(taskInfoBuilder.build())
+
+    ProtoBuilders.newOfferOperation(
+      Mesos.Offer.Operation.Type.LAUNCH,
+      launch = ProtoBuilders.newOfferOperationLaunch(taskInfos))
+  }
+
+  private[this] def buildLaunchTaskGroupOperation(podSpec: RunningPodSpec,
+                                                  agentId: Mesos.AgentID,
+                                                  frameworkId: Mesos.FrameworkID,
+                                                  taskRunTemplate: TaskGroupRunTemplateType) = {
+    import com.mesosphere.usi.core.protos.ProtoConversions._
+
+    val taskGroupInfoBuilder = taskRunTemplate.protoBuilder
+    var i = 1
+    taskGroupInfoBuilder.getTasksBuilderList.forEach { taskBuilder =>
+      val nameAndId = podSpec.id.value + "-" + i
+      // TBD: Do we want to set meaningful defaults, or throw an error if it's not set?
+      if (!taskBuilder.hasTaskId) taskBuilder.setTaskId(TaskId(nameAndId).asProto)
+      if (!taskBuilder.hasName) taskBuilder.setName(nameAndId.replaceAll("[^a-zA-Z0-9-]", ""))
+
+      taskBuilder.setAgentId(agentId)
+      i = i + 1
+    }
+    val taskGroupInfo = taskGroupInfoBuilder.build()
+
+    val executorBuilder:ExecutorInfo.Builder = taskRunTemplate.executorBuilder
+    // TBD: Do we want to set meaningful defaults, or throw an error if it's not set?
+    if (!executorBuilder.hasExecutorId) executorBuilder.setExecutorId(ExecutorID.newBuilder().setValue(podSpec.id.value.replaceAll("[^a-zA-Z0-9-]", "")))
+    executorBuilder.setFrameworkId(frameworkId)
+    val executorInfo = executorBuilder.build()
+
+    ProtoBuilders.newOfferOperation(
+      Mesos.Offer.Operation.Type.LAUNCH_GROUP,
+      launchGroup = ProtoBuilders.newOfferOperationLaunchGroup(taskGroupInfo, executorInfo))
+  }
+
   def buildLaunchOperation(
       podSpec: RunningPodSpec,
       agentId: Mesos.AgentID,
+      frameworkId: Mesos.FrameworkID,
       resources: List[Mesos.Resource]): Mesos.Offer.Operation = {
 
     podSpec.runSpec match {
-      case runTemplate: SimpleRunTemplate =>
-        val taskInfo = buildTaskInfosSimple(podSpec, runTemplate, agentId, resources)
-        ProtoBuilders.newOfferOperation(
-          Mesos.Offer.Operation.Type.LAUNCH,
-          launch = ProtoBuilders.newOfferOperationLaunch(taskInfo))
-      case runTemplate: TaskRunTemplate =>
-        val taskInfo = buildTaskInfosApp(runTemplate, agentId)
-        ProtoBuilders.newOfferOperation(
-          Mesos.Offer.Operation.Type.LAUNCH,
-          launch = ProtoBuilders.newOfferOperationLaunch(taskInfo))
-      case runTemplate: TaskGroupRunTemplate =>
-        val taskGroupInfo = buildTaskInfosPod(runTemplate, agentId)
-        ProtoBuilders.newOfferOperation(
-          Mesos.Offer.Operation.Type.LAUNCH,
-          launchGroup = ProtoBuilders.newOfferOperationLaunchGroup(taskGroupInfo))
+      case templateType: TaskRunTemplateType => buildLaunchTaskOperation(podSpec, agentId, frameworkId, templateType)
+      case templateType: TaskGroupRunTemplateType => buildLaunchTaskGroupOperation(podSpec, agentId, frameworkId, templateType)
     }
-  }
-
-  private[this] def buildTaskInfosApp(runTemplate: TaskRunTemplate, agentId: Mesos.AgentID): List[Mesos.TaskInfo] = {
-    List(
-      runTemplate.task.toBuilder
-        .setAgentId(agentId)
-        .build()
-    )
-  }
-
-  private[this] def buildTaskInfosPod(
-      runTemplate: TaskGroupRunTemplate,
-      agentId: Mesos.AgentID): Mesos.TaskGroupInfo = {
-
-    val tgBuilder = runTemplate.taskGroup.toBuilder
-
-    tgBuilder.getTasksBuilderList.forEach(taskBuilder => taskBuilder.setAgentId(agentId))
-
-    tgBuilder.build()
-  }
-
-  private[this] def buildTaskInfosSimple(
-      podSpec: RunningPodSpec,
-      runTemplate: SimpleRunTemplate,
-      agentId: Mesos.AgentID,
-      resources: List[Mesos.Resource]): List[Mesos.TaskInfo] = {
-    import com.mesosphere.usi.core.protos.ProtoBuilders._
-    import com.mesosphere.usi.core.protos.ProtoConversions._
-
-    // Note - right now, runSpec only describes a single task. This needs to be improved in the future.
-    taskIdsFor(podSpec).map { taskId =>
-      newTaskInfo(
-        taskId.asProto,
-        // we use sanitized podId as the task name for now
-        name = podSpec.id.value.replaceAll("[^a-zA-Z0-9-]", ""),
-        agentId = agentId,
-        command = newCommandInfo(runTemplate.shellCommand, runTemplate.fetch),
-        resources = resources
-      )
-    }(collection.breakOut)
   }
 
   def processEvent(state: SchedulerState)(event: MesosEvent): SchedulerEvents = {
