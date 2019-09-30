@@ -111,7 +111,7 @@ class MesosFacade(val url: URL, val waitTime: FiniteDuration = 30.seconds)(
   // `waitTime` is passed implicitly to the `request` and `requestFor` methods
   implicit val requestTimeout = waitTime
   def state: RestResult[ITMesosState] = {
-    result(requestFor[ITMesosState](Get(s"$url/state.json")), waitTime)
+    result(requestFor[ITMesosState](Get(s"$url/state")), waitTime)
   }
 
   def frameworks(): RestResult[ITFrameworks] = {
