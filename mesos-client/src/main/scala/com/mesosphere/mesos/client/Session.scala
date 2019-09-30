@@ -34,7 +34,6 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     * @return The [[HttpRequest]] with proper headers and body.
     */
   def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest = {
-    println(s"Body: ${bytes.map(_.toChar).mkString}")
     HttpRequest(
       HttpMethods.POST,
       uri = Uri(s"$url/api/v1/scheduler"),
