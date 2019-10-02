@@ -14,7 +14,7 @@ ansiColor('xterm') {
   node('jdk8-scala') {
     stage('Publish') {
       checkout scm
-      sh 'sudo -E ./gradlew publish --info'
+      sh './gradlew publish --info'
     } 
   }
 }
