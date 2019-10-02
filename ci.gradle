@@ -73,10 +73,8 @@ task ci {
 
     if (TravisEnvironment.isMasterBuild()) {
         dependsOn githubReport, gitPublishPush
-        dependsOn publishMavenJavaPublicationToMavenRepository
     } else if (TravisEnvironment.isSecureBuild())  {
         dependsOn githubReport
-        dependsOn publishMavenJavaPublicationToMavenRepository
     }
 
     // in CI we need to gather test results as a report. We use TestReport task for that
