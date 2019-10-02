@@ -275,6 +275,7 @@ private[usi] object ProtoBuilders {
       .build()
   }
 
+  // TODO - remove
   def newDockerImage(dockerImageName: String): Image = {
     Image
       .newBuilder()
@@ -283,6 +284,7 @@ private[usi] object ProtoBuilders {
       .build()
   }
 
+  // TODO - remove
   def newContainerInfo(imageName: Option[String]): Option[Mesos.ContainerInfo] = {
     imageName.map { name =>
       ContainerInfo

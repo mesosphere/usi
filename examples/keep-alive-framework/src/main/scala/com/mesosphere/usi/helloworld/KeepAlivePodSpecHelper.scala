@@ -3,14 +3,14 @@ package com.mesosphere.usi.helloworld
 import java.util.UUID
 
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
-import com.mesosphere.usi.core.models.{PodId, RunningPodSpec, RunTemplate}
+import com.mesosphere.usi.core.models.{PodId, RunningPodSpec, SimpleRunTemplate}
 
 /**
   * This is a helper object that generates pod specs and snapshots.
   */
 object KeepAlivePodSpecHelper {
 
-  val runSpec: RunTemplate = RunTemplate(
+  val runSpec: SimpleRunTemplate = SimpleRunTemplate(
     resourceRequirements = List(ScalarRequirement(ResourceType.CPUS, 0.001), ScalarRequirement(ResourceType.MEM, 32)),
     shellCommand = """echo "Hello, world" && sleep 30""",
     role = "test"

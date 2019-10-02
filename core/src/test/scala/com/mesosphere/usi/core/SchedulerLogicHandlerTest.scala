@@ -10,7 +10,7 @@ import com.mesosphere.usi.core.models.{
   PodRecordUpdatedEvent,
   PodSpecUpdatedEvent,
   PodStatusUpdatedEvent,
-  RunTemplate,
+  SimpleRunTemplate,
   StateEventOrSnapshot,
   StateSnapshot
 }
@@ -21,7 +21,7 @@ import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest.Inside
 
 class SchedulerLogicHandlerTest extends UnitTest with Inside {
-  val testRoleRunSpec = RunTemplate(Seq.empty, "", "test-role")
+  val testRoleRunSpec = SimpleRunTemplate(Seq.empty, "", "test-role")
 
   def declineCallsIn(calls: Seq[Call]): Seq[Call.Decline] = calls.collect {
     case call if call.hasDecline => call.getDecline
@@ -52,7 +52,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
       newTaskStatus(newTaskId(podId.value), Mesos.TaskState.TASK_RUNNING, newAgentId("testing"), uuid = taskStatusUUID)
     val launchPod = LaunchPod(
       podId,
-      RunTemplate(
+      SimpleRunTemplate(
         resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
         shellCommand = "sleep 3600",
         "test")

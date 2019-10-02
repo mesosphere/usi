@@ -27,7 +27,7 @@ case class TerminalPodSpec(id: PodId) extends PodSpec {
   * @param id Id of the pod
   * @param runSpec WIP the thing to run, and resource requirements, etc.
   */
-case class RunningPodSpec(id: PodId, runSpec: RunTemplate) extends PodSpec {
+case class RunningPodSpec(id: PodId, runSpec: RunTemplateLike) extends PodSpec {
   override def shouldBeTerminal: Boolean = false
 }
 
@@ -42,7 +42,7 @@ object RunningPodSpec {
     * @param runSpec runSpec we are validating
     * @return true if provided range requirements are valid
     */
-  private def validateStaticRangeRequirementsUnique(runSpec: RunTemplate): Seq[ValidationMessage] = {
+  private def validateStaticRangeRequirementsUnique(runSpec: SimpleRunTemplate): Seq[ValidationMessage] = {
     val staticPorts = runSpec.resourceRequirements.collect {
       case RangeRequirement(requestedValues, _, _) => requestedValues
     }.flatten.collect { case ExactValue(value) => value }
@@ -67,7 +67,7 @@ object RunningPodSpec {
     }
   }
 
-  def isValid(runSpec: RunTemplate): Seq[ValidationMessage] = {
+  def isValid(runSpec: SimpleRunTemplate): Seq[ValidationMessage] = {
     val uniqueRangeRequirements = validateStaticRangeRequirementsUnique(runSpec)
     val scalarRequirements = validateScalarRequirements(runSpec.resourceRequirements)
     uniqueRangeRequirements ++ scalarRequirements

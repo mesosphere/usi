@@ -31,7 +31,7 @@ class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Op
 
   val client: MesosClient = new KeepAliveMesosClientFactory(settings.clientSettings, authorization).client
 
-  val runSpec: RunTemplate = KeepAlivePodSpecHelper.runSpec
+  val runSpec: SimpleRunTemplate = KeepAlivePodSpecHelper.runSpec
 
   val specsSnapshot: List[RunningPodSpec] =
     KeepAlivePodSpecHelper.specsSnapshot(settings.numberOfTasks)

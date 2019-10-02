@@ -3,7 +3,7 @@ package com.mesosphere.usi.core.builders
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.logic.MesosEventsLogic
-import com.mesosphere.usi.core.models.{FetchUri, PodId, RunTemplate, RunningPodSpec}
+import com.mesosphere.usi.core.models.{FetchUri, PodId, SimpleRunTemplate, RunningPodSpec}
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.{Protos => Mesos}
@@ -21,7 +21,7 @@ class SpecBuilderTest extends UnitTest {
       val fetchMe = "http://foo.bar"
       val pod: RunningPodSpec = RunningPodSpec(
         PodId("mock-podId"),
-        RunTemplate(
+        SimpleRunTemplate(
           resourceRequirements = List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 32)),
           shellCommand = "sleep 3600",
           role = "test",
@@ -54,7 +54,7 @@ class SpecBuilderTest extends UnitTest {
       val containerName = Option("foo/bar:tag")
       val pod: RunningPodSpec = RunningPodSpec(
         PodId("mock-podId"),
-        RunTemplate(
+        SimpleRunTemplate(
           resourceRequirements = List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 32)),
           shellCommand = "sleep 3600",
           role = "test",

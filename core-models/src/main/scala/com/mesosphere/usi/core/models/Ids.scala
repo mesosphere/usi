@@ -7,6 +7,16 @@ package com.mesosphere.usi.core.models
 case class PodId(value: String)
 
 /**
+  * Identifier for a pod's task; does not include podId
+  * @param value
+  */
+case class PartialTaskId(value: String)
+
+object PartialTaskId {
+  val empty = PartialTaskId("")
+}
+
+/**
   * Unique identifier of a reservation
   * @param value
   */
