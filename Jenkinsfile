@@ -13,8 +13,10 @@ ansiColor('xterm') {
   }
   node('jdk8-scala') {
     stage('Publish') { withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-mesosphere-dev-jenkins']]) {
-      checkout scm
-      sh './gradlew publish --info'
+      sshagent (credentials: ['0f7ec9c9-99b2-4797-9ed5-625572d5931d']) {
+        checkout scm
+        sh './gradlew publish --info'
+      }
     }}
   }
 }
