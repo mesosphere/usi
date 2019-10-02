@@ -12,9 +12,9 @@ ansiColor('xterm') {
     }
   }
   node('jdk8-scala') {
-    stage('Publish') {
+    stage('Publish') { withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-mesosphere-dev-jenkins']]) {
       checkout scm
       sh './gradlew publish --info'
-    } 
+    }}
   }
 }
