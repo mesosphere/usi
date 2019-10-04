@@ -32,8 +32,8 @@ case class ZookeeperServer(autoStart: Boolean = true, val port: Int = PortAlloca
     new InstanceSpec(
       null, // auto-create workdir
       port,
-      -1, // random electionPort
-      -1, // random quorumPort
+      PortAllocator.ephemeralPort(),
+      PortAllocator.ephemeralPort(),
       true, // deleteDataDirectoryOnClose = true
       -1, // default serverId
       -1, // default tickTime
