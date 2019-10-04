@@ -327,7 +327,7 @@ case class MesosCluster(
     val processName: String = "Master"
   }
 
-  case class Agent(resources: Resources, extraArgs: Seq[String]) extends Mesos {
+  case class Agent(resources: Resources, extraArgs: Seq[String], logVerbosityLevel: Int = 0) extends Mesos {
     override val workDir = Files.createTempDirectory(s"$suiteName-mesos-agent-$port").toFile
     override val processBuilder = Process(
       command = Seq(
@@ -340,7 +340,7 @@ case class MesosCluster(
         s"--master=$masterUrl",
         s"--work_dir=${workDir.getAbsolutePath}",
         s"--cgroups_root=mesos$port", // See MESOS-9960 for more info
-        s"""--executor_environment_variables={"GLOG_v": "2"}""") ++ extraArgs,
+        s"""--executor_environment_variables={"GLOG_v": "$logVerbosityLevel"}""") ++ extraArgs,
       cwd = None, extraEnv = mesosEnv(workDir): _*)
 
     override val processName = "Agent"
