@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.3 API  - com.mesosphere.mesos.client.MesosCalls</title>
-          <meta name="description" content="usi 0.1.3 API - com.mesosphere.mesos.client.MesosCalls" />
-          <meta name="keywords" content="usi 0.1.3 API com.mesosphere.mesos.client.MesosCalls" />
+          <title>usi 0.1.4 API  - com.mesosphere.mesos.client.MesosCalls</title>
+          <meta name="description" content="usi 0.1.4 API - com.mesosphere.mesos.client.MesosCalls" />
+          <meta name="keywords" content="usi 0.1.4 API com.mesosphere.mesos.client.MesosCalls" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.3 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.4 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -503,7 +503,7 @@
       <p class="shortcomment cmt">Factory method to construct a ACCEPT Mesos Call event.</p><div class="fullcomment"><div class="comment cmt"><p>Factory method to construct a ACCEPT Mesos Call event. Calling this method has no side effects.</p><p>Sent by the scheduler when it accepts offer(s) sent by the master. The ACCEPT request includes the type
 of operations (e.g., launch task, launch task group, reserve resources, create volumes) that the scheduler
 wants to perform on the offers. Note that until the scheduler replies (accepts or declines) to an offer,
-the offer’s resources are considered allocated to the offer’s role and to the framework.</p><p>http://mesos.apache.org/documentation/latest/scheduler-http-api/#accept
+the offer's resources are considered allocated to the offer's role and to the framework.</p><p>http://mesos.apache.org/documentation/latest/scheduler-http-api/#accept
 </p></div></div>
     </li><li name="com.mesosphere.mesos.client.MesosCalls#newAcceptInverseOffers" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="newAcceptInverseOffers(offers:Seq[org.apache.mesos.v1.Protos.OfferID],filters:Option[org.apache.mesos.v1.Protos.Filters]):org.apache.mesos.v1.scheduler.Protos.Call"></a><a id="newAcceptInverseOffers(Seq[OfferID],Option[Filters]):Call"></a>
@@ -597,7 +597,7 @@ the provided unavailability.</p><p>https://mesosphere.com/blog/mesos-inverse-off
       
       <p class="shortcomment cmt">Factory method to construct a KILL Mesos Call event.</p><div class="fullcomment"><div class="comment cmt"><p>Factory method to construct a KILL Mesos Call event. Calling this method has no side effects.</p><p>Sent by the scheduler to kill a specific task. If the scheduler has a custom executor, the kill is forwarded
 to the executor; it is up to the executor to kill the task and send a TASK_KILLED (or TASK_FAILED) update.
-If the task hasn’t yet been delivered to the executor when Mesos master or agent receives the kill request,
+If the task hasn't yet been delivered to the executor when Mesos master or agent receives the kill request,
 a TASK_KILLED is generated and the task launch is not forwarded to the executor. Note that if the task belongs
 to a task group, killing of one task results in all tasks in the task group being killed. Mesos releases the
 resources for a task once it receives a terminal update for the task. If the task is unknown to the master,
