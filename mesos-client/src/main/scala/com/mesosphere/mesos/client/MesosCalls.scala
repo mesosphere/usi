@@ -38,7 +38,7 @@ class MesosCalls(frameworkId: FrameworkID) {
     * Sent by the scheduler when it accepts offer(s) sent by the master. The ACCEPT request includes the type
     * of operations (e.g., launch task, launch task group, reserve resources, create volumes) that the scheduler
     * wants to perform on the offers. Note that until the scheduler replies (accepts or declines) to an offer,
-    * the offer’s resources are considered allocated to the offer’s role and to the framework.
+    * the offer's resources are considered allocated to the offer's role and to the framework.
     *
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#accept
     */
@@ -116,7 +116,7 @@ class MesosCalls(frameworkId: FrameworkID) {
     *
     * Sent by the scheduler to kill a specific task. If the scheduler has a custom executor, the kill is forwarded
     * to the executor; it is up to the executor to kill the task and send a TASK_KILLED (or TASK_FAILED) update.
-    * If the task hasn’t yet been delivered to the executor when Mesos master or agent receives the kill request,
+    * If the task hasn't yet been delivered to the executor when Mesos master or agent receives the kill request,
     * a TASK_KILLED is generated and the task launch is not forwarded to the executor. Note that if the task belongs
     * to a task group, killing of one task results in all tasks in the task group being killed. Mesos releases the
     * resources for a task once it receives a terminal update for the task. If the task is unknown to the master,
