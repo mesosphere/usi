@@ -62,9 +62,7 @@ object MesosClusterExtension {
 
     private[mesos] var suiteName: String = "unknown"
     private[mesos] var mesosMasterZkUrl: String = null
-    private[mesos] var mesosNumMasters = 1
-    private[mesos] var mesosNumAgents = 1
-    private[mesos] var mesosQuorumSize = 1
+    private[mesos] var config = new MesosConfig()
     private[mesos] var agentConfig = new MesosAgentConfig("posix", "mesos", Option.empty, Option.empty)
     private[mesos] var mesosLeaderTimeout = new FiniteDuration(30, TimeUnit.SECONDS)
 
@@ -85,19 +83,19 @@ object MesosClusterExtension {
 
     /** @return the builder with the number of masters updated to {{{num}}}. Defaults to 1. */
     def withNumMasters(num: Int): Builder = {
-      this.mesosNumMasters = num
+      this.config = this.config.copy(numMasters = num)
       this
     }
 
     /** @return the builder with the number of agents updated to {{{num}}}. Defaults to 1. */
     def withNumAgents(num: Int): Builder = {
-      this.mesosNumAgents = num
+      this.config = this.config.copy(numAgents = num)
       this
     }
 
     /** @return the builder with the Mesos quorum size updated to {{{num}}}. Defaults to 1. */
     def withQuorumSize(num: Int): Builder = {
-      this.mesosQuorumSize = num
+      this.config = this.config.copy(quorumSize = num)
       this
     }
 
@@ -129,16 +127,11 @@ object MesosClusterExtension {
     def build(system: ActorSystem, materializer: Materializer): MesosClusterExtension = {
       val mesosCluster = new MesosCluster(
         suiteName,
-        mesosNumMasters,
-        mesosNumAgents,
         mesosMasterZkUrl,
-        mesosQuorumSize,
         false,
+        config,
         agentConfig,
         mesosLeaderTimeout,
-        mastersFaultDomains,
-        agentsFaultDomains,
-        agentsGpus
       )(system, materializer)
 
       new MesosClusterExtension(mesosCluster)
