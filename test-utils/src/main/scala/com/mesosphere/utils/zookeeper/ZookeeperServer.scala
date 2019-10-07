@@ -104,7 +104,10 @@ trait ZookeeperServerTest extends BeforeAndAfterAll with StrictLogging { this: S
       throw new IllegalStateException("Failed to connect to Zookeeper. Will exit now.")
     }
     val namespaced = namespace.map(client.usingNamespace(_)).getOrElse(client)
-    zkclients.add(namespaced)
+
+    // No need to add the namespaced client to the list - it's just a facade for the underlying one
+    zkclients.add(client)
+
     namespaced
   }
 
