@@ -2,6 +2,7 @@ package com.mesosphere.utils.mesos
 
 import java.net.URL
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.http.scaladsl.client.RequestBuilding.{Get, Post}
 import akka.http.scaladsl.model.{HttpEntity, HttpResponse}
@@ -9,6 +10,7 @@ import akka.stream.Materializer
 import com.mesosphere.utils.http.RestResult
 import com.typesafe.scalalogging.StrictLogging
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
+import play.api.libs.json.Json
 
 import scala.concurrent.Await._
 import scala.concurrent.duration._
@@ -89,7 +91,13 @@ object MesosFacade {
 
   case class ITask(id: String, name: String, framework_id: String, state: Option[String])
 
-  case class ITFramework(id: String, name: String, active: Boolean, connected: Boolean, tasks: Seq[ITask], unreachable_tasks: Seq[ITask])
+  case class ITFramework(
+      id: String,
+      name: String,
+      active: Boolean,
+      connected: Boolean,
+      tasks: Seq[ITask],
+      unreachable_tasks: Seq[ITask])
 
   case class ITFrameworks(
       frameworks: Seq[ITFramework],
@@ -132,5 +140,21 @@ class MesosFacade(val url: URL, val waitTime: FiniteDuration = 30.seconds)(
 
   def redirect(leader: URL = url): HttpResponse = {
     result(request(Get(s"$leader/redirect")), waitTime).value
+  }
+
+  /**
+    * Mark agent as gone using v1 operator API
+    *
+    * @param agentId
+    * @return Right(Done) on success, Left(errorString) otherwise
+    */
+  def markAgentGone(agentId: String): RestResult[Done] = {
+    val response = result(request(Post(s"$url/api/v1", Json.obj(
+      "type" -> "MARK_AGENT_GONE",
+      "mark_agent_gone" -> Json.obj(
+        "agent_id" -> Json.obj("value" -> agentId))))), waitTime)
+    response.map { _ =>
+      Done
+    }
   }
 }
