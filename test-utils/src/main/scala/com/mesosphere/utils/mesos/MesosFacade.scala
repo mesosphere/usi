@@ -89,7 +89,7 @@ object MesosFacade {
 
   case class ITask(id: String, name: String, framework_id: String, state: Option[String])
 
-  case class ITFramework(id: String, name: String, active: Boolean, connected: Boolean, tasks: Seq[ITask])
+  case class ITFramework(id: String, name: String, active: Boolean, connected: Boolean, tasks: Seq[ITask], unreachable_tasks: Seq[ITask])
 
   case class ITFrameworks(
       frameworks: Seq[ITFramework],
