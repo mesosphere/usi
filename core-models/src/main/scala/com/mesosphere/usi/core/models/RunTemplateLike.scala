@@ -7,12 +7,17 @@ import org.apache.mesos.v1.{Protos => Mesos}
 import scala.collection.JavaConverters._
 
 sealed trait RunTemplateLike {
-  final lazy val allResources: Seq[ResourceRequirement] = {
-    val b = Seq.newBuilder[ResourceRequirement]
-    taskResourceRequirements.values.foreach { r =>
-      r.foreach(b += _)
+  final lazy val allResourceRequirements: List[RunTemplateLike.KeyedResourceRequirement] = {
+    val b = List.newBuilder[RunTemplateLike.KeyedResourceRequirement]
+    taskResourceRequirements.foreach {
+      case (taskId, requirements) =>
+        requirements.foreach { r =>
+          b += RunTemplateLike.KeyedResourceRequirement(Some(taskId), r)
+        }
     }
-    executorResources.foreach { b += _ }
+    executorResources.foreach { r =>
+      b += RunTemplateLike.KeyedResourceRequirement(None, r)
+    }
     b.result()
   }
   val taskResourceRequirements: Map[PartialTaskId, Seq[ResourceRequirement]]
@@ -24,6 +29,37 @@ sealed trait RunTemplateLike {
       executorResources: Seq[Mesos.Resource],
       taskResources: Map[PartialTaskId, Seq[Mesos.Resource]])
     : Either[Mesos.Offer.Operation.Launch, Mesos.Offer.Operation.LaunchGroup]
+}
+
+object RunTemplateLike extends StrictLogging {
+  case class KeyedResourceRequirement(entityKey: Option[PartialTaskId], requirement: ResourceRequirement)
+
+  private[models] def setTaskInfo(
+      b: Mesos.TaskInfo.Builder,
+      matchedOffer: Mesos.Offer,
+      partialTaskId: PartialTaskId,
+      taskIdStrategy: CurriedPodTaskIdStrategy,
+      resources: Seq[Mesos.Resource]): Unit = {
+    if (b.hasTaskId) {
+      logger.error(
+        s"TaskInfo builder for ${taskIdStrategy.podId} / ${partialTaskId} set the task ID but shouldn't! Value is ignored")
+    }
+    if (b.hasAgentId) {
+      logger.error(
+        s"TaskInfo builder for ${taskIdStrategy.podId} / ${partialTaskId} set the agentId but shouldn't! Value is ignored")
+    }
+    if (b.getResourcesCount != 0) {
+      logger.error(s"TaskInfo builder for ${taskIdStrategy.podId} set resources but shouldn't! Value is ignored")
+      b.clearResources()
+    }
+    val taskId = taskIdStrategy(partialTaskId).value
+    if (!b.hasName) {
+      b.setName(taskId)
+    }
+    b.setTaskId(Mesos.TaskID.newBuilder().setValue(taskId))
+    b.setAgentId(matchedOffer.getAgentId)
+    b.addAllResources(resources.asJava)
+  }
 }
 
 class LegacyLaunchBuilder(val role: String, taskBuilder: TaskBuilderLike) extends RunTemplateLike {
@@ -38,11 +74,22 @@ class LegacyLaunchBuilder(val role: String, taskBuilder: TaskBuilderLike) extend
       executorResources: Seq[Mesos.Resource],
       taskResources: Map[PartialTaskId, Seq[Mesos.Resource]]
   ): Either[Mesos.Offer.Operation.Launch, Mesos.Offer.Operation.LaunchGroup] = {
-    Left(???)
+    val resources = taskResources(PartialTaskId.empty)
+    val taskInfoBuilder = taskBuilder
+      .buildTask(offer, taskResources = resources, peerTaskResources = taskResources)
+    RunTemplateLike.setTaskInfo(taskInfoBuilder, offer, PartialTaskId.empty, taskIdStrategy, resources)
+    val op = Mesos.Offer.Operation.Launch
+      .newBuilder()
+      .addTaskInfos(taskInfoBuilder)
+      .build
+    Left(op)
   }
 }
 
-class LaunchGroupBuilder(val role: String, executorBuilder: ExecutorBuilderLike, tasks: Map[PartialTaskId, TaskBuilderLike])
+class LaunchGroupBuilder(
+    val role: String,
+    executorBuilder: ExecutorBuilderLike,
+    tasks: Map[PartialTaskId, TaskBuilderLike])
     extends RunTemplateLike
     with StrictLogging {
   val taskResourceRequirements = tasks.map { case (taskId, taskBuilder) => taskId -> taskBuilder.resourceRequirements }
@@ -65,21 +112,7 @@ class LaunchGroupBuilder(val role: String, executorBuilder: ExecutorBuilderLike,
     val taskInfos = taskResources.map {
       case (partialTaskId, resources) =>
         val b = tasks(partialTaskId).buildTask(matchedOffer, resources, taskResources)
-        if (b.hasTaskId) {
-          logger.error(
-            s"TaskInfo builder for ${taskIdStrategy.podId} / ${partialTaskId} set the task ID but shouldn't! Value is ignored")
-        }
-        if (b.hasAgentId) {
-          logger.error(
-            s"TaskInfo builder for ${taskIdStrategy.podId} / ${partialTaskId} set the agentId but shouldn't! Value is ignored")
-        }
-        if (b.getResourcesCount != 0) {
-          logger.error(s"TaskInfo builder for ${taskIdStrategy.podId} set resources but shouldn't! Value is ignored")
-          b.clearResources()
-        }
-        b.setTaskId(Mesos.TaskID.newBuilder().setValue(taskIdStrategy(partialTaskId).value))
-        b.setAgentId(matchedOffer.getAgentId)
-        b.addAllResources(resources.asJava)
+        RunTemplateLike.setTaskInfo(b, matchedOffer, partialTaskId, taskIdStrategy, resources)
         partialTaskId -> b.build
     }
 
@@ -104,7 +137,7 @@ abstract class PodTaskIdStrategy {
 }
 
 object PodTaskIdStrategy {
-  def defaultStrategy = new PodTaskIdStrategy {
+  def defaultStrategy: PodTaskIdStrategy = new PodTaskIdStrategy {
     override def apply(podId: PodId, partialTaskId: PartialTaskId): TaskId =
       TaskId(podId.value + "." + partialTaskId)
 
@@ -118,6 +151,10 @@ object PodTaskIdStrategy {
 
 case class CurriedPodTaskIdStrategy(podId: PodId, strategy: PodTaskIdStrategy) {
   def apply(partialTaskId: PartialTaskId): TaskId = strategy.apply(podId, partialTaskId)
+}
+object CurriedPodTaskIdStrategy {
+  def default(podId: PodId): CurriedPodTaskIdStrategy =
+    CurriedPodTaskIdStrategy(podId, PodTaskIdStrategy.defaultStrategy)
 }
 
 trait ExecutorBuilderLike {

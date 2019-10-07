@@ -9,7 +9,6 @@ import com.mesosphere.usi.core.matching.{FCFSOfferMatcher, OfferMatcher}
 import com.mesosphere.usi.core.models._
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
-import SchedulerLogicHelpers._
 
 import scala.collection.JavaConverters._
 
@@ -19,16 +18,28 @@ import scala.collection.JavaConverters._
 private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher: OfferMatcher = new FCFSOfferMatcher())
     extends ImplicitStrictLogging {
 
+  val podTaskIdStrategy = PodTaskIdStrategy.defaultStrategy
+
   private[core] def matchOffer(
       offer: Mesos.Offer,
       specs: Iterable[RunningPodSpec]): (Set[PodId], SchedulerEventsBuilder) = {
     import com.mesosphere.usi.core.protos.ProtoBuilders._
     import com.mesosphere.usi.core.protos.ProtoConversions._
 
-    // TODO - matchOffer needs to return a type which keeps matched executor resources and task resources separate
-    val matchedSpecs: Map[RunningPodSpec, scala.List[Mesos.Resource]] = offerMatcher.matchOffer(offer, specs)
+    val matchedSpecs: Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = offerMatcher.matchOffer(offer, specs)
     val launchCommands = matchedSpecs.map {
-      case (spec, resources) => spec.id -> spec.runSpec.buildOperation(offer, ???, ???, ???)
+      case (spec, resourceMatches) =>
+        val groupedResources = resourceMatches.groupBy(_.entityKey)
+        val executorResources = groupedResources.getOrElse(None, Nil).map(_.resource)
+        val taskResources = groupedResources.collect {
+          case (Some(key), taskResourceMatches) =>
+            key -> taskResourceMatches.map(_.resource)
+        }
+        spec.id -> spec.runSpec.buildOperation(
+          offer,
+          CurriedPodTaskIdStrategy(spec.id, PodTaskIdStrategy.defaultStrategy),
+          executorResources,
+          taskResources)
     }
 
     val eventsBuilder = launchCommands.keys.foldLeft(SchedulerEventsBuilder.empty) { (events, podId) =>
@@ -51,25 +62,25 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
     } else {
       val operations = launchCommands.values.map {
         case Right(launchGroup) =>
-          newOfferOperation(
-            Mesos.Offer.Operation.Type.LAUNCH_GROUP,
-            launchGroup = launchGroup)
+          logger.info(
+            s"Launching TaskGroup taskId${if (launchGroup.getTaskGroup.getTasksCount > 1) "s"} : [{}] for offerId {}",
+            launchGroup.getTaskGroup.getTasksList.asScala.map(_.getTaskId.getValue).mkString(", "),
+            offer.getId.getValue
+          )(
+            LoggingArgs("offerId" -> offer.getId.getValue).and("mesosOperation" -> "LAUNCH")
+          )
+          newOfferOperation(Mesos.Offer.Operation.Type.LAUNCH_GROUP, launchGroup = launchGroup)
         case Left(launch) =>
-          newOfferOperation(
-            Mesos.Offer.Operation.Type.LAUNCH,
-            launch = launch)
+          logger.info(
+            s"Launching taskId${if (launch.getTaskInfosCount > 1) "s"} : [{}] for offerId {}",
+            launch.getTaskInfosList.asScala.map(_.getTaskId.getValue).mkString(", "),
+            offer.getId.getValue
+          )(
+            LoggingArgs("offerId" -> offer.getId.getValue).and("mesosOperation" -> "LAUNCH")
+          )
+          newOfferOperation(Mesos.Offer.Operation.Type.LAUNCH, launch = launch)
       }
 
-      // TODO - update logging statement
-      /**
-      logger.info(
-        s"Launching taskId${if (op.getLaunch.getTaskInfosCount > 1) "s"} : [{}] for offerId {}",
-        op.getLaunch.getTaskInfosList.asScala.map(_.getTaskId.getValue).mkString(", "),
-        offer.getId.getValue
-      )(
-        LoggingArgs("offerId" -> offer.getId.getValue).and("mesosOperation" -> "LAUNCH")
-      )
-      */
       mesosCallFactory.newAccept(
         MesosCall.Accept
           .newBuilder()
@@ -103,28 +114,33 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
 
       case UpdateEvent(taskStatus) =>
         val taskId = TaskId(taskStatus.getTaskId.getValue)
-        val podId = podIdFor(taskId)
-        logger.info(
-          s"Received task status update from taskId $taskId and podId $podId with status ${taskStatus.getState}"
-        )(LoggingArgs("taskId" -> taskId, "podId" -> podId))
+        podTaskIdStrategy.unapply(taskId) match {
+          case Some((podId, _)) =>
+            logger.info(
+              s"Received task status update from taskId $taskId and podId $podId with status ${taskStatus.getState}"
+            )(LoggingArgs("taskId" -> taskId, "podId" -> podId))
 
-        val newStatus = state.podStatuses.get(podId) match {
-          case Some(oldStatus) =>
-            oldStatus.copy(taskStatuses = oldStatus.taskStatuses.updated(taskId, taskStatus))
+            val newStatus = state.podStatuses.get(podId) match {
+              case Some(oldStatus) =>
+                oldStatus.copy(taskStatuses = oldStatus.taskStatuses.updated(taskId, taskStatus))
+              case None =>
+                PodStatus(podId, Map(taskId -> taskStatus))
+            }
+
+            SchedulerEvents(
+              stateEvents = List(PodStatusUpdatedEvent(podId, Some(newStatus))),
+              mesosCalls = if (taskStatus.hasUuid) {
+                // frameworks should accept only status updates that have UUID set
+                // http://mesos.apache.org/documentation/latest/scheduler-http-api/#acknowledge
+                List(mesosCallFactory.newAcknowledge(taskStatus.getAgentId, taskStatus.getTaskId, taskStatus.getUuid))
+              } else {
+                Nil
+              }
+            )
           case None =>
-            PodStatus(podId, Map(taskId -> taskStatus))
+            logger.error(s"Critical error! Failed to derive podId from ${taskId}; associated taskStatus has been ignored!")
+            SchedulerEvents.empty
         }
-
-        SchedulerEvents(
-          stateEvents = List(PodStatusUpdatedEvent(podId, Some(newStatus))),
-          mesosCalls = if (taskStatus.hasUuid) {
-            // frameworks should accept only status updates that have UUID set
-            // http://mesos.apache.org/documentation/latest/scheduler-http-api/#acknowledge
-            List(mesosCallFactory.newAcknowledge(taskStatus.getAgentId, taskStatus.getTaskId, taskStatus.getUuid))
-          } else {
-            Nil
-          }
-        )
       case other =>
         logger.warn(s"No handler defined for event ${other.getType} - ${other}")
         SchedulerEvents.empty

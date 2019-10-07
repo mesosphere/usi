@@ -1,5 +1,6 @@
 package com.mesosphere.usi.core.matching
-import com.mesosphere.usi.core.models.resources.{ResourceRequirement, ResourceType}
+import com.mesosphere.usi.core.models.RunTemplateLike.KeyedResourceRequirement
+import com.mesosphere.usi.core.models.resources.ResourceType
 import com.mesosphere.usi.core.models.RunningPodSpec
 import org.apache.mesos.v1.{Protos => Mesos}
 
@@ -15,19 +16,19 @@ class FCFSOfferMatcher extends OfferMatcher {
 
   @tailrec private def maybeMatchPodSpec(
       remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
-      matchedResources: List[Mesos.Resource],
-      resourceRequirements: List[ResourceRequirement])
-    : Option[(List[Mesos.Resource], Map[ResourceType, Seq[Mesos.Resource]])] = {
+      matchedResources: List[OfferMatcher.ResourceMatch],
+      resourceRequirements: List[KeyedResourceRequirement])
+    : Option[(List[OfferMatcher.ResourceMatch], Map[ResourceType, Seq[Mesos.Resource]])] = {
 
     resourceRequirements match {
       case Nil =>
         Some((matchedResources, remainingResources))
-      case req :: rest =>
+      case (KeyedResourceRequirement(entityKey, req)) :: rest =>
         ResourceMatcher.matchAndConsume(req, remainingResources.getOrElse(req.resourceType, Nil)) match {
           case Some(matchResult) =>
             maybeMatchPodSpec(
               remainingResources.updated(req.resourceType, matchResult.remainingResource),
-              matchResult.matchedResources.toList ++ matchedResources,
+              matchResult.matchedResources.toList.map(OfferMatcher.ResourceMatch(entityKey, _)) ++ matchedResources,
               rest)
           case None =>
             // we didn't match
@@ -38,15 +39,15 @@ class FCFSOfferMatcher extends OfferMatcher {
 
   @tailrec private def matchPodSpecsTaskRecords(
       remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
-      result: Map[RunningPodSpec, List[Mesos.Resource]],
-      pendingLaunchPodSpecs: List[RunningPodSpec]): Map[RunningPodSpec, List[Mesos.Resource]] = {
+      result: Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]],
+      pendingLaunchPodSpecs: List[RunningPodSpec]): Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = {
 
     pendingLaunchPodSpecs match {
       case Nil =>
         result
 
       case podSpec :: rest =>
-        maybeMatchPodSpec(remainingResources, Nil, podSpec.runSpec.resourceRequirements.toList) match {
+        maybeMatchPodSpec(remainingResources, Nil, podSpec.runSpec.allResourceRequirements) match {
           case Some((matchedResources, newRemainingResources)) =>
             matchPodSpecsTaskRecords(newRemainingResources, result.updated(podSpec, matchedResources), rest)
           case None =>
@@ -57,7 +58,7 @@ class FCFSOfferMatcher extends OfferMatcher {
 
   override def matchOffer(
       offer: Mesos.Offer,
-      podSpecs: Iterable[RunningPodSpec]): Map[RunningPodSpec, List[Mesos.Resource]] = {
+      podSpecs: Iterable[RunningPodSpec]): Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = {
     val groupedResources = offer.getResourcesList.asScala.groupBy(r => ResourceType.fromName(r.getName))
     matchPodSpecsTaskRecords(groupedResources, Map.empty, podSpecs.toList)
   }

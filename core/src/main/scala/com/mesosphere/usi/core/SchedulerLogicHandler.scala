@@ -3,9 +3,7 @@ package com.mesosphere.usi.core
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
 import com.mesosphere.usi.core.models.{
-  LaunchPod,
   PodId,
-  PodInvalid,
   PodSpec,
   PodSpecUpdatedEvent,
   PodStatusUpdatedEvent,
@@ -82,21 +80,10 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialS
     */
   private var state: SchedulerState = SchedulerState.fromSnapshot(initialState)
 
-  def validateCommand(msg: SchedulerCommand): Seq[PodInvalid] = msg match {
-    case LaunchPod(id, runSpec) =>
-      RunningPodSpec.isValid(runSpec).toList.map(err => PodInvalid(id, Seq(err)))
-    case _ => Seq.empty
-  }
-
   def handleCommand(command: SchedulerCommand): SchedulerEvents = {
-    val invalidPods = validateCommand(command)
-    if (invalidPods.nonEmpty) {
-      SchedulerEvents(invalidPods.toList, List.empty)
-    } else {
-      handleFrame { builder =>
-        builder.process { (state, _) =>
-          schedulerLogic.handleCommand(state)(command)
-        }
+    handleFrame { builder =>
+      builder.process { (state, _) =>
+        schedulerLogic.handleCommand(state)(command)
       }
     }
   }
@@ -202,5 +189,4 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialS
       }
     }
   }
-
 }

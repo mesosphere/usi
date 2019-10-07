@@ -4,15 +4,8 @@ import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.SchedulerState
 import com.mesosphere.usi.core.helpers.MesosMock
-import com.mesosphere.usi.core.models.{
-  PodId,
-  PodStatus,
-  PodStatusUpdatedEvent,
-  SimpleRunTemplate,
-  RunningPodSpec,
-  TaskId
-}
-import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
+import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunTemplateLike, RunningPodSpec, SimpleRunTemplate, TaskId}
+import com.mesosphere.usi.core.models.resources.{ResourceRequirement, ResourceType, ScalarRequirement}
 import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskStatus}
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.{Protos => Mesos}
@@ -21,13 +14,16 @@ class MesosEventsLogicTest extends UnitTest {
 
   private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId))
 
-  val podWith1Cpu256Mem: RunningPodSpec = RunningPodSpec(
-    PodId("mock-podId"),
-    SimpleRunTemplate(
-      List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
+  def testRunTemplate(resourceRequirements: Seq[ResourceRequirement] = List(ScalarRequirement(ResourceType.CPUS, Integer.MAX_VALUE))): RunTemplateLike = {
+    SimpleRunTemplate(resourceRequirements = resourceRequirements,
       shellCommand = "sleep 3600",
       "test")
-  )
+  }
+
+  val testPodId = PodId("mock-podId")
+  def podWith1Cpu256Mem: RunningPodSpec = RunningPodSpec(
+    testPodId,
+    testRunTemplate())
 
   "MesosEventsLogic" should {
     "decline an offer when there is no PodSpec to launch" in {
@@ -47,11 +43,7 @@ class MesosEventsLogicTest extends UnitTest {
       val (_, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
         insufficientOffer,
         Seq(
-          podWith1Cpu256Mem.copy(
-            runSpec = podWith1Cpu256Mem.runSpec.copy(
-              resourceRequirements = Seq(ScalarRequirement(ResourceType.CPUS, Integer.MAX_VALUE))
-            )))
-      )
+          RunningPodSpec(testPodId, testRunTemplate(resourceRequirements = Seq(ScalarRequirement(ResourceType.CPUS, Integer.MAX_VALUE))))))
       schedulerEventsBuilder.result.mesosCalls.size shouldBe 1
       val declines = schedulerEventsBuilder.result.mesosCalls.head.getDecline.getOfferIdsList
       declines.size() shouldBe 1

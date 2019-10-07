@@ -51,7 +51,6 @@ case class SchedulerState(
           case None =>
             newPodSpecs -= id
         }
-      case _: PodInvalid => ???
     }
 
     copy(podRecords = newPodRecords, podStatuses = newPodStatuses, podSpecs = newPodSpecs)

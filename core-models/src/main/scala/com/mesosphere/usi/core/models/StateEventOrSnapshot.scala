@@ -37,20 +37,6 @@ object StateSnapshot {
 }
 
 /**
-  * Captures a pod event that was caused by a [[SchedulerCommand]] submitted by the user.
-  */
-sealed trait UserError extends PodStateEvent
-
-/**
-  * The RunSpec submitted from a [[LaunchPod]] command had obvious errors that would prevent it from launching. If the
-  * implementation framework receive these, then it should be considered a bug.
-  *
-  * @param id The podId for which the errors were detected
-  * @param errors Text description of the errors
-  */
-case class PodInvalid(id: PodId, errors: Seq[String]) extends UserError
-
-/**
   * These specs are managed by the Scheduler in response to [[LaunchPod]] and [[KillPod]] commands. They indicate that
   * there is some pending action to perform on behalf of a pod.
   *
