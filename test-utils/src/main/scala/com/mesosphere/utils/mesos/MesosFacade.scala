@@ -149,10 +149,14 @@ class MesosFacade(val url: URL, val waitTime: FiniteDuration = 30.seconds)(
     * @return Right(Done) on success, Left(errorString) otherwise
     */
   def markAgentGone(agentId: String): RestResult[Done] = {
-    val response = result(request(Post(s"$url/api/v1", Json.obj(
-      "type" -> "MARK_AGENT_GONE",
-      "mark_agent_gone" -> Json.obj(
-        "agent_id" -> Json.obj("value" -> agentId))))), waitTime)
+    val response = result(
+      request(
+        Post(
+          s"$url/api/v1",
+          Json.obj(
+            "type" -> "MARK_AGENT_GONE",
+            "mark_agent_gone" -> Json.obj("agent_id" -> Json.obj("value" -> agentId))))),
+      waitTime)
     response.map { _ =>
       Done
     }
