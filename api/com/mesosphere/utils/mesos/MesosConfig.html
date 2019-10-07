@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.5 API  - com.mesosphere.utils.mesos.MesosClusterExtension</title>
-          <meta name="description" content="usi 0.1.5 API - com.mesosphere.utils.mesos.MesosClusterExtension" />
-          <meta name="keywords" content="usi 0.1.5 API com.mesosphere.utils.mesos.MesosClusterExtension" />
+          <title>usi 0.1.5 API  - com.mesosphere.utils.mesos.MesosConfig</title>
+          <meta name="description" content="usi 0.1.5 API - com.mesosphere.utils.mesos.MesosConfig" />
+          <meta name="keywords" content="usi 0.1.5 API com.mesosphere.utils.mesos.MesosConfig" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -150,7 +150,7 @@
                         <a class="class" href="MesosCluster.html" title="Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable number of masters/agents."></a>
                         <a href="MesosCluster.html" title="Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable number of masters/agents.">MesosCluster</a>
                       </li><li class="current-entities indented4">
-                        <a class="object" href="" title="Provides a JUnit 5 extension for booting a Mesos cluster for tests."></a>
+                        <a class="object" href="MesosClusterExtension$.html" title="Provides a JUnit 5 extension for booting a Mesos cluster for tests."></a>
                         <a class="class" href="MesosClusterExtension.html" title=""></a>
                         <a href="MesosClusterExtension.html" title="">MesosClusterExtension</a>
                       </li><li class="current-entities indented4">
@@ -159,8 +159,8 @@
                         <a href="MesosClusterTest.html" title="Basic trait to include in tests.">MesosClusterTest</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="class" href="MesosConfig.html" title=""></a>
-                        <a href="MesosConfig.html" title="">MesosConfig</a>
+                        <a class="class" href="" title=""></a>
+                        <a href="" title="">MesosConfig</a>
                       </li><li class="current-entities indented4">
                         <a class="object" href="MesosFacade$.html" title=""></a>
                         <a class="class" href="MesosFacade.html" title=""></a>
@@ -186,60 +186,34 @@
             </div>
           </div>
           <div id="content">
-            <body class="object value">
+            <body class="class type">
       <div id="definition">
-        <a href="MesosClusterExtension.html" title="See companion class"><div class="big-circle object-companion-class">o</div></a>
+        <div class="big-circle class">c</div>
         <p id="owner"><a href="../../../index.html" class="extype" name="com">com</a>.<a href="../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../index.html" class="extype" name="com.mesosphere.utils">utils</a>.<a href="index.html" class="extype" name="com.mesosphere.utils.mesos">mesos</a></p>
-        <h1><a href="MesosClusterExtension.html" title="See companion class">MesosClusterExtension</a><span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html" title="Permalink">
+        <h1>MesosConfig<span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"><div>
-            Companion <a href="MesosClusterExtension.html" title="See companion class">class MesosClusterExtension</a>
-          </div></span></h3>
+        <h3><span class="morelinks"></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">object</span>
+        <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">MesosClusterExtension</span>
+        <span class="name">MesosConfig</span><span class="params">(<span name="numMasters">numMasters: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="numAgents">numAgents: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="quorumSize">quorumSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="launcher">launcher: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;posix&quot;</span></span>, <span name="containerizers">containerizers: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;mesos&quot;</span></span>, <span name="isolation">isolation: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="imageProviders">imageProviders: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="mastersFaultDomains">mastersFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]] = <span class="symbol">Seq.empty</span></span>, <span name="agentsFaultDomains">agentsFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]] = <span class="symbol">Seq.empty</span></span>, <span name="agentsGpus">agentsGpus: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>] = <span class="symbol">None</span></span>, <span name="agentSeccompConfigDir">agentSeccompConfigDir: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="agentSeccompProfileName">agentSeccompProfileName: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="restrictedToRoles">restrictedToRoles: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">Some(&quot;public,foo&quot;)</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides a JUnit 5 extension for booting a Mesos cluster for tests.</p><p>A minimal configuration is</p><pre><span class="kw">import</span> akka.actor.ActorSystem;
-<span class="kw">import</span> akka.stream.ActorMaterializer;
-<span class="kw">import</span> com.mesosphere.utils.mesos.MesosClusterExtension;
-<span class="kw">import</span> com.mesosphere.utils.zookeeper.ZookeeperServerExtension;
-<span class="kw">import</span> org.junit.jupiter.api.Test;
-<span class="kw">import</span> org.junit.jupiter.api.extension.RegisterExtension;
-
-<span class="kw">class</span> ConnectionTest {
-
-  @RegisterExtension static ZookeeperServerExtension zkServer = <span class="kw">new</span> ZookeeperServerExtension();
-
-  static ActorSystem system = ActorSystem.create(<span class="lit">"mesos-scheduler-test"</span>);
-  static ActorMaterializer materializer = ActorMaterializer.create(system);
-
-  @RegisterExtension
-  static MesosClusterExtension mesosCluster =
-      MesosClusterExtension.builder()
-          .withMesosMasterUrl(<span class="std">String</span>.format(<span class="lit">"zk://%s/mesos"</span>, zkServer.getConnectionUrl()))
-          .build(system, materializer);
-
-  @Test
-  public void connectMesosApi() throws InterruptedException, ExecutionException {
-    System.out.println(<span class="lit">"Started Mesos cluster at "</span> + mesosCluster.getMesosUrl());
-  }
-}</pre></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">numMasters</dt><dd class="cmt"><p>number of Mesos master</p></dd><dt class="param">numAgents</dt><dd class="cmt"><p>number of Mesos agents</p></dd><dt class="param">quorumSize</dt><dd class="cmt"><p>Mesos master quorum size</p></dd><dt class="param">mastersFaultDomains</dt><dd class="cmt"><p>Mesos master fault domain configuration</p></dd><dt class="param">agentsFaultDomains</dt><dd class="cmt"><p>Mesos agents fault domain configuration</p></dd><dt class="param">agentsGpus</dt><dd class="cmt"><p>number of GPUs per agent</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -265,7 +239,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.utils.mesos.MesosClusterExtension"><span>MesosClusterExtension</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.utils.mesos.MesosConfig"><span>MesosConfig</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -283,28 +257,28 @@
 
       <div id="template">
         <div id="allMembers">
-        
-
-        <div id="types" class="types members">
-              <h3>Type Members</h3>
-              <ol><li name="com.mesosphere.utils.mesos.MesosClusterExtension.Builder" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="BuilderextendsAnyRef"></a><a id="Builder:Builder"></a>
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="com.mesosphere.utils.mesos.MesosConfig#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(numMasters:Int,numAgents:Int,quorumSize:Int,launcher:String,containerizers:String,isolation:Option[String],imageProviders:Option[String],mastersFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]],agentsFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]],agentsGpus:Option[Int],agentSeccompConfigDir:Option[String],agentSeccompProfileName:Option[String],restrictedToRoles:Option[String]):com.mesosphere.utils.mesos.MesosConfig"></a><a id="&lt;init&gt;:MesosConfig"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#BuilderextendsAnyRef" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#&lt;init&gt;(numMasters:Int,numAgents:Int,quorumSize:Int,launcher:String,containerizers:String,isolation:Option[String],imageProviders:Option[String],mastersFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]],agentsFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]],agentsGpus:Option[Int],agentSeccompConfigDir:Option[String],agentSeccompProfileName:Option[String],restrictedToRoles:Option[String]):com.mesosphere.utils.mesos.MesosConfig" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">class</span>
+        <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <a title="" href="MesosClusterExtension$$Builder.html"><span class="name">Builder</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">MesosConfig</span><span class="params">(<span name="numMasters">numMasters: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="numAgents">numAgents: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="quorumSize">quorumSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="launcher">launcher: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;posix&quot;</span></span>, <span name="containerizers">containerizers: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;mesos&quot;</span></span>, <span name="isolation">isolation: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="imageProviders">imageProviders: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="mastersFaultDomains">mastersFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]] = <span class="symbol">Seq.empty</span></span>, <span name="agentsFaultDomains">agentsFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]] = <span class="symbol">Seq.empty</span></span>, <span name="agentsGpus">agentsGpus: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>] = <span class="symbol">None</span></span>, <span name="agentSeccompConfigDir">agentSeccompConfigDir: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="agentSeccompProfileName">agentSeccompProfileName: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="restrictedToRoles">restrictedToRoles: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">Some(&quot;public,foo&quot;)</span></span>)</span>
       </span>
       
-      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">numMasters</dt><dd class="cmt"><p>number of Mesos master</p></dd><dt class="param">numAgents</dt><dd class="cmt"><p>number of Mesos agents</p></dd><dt class="param">quorumSize</dt><dd class="cmt"><p>Mesos master quorum size</p></dd><dt class="param">mastersFaultDomains</dt><dd class="cmt"><p>Mesos master fault domain configuration</p></dd><dt class="param">agentsFaultDomains</dt><dd class="cmt"><p>Mesos agents fault domain configuration</p></dd><dt class="param">agentsGpus</dt><dd class="cmt"><p>number of GPUs per agent</p></dd></dl></div>
     </li></ol>
             </div>
+
+        
 
         
 
@@ -314,7 +288,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -330,7 +304,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html###():Int" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -346,7 +320,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -359,10 +333,74 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#agentSeccompConfigDir" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="agentSeccompConfigDir:Option[String]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#agentSeccompConfigDir:Option[String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">agentSeccompConfigDir</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#agentSeccompProfileName" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="agentSeccompProfileName:Option[String]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#agentSeccompProfileName:Option[String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">agentSeccompProfileName</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#agentsFaultDomains" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="agentsFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]]"></a><a id="agentsFaultDomains:Seq[Option[FaultDomain]]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#agentsFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">agentsFaultDomains</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#agentsGpus" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="agentsGpus:Option[Int]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#agentsGpus:Option[Int]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">agentsGpus</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>]</span>
+      </span>
+      
+      
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -375,26 +413,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.mesosphere.utils.mesos.MesosClusterExtension#builder" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="builder:com.mesosphere.utils.mesos.MesosClusterExtension.Builder"></a><a id="builder:Builder"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#builder:com.mesosphere.utils.mesos.MesosClusterExtension.Builder" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">builder</span><span class="result">: <a href="MesosClusterExtension$$Builder.html" class="extype" name="com.mesosphere.utils.mesos.MesosClusterExtension.Builder">Builder</a></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#clone():Object" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -415,10 +437,26 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#containerizers" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="containerizers:String"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#containerizers:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">containerizers</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -431,26 +469,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#equals(x$1:Any):Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#finalize():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -472,7 +494,7 @@
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -488,29 +510,26 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="hashCode():Int"></a>
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#imageProviders" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="imageProviders:Option[String]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#hashCode():Int" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#imageProviders:Option[String]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+        <span class="name">imageProviders</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd><dt>Annotations</dt><dd>
-                <span class="name">@native</span><span class="args">()</span>
-              
-        </dd></dl></div>
+      
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -523,10 +542,58 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#isolation" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isolation:Option[String]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#isolation:Option[String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isolation</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#launcher" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="launcher:String"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#launcher:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">launcher</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#mastersFaultDomains" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="mastersFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]]"></a><a id="mastersFaultDomains:Seq[Option[FaultDomain]]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#mastersFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">mastersFaultDomains</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -542,7 +609,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#notify():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -561,7 +628,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -577,10 +644,74 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#numAgents" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="numAgents:Int"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#numAgents:Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">numAgents</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#numMasters" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="numMasters:Int"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#numMasters:Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">numMasters</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#quorumSize" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="quorumSize:Int"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#quorumSize:Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">quorumSize</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#restrictedToRoles" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="restrictedToRoles:Option[String]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#restrictedToRoles:Option[String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">restrictedToRoles</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -593,10 +724,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="toString():String"></a>
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#validFaultDomainConfig" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="validFaultDomainConfig:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#toString():String" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#validFaultDomainConfig:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -605,14 +736,46 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+        <span class="name">validFaultDomainConfig</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#validQuorumSize" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="validQuorumSize:Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#validQuorumSize:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">validQuorumSize</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosConfig#validSeccompConfig" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="validSeccompConfig:Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#validSeccompConfig:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">validSeccompConfig</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#wait():Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -634,7 +797,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -656,7 +819,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosClusterExtension$.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosConfig.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -687,7 +850,15 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.Product">
+              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
+            </div><div class="parent" name="scala.Equals">
+              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>

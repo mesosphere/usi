@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.4 API  - com.mesosphere.utils.mesos.MesosFacade</title>
-          <meta name="description" content="usi 0.1.4 API - com.mesosphere.utils.mesos.MesosFacade" />
-          <meta name="keywords" content="usi 0.1.4 API com.mesosphere.utils.mesos.MesosFacade" />
+          <title>usi 0.1.5 API  - com.mesosphere.utils.mesos.MesosFacade</title>
+          <meta name="description" content="usi 0.1.5 API - com.mesosphere.utils.mesos.MesosFacade" />
+          <meta name="keywords" content="usi 0.1.5 API com.mesosphere.utils.mesos.MesosFacade" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.4 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.5 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -157,6 +157,10 @@
                         <span class="separator"></span>
                         <a class="trait" href="MesosClusterTest.html" title="Basic trait to include in tests."></a>
                         <a href="MesosClusterTest.html" title="Basic trait to include in tests.">MesosClusterTest</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="MesosConfig.html" title=""></a>
+                        <a href="MesosConfig.html" title="">MesosConfig</a>
                       </li><li class="current-entities indented4">
                         <a class="object" href="MesosFacade$.html" title=""></a>
                         <a class="class" href="" title=""></a>
@@ -543,6 +547,24 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>StrictLogging</dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosFacade#markAgentGone" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="markAgentGone(agentId:String):com.mesosphere.utils.http.RestResult[akka.Done]"></a><a id="markAgentGone(String):RestResult[Done]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosFacade.html#markAgentGone(agentId:String):com.mesosphere.utils.http.RestResult[akka.Done]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">markAgentGone</span><span class="params">(<span name="agentId">agentId: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="../http/RestResult.html" class="extype" name="com.mesosphere.utils.http.RestResult">RestResult</a>[<span class="extype" name="akka.Done">Done</span>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">Mark agent as gone using v1 operator API
+</p><div class="fullcomment"><div class="comment cmt"><p>Mark agent as gone using v1 operator API
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>Right(Done) on success, Left(errorString) otherwise</p></dd></dl></div>
     </li><li name="de.heikoseeberger.akkahttpplayjson.PlayJsonSupport#marshaller" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="marshaller[A](implicitwrites:play.api.libs.json.Writes[A],implicitprinter:play.api.libs.json.JsValue=&gt;String):akka.http.scaladsl.marshalling.ToEntityMarshaller[A]"></a><a id="marshaller[A](Writes[A],(JsValue)⇒String):ToEntityMarshaller[A]"></a>
       <span class="permalink">

@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.4 API  - com.mesosphere.utils.mesos.MesosCluster</title>
-          <meta name="description" content="usi 0.1.4 API - com.mesosphere.utils.mesos.MesosCluster" />
-          <meta name="keywords" content="usi 0.1.4 API com.mesosphere.utils.mesos.MesosCluster" />
+          <title>usi 0.1.5 API  - com.mesosphere.utils.mesos.MesosCluster</title>
+          <meta name="description" content="usi 0.1.5 API - com.mesosphere.utils.mesos.MesosCluster" />
+          <meta name="keywords" content="usi 0.1.5 API com.mesosphere.utils.mesos.MesosCluster" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.4 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.5 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -158,6 +158,10 @@
                         <a class="trait" href="MesosClusterTest.html" title="Basic trait to include in tests."></a>
                         <a href="MesosClusterTest.html" title="Basic trait to include in tests.">MesosClusterTest</a>
                       </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="MesosConfig.html" title=""></a>
+                        <a href="MesosConfig.html" title="">MesosConfig</a>
+                      </li><li class="current-entities indented4">
                         <a class="object" href="MesosFacade$.html" title=""></a>
                         <a class="class" href="MesosFacade.html" title=""></a>
                         <a href="MesosFacade.html" title="">MesosFacade</a>
@@ -200,14 +204,14 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">MesosCluster</span><span class="params">(<span name="suiteName">suiteName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="numMasters">numMasters: <span class="extype" name="scala.Int">Int</span></span>, <span name="numSlaves">numSlaves: <span class="extype" name="scala.Int">Int</span></span>, <span name="masterUrl">masterUrl: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="quorumSize">quorumSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="autoStart">autoStart: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="agentsConfig">agentsConfig: <a href="MesosAgentConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosAgentConfig">MesosAgentConfig</a> = <span class="symbol">MesosAgentConfig()</span></span>, <span name="waitForMesosTimeout">waitForMesosTimeout: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span> = <span class="symbol">5.minutes</span></span>, <span name="mastersFaultDomains">mastersFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsFaultDomains">agentsFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsGpus">agentsGpus: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>] = <span class="symbol">None</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result"> extends <span class="extype" name="java.lang.AutoCloseable">AutoCloseable</span> with <span class="extype" name="org.scalatest.concurrent.Eventually">Eventually</span> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">MesosCluster</span><span class="params">(<span name="suiteName">suiteName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="masterUrl">masterUrl: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="autoStart">autoStart: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="config">config: <a href="MesosConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosConfig">MesosConfig</a> = <span class="symbol">MesosConfig()</span></span>, <span name="agentsConfig">agentsConfig: <a href="MesosAgentConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosAgentConfig">MesosAgentConfig</a> = <span class="symbol">MesosAgentConfig()</span></span>, <span name="waitForMesosTimeout">waitForMesosTimeout: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span> = <span class="symbol">5.minutes</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result"> extends <span class="extype" name="java.lang.AutoCloseable">AutoCloseable</span> with <span class="extype" name="org.scalatest.concurrent.Eventually">Eventually</span> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Basic class that wraps starting/stopping a Mesos cluster with passed agent/master configuration and configurable
 number of masters/agents.
-</p></div><dl class="paramcmts block"><dt class="param">suiteName</dt><dd class="cmt"><p>suite name that uses the cluster. will be included into logging messages</p></dd><dt class="param">numMasters</dt><dd class="cmt"><p>number of Mesos master</p></dd><dt class="param">numSlaves</dt><dd class="cmt"><p>number of Mesos slaves</p></dd><dt class="param">masterUrl</dt><dd class="cmt"><p>Mesos master ZK url in the form of zk://zk-1/mesos</p></dd><dt class="param">quorumSize</dt><dd class="cmt"><p>Mesos master quorum size</p></dd><dt class="param">autoStart</dt><dd class="cmt"><p>if true, the cluster will be started automatically</p></dd><dt class="param">agentsConfig</dt><dd class="cmt"><p>Mesos agent configuration</p></dd><dt class="param">waitForMesosTimeout</dt><dd class="cmt"><p>time to wait for Mesos master/agent to start</p></dd><dt class="param">mastersFaultDomains</dt><dd class="cmt"><p>Mesos master fault domain configuration</p></dd><dt class="param">agentsFaultDomains</dt><dd class="cmt"><p>Mesos agents fault domain configuration</p></dd><dt class="param">agentsGpus</dt><dd class="cmt"><p>number of GPUs per agent</p></dd></dl><div class="toggleContainer block">
+</p></div><dl class="paramcmts block"><dt class="param">suiteName</dt><dd class="cmt"><p>suite name that uses the cluster. will be included into logging messages</p></dd><dt class="param">masterUrl</dt><dd class="cmt"><p>Mesos master ZK url in the form of zk://zk-1/mesos</p></dd><dt class="param">autoStart</dt><dd class="cmt"><p>if true, the cluster will be started automatically</p></dd><dt class="param">config</dt><dd class="cmt"><p>Mesos master configuration</p></dd><dt class="param">agentsConfig</dt><dd class="cmt"><p>Mesos agent configuration</p></dd><dt class="param">waitForMesosTimeout</dt><dd class="cmt"><p>time to wait for Mesos master/agent to start</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -258,9 +262,9 @@ number of masters/agents.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.utils.mesos.MesosCluster#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(suiteName:String,numMasters:Int,numSlaves:Int,masterUrl:String,quorumSize:Int,autoStart:Boolean,agentsConfig:com.mesosphere.utils.mesos.MesosAgentConfig,waitForMesosTimeout:scala.concurrent.duration.FiniteDuration,mastersFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]],agentsFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]],agentsGpus:Option[Int])(implicitsystem:akka.actor.ActorSystem,implicitmat:akka.stream.Materializer):com.mesosphere.utils.mesos.MesosCluster"></a><a id="&lt;init&gt;:MesosCluster"></a>
+      <a id="&lt;init&gt;(suiteName:String,masterUrl:String,autoStart:Boolean,config:com.mesosphere.utils.mesos.MesosConfig,agentsConfig:com.mesosphere.utils.mesos.MesosAgentConfig,waitForMesosTimeout:scala.concurrent.duration.FiniteDuration)(implicitsystem:akka.actor.ActorSystem,implicitmat:akka.stream.Materializer):com.mesosphere.utils.mesos.MesosCluster"></a><a id="&lt;init&gt;:MesosCluster"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#&lt;init&gt;(suiteName:String,numMasters:Int,numSlaves:Int,masterUrl:String,quorumSize:Int,autoStart:Boolean,agentsConfig:com.mesosphere.utils.mesos.MesosAgentConfig,waitForMesosTimeout:scala.concurrent.duration.FiniteDuration,mastersFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]],agentsFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]],agentsGpus:Option[Int])(implicitsystem:akka.actor.ActorSystem,implicitmat:akka.stream.Materializer):com.mesosphere.utils.mesos.MesosCluster" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#&lt;init&gt;(suiteName:String,masterUrl:String,autoStart:Boolean,config:com.mesosphere.utils.mesos.MesosConfig,agentsConfig:com.mesosphere.utils.mesos.MesosAgentConfig,waitForMesosTimeout:scala.concurrent.duration.FiniteDuration)(implicitsystem:akka.actor.ActorSystem,implicitmat:akka.stream.Materializer):com.mesosphere.utils.mesos.MesosCluster" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -269,10 +273,10 @@ number of masters/agents.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">MesosCluster</span><span class="params">(<span name="suiteName">suiteName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="numMasters">numMasters: <span class="extype" name="scala.Int">Int</span></span>, <span name="numSlaves">numSlaves: <span class="extype" name="scala.Int">Int</span></span>, <span name="masterUrl">masterUrl: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="quorumSize">quorumSize: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="autoStart">autoStart: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="agentsConfig">agentsConfig: <a href="MesosAgentConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosAgentConfig">MesosAgentConfig</a> = <span class="symbol">MesosAgentConfig()</span></span>, <span name="waitForMesosTimeout">waitForMesosTimeout: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span> = <span class="symbol">5.minutes</span></span>, <span name="mastersFaultDomains">mastersFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsFaultDomains">agentsFaultDomains: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>, <span name="agentsGpus">agentsGpus: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>] = <span class="symbol">None</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span>
+        <span class="name">MesosCluster</span><span class="params">(<span name="suiteName">suiteName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="masterUrl">masterUrl: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="autoStart">autoStart: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>, <span name="config">config: <a href="MesosConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosConfig">MesosConfig</a> = <span class="symbol">MesosConfig()</span></span>, <span name="agentsConfig">agentsConfig: <a href="MesosAgentConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosAgentConfig">MesosAgentConfig</a> = <span class="symbol">MesosAgentConfig()</span></span>, <span name="waitForMesosTimeout">waitForMesosTimeout: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span> = <span class="symbol">5.minutes</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span>
       </span>
       
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">suiteName</dt><dd class="cmt"><p>suite name that uses the cluster. will be included into logging messages</p></dd><dt class="param">numMasters</dt><dd class="cmt"><p>number of Mesos master</p></dd><dt class="param">numSlaves</dt><dd class="cmt"><p>number of Mesos slaves</p></dd><dt class="param">masterUrl</dt><dd class="cmt"><p>Mesos master ZK url in the form of zk://zk-1/mesos</p></dd><dt class="param">quorumSize</dt><dd class="cmt"><p>Mesos master quorum size</p></dd><dt class="param">autoStart</dt><dd class="cmt"><p>if true, the cluster will be started automatically</p></dd><dt class="param">agentsConfig</dt><dd class="cmt"><p>Mesos agent configuration</p></dd><dt class="param">waitForMesosTimeout</dt><dd class="cmt"><p>time to wait for Mesos master/agent to start</p></dd><dt class="param">mastersFaultDomains</dt><dd class="cmt"><p>Mesos master fault domain configuration</p></dd><dt class="param">agentsFaultDomains</dt><dd class="cmt"><p>Mesos agents fault domain configuration</p></dd><dt class="param">agentsGpus</dt><dd class="cmt"><p>number of GPUs per agent</p></dd></dl></div>
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">suiteName</dt><dd class="cmt"><p>suite name that uses the cluster. will be included into logging messages</p></dd><dt class="param">masterUrl</dt><dd class="cmt"><p>Mesos master ZK url in the form of zk://zk-1/mesos</p></dd><dt class="param">autoStart</dt><dd class="cmt"><p>if true, the cluster will be started automatically</p></dd><dt class="param">config</dt><dd class="cmt"><p>Mesos master configuration</p></dd><dt class="param">agentsConfig</dt><dd class="cmt"><p>Mesos agent configuration</p></dd><dt class="param">waitForMesosTimeout</dt><dd class="cmt"><p>time to wait for Mesos master/agent to start</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -448,38 +452,6 @@ up after the execution which included collecting agent sandboxes.
       </span>
       
       
-    </li><li name="com.mesosphere.utils.mesos.MesosCluster#agentsFaultDomains" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="agentsFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]]"></a><a id="agentsFaultDomains:Seq[Option[FaultDomain]]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#agentsFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">agentsFaultDomains</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.utils.mesos.MesosCluster#agentsGpus" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="agentsGpus:Option[Int]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#agentsGpus:Option[Int]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">agentsGpus</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>]</span>
-      </span>
-      
-      
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
@@ -552,6 +524,22 @@ up after the execution which included collecting agent sandboxes.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.utils.mesos.MesosCluster">MesosCluster</a> → AutoCloseable</dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster#config" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="config:com.mesosphere.utils.mesos.MesosConfig"></a><a id="config:MesosConfig"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#config:com.mesosphere.utils.mesos.MesosConfig" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">config</span><span class="result">: <a href="MesosConfig.html" class="extype" name="com.mesosphere.utils.mesos.MesosConfig">MesosConfig</a></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -753,22 +741,6 @@ up after the execution which included collecting agent sandboxes.
       </span>
       
       
-    </li><li name="com.mesosphere.utils.mesos.MesosCluster#mastersFaultDomains" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="mastersFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]]"></a><a id="mastersFaultDomains:Seq[Option[FaultDomain]]"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#mastersFaultDomains:Seq[Option[com.mesosphere.utils.mesos.FaultDomain]]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">mastersFaultDomains</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Option">Option</span>[<a href="FaultDomain.html" class="extype" name="com.mesosphere.utils.mesos.FaultDomain">FaultDomain</a>]]</span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -823,38 +795,6 @@ up after the execution which included collecting agent sandboxes.
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.utils.mesos.MesosCluster#numMasters" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="numMasters:Int"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#numMasters:Int" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">numMasters</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.utils.mesos.MesosCluster#numSlaves" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="numSlaves:Int"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#numSlaves:Int" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">numSlaves</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      
-      
     </li><li name="org.scalatest.concurrent.PatienceConfiguration#patienceConfig" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="patienceConfig:PatienceConfiguration.this.PatienceConfig"></a><a id="patienceConfig:PatienceConfig"></a>
       <span class="permalink">
@@ -871,22 +811,6 @@ up after the execution which included collecting agent sandboxes.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>PatienceConfiguration → AbstractPatienceConfiguration</dd></dl></div>
-    </li><li name="com.mesosphere.utils.mesos.MesosCluster#quorumSize" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="quorumSize:Int"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#quorumSize:Int" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">quorumSize</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      
-      
     </li><li name="com.mesosphere.utils.mesos.MesosCluster#randomAgentPort" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="randomAgentPort():Int"></a>
       <span class="permalink">
