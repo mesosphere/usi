@@ -328,6 +328,7 @@ case class MesosCluster(
       "MESOS_SYSTEMD_ENABLE_SUPPORT" -> "false",
       "MESOS_SWITCH_USER" -> "false"
     ) ++
+      config.restrictedToRoles.map("MESOS_ROLES" -> _).to[Seq] ++
       agentsConfig.isolation.map("MESOS_ISOLATION" -> _).to[Seq] ++
       agentsConfig.imageProviders.map("MESOS_IMAGE_PROVIDERS" -> _).to[Seq]
   }
