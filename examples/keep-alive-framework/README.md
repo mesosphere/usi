@@ -16,12 +16,14 @@ Run the keep-alive example framework that:
    ```
    dcos security org service-accounts create -p usi.pub.pem -d "For testing USI on strict" strict-usi
    ```
-4. Grant `strict-usi` access:
+4. Store private key as secret:
    ```
-   curl -L -X PUT -k -H "Authorization: token=$(dcos config show core.dcos_acs_token)" \
-       "$(dcos config show core.dcos_url)/acs/api/v1/acls/dcos:superuser/users/strict-usi/full"
+   dcos security secrets create -f ./usi.private.pem usi/private_key
    ```
-5. Great a secret from `usi.private.pem`: `dcos ???`
+5. Grant `strict-usi` access:
+   ```
+   dcos security org users grant strict-usi dcos:mesos:master:task:user:nobody create
+   ```
 6. Deploy the framework:
    ```
    dcos marathon app add keep-alive-framework-app.json
