@@ -65,7 +65,7 @@ case class MesosConfig(
     agentsGpus: Option[Int] = None, // TODO: move agent related config into MesosAgentConfig
     agentSeccompConfigDir: Option[String] = None,
     agentSeccompProfileName: Option[String] = None,
-    restrictedToRoles: Option[String] = Some("public,foo")) {
+    restrictedToRoles: Option[String] = Some("public,foo,test")) {
 
   require(validQuorumSize, "Mesos quorum size should be 0 or smaller than number of agents")
   require(
@@ -322,7 +322,6 @@ case class MesosCluster(
       "MESOS_LAUNCHER" -> "posix",
       "MESOS_CONTAINERIZERS" -> agentsConfig.containerizers,
       "MESOS_LAUNCHER" -> agentsConfig.launcher,
-      "MESOS_ROLES" -> "public,test",
       "MESOS_ACLS" -> s"file://$aclsPath",
       "MESOS_CREDENTIALS" -> s"file://$credentialsPath",
       "MESOS_SYSTEMD_ENABLE_SUPPORT" -> "false",
