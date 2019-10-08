@@ -29,54 +29,49 @@ import scala.util.Try
   *                       Available options are mesos and docker (on Linux).
   * @param isolation isolation mechanisms to use, e.g., posix/cpu,posix/mem
   * @param imageProviders Comma-separated list of supported image providers, e.g., APPC,DOCKER.
+  * @param seccompConfigDir
+  * @param seccompProfileName
   */
 case class MesosAgentConfig(
     launcher: String = "posix",
     containerizers: String = "mesos",
     isolation: Option[String] = None,
-    imageProviders: Option[String] = None)
+    imageProviders: Option[String] = None,
+    seccompConfigDir: Option[String] = None,
+    seccompProfileName: Option[String] = None) {
+
+  require(
+    validSeccompConfig,
+    "To enable seccomp, agentSeccompConfigDir should be defined and isolation \"linux/seccomp\" used")
+
+  def validSeccompConfig: Boolean =
+    seccompConfigDir.isEmpty || (seccompConfigDir.isDefined && isolation.get.contains("linux/seccomp"))
+}
 
 /**
   *
   * @param numMasters number of Mesos master
   * @param numAgents number of Mesos agents
   * @param quorumSize Mesos master quorum size
-  * @param launcher
-  * @param containerizers
-  * @param isolation
-  * @param imageProviders
   * @param mastersFaultDomains Mesos master fault domain configuration
   * @param agentsFaultDomains Mesos agents fault domain configuration
   * @param agentsGpus number of GPUs per agent
-  * @param agentSeccompConfigDir
-  * @param agentSeccompProfileName
   * @param restrictedToRoles
   */
 case class MesosConfig(
     numMasters: Int = 1,
     numAgents: Int = 1,
     quorumSize: Int = 1,
-    launcher: String = "posix",
-    containerizers: String = "mesos",
-    isolation: Option[String] = None,
-    imageProviders: Option[String] = None,
     mastersFaultDomains: Seq[Option[FaultDomain]] = Seq.empty,
     agentsFaultDomains: Seq[Option[FaultDomain]] = Seq.empty,
     agentsGpus: Option[Int] = None, // TODO: move agent related config into MesosAgentConfig
-    agentSeccompConfigDir: Option[String] = None,
-    agentSeccompProfileName: Option[String] = None,
     restrictedToRoles: Option[String] = Some("public,foo,test")) {
 
   require(validQuorumSize, "Mesos quorum size should be 0 or smaller than number of agents")
-  require(
-    validSeccompConfig,
-    "To enable seccomp, agentSeccompConfigDir should be defined and isolation \"linux/seccomp\" used")
   require(validFaultDomainConfig, "Fault domains should be configure for all agents or not at all")
 
   def validQuorumSize: Boolean = quorumSize > 0 && quorumSize <= numMasters
   def validFaultDomainConfig: Boolean = agentsFaultDomains.isEmpty || agentsFaultDomains.size == numAgents
-  def validSeccompConfig: Boolean =
-    agentSeccompConfigDir.isEmpty || (agentSeccompConfigDir.isDefined && isolation.get.contains("linux/seccomp"))
 }
 
 /**
@@ -172,6 +167,8 @@ case class MesosCluster(
       extraArgs = Seq(
         s"--attributes=$renderedAttributes"
       ) ++ mesosFaultDomainAgentCmdOption.map(fd => s"--domain=$fd")
+        ++ agentsConfig.seccompConfigDir.map(dir => s"--seccomp_config_dir=$dir")
+        ++ agentsConfig.seccompProfileName.map(prf => s"--seccomp_profile_name=$prf")
     )
   }
 
