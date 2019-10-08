@@ -10,7 +10,7 @@ import java.net.URI
   * @param uri artifact URI to download
   * @param extract if true, the artifact will be treated as an archive an extracted to the sandbox. See the list
   *                of the supported archive types below
-  * @param executable if true, the fetch result will be changed to be executable (by “chmod”) for every user
+  * @param executable if true, the fetch result will be changed to be executable (by "chmod") for every user
   * @param cache if true, the fetcher cache is to be used for the URI
   * @param outputFile if set, the fetcher will use that name for the copy stored in the sandbox directory
   */

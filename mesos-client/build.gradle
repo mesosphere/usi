@@ -8,3 +8,9 @@ dependencies {
     compile "de.heikoseeberger:akka-http-play-json_$scalaVersion:1.26.0"
     compile "org.apache.mesos:mesos:$mesosVersion"
 }
+
+publishing.publications {
+    mavenJava(MavenPublication) {
+        artifactId 'mesos-client'
+    }
+}

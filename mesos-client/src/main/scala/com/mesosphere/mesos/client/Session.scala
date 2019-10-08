@@ -34,7 +34,6 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     * @return The [[HttpRequest]] with proper headers and body.
     */
   def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest = {
-    println(s"Body: ${bytes.map(_.toChar).mkString}")
     HttpRequest(
       HttpMethods.POST,
       uri = Uri(s"$url/api/v1/scheduler"),
@@ -142,11 +141,11 @@ class SessionActor(
 
   def initializing: Receive = {
     case credentials: HttpCredentials =>
-      logger.info("Retrieved IAM session token")
+      logger.info("Retrieved IAM authentication token")
       context.become(initialized(credentials))
       unstashAll()
     case Status.Failure(ex) =>
-      logger.error("Fetching the next IAM session token failed", ex)
+      logger.error("Fetching the next IAM authentication token failed", ex)
       throw ex
     case _ => stash()
   }
@@ -171,7 +170,7 @@ class SessionActor(
     case SessionActor.Response(originalCall, originalSender, response) =>
       logger.debug(s"Call replied with ${response.status}")
       if (response.status == StatusCodes.Unauthorized) {
-        logger.info("Refreshing IAM session token")
+        logger.info("Refreshing IAM authentication token")
 
         context.become(initializing)
         credentialsProvider.nextToken().pipeTo(self)
