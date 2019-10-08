@@ -4,7 +4,7 @@
   "id": "/usi/keep-alive-framework",
   "backoffFactor": 1.15,
   "backoffSeconds": 1,
-  "cmd": "export JAVA_HOME=$(ls -d $MESOS_SANDBOX/jdk*/jre/); export JAVA_HOME=${JAVA_HOME%/}; export PATH=$(ls -d $JAVA_HOME/bin):$PATH && export JAVA_OPTS=\"-Xms256M -Xmx512M\"; ./keep-alive-framework-0.1/bin/keep-alive-framework https://master.mesos https://leader.mesos:5050 $MESOS_SANDBOX/.ssl/ca-bundle.crt $MESOS_SANDBOX/private_key.pem strict-usi",
+  "cmd": "export JAVA_HOME=$(ls -d $MESOS_SANDBOX/amazon-corretto*/jre/); export JAVA_HOME=${JAVA_HOME%/}; export PATH=$(ls -d $JAVA_HOME/bin):$PATH && export JAVA_OPTS=\"-Xms256M -Xmx512M\"; ./keep-alive-framework-0.1/bin/keep-alive-framework https://master.mesos https://leader.mesos:5050 $MESOS_SANDBOX/.ssl/ca-bundle.crt $MESOS_SANDBOX/private_key.pem strict-usi",
   "container": {
     "type": "MESOS",
     "volumes": [
@@ -24,7 +24,7 @@
       "cache": false
     },
     {
-      "uri": "https://downloads.mesosphere.com/java/server-jre-8u192-linux-x64.tar.gz",
+      "uri": "https://d3pxv6yz143wms.cloudfront.net/8.222.10.1/amazon-corretto-8.222.10.1-linux-x64.tar.gz",
       "extract": true,
       "executable": false,
       "cache": true
