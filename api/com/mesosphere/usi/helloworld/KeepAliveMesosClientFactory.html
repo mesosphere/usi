@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.5 API  - com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory</title>
-          <meta name="description" content="usi 0.1.5 API - com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory" />
-          <meta name="keywords" content="usi 0.1.5 API com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory" />
+          <title>usi 0.1.6 API  - com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory</title>
+          <meta name="description" content="usi 0.1.6 API - com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory" />
+          <meta name="keywords" content="usi 0.1.6 API com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.5 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.6 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -134,13 +134,17 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi">usi</a></dd></dl></div>
     </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="KeepAliveFrameWorkSettings.html" title=""></a>
+                        <a href="KeepAliveFrameWorkSettings.html" title="">KeepAliveFrameWorkSettings</a>
+                      </li><li class="current-entities indented4">
                         <a class="object" href="KeepAliveFramework$.html" title=""></a>
                         <a class="class" href="KeepAliveFramework.html" title=""></a>
                         <a href="KeepAliveFramework.html" title="">KeepAliveFramework</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="class" href="" title="Helper that builds a mesos client that can be used by USI"></a>
-                        <a href="" title="Helper that builds a mesos client that can be used by USI">KeepAliveMesosClientFactory</a>
+                        <a class="class" href="" title="Helper that builds a Mesos client that can be used by USI"></a>
+                        <a href="" title="Helper that builds a Mesos client that can be used by USI">KeepAliveMesosClientFactory</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
                         <a class="object" href="KeepAlivePodSpecHelper$.html" title="This is a helper object that generates pod specs and snapshots."></a>
@@ -173,7 +177,7 @@
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Helper that builds a mesos client that can be used by USI
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Helper that builds a Mesos client that can be used by USI
 </p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
@@ -225,9 +229,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(conf:com.typesafe.config.Config)(implicitsystem:akka.actor.ActorSystem,implicitmat:akka.stream.ActorMaterializer):com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory"></a><a id="&lt;init&gt;:KeepAliveMesosClientFactory"></a>
+      <a id="&lt;init&gt;(settings:com.mesosphere.mesos.conf.MesosClientSettings,authorization:Option[com.mesosphere.mesos.client.CredentialsProvider])(implicitsystem:akka.actor.ActorSystem,implicitmat:akka.stream.ActorMaterializer):com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory"></a><a id="&lt;init&gt;:KeepAliveMesosClientFactory"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveMesosClientFactory.html#&lt;init&gt;(conf:com.typesafe.config.Config)(implicitsystem:akka.actor.ActorSystem,implicitmat:akka.stream.ActorMaterializer):com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveMesosClientFactory.html#&lt;init&gt;(settings:com.mesosphere.mesos.conf.MesosClientSettings,authorization:Option[com.mesosphere.mesos.client.CredentialsProvider])(implicitsystem:akka.actor.ActorSystem,implicitmat:akka.stream.ActorMaterializer):com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -236,7 +240,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">KeepAliveMesosClientFactory</span><span class="params">(<span name="conf">conf: <span class="extype" name="com.typesafe.config.Config">Config</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.ActorMaterializer">ActorMaterializer</span></span>)</span>
+        <span class="name">KeepAliveMesosClientFactory</span><span class="params">(<span name="settings">settings: <a href="../../mesos/conf/MesosClientSettings.html" class="extype" name="com.mesosphere.mesos.conf.MesosClientSettings">MesosClientSettings</a></span>, <span name="authorization">authorization: <span class="extype" name="scala.Option">Option</span>[<a href="../../mesos/client/CredentialsProvider.html" class="extype" name="com.mesosphere.mesos.client.CredentialsProvider">CredentialsProvider</a>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.ActorMaterializer">ActorMaterializer</span></span>)</span>
       </span>
       
       
@@ -532,22 +536,6 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.helloworld.KeepAliveMesosClientFactory#settings" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="settings:com.mesosphere.mesos.conf.MesosClientSettings"></a><a id="settings:MesosClientSettings"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveMesosClientFactory.html#settings:com.mesosphere.mesos.conf.MesosClientSettings" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">settings</span><span class="result">: <a href="../../mesos/conf/MesosClientSettings.html" class="extype" name="com.mesosphere.mesos.conf.MesosClientSettings">MesosClientSettings</a></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">

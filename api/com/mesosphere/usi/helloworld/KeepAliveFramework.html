@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.5 API  - com.mesosphere.usi.helloworld.KeepAliveFramework</title>
-          <meta name="description" content="usi 0.1.5 API - com.mesosphere.usi.helloworld.KeepAliveFramework" />
-          <meta name="keywords" content="usi 0.1.5 API com.mesosphere.usi.helloworld.KeepAliveFramework" />
+          <title>usi 0.1.6 API  - com.mesosphere.usi.helloworld.KeepAliveFramework</title>
+          <meta name="description" content="usi 0.1.6 API - com.mesosphere.usi.helloworld.KeepAliveFramework" />
+          <meta name="keywords" content="usi 0.1.6 API com.mesosphere.usi.helloworld.KeepAliveFramework" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.5 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.6 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -134,13 +134,17 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi">usi</a></dd></dl></div>
     </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="KeepAliveFrameWorkSettings.html" title=""></a>
+                        <a href="KeepAliveFrameWorkSettings.html" title="">KeepAliveFrameWorkSettings</a>
+                      </li><li class="current-entities indented4">
                         <a class="object" href="KeepAliveFramework$.html" title=""></a>
                         <a class="class" href="" title=""></a>
                         <a href="" title="">KeepAliveFramework</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="class" href="KeepAliveMesosClientFactory.html" title="Helper that builds a mesos client that can be used by USI"></a>
-                        <a href="KeepAliveMesosClientFactory.html" title="Helper that builds a mesos client that can be used by USI">KeepAliveMesosClientFactory</a>
+                        <a class="class" href="KeepAliveMesosClientFactory.html" title="Helper that builds a Mesos client that can be used by USI"></a>
+                        <a href="KeepAliveMesosClientFactory.html" title="Helper that builds a Mesos client that can be used by USI">KeepAliveMesosClientFactory</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
                         <a class="object" href="KeepAlivePodSpecHelper$.html" title="This is a helper object that generates pod specs and snapshots."></a>
@@ -226,9 +230,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.helloworld.KeepAliveFramework#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(conf:com.typesafe.config.Config):com.mesosphere.usi.helloworld.KeepAliveFramework"></a><a id="&lt;init&gt;:KeepAliveFramework"></a>
+      <a id="&lt;init&gt;(settings:com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings,authorization:Option[com.mesosphere.mesos.client.CredentialsProvider])(implicitsystem:akka.actor.ActorSystem,implicitmat:akka.stream.ActorMaterializer):com.mesosphere.usi.helloworld.KeepAliveFramework"></a><a id="&lt;init&gt;:KeepAliveFramework"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#&lt;init&gt;(conf:com.typesafe.config.Config):com.mesosphere.usi.helloworld.KeepAliveFramework" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#&lt;init&gt;(settings:com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings,authorization:Option[com.mesosphere.mesos.client.CredentialsProvider])(implicitsystem:akka.actor.ActorSystem,implicitmat:akka.stream.ActorMaterializer):com.mesosphere.usi.helloworld.KeepAliveFramework" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -237,7 +241,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">KeepAliveFramework</span><span class="params">(<span name="conf">conf: <span class="extype" name="com.typesafe.config.Config">Config</span></span>)</span>
+        <span class="name">KeepAliveFramework</span><span class="params">(<span name="settings">settings: <a href="KeepAliveFrameWorkSettings.html" class="extype" name="com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings">KeepAliveFrameWorkSettings</a></span>, <span name="authorization">authorization: <span class="extype" name="scala.Option">Option</span>[<a href="../../mesos/client/CredentialsProvider.html" class="extype" name="com.mesosphere.mesos.client.CredentialsProvider">CredentialsProvider</a>] = <span class="symbol">None</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="mat">mat: <span class="extype" name="akka.stream.ActorMaterializer">ActorMaterializer</span></span>)</span>
       </span>
       
       
@@ -355,22 +359,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.helloworld.KeepAliveFramework#ec" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ec:scala.concurrent.ExecutionContextExecutor"></a><a id="ec:ExecutionContextExecutor"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#ec:scala.concurrent.ExecutionContextExecutor" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">ec</span><span class="result">: <span class="extype" name="scala.concurrent.ExecutionContextExecutor">ExecutionContextExecutor</span></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -511,22 +499,6 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>StrictLogging</dd></dl></div>
-    </li><li name="com.mesosphere.usi.helloworld.KeepAliveFramework#mat" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="mat:akka.stream.ActorMaterializer"></a><a id="mat:ActorMaterializer"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#mat:akka.stream.ActorMaterializer" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">mat</span><span class="result">: <span class="extype" name="akka.stream.ActorMaterializer">ActorMaterializer</span></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -693,22 +665,6 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.mesosphere.usi.helloworld.KeepAliveFramework#system" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="system:akka.actor.ActorSystem"></a><a id="system:ActorSystem"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#system:akka.actor.ActorSystem" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">system</span><span class="result">: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
