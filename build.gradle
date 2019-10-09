@@ -11,7 +11,7 @@ plugins {
 ext {
     scalaVersion = '2.12'
     mesosVersion = '1.7.0'
-    akkaVersion = '2.5.19'
+    akkaVersion = '2.5.23'
 }
 
 def readCurrentVersion = {
@@ -67,7 +67,7 @@ allprojects {
         compile "com.typesafe.scala-logging:scala-logging_$scalaVersion:3.9.2"
 
         // Akka and akka-http
-        compile group: 'com.typesafe.akka', name: "akka-http_$scalaVersion", version: '10.0.11'
+        compile group: 'com.typesafe.akka', name: "akka-http_$scalaVersion", version: '10.0.15'
         compile group: 'com.typesafe.akka', name: "akka-stream_$scalaVersion", version: akkaVersion
         compile group: 'com.typesafe.akka', name: "akka-slf4j_$scalaVersion", version: akkaVersion
 
