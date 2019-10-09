@@ -72,7 +72,8 @@ task ci {
     subprojects*.test.each { it.ignoreFailures = true }
 
     if (TravisEnvironment.isMasterBuild()) {
-        dependsOn githubReport, gitPublishPush
+        dependsOn githubReport, gitPublishPush 
+        dependsOn ':keep-alive-framework:uploadTarball'
     } else if (TravisEnvironment.isSecureBuild())  {
         dependsOn githubReport
     }

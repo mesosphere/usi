@@ -1,3 +1,5 @@
+import mesosphere.gradle.aws.S3Upload
+
 plugins {
     id 'application'
 }
@@ -13,4 +15,15 @@ dependencies {
     // Use testCompile when we add implementation project(':persistence-zookeeper')
     implementation project(':test-utils')
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
+}
+
+task uploadTarball(type: S3Upload) {
+    description = "Upload the framework tarball to S3."
+    group = "CI"
+    dependsOn distTar
+
+    region = "us-west-2"
+    bucket = "usi-builds"
+    prefix = "mesosphere/usi/artifacts"
+    source = files(distTar.archiveFile).asFileTree
 }

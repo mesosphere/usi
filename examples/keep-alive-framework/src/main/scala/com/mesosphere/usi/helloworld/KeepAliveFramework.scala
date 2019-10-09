@@ -1,10 +1,13 @@
 package com.mesosphere.usi.helloworld
 
+import java.net.URL
+
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Source}
-import com.mesosphere.mesos.client.MesosClient
+import com.mesosphere.mesos.client.{CredentialsProvider, DcosServiceAccountProvider, MesosClient}
+import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models._
@@ -16,18 +19,22 @@ import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}
 import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
 
-class KeepAliveFramework(conf: Config) extends StrictLogging {
+case class KeepAliveFrameWorkSettings(clientSettings: MesosClientSettings, numberOfTasks: Int) {
+  def this(config: Config) =
+    this(MesosClientSettings.fromConfig(config), config.getInt("keep-alive-framework.tasks-started"))
+}
 
-  implicit val system: ActorSystem = ActorSystem()
-  implicit val mat: ActorMaterializer = ActorMaterializer()
-  implicit val ec: ExecutionContextExecutor = system.dispatcher
+class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Option[CredentialsProvider] = None)(
+    implicit system: ActorSystem,
+    mat: ActorMaterializer)
+    extends StrictLogging {
 
-  val client: MesosClient = new KeepAliveMesosClientFactory(conf).client
+  val client: MesosClient = new KeepAliveMesosClientFactory(settings.clientSettings, authorization).client
 
   val runSpec: RunTemplate = KeepAlivePodSpecHelper.runSpec
 
   val specsSnapshot: List[RunningPodSpec] =
-    KeepAlivePodSpecHelper.specsSnapshot(conf.getInt("keep-alive-framework.tasks-started"))
+    KeepAlivePodSpecHelper.specsSnapshot(settings.numberOfTasks)
 
   // KeepAliveWatcher looks for a terminal task and then restarts the whole pod.
   val keepAliveWatcher: Flow[StateEventOrSnapshot, SchedulerCommand, NotUsed] = Flow[StateEventOrSnapshot].mapConcat {
@@ -103,10 +110,49 @@ class KeepAliveFramework(conf: Config) extends StrictLogging {
 
 object KeepAliveFramework {
 
+  /**
+    * Set ups the same way as [[MesosClientExampleFramework.main]] and run with
+    * {{{
+    *   ./gradlew :keep-alive-framework:run --stacktrace --args "\
+    *     $(dcos config show core.dcos_url) \
+    *     $(dcos config show core.dcos_url)/mesos \
+    *     $(pwd)/dcos-ca.crt \
+    *     $(pwd)/usi.private.pem strict-usi"
+    * }}}
+    */
   def main(args: Array[String]): Unit = {
+
+    require(
+      (2 == args.length) || (args.length == 3) || (args.length == 5),
+      "Please provide arguments: <dcos-url> <mesos-url> [<dcos-ca.cert>] [<private-key-file> <iam-uid>]"
+    )
+
+    val akkaConfig: Config = ConfigFactory.parseString(s"""
+      |akka.ssl-config.trustManager.stores = [
+      | { type: "PEM", path: ${args(2)} }
+      |]
+      """.stripMargin).withFallback(ConfigFactory.load())
+
+    implicit val system: ActorSystem = ActorSystem("keep-alive", akkaConfig)
+    implicit val mat: ActorMaterializer = ActorMaterializer()
+    implicit val ec: ExecutionContextExecutor = system.dispatcher
+
+    val dcosRoot = new URL(args(0))
+    val mesosUrl = new URL(args(1))
+    val provider = if (args.length == 5) {
+      val privateKey = scala.io.Source.fromFile(args(3)).mkString
+      Some(DcosServiceAccountProvider(args(4), privateKey, dcosRoot))
+    } else {
+      None
+    }
+
     val conf = ConfigFactory.load().getConfig("mesos-client").withFallback(ConfigFactory.load())
-    KeepAliveFramework(conf)
+    val settings = KeepAliveFrameWorkSettings(
+      MesosClientSettings.fromConfig(conf).withMasters(Seq(mesosUrl)),
+      conf.getInt("keep-alive-framework.tasks-started"))
+    new KeepAliveFramework(settings, provider)
   }
 
-  def apply(conf: Config): KeepAliveFramework = new KeepAliveFramework(conf)
+  def apply(conf: Config)(implicit system: ActorSystem, mat: ActorMaterializer): KeepAliveFramework =
+    new KeepAliveFramework(new KeepAliveFrameWorkSettings(conf))
 }
