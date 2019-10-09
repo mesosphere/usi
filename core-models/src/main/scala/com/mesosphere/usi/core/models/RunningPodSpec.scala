@@ -30,5 +30,3 @@ case class TerminalPodSpec(id: PodId) extends PodSpec {
 case class RunningPodSpec(id: PodId, runSpec: RunTemplate) extends PodSpec {
   override def shouldBeTerminal: Boolean = false
 }
-
-object RunningPodSpec {}

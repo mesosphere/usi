@@ -32,7 +32,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     eventually {
       val framework = mesosFacade.frameworks().value.frameworks.head
       val task = framework.tasks.head
-      task.name should startWith("hello-world")
+      task.id should startWith("hello-world")
       task.state.get shouldBe "TASK_RUNNING"
     }
   }

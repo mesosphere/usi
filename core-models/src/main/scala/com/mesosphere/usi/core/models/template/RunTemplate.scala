@@ -85,9 +85,10 @@ class LaunchGroupRunTemplate(val role: String, executorBuilder: ExecutorBuilder,
 
     val taskInfos = taskResources.map {
       case (taskName, resources) =>
-        val b = tasks(taskName).buildTask(matchedOffer, resources, taskResources)
-        RunTemplate.setTaskInfo(b, matchedOffer, taskName, taskIdStrategy, resources)
-        taskName -> b.build
+        val taskInfoBuilder = Mesos.TaskInfo.newBuilder()
+        tasks(taskName).buildTask(taskInfoBuilder, matchedOffer, resources, taskResources)
+        RunTemplate.setTaskInfo(taskInfoBuilder, matchedOffer, taskName, taskIdStrategy, resources)
+        taskName -> taskInfoBuilder.build
     }
 
     val tgBuilder = Mesos.TaskGroupInfo
@@ -117,8 +118,8 @@ class LegacyLaunchRunTemplate(val role: String, taskBuilder: TaskBuilder) extend
       taskResources: Map[TaskName, Seq[Mesos.Resource]]
   ): Either[Mesos.Offer.Operation.Launch, Mesos.Offer.Operation.LaunchGroup] = {
     val resources = taskResources(TaskName.empty)
-    val taskInfoBuilder = taskBuilder
-      .buildTask(offer, taskResources = resources, peerTaskResources = taskResources)
+    val taskInfoBuilder = Mesos.TaskInfo.newBuilder()
+    taskBuilder.buildTask(taskInfoBuilder, offer, taskResources = resources, peerTaskResources = taskResources)
     RunTemplate.setTaskInfo(taskInfoBuilder, offer, TaskName.empty, taskIdStrategy, resources)
     val op = Mesos.Offer.Operation.Launch
       .newBuilder()

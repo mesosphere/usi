@@ -17,10 +17,10 @@ object SimpleRunTemplateFactory {
       extends TaskBuilder {
 
     override def buildTask(
+        taskInfoBuilder: Mesos.TaskInfo.Builder,
         matchedOffer: Mesos.Offer,
         taskResources: Seq[Mesos.Resource],
-        peerTaskResources: Map[TaskName, Seq[Mesos.Resource]]): Mesos.TaskInfo.Builder = {
-      val taskInfoBuilder = Mesos.TaskInfo.newBuilder()
+        peerTaskResources: Map[TaskName, Seq[Mesos.Resource]]): Unit = {
       val uris = fetch.map { f =>
         val fetchBuilder = Mesos.CommandInfo.URI
           .newBuilder()
@@ -54,7 +54,6 @@ object SimpleRunTemplateFactory {
                   .setDocker(Mesos.Image.Docker.newBuilder().setName(name))))
             .build())
       }
-      taskInfoBuilder
     }
   }
 

@@ -4,30 +4,21 @@ import com.mesosphere.utils.UnitTest
 
 class PodTaskIdStrategyTest extends UnitTest {
   "default strategy" should {
-    "when dealing with TaskName.empty" should {
-      "returns a TaskId with the podId verbatim" in {
-        PodTaskIdStrategy.DefaultStrategy.apply(PodId("testing"), TaskName.empty) shouldBe TaskId("testing")
-      }
-
-      "unapplies returning an empty taskName" in {
-        val Some((unappliedPodId, unappliedTaskName)) =
-          PodTaskIdStrategy.DefaultStrategy.unapply(TaskId("testing"))
-        unappliedPodId shouldBe PodId("testing")
-        unappliedTaskName shouldBe TaskName.empty
-      }
-    }
-
-    "when dealing with a non-empty TaskName" should {
-      "return the PodId and TaskId joined by a '.'" in {
-        PodTaskIdStrategy.DefaultStrategy.apply(PodId("testing"), TaskName("web")) shouldBe TaskId("testing.web")
-      }
-
-      "unapplies returning the taskName" in {
-        val Some((unappliedPodId, unappliedTaskName)) =
-          PodTaskIdStrategy.DefaultStrategy.unapply(TaskId("testing.web"))
-        unappliedPodId shouldBe PodId("testing")
-        unappliedTaskName shouldBe TaskName("web")
-      }
+    Seq(
+      (PodId("testing"), TaskName.empty) -> TaskId("testing"),
+      (PodId("testing"), TaskName("web")) -> TaskId("testing.web"),
+      (PodId("testing"), TaskName("web.1")) -> TaskId("testing.web.1")
+    ).foreach {
+      case ((podId, taskName), taskId) =>
+        s"combine ${podId} and ${taskName} to ${taskId}" in {
+          PodTaskIdStrategy.DefaultStrategy.apply(podId, taskName) shouldBe taskId
+        }
+        s"parse ${podId} and ${taskName} from ${taskId}" in {
+          val Some((unappliedPodId, unappliedTaskName)) =
+            PodTaskIdStrategy.DefaultStrategy.unapply(taskId)
+          unappliedPodId shouldBe podId
+          unappliedTaskName shouldBe taskName
+        }
     }
   }
 }

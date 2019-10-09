@@ -3,7 +3,7 @@ package com.mesosphere.usi.core.models
 import com.typesafe.scalalogging.StrictLogging
 
 /**
-  * Strategy which dictates how task ids are generated from their task name
+  * Strategy which dictates how task ids are generated from their task name.
   */
 abstract class PodTaskIdStrategy {
   def apply(podId: PodId, taskName: TaskName): TaskId
@@ -12,6 +12,12 @@ abstract class PodTaskIdStrategy {
 }
 
 object PodTaskIdStrategy {
+
+  /**
+    * Default strategy to convert between podId and taskName. Uses a '.' to delimit the podId and the taskName.
+    *
+    * When this strategy is used, it is illegal to use '.' in podIds.
+    */
   object DefaultStrategy extends PodTaskIdStrategy with StrictLogging {
     override def apply(podId: PodId, taskName: TaskName): TaskId = {
       if (taskName == TaskName.empty)
