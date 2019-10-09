@@ -3,6 +3,7 @@ package com.mesosphere.usi.core.logic
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
 import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.core.models.commands.{CreateReservation, ExpungePod, KillPod, LaunchPod, SchedulerCommand}
 
 /**
   * The current home for USI business logic for dealing with spec commands

@@ -34,7 +34,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
         val taskResources = groupedResources.collect {
           case (Some(key), taskResourceMatches) =>
             key -> taskResourceMatches.map(_.resource)
-        }
+        }.withDefaultValue(Nil)
         spec.id -> spec.runSpec.buildOperation(
           offer,
           CurriedPodTaskIdStrategy(spec.id, PodTaskIdStrategy.defaultStrategy),
@@ -138,7 +138,8 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
               }
             )
           case None =>
-            logger.error(s"Critical error! Failed to derive podId from ${taskId}; associated taskStatus has been ignored!")
+            logger.error(
+              s"Critical error! Failed to derive podId from ${taskId}; associated taskStatus has been ignored!")
             SchedulerEvents.empty
         }
       case other =>

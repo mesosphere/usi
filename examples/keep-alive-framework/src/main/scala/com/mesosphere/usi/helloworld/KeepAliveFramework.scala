@@ -10,7 +10,9 @@ import com.mesosphere.mesos.client.{CredentialsProvider, DcosServiceAccountProvi
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.conf.SchedulerSettings
-import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.core.models.{commands, _}
+import com.mesosphere.usi.core.models.commands.{ExpungePod, LaunchPod, SchedulerCommand}
+import com.mesosphere.usi.core.models.template.RunTemplate
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
@@ -31,7 +33,7 @@ class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Op
 
   val client: MesosClient = new KeepAliveMesosClientFactory(settings.clientSettings, authorization).client
 
-  val runSpec: RunTemplateLike = KeepAlivePodSpecHelper.runSpec
+  val runSpec: RunTemplate = KeepAlivePodSpecHelper.runSpec
 
   val specsSnapshot: List[RunningPodSpec] =
     KeepAlivePodSpecHelper.specsSnapshot(settings.numberOfTasks)
@@ -98,7 +100,7 @@ class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Op
   source
     .via(keepAliveWatcher)
     .prepend(Source(specsSnapshot.map { spec =>
-      LaunchPod(spec.id, spec.runSpec)
+      commands.LaunchPod(spec.id, spec.runSpec)
     }))
     .to(sink)
     .run()

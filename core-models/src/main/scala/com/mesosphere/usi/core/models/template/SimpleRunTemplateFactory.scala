@@ -1,10 +1,12 @@
-package com.mesosphere.usi.core.models
+package com.mesosphere.usi.core.models.template
 
 import com.mesosphere.usi.core.models.resources.ResourceRequirement
+import com.mesosphere.usi.core.models.{PartialTaskId, TaskBuilder}
 import org.apache.mesos.v1.{Protos => Mesos}
+
 import scala.collection.JavaConverters._
 
-object SimpleRunTemplate {
+object SimpleRunTemplateFactory {
 
   case class SimpleTaskInfoBuilder(
       resourceRequirements: Seq[ResourceRequirement],
@@ -12,7 +14,7 @@ object SimpleRunTemplate {
       role: String,
       fetch: Seq[FetchUri] = Seq.empty,
       dockerImageName: Option[String] = None)
-      extends TaskBuilderLike {
+      extends TaskBuilder {
 
     override def buildTask(
         matchedOffer: Mesos.Offer,
@@ -43,9 +45,13 @@ object SimpleRunTemplate {
           Mesos.ContainerInfo
             .newBuilder()
             .setType(Mesos.ContainerInfo.Type.MESOS)
-            .setMesos(Mesos.ContainerInfo.MesosInfo
-              .newBuilder()
-              .setImage(Mesos.Image.newBuilder().setType(Mesos.Image.Type.DOCKER).setDocker(Mesos.Image.Docker.newBuilder().setName(name))))
+            .setMesos(
+              Mesos.ContainerInfo.MesosInfo
+                .newBuilder()
+                .setImage(Mesos.Image
+                  .newBuilder()
+                  .setType(Mesos.Image.Type.DOCKER)
+                  .setDocker(Mesos.Image.Docker.newBuilder().setName(name))))
             .build())
       }
       taskInfoBuilder
@@ -69,7 +75,7 @@ object SimpleRunTemplate {
       shellCommand: String,
       role: String,
       fetch: Seq[FetchUri] = Seq.empty,
-      dockerImageName: Option[String] = None): RunTemplateLike =
+      dockerImageName: Option[String] = None): RunTemplate =
     new LegacyLaunchBuilder(
       role,
       new SimpleTaskInfoBuilder(

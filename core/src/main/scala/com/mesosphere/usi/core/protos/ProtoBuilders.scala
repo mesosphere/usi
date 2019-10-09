@@ -1,6 +1,6 @@
 package com.mesosphere.usi.core.protos
 import com.google.protobuf.ByteString
-import com.mesosphere.usi.core.models.FetchUri
+import com.mesosphere.usi.core.models.template.FetchUri
 import org.apache.mesos.v1.Protos.{ContainerInfo, Image}
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}

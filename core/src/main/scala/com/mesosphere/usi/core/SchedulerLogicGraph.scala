@@ -3,7 +3,8 @@ package com.mesosphere.usi.core
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
 import com.mesosphere.mesos.client.MesosCalls
-import com.mesosphere.usi.core.models.{SchedulerCommand, StateSnapshot}
+import com.mesosphere.usi.core.models.StateSnapshot
+import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
 import scala.collection.mutable

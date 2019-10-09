@@ -4,7 +4,8 @@ import java.net.URI
 
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
-import com.mesosphere.usi.core.models.{CurriedPodTaskIdStrategy, FetchUri, PartialTaskId, PodId, RunTemplateLike, SimpleRunTemplate}
+import com.mesosphere.usi.core.models.template.{FetchUri, RunTemplate, SimpleRunTemplateFactory}
+import com.mesosphere.usi.core.models.{CurriedPodTaskIdStrategy, PartialTaskId, PodId}
 import com.mesosphere.usi.core.protos.ProtoConversions._
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.{Protos => Mesos}
@@ -24,7 +25,7 @@ class SpecBuilderTest extends UnitTest {
     "build Mesos proto from RunSpec when fetchUri is defined" in {
       Given("a PodSpec with a RunSpec with fetchUri defined")
       val fetchMe = "http://foo.bar"
-      val runTemplate: RunTemplateLike = SimpleRunTemplate(
+      val runTemplate: RunTemplate = SimpleRunTemplateFactory(
         resourceRequirements = List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 32)),
         shellCommand = "sleep 3600",
         role = "test",
@@ -43,7 +44,8 @@ class SpecBuilderTest extends UnitTest {
                 "cpus",
                 Mesos.Value.Type.SCALAR,
                 newResourceAllocationInfo("some-role"),
-                scalar = 4d.asProtoScalar))))
+                scalar = 4d.asProtoScalar)))
+      )
 
       val uri = operation.getTaskInfos(0).getCommand.getUris(0)
 
@@ -56,7 +58,7 @@ class SpecBuilderTest extends UnitTest {
     "build Mesos proto from RunSpec when dockerImageName is defined" in {
       Given("a PodSpec with a RunSpec with dockerImageName defined")
       val containerName = Option("foo/bar:tag")
-      val runTemplate = SimpleRunTemplate(
+      val runTemplate = SimpleRunTemplateFactory(
         resourceRequirements = List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 32)),
         shellCommand = "sleep 3600",
         role = "test",

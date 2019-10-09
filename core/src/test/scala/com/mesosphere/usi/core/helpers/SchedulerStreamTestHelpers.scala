@@ -1,7 +1,7 @@
 package com.mesosphere.usi.core.helpers
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{Source, SourceQueueWithComplete}
-import com.mesosphere.usi.core.models.SchedulerCommand
+import com.mesosphere.usi.core.models.commands.SchedulerCommand
 
 /**
   * It's a little difficult to deal with the subscription input and output types; these methods provide helpers to more

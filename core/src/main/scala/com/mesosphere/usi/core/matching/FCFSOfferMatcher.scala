@@ -1,5 +1,5 @@
 package com.mesosphere.usi.core.matching
-import com.mesosphere.usi.core.models.RunTemplateLike.KeyedResourceRequirement
+import com.mesosphere.usi.core.models.template.RunTemplate.KeyedResourceRequirement
 import com.mesosphere.usi.core.models.resources.ResourceType
 import com.mesosphere.usi.core.models.RunningPodSpec
 import org.apache.mesos.v1.{Protos => Mesos}
@@ -29,7 +29,8 @@ class FCFSOfferMatcher extends OfferMatcher {
             maybeMatchPodSpec(
               remainingResources.updated(req.resourceType, matchResult.remainingResource),
               matchResult.matchedResources.toList.map(OfferMatcher.ResourceMatch(entityKey, _)) ++ matchedResources,
-              rest)
+              rest
+            )
           case None =>
             // we didn't match
             None

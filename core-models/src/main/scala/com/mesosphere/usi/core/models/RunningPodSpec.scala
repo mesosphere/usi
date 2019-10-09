@@ -1,5 +1,7 @@
 package com.mesosphere.usi.core.models
 
+import com.mesosphere.usi.core.models.template.RunTemplate
+
 /**
   * Scheduler logic state indicating that some action still needs to be done some pod [[RunningPodSpec]] or
   * [[TerminalPodSpec]]
@@ -25,9 +27,8 @@ case class TerminalPodSpec(id: PodId) extends PodSpec {
   * @param id Id of the pod
   * @param runSpec WIP the thing to run, and resource requirements, etc.
   */
-case class RunningPodSpec(id: PodId, runSpec: RunTemplateLike) extends PodSpec {
+case class RunningPodSpec(id: PodId, runSpec: RunTemplate) extends PodSpec {
   override def shouldBeTerminal: Boolean = false
 }
 
-object RunningPodSpec {
-}
+object RunningPodSpec {}

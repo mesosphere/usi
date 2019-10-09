@@ -1,8 +1,8 @@
 package com.mesosphere.usi.core.linting
 
-import com.mesosphere.usi.core.models.RunTemplateLike
-import com.mesosphere.usi.core.models.RunTemplateLike.KeyedResourceRequirement
 import com.mesosphere.usi.core.models.resources.{ExactValue, RangeRequirement, ResourceRequirement, ScalarRequirement}
+import com.mesosphere.usi.core.models.template.RunTemplate
+import com.mesosphere.usi.core.models.template.RunTemplate.KeyedResourceRequirement
 
 class Linting {
   type LintingWarning = String
@@ -14,7 +14,7 @@ class Linting {
     * @param runTemplate runTemplate we are linting
     * @return List of linting errors; empty if none
     */
-  private def validateStaticRangeRequirementsUnique(runTemplate: RunTemplateLike): Seq[LintingWarning] = {
+  private def validateStaticRangeRequirementsUnique(runTemplate: RunTemplate): Seq[LintingWarning] = {
     val staticPorts = runTemplate.allResourceRequirements.collect {
       case KeyedResourceRequirement(_, RangeRequirement(requestedValues, _, _)) => requestedValues
     }.flatten.collect { case ExactValue(value) => value }
@@ -39,7 +39,7 @@ class Linting {
     }
   }
 
-  def isValid(runTemplate: RunTemplateLike): Seq[LintingWarning] = {
+  def isValid(runTemplate: RunTemplate): Seq[LintingWarning] = {
     val uniqueRangeRequirements = validateStaticRangeRequirementsUnique(runTemplate)
     val scalarRequirements = validateScalarRequirements(runTemplate.allResourceRequirements.map(_.requirement))
     uniqueRangeRequirements ++ scalarRequirements
