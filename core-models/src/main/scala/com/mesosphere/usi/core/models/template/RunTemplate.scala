@@ -63,7 +63,7 @@ object RunTemplate extends StrictLogging {
   }
 }
 
-class LaunchGroupBuilder(val role: String, executorBuilder: ExecutorBuilder, tasks: Map[TaskName, TaskBuilder])
+class LaunchGroupRunTemplate(val role: String, executorBuilder: ExecutorBuilder, tasks: Map[TaskName, TaskBuilder])
     extends RunTemplate
     with StrictLogging {
   val taskResourceRequirements = tasks.map { case (taskId, taskBuilder) => taskId -> taskBuilder.resourceRequirements }
@@ -104,7 +104,7 @@ class LaunchGroupBuilder(val role: String, executorBuilder: ExecutorBuilder, tas
   }
 }
 
-class LegacyLaunchBuilder(val role: String, taskBuilder: TaskBuilder) extends RunTemplate {
+class LegacyLaunchRunTemplate(val role: String, taskBuilder: TaskBuilder) extends RunTemplate {
   final override val taskResourceRequirements: Map[TaskName, Seq[ResourceRequirement]] =
     Map(TaskName.empty -> taskBuilder.resourceRequirements)
 

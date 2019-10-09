@@ -76,7 +76,7 @@ object SimpleRunTemplateFactory {
       role: String,
       fetch: Seq[FetchUri] = Seq.empty,
       dockerImageName: Option[String] = None): RunTemplate =
-    new LegacyLaunchBuilder(
+    new LegacyLaunchRunTemplate(
       role,
       new SimpleTaskInfoBuilder(
         resourceRequirements: Seq[ResourceRequirement],
