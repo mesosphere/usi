@@ -35,7 +35,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
           case (Some(key), taskResourceMatches) =>
             key -> taskResourceMatches.map(_.resource)
         }.withDefaultValue(Nil)
-        spec.id -> spec.runSpec.buildOperation(
+        spec.id -> spec.runSpec.buildLaunchOperation(
           offer,
           CurriedPodTaskIdStrategy(spec.id, podTaskIdStrategy),
           executorResources,

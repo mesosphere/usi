@@ -33,7 +33,7 @@ class SpecBuilderTest extends UnitTest {
       )
 
       Then("taskInfo built from the RunSpec should contain fetch Uri")
-      val Left(operation) = runTemplate.buildOperation(
+      val Left(operation) = runTemplate.buildLaunchOperation(
         testOffer,
         CurriedPodTaskIdStrategy.default(podId),
         Nil,
@@ -66,7 +66,7 @@ class SpecBuilderTest extends UnitTest {
       )
 
       Then("taskInfo built from the RunSpec should contain fetch Uri")
-      val Left(operation) = runTemplate.buildOperation(
+      val Left(operation) = runTemplate.buildLaunchOperation(
         testOffer,
         CurriedPodTaskIdStrategy.default(podId),
         Nil,

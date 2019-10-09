@@ -24,7 +24,7 @@ sealed trait RunTemplate {
   val taskResourceRequirements: Map[TaskName, Seq[ResourceRequirement]]
   val executorResources: Seq[ResourceRequirement]
   val role: String
-  private[usi] def buildOperation(
+  private[usi] def buildLaunchOperation(
       matchedOffer: Mesos.Offer,
       taskIdStrategy: CurriedPodTaskIdStrategy,
       executorResources: Seq[Mesos.Resource],
@@ -70,7 +70,7 @@ class LaunchGroupBuilder(val role: String, executorBuilder: ExecutorBuilder, tas
 
   override val executorResources: Seq[ResourceRequirement] = Nil
 
-  override private[usi] def buildOperation(
+  override private[usi] def buildLaunchOperation(
       matchedOffer: Mesos.Offer,
       taskIdStrategy: CurriedPodTaskIdStrategy,
       executorResources: Seq[Mesos.Resource],
@@ -110,7 +110,7 @@ class LegacyLaunchBuilder(val role: String, taskBuilder: TaskBuilder) extends Ru
 
   final override val executorResources: Seq[ResourceRequirement] = Nil
 
-  override private[usi] def buildOperation(
+  override private[usi] def buildLaunchOperation(
       offer: Mesos.Offer,
       taskIdStrategy: CurriedPodTaskIdStrategy,
       executorResources: Seq[Mesos.Resource],
