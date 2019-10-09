@@ -360,7 +360,16 @@ case class MesosCluster(
     val processName: String = "Master"
   }
 
+
   case class Agent(resources: Resources, extraArgs: Seq[String], logVerbosityLevel: Int = 0) extends Mesos {
+    /**
+      * We can only specify the cgroups_root flag if running the integration tests under Linux; on Mac OS this flag is unrecognized.
+      */
+    private val cgroupsRootArgs: Seq[String] =
+      if (MesosTest.isLinux)
+        Seq(s"--cgroups_root=mesos$port") // See MESOS-9960 for more info
+      else
+        Nil
     override val workDir = Files.createTempDirectory(s"$suiteName-mesos-agent-$port").toFile
     override val processBuilder = Process(
       command = Seq(
@@ -372,8 +381,9 @@ case class MesosCluster(
         s"--resources=${resources.resourceString()}",
         s"--master=$masterUrl",
         s"--work_dir=${workDir.getAbsolutePath}",
-        s"--cgroups_root=mesos$port", // See MESOS-9960 for more info
-        s"""--executor_environment_variables={"GLOG_v": "$logVerbosityLevel"}""") ++ extraArgs,
+        s"""--executor_environment_variables={"GLOG_v": "2"}""") ++
+        cgroupsRootArgs ++
+        extraArgs,
       cwd = None, extraEnv = mesosEnv(workDir): _*)
 
     override val processName = "Agent"
@@ -425,6 +435,12 @@ trait MesosClusterTest extends Suite with ZookeeperServerTest with MesosTest wit
     mesosCluster.close()
     super.afterAll()
   }
+}
+
+object MesosTest {
+  import sys.process._
+  lazy val isLinux: Boolean =
+    Seq("uname").!!.trim.startsWith("Linux")
 }
 
 object IP extends StrictLogging {
