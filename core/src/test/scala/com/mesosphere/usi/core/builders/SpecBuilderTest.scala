@@ -5,7 +5,7 @@ import java.net.URI
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.usi.core.models.template.{FetchUri, RunTemplate, SimpleRunTemplateFactory}
-import com.mesosphere.usi.core.models.{CurriedPodTaskIdStrategy, PartialTaskId, PodId}
+import com.mesosphere.usi.core.models.{CurriedPodTaskIdStrategy, TaskName, PodId}
 import com.mesosphere.usi.core.protos.ProtoConversions._
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.{Protos => Mesos}
@@ -38,7 +38,7 @@ class SpecBuilderTest extends UnitTest {
         CurriedPodTaskIdStrategy.default(podId),
         Nil,
         Map(
-          PartialTaskId.empty ->
+          TaskName.empty ->
             List(
               newResource(
                 "cpus",
@@ -71,7 +71,7 @@ class SpecBuilderTest extends UnitTest {
         CurriedPodTaskIdStrategy.default(podId),
         Nil,
         Map(
-          PartialTaskId.empty ->
+          TaskName.empty ->
             List(
               newResource(
                 "cpus",

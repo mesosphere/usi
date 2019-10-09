@@ -18,7 +18,7 @@ import scala.collection.JavaConverters._
 private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher: OfferMatcher = new FCFSOfferMatcher())
     extends ImplicitStrictLogging {
 
-  val podTaskIdStrategy = PodTaskIdStrategy.defaultStrategy
+  val podTaskIdStrategy: PodTaskIdStrategy = PodTaskIdStrategy.DefaultStrategy
 
   private[core] def matchOffer(
       offer: Mesos.Offer,
@@ -37,7 +37,7 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
         }.withDefaultValue(Nil)
         spec.id -> spec.runSpec.buildOperation(
           offer,
-          CurriedPodTaskIdStrategy(spec.id, PodTaskIdStrategy.defaultStrategy),
+          CurriedPodTaskIdStrategy(spec.id, podTaskIdStrategy),
           executorResources,
           taskResources)
     }

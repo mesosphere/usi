@@ -1,6 +1,6 @@
 package com.mesosphere.usi.core.matching
 
-import com.mesosphere.usi.core.models.{PartialTaskId, RunningPodSpec}
+import com.mesosphere.usi.core.models.{TaskName, RunningPodSpec}
 import org.apache.mesos.v1.{Protos => Mesos}
 
 /**
@@ -30,6 +30,6 @@ object OfferMatcher {
     * @param entityKey Optional taskId. If None, then this resource match is for the executor.
     * @param resource The actual resource
     */
-  case class ResourceMatch(entityKey: Option[PartialTaskId], resource: Mesos.Resource)
+  case class ResourceMatch(entityKey: Option[TaskName], resource: Mesos.Resource)
 
 }

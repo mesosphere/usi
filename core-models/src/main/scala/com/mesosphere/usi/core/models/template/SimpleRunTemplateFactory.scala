@@ -1,7 +1,7 @@
 package com.mesosphere.usi.core.models.template
 
 import com.mesosphere.usi.core.models.resources.ResourceRequirement
-import com.mesosphere.usi.core.models.{PartialTaskId, TaskBuilder}
+import com.mesosphere.usi.core.models.{TaskName, TaskBuilder}
 import org.apache.mesos.v1.{Protos => Mesos}
 
 import scala.collection.JavaConverters._
@@ -19,7 +19,7 @@ object SimpleRunTemplateFactory {
     override def buildTask(
         matchedOffer: Mesos.Offer,
         taskResources: Seq[Mesos.Resource],
-        peerTaskResources: Map[PartialTaskId, Seq[Mesos.Resource]]): Mesos.TaskInfo.Builder = {
+        peerTaskResources: Map[TaskName, Seq[Mesos.Resource]]): Mesos.TaskInfo.Builder = {
       val taskInfoBuilder = Mesos.TaskInfo.newBuilder()
       val uris = fetch.map { f =>
         val fetchBuilder = Mesos.CommandInfo.URI

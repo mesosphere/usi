@@ -8,5 +8,5 @@ trait TaskBuilder {
   def buildTask(
       matchedOffer: Mesos.Offer,
       taskResources: Seq[Mesos.Resource],
-      peerTaskResources: Map[PartialTaskId, Seq[Mesos.Resource]]): Mesos.TaskInfo.Builder
+      peerTaskResources: Map[TaskName, Seq[Mesos.Resource]]): Mesos.TaskInfo.Builder
 }
