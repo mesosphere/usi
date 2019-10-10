@@ -1,6 +1,7 @@
 package com.mesosphere.usi.helloworld
 
-import java.net.URL
+import java.io.File
+import java.net.URI
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -15,21 +16,20 @@ import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{TaskState, TaskStatus}
+import scopt.OParser
 
 import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
 
-case class KeepAliveFrameWorkSettings(clientSettings: MesosClientSettings, numberOfTasks: Int) {
-  def this(config: Config) =
-    this(MesosClientSettings.fromConfig(config), config.getInt("keep-alive-framework.tasks-started"))
-}
+case class KeepAliveFrameWorkSettings(clientSettings: MesosClientSettings, numberOfTasks: Int, role: String)
 
 class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Option[CredentialsProvider] = None)(
     implicit system: ActorSystem,
     mat: ActorMaterializer)
     extends StrictLogging {
 
-  val client: MesosClient = new KeepAliveMesosClientFactory(settings.clientSettings, authorization).client
+  val client: MesosClient =
+    new KeepAliveMesosClientFactory(settings.clientSettings, authorization, settings.role).client
 
   val runSpec: RunTemplate = KeepAlivePodSpecHelper.runSpec
 
@@ -110,49 +110,97 @@ class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Op
 
 object KeepAliveFramework {
 
+  case class Args(
+      dcosRoot: URI = new URI("http://localhost"),
+      mesosUrl: URI = new URI("http://localhost:5050"),
+      dcosCertPath: Option[String] = None,
+      privateKey: Option[File] = None,
+      iamUid: Option[String] = None,
+      mesosRole: String = "test"
+  )
+  val argsParser = {
+    val builder = OParser.builder[Args]
+    import builder._
+
+    OParser.sequence(
+      programName("keep-alive-framework"),
+      head("keep-alive-framework"),
+      opt[URI]("dcos-url")
+        .action((root, c) => c.copy(dcosRoot = root))
+        .text("The DC/OS root address."),
+      opt[URI]("mesos-url")
+        .action((mesos, c) => c.copy(mesosUrl = mesos))
+        .text("The Mesos master URL."),
+      opt[String]("dcos-ca.cert")
+        .optional()
+        .action((cert, c) => c.copy(dcosCertPath = Some(cert)))
+        .text("Optional path to a DC/OS SSL certificate."),
+      opt[File]("private-key-file")
+        .optional()
+        .action((key, c) => c.copy(privateKey = Some(key)))
+        .text("Optional private key for strict authentication."),
+      opt[String]("iam-uid")
+        .optional()
+        .action((iam, c) => c.copy(iamUid = Some(iam)))
+        .text("Optional DC/OS IAM user id."),
+      opt[String]("mesos-role")
+        .optional()
+        .action((role, c) => c.copy(mesosRole = role))
+        .text("Optional Mesos role. Defaults to 'test'."),
+      checkConfig { c =>
+        if ((c.privateKey.isEmpty && c.iamUid.nonEmpty) || (c.privateKey.nonEmpty && c.iamUid.isEmpty)) {
+          failure("Private key and IAM user must defined together.")
+        } else {
+          success
+        }
+      }
+    )
+  }
+
   /**
     * Set ups the same way as [[MesosClientExampleFramework.main]] and run with
     * {{{
     *   ./gradlew :keep-alive-framework:run --stacktrace --args "\
-    *     $(dcos config show core.dcos_url) \
-    *     $(dcos config show core.dcos_url)/mesos \
-    *     $(pwd)/dcos-ca.crt \
-    *     $(pwd)/usi.private.pem strict-usi"
+    *     --dcos-url $(dcos config show core.dcos_url) \
+    *     --mesos-url $(dcos config show core.dcos_url)/mesos \
+    *     --dcos-ca.cert $(pwd)/dcos-ca.crt \
+    *     --private-key-file $(pwd)/usi.private.pem --iam-uid strict-usi\
+    *     --mesos-role usi"
     * }}}
     */
   def main(args: Array[String]): Unit = {
 
-    require(
-      (2 == args.length) || (args.length == 3) || (args.length == 5),
-      "Please provide arguments: <dcos-url> <mesos-url> [<dcos-ca.cert>] [<private-key-file> <iam-uid>]"
-    )
+    OParser.parse(argsParser, args, Args()) match {
+      case Some(Args(dcosRoot, mesosUrl, maybeDcosCertPath, privateKey, iamUid, mesosRole)) =>
+        val akkaConfig: Config = maybeDcosCertPath match {
+          case Some(dcosCertPath) =>
+            ConfigFactory.parseString(s"""
+              |akka.ssl-config.trustManager.stores = [
+              | { type: "PEM", path: $dcosCertPath }
+              |]
+              """.stripMargin).withFallback(ConfigFactory.load())
+          case None => ConfigFactory.load()
+        }
 
-    val akkaConfig: Config = ConfigFactory.parseString(s"""
-      |akka.ssl-config.trustManager.stores = [
-      | { type: "PEM", path: ${args(2)} }
-      |]
-      """.stripMargin).withFallback(ConfigFactory.load())
+        implicit val system: ActorSystem = ActorSystem("keep-alive", akkaConfig)
+        implicit val mat: ActorMaterializer = ActorMaterializer()
+        implicit val ec: ExecutionContextExecutor = system.dispatcher
 
-    implicit val system: ActorSystem = ActorSystem("keep-alive", akkaConfig)
-    implicit val mat: ActorMaterializer = ActorMaterializer()
-    implicit val ec: ExecutionContextExecutor = system.dispatcher
+        val provider = (privateKey, iamUid) match {
+          case (Some(privateKeyFile), Some(iam)) =>
+            val privateKey = scala.io.Source.fromFile(privateKeyFile).mkString
+            Some(DcosServiceAccountProvider(iam, privateKey, dcosRoot.toURL))
+          case _ => None
+        }
 
-    val dcosRoot = new URL(args(0))
-    val mesosUrl = new URL(args(1))
-    val provider = if (args.length == 5) {
-      val privateKey = scala.io.Source.fromFile(args(3)).mkString
-      Some(DcosServiceAccountProvider(args(4), privateKey, dcosRoot))
-    } else {
-      None
+        val conf = ConfigFactory.load().getConfig("mesos-client").withFallback(ConfigFactory.load())
+        val settings = KeepAliveFrameWorkSettings(
+          MesosClientSettings.fromConfig(conf).withMasters(Seq(mesosUrl.toURL)),
+          conf.getInt("keep-alive-framework.tasks-started"),
+          mesosRole)
+        new KeepAliveFramework(settings, provider)
+      case _ =>
+        sys.exit(1)
     }
-
-    val conf = ConfigFactory.load().getConfig("mesos-client").withFallback(ConfigFactory.load())
-    val settings = KeepAliveFrameWorkSettings(
-      MesosClientSettings.fromConfig(conf).withMasters(Seq(mesosUrl)),
-      conf.getInt("keep-alive-framework.tasks-started"))
-    new KeepAliveFramework(settings, provider)
   }
-
-  def apply(conf: Config)(implicit system: ActorSystem, mat: ActorMaterializer): KeepAliveFramework =
-    new KeepAliveFramework(new KeepAliveFrameWorkSettings(conf))
 }

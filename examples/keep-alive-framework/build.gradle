@@ -11,6 +11,7 @@ application {
 dependencies {
     implementation project(':core')
     implementation project(':persistence')
+    implementation group: 'com.github.scopt', name: "scopt_$scalaVersion", version: '4.0.0-RC2'
 
     // Use testCompile when we add implementation project(':persistence-zookeeper')
     implementation project(':test-utils')
