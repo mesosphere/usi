@@ -95,17 +95,16 @@ class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Op
       +-----------------------+
 
     */
-  source
+  val end = source
     .via(keepAliveWatcher)
     .prepend(Source(specsSnapshot.map { spec =>
       LaunchPod(spec.id, spec.runSpec)
     }))
-    .to(sink)
-    .run()
+    .runWith(sink)
 
   // We let the framework run "forever"
-  io.StdIn.readLine("Keep alive framework is started")
-
+  val result = Await.result(end, Duration.Inf)
+  logger.warn(s"Framework finished with $result")
 }
 
 object KeepAliveFramework {

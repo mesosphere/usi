@@ -12,17 +12,19 @@ Run the keep-alive example framework that:
    ```
    dcos security org service-accounts keypair usi.private.pem usi.pub.pem
    ```
-3. Create user `strict-usi`:
+3. Create user `usi`:
    ```
-   dcos security org service-accounts create -p usi.pub.pem -d "For testing USI on strict" strict-usi
+   dcos security org service-accounts create -p usi.pub.pem -d "For testing USI on strict" usi
    ```
 4. Store private key as secret:
    ```
    dcos security secrets create -f ./usi.private.pem usi/private_key
    ```
-5. Grant `strict-usi` access:
+5. Grant `usi` access:
    ```
-   dcos security org users grant strict-usi dcos:mesos:master:task:user:nobody create
+   dcos security org users grant usi dcos:mesos:master:task:user:nobody create
+   dcos security org users grant usi dcos:mesos:master:framework:role:usi read
+   dcos security org users grant usi dcos:mesos:master:framework:role:usi create
    ```
 6. Deploy the framework:
    ```
