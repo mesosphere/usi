@@ -8,6 +8,15 @@ import scala.collection.JavaConverters._
 
 object SimpleRunTemplateFactory {
 
+  /**
+    * This task info builder is used by the [[LegacyLaunchRunTemplate]]. I launches a simple pod.
+    *
+    * @param resourceRequirements The resources required for the pod.
+    * @param shellCommand The command that is executed.
+    * @param role The Mesos role used.
+    * @param fetch The artifacts that are fetched by Mesos.
+    * @param dockerImageName The optional Docker image the task will run in.
+    */
   case class SimpleTaskInfoBuilder(
       resourceRequirements: Seq[ResourceRequirement],
       shellCommand: String,
@@ -58,10 +67,7 @@ object SimpleRunTemplateFactory {
   }
 
   /**
-    * Launch template used to launch a pod
-    *
-    * Support is rather primitive now. We will add richer support for TaskInfo and TaskGroupInfo specification in
-    * (DCOS-48503, DCOS-47481)
+    * Creates a [[LegacyLaunchRunTemplate]] that is compatible to older USI versions.
     *
     * @param resourceRequirements a list of resource requirements for the [[RunningPodSpec]]. See [[ResourceRequirement]]
     *                             class for more information
