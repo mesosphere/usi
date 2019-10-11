@@ -7,8 +7,10 @@ import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.commandInputSource
-import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.core.models.{commands, _}
+import com.mesosphere.usi.core.models.commands.LaunchPod
 import com.mesosphere.usi.core.models.resources.{RangeRequirement, ScalarRequirement}
+import com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
@@ -46,7 +48,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     input.offer(
       LaunchPod(
         podId,
-        RunTemplate(
+        SimpleRunTemplateFactory(
           resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
           shellCommand = "sleep 3600",
           "test")
@@ -74,9 +76,9 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     val podId = PodId("pod-with-ports")
 
     input.offer(
-      LaunchPod(
+      commands.LaunchPod(
         podId,
-        RunTemplate(
+        SimpleRunTemplateFactory(
           resourceRequirements =
             List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256), RangeRequirement.ports(Seq(0))),
           shellCommand = "sleep 3600",

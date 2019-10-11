@@ -1,4 +1,7 @@
-package com.mesosphere.usi.core.models
+package com.mesosphere.usi.core.models.commands
+
+import com.mesosphere.usi.core.models.template.RunTemplate
+import com.mesosphere.usi.core.models.{PodId, ReservationId, ReservationSpec}
 
 /**
   * Trait which includes all possible events that can describe the evolution of the framework implementation's

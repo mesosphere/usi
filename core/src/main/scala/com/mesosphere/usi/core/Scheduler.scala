@@ -5,7 +5,8 @@ import akka.stream.{BidiShape, FlowShape, Materializer}
 import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.conf.SchedulerSettings
-import com.mesosphere.usi.core.models.{PodRecordUpdatedEvent, SchedulerCommand, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.commands.SchedulerCommand
+import com.mesosphere.usi.core.models.{PodRecordUpdatedEvent, StateEvent, StateSnapshot}
 import com.mesosphere.usi.repository.PodRecordRepository
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}

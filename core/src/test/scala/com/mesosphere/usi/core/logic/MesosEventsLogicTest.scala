@@ -4,8 +4,9 @@ import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.SchedulerState
 import com.mesosphere.usi.core.helpers.MesosMock
-import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunTemplate, RunningPodSpec, TaskId}
-import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
+import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunningPodSpec, TaskId}
+import com.mesosphere.usi.core.models.resources.{ResourceRequirement, ResourceType, ScalarRequirement}
+import com.mesosphere.usi.core.models.template.{RunTemplate, SimpleRunTemplateFactory}
 import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskStatus}
 import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.{Protos => Mesos}
@@ -14,13 +15,17 @@ class MesosEventsLogicTest extends UnitTest {
 
   private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId))
 
-  val podWith1Cpu256Mem: RunningPodSpec = RunningPodSpec(
-    PodId("mock-podId"),
-    RunTemplate(
-      List(ScalarRequirement(ResourceType.CPUS, 1), ScalarRequirement(ResourceType.MEM, 256)),
-      shellCommand = "sleep 3600",
-      "test")
-  )
+  def testRunTemplate(cpus: Int = Integer.MAX_VALUE, mem: Int = 256): RunTemplate = {
+    val resourceRequirements = List.newBuilder[ResourceRequirement]
+    if (cpus > 0)
+      resourceRequirements += ScalarRequirement(ResourceType.CPUS, cpus)
+    if (mem > 0)
+      resourceRequirements += ScalarRequirement(ResourceType.MEM, mem)
+    SimpleRunTemplateFactory(resourceRequirements = resourceRequirements.result(), shellCommand = "sleep 3600", "test")
+  }
+
+  val testPodId = PodId("mock-podId")
+  def podWith1Cpu256Mem: RunningPodSpec = RunningPodSpec(testPodId, testRunTemplate(cpus = 1, mem = 256))
 
   "MesosEventsLogic" should {
     "decline an offer when there is no PodSpec to launch" in {
@@ -39,12 +44,7 @@ class MesosEventsLogicTest extends UnitTest {
       val insufficientOffer = MesosMock.createMockOffer(cpus = 1)
       val (_, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
         insufficientOffer,
-        Seq(
-          podWith1Cpu256Mem.copy(
-            runSpec = podWith1Cpu256Mem.runSpec.copy(
-              resourceRequirements = Seq(ScalarRequirement(ResourceType.CPUS, Integer.MAX_VALUE))
-            )))
-      )
+        Seq(RunningPodSpec(testPodId, testRunTemplate(cpus = Integer.MAX_VALUE))))
       schedulerEventsBuilder.result.mesosCalls.size shouldBe 1
       val declines = schedulerEventsBuilder.result.mesosCalls.head.getDecline.getOfferIdsList
       declines.size() shouldBe 1

@@ -3,16 +3,17 @@ package com.mesosphere.usi.core
 import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.helpers.MesosMock
+import com.mesosphere.usi.core.models.commands.LaunchPod
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
+import com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory
 import com.mesosphere.usi.core.models.{
-  LaunchPod,
   PodId,
   PodRecordUpdatedEvent,
   PodSpecUpdatedEvent,
   PodStatusUpdatedEvent,
-  RunTemplate,
   StateEventOrSnapshot,
-  StateSnapshot
+  StateSnapshot,
+  commands
 }
 import com.mesosphere.usi.core.protos.ProtoBuilders
 import com.mesosphere.utils.UnitTest
@@ -21,7 +22,7 @@ import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest.Inside
 
 class SchedulerLogicHandlerTest extends UnitTest with Inside {
-  val testRoleRunSpec = RunTemplate(Seq.empty, "", "test-role")
+  val testRoleRunSpec = SimpleRunTemplateFactory(Seq.empty, "", "test-role")
 
   def declineCallsIn(calls: Seq[Call]): Seq[Call.Decline] = calls.collect {
     case call if call.hasDecline => call.getDecline
@@ -52,7 +53,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
       newTaskStatus(newTaskId(podId.value), Mesos.TaskState.TASK_RUNNING, newAgentId("testing"), uuid = taskStatusUUID)
     val launchPod = LaunchPod(
       podId,
-      RunTemplate(
+      SimpleRunTemplateFactory(
         resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
         shellCommand = "sleep 3600",
         "test")
@@ -204,7 +205,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
       val podId = PodId("pod")
 
       When("pod with role 'test-role' is launched")
-      val result = handler.handleCommand(LaunchPod(podId, testRoleRunSpec))
+      val result = handler.handleCommand(commands.LaunchPod(podId, testRoleRunSpec))
 
       Then("revive call is generated for that role")
       inside(result.mesosCalls.collectFirst { case c if c.hasRevive => c.getRevive }) {
@@ -214,7 +215,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
 
       And("Another revive is generated for the same role when another podSpec is updated")
       val podId2 = PodId("pod2")
-      val result2 = handler.handleCommand(LaunchPod(podId2, testRoleRunSpec))
+      val result2 = handler.handleCommand(commands.LaunchPod(podId2, testRoleRunSpec))
       inside(result2.mesosCalls.collectFirst { case c if c.hasRevive => c.getRevive }) {
         case Some(revive) =>
           revive.getRoles(0).shouldBe("test-role")
@@ -226,7 +227,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
       val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), StateSnapshot.empty)
       val podId = PodId("pod")
       // creates not launched pod in the internal state of scheduler logic
-      handler.handleCommand(LaunchPod(podId, testRoleRunSpec))
+      handler.handleCommand(commands.LaunchPod(podId, testRoleRunSpec))
 
       When("that pod is launched")
       val offer = MesosMock.createMockOffer()

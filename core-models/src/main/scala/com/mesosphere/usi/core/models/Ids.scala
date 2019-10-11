@@ -7,6 +7,17 @@ package com.mesosphere.usi.core.models
 case class PodId(value: String)
 
 /**
+  * Name for a pod's task. The TaskName and PodId are combined via PodTaskIdStrategy to generate a TaskId.
+  *
+  * @param value
+  */
+case class TaskName(value: String)
+
+object TaskName {
+  val empty = TaskName("")
+}
+
+/**
   * Unique identifier of a reservation
   * @param value
   */

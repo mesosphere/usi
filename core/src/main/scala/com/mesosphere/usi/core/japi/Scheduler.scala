@@ -6,7 +6,8 @@ import akka.stream.{Materializer, javadsl}
 import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.conf.SchedulerSettings
-import com.mesosphere.usi.core.models.{SchedulerCommand, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.commands.SchedulerCommand
+import com.mesosphere.usi.core.models.{StateEvent, StateSnapshot}
 import com.mesosphere.usi.core.{CallerThreadExecutionContext, Scheduler => ScalaScheduler}
 import com.mesosphere.usi.repository.PodRecordRepository
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}

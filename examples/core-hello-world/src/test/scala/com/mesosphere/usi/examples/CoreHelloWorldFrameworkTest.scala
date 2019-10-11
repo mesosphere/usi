@@ -4,7 +4,8 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.testkit.{TestPublisher, TestSubscriber}
 import com.mesosphere.mesos.conf.MesosClientSettings
-import com.mesosphere.usi.core.models.{PodStatusUpdatedEvent, SchedulerCommand, StateEvent}
+import com.mesosphere.usi.core.models.commands.SchedulerCommand
+import com.mesosphere.usi.core.models.{PodStatusUpdatedEvent, StateEvent}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
@@ -31,7 +32,7 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     eventually {
       val framework = mesosFacade.frameworks().value.frameworks.head
       val task = framework.tasks.head
-      task.name should startWith("hello-world")
+      task.id should startWith("hello-world")
       task.state.get shouldBe "TASK_RUNNING"
     }
   }
