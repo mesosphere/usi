@@ -33,8 +33,9 @@ sealed trait RunTemplate {
 }
 
 object RunTemplate extends StrictLogging {
+
   /**
-   * Used to identify to which task a requirement belongs. An empty entityKey indicates that the requirement belongs to the executor 
+    * Used to identify to which task a requirement belongs. An empty entityKey indicates that the requirement belongs to the executor
    **/
   case class KeyedResourceRequirement(entityKey: Option[TaskName], requirement: ResourceRequirement)
 

@@ -1,7 +1,5 @@
 package com.mesosphere.usi.core.protos
 import com.google.protobuf.ByteString
-import com.mesosphere.usi.core.models.template.FetchUri
-import org.apache.mesos.v1.Protos.{ContainerInfo, Image}
 import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
@@ -233,28 +231,6 @@ private[usi] object ProtoBuilders {
     b.build()
   }
 
-  def newCommandInfo(shellCommand: String, fetchUri: Seq[FetchUri]): Mesos.CommandInfo = {
-    val b = Mesos.CommandInfo
-      .newBuilder()
-      .setShell(true)
-      .setValue(shellCommand)
-    fetchUri.map(u => b.addUris(newURI(u)))
-    b.build()
-  }
-
-  def newURI(fetch: FetchUri): Mesos.CommandInfo.URI = {
-    val b = Mesos.CommandInfo.URI
-      .newBuilder()
-      .setValue(fetch.uri.toString)
-      .setExecutable(fetch.executable)
-      .setExtract(fetch.extract)
-      .setCache(fetch.cache)
-    fetch.outputFile.foreach { name =>
-      b.setOutputFile(name)
-    }
-    b.build()
-  }
-
   def newValueRanges(ranges: Iterable[Mesos.Value.Range]): Mesos.Value.Ranges = {
     val b = Mesos.Value.Ranges.newBuilder()
     ranges.foreach(b.addRange)
@@ -273,25 +249,5 @@ private[usi] object ProtoBuilders {
       .newBuilder()
       .setOffers(MesosEvent.Offers.newBuilder().addOffers(offer))
       .build()
-  }
-
-  // TODO - remove
-  def newDockerImage(dockerImageName: String): Image = {
-    Image
-      .newBuilder()
-      .setType(Image.Type.DOCKER)
-      .setDocker(Image.Docker.newBuilder().setName(dockerImageName).build())
-      .build()
-  }
-
-  // TODO - remove
-  def newContainerInfo(imageName: Option[String]): Option[Mesos.ContainerInfo] = {
-    imageName.map { name =>
-      ContainerInfo
-        .newBuilder()
-        .setType(Mesos.ContainerInfo.Type.MESOS)
-        .setMesos(ContainerInfo.MesosInfo.newBuilder().setImage(newDockerImage(name)).build())
-        .build()
-    }
   }
 }
