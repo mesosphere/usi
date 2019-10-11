@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.8 API  - com.mesosphere.usi.core.matching.OfferMatcher</title>
-          <meta name="description" content="usi 0.1.8 API - com.mesosphere.usi.core.matching.OfferMatcher" />
-          <meta name="keywords" content="usi 0.1.8 API com.mesosphere.usi.core.matching.OfferMatcher" />
+          <title>usi 0.1.9 API  - com.mesosphere.usi.core.matching.OfferMatcher</title>
+          <meta name="description" content="usi 0.1.9 API - com.mesosphere.usi.core.matching.OfferMatcher" />
+          <meta name="keywords" content="usi 0.1.9 API com.mesosphere.usi.core.matching.OfferMatcher" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.8 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.9 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -158,7 +158,7 @@
                         <a class="class" href="MesosRange.html" title=""></a>
                         <a href="MesosRange.html" title="">MesosRange</a>
                       </li><li class="current-entities indented5">
-                        <span class="separator"></span>
+                        <a class="object" href="OfferMatcher$.html" title=""></a>
                         <a class="trait" href="" title="Interface for the offer matcher implementations."></a>
                         <a href="" title="Interface for the offer matcher implementations.">OfferMatcher</a>
                       </li><li class="current-entities indented5">
@@ -196,14 +196,16 @@
           <div id="content">
             <body class="trait type">
       <div id="definition">
-        <div class="big-circle trait">t</div>
+        <a href="OfferMatcher$.html" title="See companion object"><div class="big-circle trait-companion-object">t</div></a>
         <p id="owner"><a href="../../../../index.html" class="extype" name="com">com</a>.<a href="../../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../../index.html" class="extype" name="com.mesosphere.usi">usi</a>.<a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a>.<a href="index.html" class="extype" name="com.mesosphere.usi.core.matching">matching</a></p>
-        <h1>OfferMatcher<span class="permalink">
+        <h1><a href="OfferMatcher$.html" title="See companion object">OfferMatcher</a><span class="permalink">
       <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"></span></h3>
+        <h3><span class="morelinks"><div>
+            Companion <a href="OfferMatcher$.html" title="See companion object">object OfferMatcher</a>
+          </div></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
@@ -279,9 +281,9 @@ return a map of all matched PodSpecs with the list of matched Mesos resources.
         <div class="values members">
               <h3>Abstract Value Members</h3>
               <ol><li name="com.mesosphere.usi.core.matching.OfferMatcher#matchOffer" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="matchOffer(offer:org.apache.mesos.v1.Protos.Offer,podSpecs:Iterable[com.mesosphere.usi.core.models.RunningPodSpec]):Map[com.mesosphere.usi.core.models.RunningPodSpec,List[org.apache.mesos.v1.Protos.Resource]]"></a><a id="matchOffer(Offer,Iterable[RunningPodSpec]):Map[RunningPodSpec,List[Resource]]"></a>
+      <a id="matchOffer(offer:org.apache.mesos.v1.Protos.Offer,podSpecs:Iterable[com.mesosphere.usi.core.models.RunningPodSpec]):Map[com.mesosphere.usi.core.models.RunningPodSpec,List[com.mesosphere.usi.core.matching.OfferMatcher.ResourceMatch]]"></a><a id="matchOffer(Offer,Iterable[RunningPodSpec]):Map[RunningPodSpec,List[ResourceMatch]]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#matchOffer(offer:org.apache.mesos.v1.Protos.Offer,podSpecs:Iterable[com.mesosphere.usi.core.models.RunningPodSpec]):Map[com.mesosphere.usi.core.models.RunningPodSpec,List[org.apache.mesos.v1.Protos.Resource]]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher.html#matchOffer(offer:org.apache.mesos.v1.Protos.Offer,podSpecs:Iterable[com.mesosphere.usi.core.models.RunningPodSpec]):Map[com.mesosphere.usi.core.models.RunningPodSpec,List[com.mesosphere.usi.core.matching.OfferMatcher.ResourceMatch]]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -290,7 +292,7 @@ return a map of all matched PodSpecs with the list of matched Mesos resources.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">matchOffer</span><span class="params">(<span name="offer">offer: <span class="extype" name="org.apache.mesos.v1.Protos.Offer">Offer</span></span>, <span name="podSpecs">podSpecs: <span class="extype" name="scala.Iterable">Iterable</span>[<a href="../models/RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../models/RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a>, <span class="extype" name="scala.List">List</span>[<span class="extype" name="org.apache.mesos.v1.Protos.Resource">Resource</span>]]</span>
+        <span class="name">matchOffer</span><span class="params">(<span name="offer">offer: <span class="extype" name="org.apache.mesos.v1.Protos.Offer">Offer</span></span>, <span name="podSpecs">podSpecs: <span class="extype" name="scala.Iterable">Iterable</span>[<a href="../models/RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../models/RunningPodSpec.html" class="extype" name="com.mesosphere.usi.core.models.RunningPodSpec">RunningPodSpec</a>, <span class="extype" name="scala.List">List</span>[<a href="OfferMatcher$$ResourceMatch.html" class="extype" name="com.mesosphere.usi.core.matching.OfferMatcher.ResourceMatch">ResourceMatch</a>]]</span>
       </span>
       
       <p class="shortcomment cmt">Given a Mesos <span class="extype" name="Mesos.Offer">Mesos.Offer</span> and a set of <span class="extype" name="RunningPodSpec">RunningPodSpec</span>s return a map of all matched <a href="../models/PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">com.mesosphere.usi.core.models.PodId</a>s
