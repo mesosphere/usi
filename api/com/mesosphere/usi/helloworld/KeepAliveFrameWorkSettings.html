@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.10 API  - com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings</title>
-          <meta name="description" content="usi 0.1.10 API - com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings" />
-          <meta name="keywords" content="usi 0.1.10 API com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings" />
+          <title>usi 0.1.12 API  - com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings</title>
+          <meta name="description" content="usi 0.1.12 API - com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings" />
+          <meta name="keywords" content="usi 0.1.12 API com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.10 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.12 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -172,7 +172,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">KeepAliveFrameWorkSettings</span><span class="params">(<span name="clientSettings">clientSettings: <a href="../../mesos/conf/MesosClientSettings.html" class="extype" name="com.mesosphere.mesos.conf.MesosClientSettings">MesosClientSettings</a></span>, <span name="numberOfTasks">numberOfTasks: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">KeepAliveFrameWorkSettings</span><span class="params">(<span name="clientSettings">clientSettings: <a href="../../mesos/conf/MesosClientSettings.html" class="extype" name="com.mesosphere.mesos.conf.MesosClientSettings">MesosClientSettings</a></span>, <span name="numberOfTasks">numberOfTasks: <span class="extype" name="scala.Int">Int</span></span>, <span name="role">role: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -228,9 +228,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(config:com.typesafe.config.Config):com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings"></a><a id="&lt;init&gt;:KeepAliveFrameWorkSettings"></a>
+      <a id="&lt;init&gt;(clientSettings:com.mesosphere.mesos.conf.MesosClientSettings,numberOfTasks:Int,role:String):com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings"></a><a id="&lt;init&gt;:KeepAliveFrameWorkSettings"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFrameWorkSettings.html#&lt;init&gt;(config:com.typesafe.config.Config):com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFrameWorkSettings.html#&lt;init&gt;(clientSettings:com.mesosphere.mesos.conf.MesosClientSettings,numberOfTasks:Int,role:String):com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -239,23 +239,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">KeepAliveFrameWorkSettings</span><span class="params">(<span name="config">config: <span class="extype" name="com.typesafe.config.Config">Config</span></span>)</span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(clientSettings:com.mesosphere.mesos.conf.MesosClientSettings,numberOfTasks:Int):com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings"></a><a id="&lt;init&gt;:KeepAliveFrameWorkSettings"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFrameWorkSettings.html#&lt;init&gt;(clientSettings:com.mesosphere.mesos.conf.MesosClientSettings,numberOfTasks:Int):com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">KeepAliveFrameWorkSettings</span><span class="params">(<span name="clientSettings">clientSettings: <a href="../../mesos/conf/MesosClientSettings.html" class="extype" name="com.mesosphere.mesos.conf.MesosClientSettings">MesosClientSettings</a></span>, <span name="numberOfTasks">numberOfTasks: <span class="extype" name="scala.Int">Int</span></span>)</span>
+        <span class="name">KeepAliveFrameWorkSettings</span><span class="params">(<span name="clientSettings">clientSettings: <a href="../../mesos/conf/MesosClientSettings.html" class="extype" name="com.mesosphere.mesos.conf.MesosClientSettings">MesosClientSettings</a></span>, <span name="numberOfTasks">numberOfTasks: <span class="extype" name="scala.Int">Int</span></span>, <span name="role">role: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
       </span>
       
       
@@ -513,6 +497,22 @@
       </span>
       <span class="symbol">
         <span class="name">numberOfTasks</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.helloworld.KeepAliveFrameWorkSettings#role" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="role:String"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFrameWorkSettings.html#role:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">role</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
       

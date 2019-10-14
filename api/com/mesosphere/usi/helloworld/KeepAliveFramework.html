@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.10 API  - com.mesosphere.usi.helloworld.KeepAliveFramework</title>
-          <meta name="description" content="usi 0.1.10 API - com.mesosphere.usi.helloworld.KeepAliveFramework" />
-          <meta name="keywords" content="usi 0.1.10 API com.mesosphere.usi.helloworld.KeepAliveFramework" />
+          <title>usi 0.1.12 API  - com.mesosphere.usi.helloworld.KeepAliveFramework</title>
+          <meta name="description" content="usi 0.1.12 API - com.mesosphere.usi.helloworld.KeepAliveFramework" />
+          <meta name="keywords" content="usi 0.1.12 API com.mesosphere.usi.helloworld.KeepAliveFramework" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.10 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.12 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -359,6 +359,42 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.usi.helloworld.KeepAliveFramework#end" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="end:scala.concurrent.Future[akka.Done]"></a><a id="end:Future[Done]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#end:scala.concurrent.Future[akka.Done]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">end</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="akka.Done">Done</span>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">This is the core part of this framework.</p><div class="fullcomment"><div class="comment cmt"><p>This is the core part of this framework. Source with SpecEvents is pushing events to the keepAliveWatcher,
+which pushes the pod updates to the SpecUpdates Sink:</p><p>      +-----------------------+
+      |SpecEvents Source      |
+      |(What happened to pod) |
+      +----------+------------+
+                 |
+                 v
+      +----------+------------+
+      |keepAliveWatcher       |
+      |(listens to PodFinished|
+      |events and issues      |
+      |commands to spawn new  |
+      |pods)                  |
+      +----------+------------+
+                 |
+                 v
+      +----------+------------+
+      |SpecUpdates Sink       |
+      |(commands to launch    |
+      |new pods)              |
+      +-----------------------+</p></div></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -566,6 +602,22 @@
       </span>
       <span class="symbol">
         <span class="name">podRecordRepository</span><span class="result">: <a href="../../utils/persistence/InMemoryPodRecordRepository.html" class="extype" name="com.mesosphere.utils.persistence.InMemoryPodRecordRepository">InMemoryPodRecordRepository</a></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.helloworld.KeepAliveFramework#result" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="result:akka.Done"></a><a id="result:Done"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/helloworld/KeepAliveFramework.html#result:akka.Done" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">result</span><span class="result">: <span class="extype" name="akka.Done">Done</span></span>
       </span>
       
       
