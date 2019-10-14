@@ -85,6 +85,11 @@ allprojects {
     }
     check {}
 
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
     publishing {
         publications {
             mavenJava(MavenPublication) {
@@ -92,6 +97,7 @@ allprojects {
                 version project.version
 
                 from components.java
+                artifact sourcesJar
             }
         }
         repositories {
