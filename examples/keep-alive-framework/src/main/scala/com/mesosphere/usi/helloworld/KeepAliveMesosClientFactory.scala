@@ -13,15 +13,16 @@ import scala.concurrent.Await
 /**
   * Helper that builds a Mesos client that can be used by USI
   */
-class KeepAliveMesosClientFactory(settings: MesosClientSettings, authorization: Option[CredentialsProvider])(
-    implicit system: ActorSystem,
-    mat: ActorMaterializer) {
+class KeepAliveMesosClientFactory(
+    settings: MesosClientSettings,
+    authorization: Option[CredentialsProvider],
+    role: String)(implicit system: ActorSystem, mat: ActorMaterializer) {
 
   val frameworkInfo = FrameworkInfo
     .newBuilder()
     .setUser("nobody")
     .setName("KeepAliveFramework")
-    .addRoles("test")
+    .addRoles(role)
     .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .setFailoverTimeout(0d)
     .build()
