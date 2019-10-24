@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(':metrics')
+    compile project(':metrics')
     testCompile project(':test-utils')
 
     compile group: 'com.github.vladimir-bukhtoyarov', name: 'rolling-metrics', version:  '2.0.4'
