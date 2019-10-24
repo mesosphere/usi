@@ -5,6 +5,7 @@ import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.models.StateSnapshot
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
+import com.mesosphere.usi.metrics.Metrics
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
 import scala.collection.mutable
@@ -42,7 +43,7 @@ object SchedulerLogicGraph {
   * It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
   * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
-private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialState: StateSnapshot)
+private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialState: StateSnapshot, metrics: Metrics)
     extends GraphStage[FanInShape2[SchedulerCommand, MesosEvent, SchedulerEvents]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
@@ -57,7 +58,8 @@ private[core] class SchedulerLogicGraph(mesosCallFactory: MesosCalls, initialSta
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
 
     new GraphStageLogic(shape) {
-      private[this] val handler: SchedulerLogicHandler = new SchedulerLogicHandler(mesosCallFactory, initialState)
+      private[this] val handler: SchedulerLogicHandler =
+        new SchedulerLogicHandler(mesosCallFactory, initialState, metrics)
 
       val pendingEffects: mutable.Queue[SchedulerEvents] = mutable.Queue.empty
 

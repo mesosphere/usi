@@ -14,6 +14,7 @@ import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.{commands, _}
 import com.mesosphere.usi.core.models.commands.{ExpungePod, LaunchPod, SchedulerCommand}
 import com.mesosphere.usi.core.models.template.RunTemplate
+import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
@@ -69,7 +70,9 @@ class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Op
   val podRecordRepository = InMemoryPodRecordRepository()
 
   val (stateSnapshot, source, sink) =
-    Await.result(Scheduler.asSourceAndSink(client, podRecordRepository, SchedulerSettings.load()), 10.seconds)
+    Await.result(
+      Scheduler.asSourceAndSink(client, podRecordRepository, DummyMetrics, SchedulerSettings.load()),
+      10.seconds)
 
   /**
     * This is the core part of this framework. Source with SpecEvents is pushing events to the keepAliveWatcher,

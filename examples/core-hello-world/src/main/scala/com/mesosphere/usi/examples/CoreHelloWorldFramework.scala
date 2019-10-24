@@ -15,6 +15,7 @@ import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory
 import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, StateEvent, StateSnapshot, commands}
 import com.mesosphere.usi.repository.PodRecordRepository
+import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo, TaskState, TaskStatus}
@@ -124,7 +125,9 @@ object CoreHelloWorldFramework extends StrictLogging {
       materializer: Materializer): (MesosClient, StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed]) = {
     val client: MesosClient = Await.result(MesosClient(clientSettings, frameworkInfo).runWith(Sink.head), 10.seconds)
     val (snapshot, schedulerFlow) =
-      Await.result(Scheduler.fromClient(client, podRecordRepository, SchedulerSettings.load()), 10.seconds)
+      Await.result(
+        Scheduler.fromClient(client, podRecordRepository, DummyMetrics, SchedulerSettings.load()),
+        10.seconds)
     (client, snapshot, schedulerFlow)
   }
 

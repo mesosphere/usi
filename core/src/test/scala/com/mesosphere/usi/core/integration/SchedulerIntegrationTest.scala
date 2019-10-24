@@ -13,6 +13,7 @@ import com.mesosphere.usi.core.models.resources.{RangeRequirement, ScalarRequire
 import com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
+import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import org.apache.mesos.v1.Protos
 import org.apache.mesos.v1.Protos.FrameworkInfo
@@ -32,7 +33,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
 
   lazy val mesosClient: MesosClient = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
   lazy val (snapshot, schedulerFlow) =
-    Scheduler.fromClient(mesosClient, InMemoryPodRecordRepository(), SchedulerSettings.load()).futureValue
+    Scheduler.fromClient(mesosClient, InMemoryPodRecordRepository(), DummyMetrics, SchedulerSettings.load()).futureValue
   lazy val (input, output) = commandInputSource
     .via(schedulerFlow)
     .toMat(Sink.queue())(Keep.both)

@@ -11,6 +11,7 @@ import com.mesosphere.usi.core.models.{
   RunningPodSpec,
   StateSnapshot
 }
+import com.mesosphere.usi.metrics.Metrics
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
 
 /**
@@ -70,10 +71,10 @@ import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
   * that a Mesos call will not be processed until after we store the associated PodRecord recording the offer chosen for
   * a given RunningPodSpec
   */
-private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialState: StateSnapshot) {
+private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialState: StateSnapshot, metrics: Metrics) {
 
   private val schedulerLogic = new SpecLogic(mesosCallFactory)
-  private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory)
+  private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory, metrics)
 
   /**
     * State managed by the SchedulerLogicHandler. Statuses are derived from Mesos events.
@@ -166,10 +167,13 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialS
       state.podSpecs.valuesIterator.collect { case RunningPodSpec(_, runSpec) => runSpec.role }.toSet
     val rolesNoLongerWanted = oldRoles -- currentLaunchingRoles
 
-    val reviveCalls: List[Call] = newPodSpecRoles
-      .map(r => mesosCallFactory.newRevive(Some(r)))(collection.breakOut)
+    val reviveCalls: List[Call] = newPodSpecRoles.map { r =>
+      metrics.meter(s"usi.scheduler.offers.revive.$r").mark()
+      mesosCallFactory.newRevive(Some(r))
+    }(collection.breakOut)
 
     val suppressCalls = rolesNoLongerWanted.map { r =>
+      metrics.meter(s"usi.scheduler.offers.suppress.$r").mark()
       mesosCallFactory.newSuppress(Some(r))
     }.toList
 
