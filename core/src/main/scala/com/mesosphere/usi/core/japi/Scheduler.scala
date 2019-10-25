@@ -11,6 +11,7 @@ import com.mesosphere.usi.core.models.{StateEvent, StateSnapshot}
 import com.mesosphere.usi.core.{CallerThreadExecutionContext, Scheduler => ScalaScheduler}
 import com.mesosphere.usi.metrics.Metrics
 import com.mesosphere.usi.repository.PodRecordRepository
+import org.apache.mesos.v1.Protos.DomainInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
 import scala.compat.java8.FutureConverters._
@@ -38,7 +39,7 @@ object Scheduler {
       metrics: Metrics,
       schedulerSettings: SchedulerSettings): CompletableFuture[FlowResult] = {
     val flow = javadsl.Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource)
-    fromFlow(client.calls, podRecordRepository, metrics, flow, schedulerSettings)
+    fromFlow(client.calls, podRecordRepository, metrics, flow, schedulerSettings, client.masterInfo.getDomain)
   }
 
   /**
@@ -57,10 +58,11 @@ object Scheduler {
       podRecordRepository: PodRecordRepository,
       metrics: Metrics,
       mesosFlow: javadsl.Flow[MesosCall, MesosEvent, NotUsed],
-      schedulerSettings: SchedulerSettings): CompletableFuture[FlowResult] = {
+      schedulerSettings: SchedulerSettings,
+      masterDomainInfo: DomainInfo): CompletableFuture[FlowResult] = {
 
     ScalaScheduler
-      .fromFlow(mesosCallFactory, podRecordRepository, metrics, mesosFlow.asScala, schedulerSettings)
+      .fromFlow(mesosCallFactory, podRecordRepository, metrics, mesosFlow.asScala, schedulerSettings, masterDomainInfo)
       .map {
         case (snapshot, flow) =>
           new FlowResult(snapshot, flow.asJava)

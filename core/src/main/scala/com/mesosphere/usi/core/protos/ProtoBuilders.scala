@@ -25,6 +25,15 @@ private[usi] object ProtoBuilders {
     Mesos.FrameworkID.newBuilder().setValue(id).build
   }
 
+  def newDomainInfo(region: String, zone: String): Mesos.DomainInfo = {
+    Mesos.DomainInfo.newBuilder()
+      .setFaultDomain(
+        Mesos.DomainInfo.FaultDomain.newBuilder()
+          .setRegion(Mesos.DomainInfo.FaultDomain.RegionInfo.newBuilder().setName(region))
+          .setZone(Mesos.DomainInfo.FaultDomain.ZoneInfo.newBuilder().setName(zone)))
+      .build()
+  }
+
   def newOffer(
       id: Mesos.OfferID,
       agentId: Mesos.AgentID,

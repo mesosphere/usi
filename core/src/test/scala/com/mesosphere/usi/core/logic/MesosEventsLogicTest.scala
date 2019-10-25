@@ -14,7 +14,7 @@ import org.apache.mesos.v1.{Protos => Mesos}
 
 class MesosEventsLogicTest extends UnitTest {
 
-  private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId), DummyMetrics)
+  private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId), MesosMock.masterDomainInfo, DummyMetrics)
 
   def testRunTemplate(cpus: Int = Integer.MAX_VALUE, mem: Int = 256): RunTemplate = {
     val resourceRequirements = List.newBuilder[ResourceRequirement]

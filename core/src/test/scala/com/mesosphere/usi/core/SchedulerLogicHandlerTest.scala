@@ -62,8 +62,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
 
     "ignore launch commands for podIds that already have a podRecord" in {
       Given("the scheduler logic already has launched a pod")
-      val handler =
-        new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), StateSnapshot.empty, DummyMetrics)
+      val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), MesosMock.masterDomainInfo, StateSnapshot.empty, DummyMetrics)
       handler.handleCommand(launchPod)
 
       inside(handler.handleMesosEvent(newOfferEvent(offer))) {
@@ -85,8 +84,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
     }
 
     "match a valid offer and reports a running task" in {
-      val handler =
-        new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), StateSnapshot.empty, DummyMetrics)
+      val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), MesosMock.masterDomainInfo, StateSnapshot.empty, DummyMetrics)
       handler.handleCommand(launchPod)
 
       inside(handler.handleMesosEvent(newOfferEvent(offer))) {
@@ -118,8 +116,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
 
     "emits a unrecognized podStatus and acknowledges a task status when receiving a task status for a record-less pod" in {
       Given("Scheduler logic handler with empty state")
-      val handler =
-        new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), StateSnapshot.empty, DummyMetrics)
+      val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), MesosMock.masterDomainInfo, StateSnapshot.empty, DummyMetrics)
 
       When("a task status update is received")
       val result = handler.handleMesosEvent(newTaskUpdateEvent(runningTaskStatus))
@@ -143,8 +140,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
 
     "removes unrecognized podStatuses when they become terminal" in {
       Given("Scheduler logic handler with a unrecognized podStatus state")
-      val handler =
-        new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), StateSnapshot.empty, DummyMetrics)
+      val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), MesosMock.masterDomainInfo, StateSnapshot.empty, DummyMetrics)
 
       When("a unrecognized task status update is received")
       val resultForRunningTaskStatus = handler.handleMesosEvent(newTaskUpdateEvent(runningTaskStatus))
@@ -176,8 +172,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
 
     "removes TerminalPodSpecs when they are reported terminal" in {
       Given("Scheduler logic handler with a unrecognized podStatus state")
-      val handler =
-        new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), StateSnapshot.empty, DummyMetrics)
+      val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), MesosMock.masterDomainInfo, StateSnapshot.empty, DummyMetrics)
       handler.handleMesosEvent(newTaskUpdateEvent(runningTaskStatus))
 
       And("the task status turns back to terminal")
@@ -207,8 +202,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
   "suppress and revive logic" should {
     "produces a Mesos revive call for a newly launched podSpec's role" in {
       Given("Scheduler logic handler with empty state")
-      val handler =
-        new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), StateSnapshot.empty, DummyMetrics)
+      val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), MesosMock.masterDomainInfo, StateSnapshot.empty, DummyMetrics)
       val podId = PodId("pod")
 
       When("pod with role 'test-role' is launched")
@@ -231,8 +225,7 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
 
     "produces a Mesos suppress call when all podSpecs for a given role are launched" in {
       Given("Scheduler logic handler with not launched pod")
-      val handler =
-        new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), StateSnapshot.empty, DummyMetrics)
+      val handler = new SchedulerLogicHandler(new MesosCalls(MesosMock.mockFrameworkId), MesosMock.masterDomainInfo, StateSnapshot.empty, DummyMetrics)
       val podId = PodId("pod")
       // creates not launched pod in the internal state of scheduler logic
       handler.handleCommand(commands.LaunchPod(podId, testRoleRunSpec))
