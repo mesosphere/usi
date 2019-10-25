@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.13 API  - com.mesosphere.usi.core.japi.Scheduler</title>
-          <meta name="description" content="usi 0.1.13 API - com.mesosphere.usi.core.japi.Scheduler" />
-          <meta name="keywords" content="usi 0.1.13 API com.mesosphere.usi.core.japi.Scheduler" />
+          <title>usi 0.1.14 API  - com.mesosphere.usi.core.japi.Scheduler</title>
+          <meta name="description" content="usi 0.1.14 API - com.mesosphere.usi.core.japi.Scheduler" />
+          <meta name="keywords" content="usi 0.1.14 API com.mesosphere.usi.core.japi.Scheduler" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.13 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.14 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -450,7 +450,7 @@
       
       <p class="shortcomment cmt">Constructs a USI scheduler flow to managing pods.</p><div class="fullcomment"><div class="comment cmt"><p>Constructs a USI scheduler flow to managing pods.</p><p>The input is a <span class="extype" name="javadsl.Source">javadsl.Source</span> of <span class="extype" name="SchedulerCommand">SchedulerCommand</span>. The output is a <span class="extype" name="akka.japi.Pair">akka.japi.Pair</span>
 of <span class="extype" name="StateSnapshot">StateSnapshot</span> and <span class="extype" name="javadsl.Source">javadsl.Source</span> of <span class="extype" name="StateEvent">StateEvent</span>.
-</p></div><dl class="paramcmts block"><dt class="param">client</dt><dd class="cmt"><p>The <span class="extype" name="MesosClient">MesosClient</span> used to interact with Mesos.</p></dd><dt class="param">podRecordRepository</dt><dd class="cmt"><p>The persistent backend used to recover from a crash.</p></dd><dt class="param">metrics</dt><dd class="cmt"><p>The Metrics backend.</p></dd><dt class="param">schedulerSettings</dt><dd class="cmt"><p>Settings for USI.</p></dd><dt>returns</dt><dd class="cmt"><p>A <span class="extype" name="javadsl">flow from pod specs to state events.</span></p></dd></dl></div>
+</p></div><dl class="paramcmts block"><dt class="param">client</dt><dd class="cmt"><p>The <span class="extype" name="MesosClient">MesosClient</span> used to interact with Mesos.</p></dd><dt class="param">podRecordRepository</dt><dd class="cmt"><p>The persistent backend used to recover from a crash.</p></dd><dt class="param">metrics</dt><dd class="cmt"><p>The Metrics backend.</p></dd><dt class="param">schedulerSettings</dt><dd class="cmt"><p>Settings for USI.</p></dd><dt>returns</dt><dd class="cmt"><p>A <span class="extype" name="javadsl">javadsl</span> flow from pod specs to state events.</p></dd></dl></div>
     </li><li name="com.mesosphere.usi.core.japi.Scheduler#fromFlow" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="fromFlow(mesosCallFactory:com.mesosphere.mesos.client.MesosCalls,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,metrics:com.mesosphere.usi.metrics.Metrics,mesosFlow:akka.stream.javadsl.Flow[org.apache.mesos.v1.scheduler.Protos.Call,org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed],schedulerSettings:com.mesosphere.usi.core.conf.SchedulerSettings):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.FlowResult]"></a><a id="fromFlow(MesosCalls,PodRecordRepository,Metrics,Flow[Call,Event,NotUsed],SchedulerSettings):CompletableFuture[FlowResult]"></a>
       <span class="permalink">
