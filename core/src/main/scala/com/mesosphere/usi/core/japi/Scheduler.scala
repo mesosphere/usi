@@ -30,7 +30,7 @@ object Scheduler {
     * @param podRecordRepository The persistent backend used to recover from a crash.
     * @param metrics The Metrics backend.
     * @param schedulerSettings Settings for USI.
-    * @return A [[javadsl flow from pod specs to state events.
+    * @return A [[javadsl]] flow from pod specs to state events.
     */
   def fromClient(
       client: MesosClient,
