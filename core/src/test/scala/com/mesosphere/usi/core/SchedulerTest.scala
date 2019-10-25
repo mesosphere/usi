@@ -13,6 +13,7 @@ import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.commandInputSo
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord, PodRecordUpdatedEvent, StateEvent}
 import com.mesosphere.utils.AkkaUnitTest
+import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.scalatest._
@@ -42,6 +43,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
         .unconnectedGraph(
           new MesosCalls(MesosMock.mockFrameworkId),
           InMemoryPodRecordRepository(),
+          DummyMetrics,
           SchedulerSettings.load())
         .futureValue
     Flow.fromGraph {

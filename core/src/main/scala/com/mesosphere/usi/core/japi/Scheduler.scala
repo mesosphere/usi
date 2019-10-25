@@ -9,6 +9,7 @@ import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.models.{StateEvent, StateSnapshot}
 import com.mesosphere.usi.core.{CallerThreadExecutionContext, Scheduler => ScalaScheduler}
+import com.mesosphere.usi.metrics.Metrics
 import com.mesosphere.usi.repository.PodRecordRepository
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
@@ -26,14 +27,18 @@ object Scheduler {
     * of [[StateSnapshot]] and [[javadsl.Source]] of [[StateEvent]].
     *
     * @param client The [[MesosClient]] used to interact with Mesos.
-    * @return A [[javadsl]] flow from pod specs to state events.
+    * @param podRecordRepository The persistent backend used to recover from a crash.
+    * @param metrics The Metrics backend.
+    * @param schedulerSettings Settings for USI.
+    * @return A [[javadsl flow from pod specs to state events.
     */
   def fromClient(
       client: MesosClient,
       podRecordRepository: PodRecordRepository,
+      metrics: Metrics,
       schedulerSettings: SchedulerSettings): CompletableFuture[FlowResult] = {
     val flow = javadsl.Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource)
-    fromFlow(client.calls, podRecordRepository, flow, schedulerSettings)
+    fromFlow(client.calls, podRecordRepository, metrics, flow, schedulerSettings)
   }
 
   /**
@@ -42,17 +47,20 @@ object Scheduler {
     * See [[Scheduler.fromClient()]] for a simpler constructor.
     *
     * @param mesosCallFactory A factory for construct [[MesosCall]]s.
+    * @param metrics The Metrics backend.
     * @param mesosFlow A flow from [[MesosCall]]s to [[MesosEvent]]s.
+    * @param schedulerSettings Settings for USI.
     * @return A [[javadsl]] flow from pod specs to state events.
     */
   def fromFlow(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
+      metrics: Metrics,
       mesosFlow: javadsl.Flow[MesosCall, MesosEvent, NotUsed],
       schedulerSettings: SchedulerSettings): CompletableFuture[FlowResult] = {
 
     ScalaScheduler
-      .fromFlow(mesosCallFactory, podRecordRepository, mesosFlow.asScala, schedulerSettings)
+      .fromFlow(mesosCallFactory, podRecordRepository, metrics, mesosFlow.asScala, schedulerSettings)
       .map {
         case (snapshot, flow) =>
           new FlowResult(snapshot, flow.asJava)
@@ -71,10 +79,11 @@ object Scheduler {
   def asSourceAndSink(
       client: MesosClient,
       podRecordRepository: PodRecordRepository,
+      metrics: Metrics,
       schedulerSettings: SchedulerSettings,
       materializer: Materializer): CompletableFuture[SourceAndSinkResult] = {
     ScalaScheduler
-      .asSourceAndSink(client, podRecordRepository, schedulerSettings)(materializer)
+      .asSourceAndSink(client, podRecordRepository, metrics, schedulerSettings)(materializer)
       .map {
         case (snap, source, sink) =>
           new SourceAndSinkResult(snap, source.asJava, sink.mapMaterializedValue(_.toJava.toCompletableFuture).asJava)

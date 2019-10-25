@@ -9,11 +9,12 @@ import com.mesosphere.usi.core.models.resources.{ResourceRequirement, ResourceTy
 import com.mesosphere.usi.core.models.template.{RunTemplate, SimpleRunTemplateFactory}
 import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskStatus}
 import com.mesosphere.utils.UnitTest
+import com.mesosphere.utils.metrics.DummyMetrics
 import org.apache.mesos.v1.{Protos => Mesos}
 
 class MesosEventsLogicTest extends UnitTest {
 
-  private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId))
+  private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId), DummyMetrics)
 
   def testRunTemplate(cpus: Int = Integer.MAX_VALUE, mem: Int = 256): RunTemplate = {
     val resourceRequirements = List.newBuilder[ResourceRequirement]

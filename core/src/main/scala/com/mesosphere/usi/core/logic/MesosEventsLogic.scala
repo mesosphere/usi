@@ -7,6 +7,7 @@ import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
 import com.mesosphere.usi.core.matching.{FCFSOfferMatcher, OfferMatcher}
 import com.mesosphere.usi.core.models._
+import com.mesosphere.usi.metrics.Metrics
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.apache.mesos.v1.{Protos => Mesos}
 
@@ -15,7 +16,10 @@ import scala.collection.JavaConverters._
 /**
   * The current home for USI Mesos event related logic
   */
-private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher: OfferMatcher = new FCFSOfferMatcher())
+private[core] class MesosEventsLogic(
+    mesosCallFactory: MesosCalls,
+    metrics: Metrics,
+    offerMatcher: OfferMatcher = new FCFSOfferMatcher())
     extends ImplicitStrictLogging {
 
   val podTaskIdStrategy: PodTaskIdStrategy = PodTaskIdStrategy.DefaultStrategy
@@ -58,6 +62,8 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
       )(
         LoggingArgs("offerId" -> offer.getId.getValue).and("mesosOperation" -> "DECLINE")
       )
+      metrics.meter("usi.scheduler.offer.decline").mark()
+      metrics.meter(s"usi.scheduler.offer.decline.${offer.getAgentId.getValue}").mark()
       mesosCallFactory.newDecline(Seq(offer.getId))
     } else {
       val operations = launchCommands.values.map {
@@ -81,6 +87,8 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
           newOfferOperation(Mesos.Offer.Operation.Type.LAUNCH, launch = launch)
       }
 
+      metrics.counter("usi.scheduler.operation.launch").increment(operations.size)
+
       mesosCallFactory.newAccept(
         MesosCall.Accept
           .newBuilder()
@@ -97,18 +105,28 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, offerMatcher:
     import com.mesosphere.usi.core.protos.ProtoConversions.EventMatchers._
     event match {
       case OffersEvent(offersList) =>
+        offersList.forEach { offer =>
+          metrics.meter("usi.scheduler.offers.received").mark()
+          metrics.meter(s"usi.scheduler.offers.received.${offer.getAgentId.getValue}").mark()
+        }
         val pendingLaunchPodSpecs: Map[PodId, RunningPodSpec] =
           state.podSpecs.collect { case (id, runningPodSpec: RunningPodSpec) => id -> runningPodSpec }
 
         val (schedulerEventsBuilder, _) =
           offersList.asScala.foldLeft((SchedulerEventsBuilder.empty, pendingLaunchPodSpecs)) {
             case ((builder, pending), offer) =>
-              val (matchedPodIds, offerMatchSchedulerEvents) = matchOffer(
-                offer,
-                pending.values
-              )
+              metrics.timer("usi.scheduler.offer.processing").blocking {
 
-              (builder ++ offerMatchSchedulerEvents, pending -- matchedPodIds)
+                val (matchedPodIds, offerMatchSchedulerEvents) = matchOffer(
+                  offer,
+                  pending.values
+                )
+
+                metrics.meter("usi.scheduler.offer.processed").mark()
+                metrics.meter(s"usi.scheduler.offer.processed.${offer.getAgentId.getValue}").mark()
+
+                (builder ++ offerMatchSchedulerEvents, pending -- matchedPodIds)
+              }
           }
         schedulerEventsBuilder.result
 

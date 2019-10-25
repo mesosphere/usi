@@ -7,6 +7,7 @@ import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.models.{PodRecordUpdatedEvent, StateEvent, StateSnapshot}
+import com.mesosphere.usi.metrics.Metrics
 import com.mesosphere.usi.repository.PodRecordRepository
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
@@ -64,9 +65,10 @@ object Scheduler {
   def asSourceAndSink(
       client: MesosClient,
       podRecordRepository: PodRecordRepository,
+      metrics: Metrics,
       schedulerSettings: SchedulerSettings)(implicit mat: Materializer)
     : Future[(StateSnapshot, Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]])] = {
-    fromClient(client, podRecordRepository, schedulerSettings).map {
+    fromClient(client, podRecordRepository, metrics, schedulerSettings).map {
       case (snapshot, flow) =>
         val (source, sink) = FlowHelpers.asSourceAndSink(flow)(mat)
         (snapshot, source, sink)
@@ -76,6 +78,7 @@ object Scheduler {
   private[usi] def fromClient(
       client: MesosClient,
       podRecordRepository: PodRecordRepository,
+      metrics: Metrics,
       schedulerSettings: SchedulerSettings): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
@@ -85,6 +88,7 @@ object Scheduler {
     fromFlow(
       client.calls,
       podRecordRepository,
+      metrics,
       Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource),
       schedulerSettings)
   }
@@ -92,9 +96,10 @@ object Scheduler {
   private[usi] def fromFlow(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
+      metrics: Metrics,
       mesosFlow: Flow[MesosCall, MesosEvent, Any],
       schedulerSettings: SchedulerSettings): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
-    unconnectedGraph(mesosCallFactory, podRecordRepository, schedulerSettings).map {
+    unconnectedGraph(mesosCallFactory, podRecordRepository, metrics, schedulerSettings).map {
       case (snapshot, graph) =>
         val flow = Flow.fromGraph {
           GraphDSL.create(graph, mesosFlow)((_, _) => NotUsed) { implicit builder =>
@@ -115,13 +120,14 @@ object Scheduler {
   private[core] def unconnectedGraph(
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
+      metrics: Metrics,
       schedulerSettings: SchedulerSettings)
     : Future[(StateSnapshot, BidiFlow[SchedulerCommand, StateEvent, MesosEvent, MesosCall, NotUsed])] = {
     podRecordRepository
       .readAll()
       .map { podRecords =>
         val snapshot = StateSnapshot(podRecords = podRecords.values.toSeq, agentRecords = Nil)
-        val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, snapshot)
+        val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, snapshot, metrics)
         val bidiFlow = BidiFlow.fromGraph {
           GraphDSL.create(schedulerLogicGraph) { implicit builder => (schedulerLogic) =>
             {
