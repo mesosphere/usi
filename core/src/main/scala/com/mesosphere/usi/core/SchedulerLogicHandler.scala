@@ -82,7 +82,7 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialS
   private var state: SchedulerState = SchedulerState.fromSnapshot(initialState)
 
   def handleCommand(command: SchedulerCommand): SchedulerEvents = {
-    metrics.meter(s"usi.scheduler.command.${command.getClass}").mark()
+    metrics.meter(s"usi.scheduler.command.${command.getClass.getSimpleName}").mark()
     handleFrame { builder =>
       builder.process { (state, _) =>
         schedulerLogic.handleCommand(state)(command)
