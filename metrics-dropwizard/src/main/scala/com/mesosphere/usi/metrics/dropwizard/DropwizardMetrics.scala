@@ -121,7 +121,7 @@ object DropwizardMetrics {
     constructedName match {
       case validNameRegex() =>
       case _ =>
-        throw new IllegalArgumentException(s"$name is not a valid metric name")
+        throw new IllegalArgumentException(s"$constructedName is not a valid metric name. It must only include alpha numeric characters, '.' and '-'.")
     }
     constructedName
   }
