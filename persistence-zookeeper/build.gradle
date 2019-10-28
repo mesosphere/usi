@@ -3,6 +3,4 @@ dependencies {
     compile project(':persistence')
     implementation project(':metrics')
     implementation project(':test-utils')
-
-    compile "org.scala-lang.modules:scala-async_$scalaVersion:0.9.7"
 }
