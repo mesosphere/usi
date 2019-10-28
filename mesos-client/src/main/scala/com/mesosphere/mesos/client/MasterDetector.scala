@@ -58,9 +58,13 @@ case class Zookeeper(master: String) extends MasterDetector with StrictLogging {
   }
 
   override def getMaster()(implicit ex: ExecutionContext): CompletionStage[URL] = {
-    val ZkUrl(_, servers, path) = parse() // TODO: use authentication.
+    val ZkUrl(auth, servers, path) = parse()
 
-    val client = CuratorFrameworkFactory.newClient(servers, new RetryOneTime(100))
+    val client = {
+      val clientBuilder = CuratorFrameworkFactory.builder().connectString(servers).retryPolicy(new RetryOneTime(100))
+      auth.foreach(userPassword => clientBuilder.authorization("digest", userPassword.getBytes))
+      clientBuilder.build()
+    }
     client.start()
 
     if (!client.blockUntilConnected(
