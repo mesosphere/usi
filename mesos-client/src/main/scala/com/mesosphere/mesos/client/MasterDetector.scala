@@ -15,11 +15,15 @@ import scala.async.Async.{async, await}
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 trait MasterDetector {
 
   /** @return the Mesos master URL for the cluster. */
   def getMaster()(implicit ex: ExecutionContext): CompletionStage[URL]
+
+  /** @return whether the master string is valid. */
+  def isValid(): Boolean
 }
 
 object MasterDetector {
@@ -56,6 +60,8 @@ case class Zookeeper(master: String) extends MasterDetector with StrictLogging {
   ) { (hostname, port, id, ip) =>
     Protos.MasterInfo.newBuilder().setHostname(hostname).setPort(port).setId(id).setIp(ip).build()
   }
+
+  override def isValid(): Boolean = Try(parse()).map(_ => true).getOrElse(false)
 
   override def getMaster()(implicit ex: ExecutionContext): CompletionStage[URL] = {
     val ZkUrl(auth, servers, path) = parse()
@@ -112,7 +118,9 @@ case class Zookeeper(master: String) extends MasterDetector with StrictLogging {
 }
 
 case class Standalone(master: String) extends MasterDetector {
-  val url = if (master.startsWith("http") || master.startsWith("https")) new URL(master) else new URL(s"http://$master")
+  def url = if (master.startsWith("http") || master.startsWith("https")) new URL(master) else new URL(s"http://$master")
+
+  override def isValid(): Boolean = Try(url).map(_ => true).getOrElse(false)
 
   override def getMaster()(implicit ex: ExecutionContext): CompletionStage[URL] = Future.successful(url).toJava
 }

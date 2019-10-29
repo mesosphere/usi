@@ -55,6 +55,13 @@ class MasterDetectorTest extends AkkaUnitTest with MesosClusterTest {
       Then("the path should default to /")
       result.path should be("/")
     }
+
+    "validates master strings" in {
+      MasterDetector("zk://host1:port1,host2:port2/path/to/master").isValid() should be(true)
+      MasterDetector("zk://user:pass@me@host1:port1,host2:port2/path/to/master").isValid() should be(false)
+      MasterDetector("host:port1").isValid() should be(false)
+      MasterDetector("host:5050").isValid() should be(true)
+    }
   }
 
   "The master detector" should {
