@@ -1,6 +1,6 @@
 dependencies {
     compile project(':core-models')
     compile project(':persistence')
-    implementation project(':metrics')
-    implementation project(':test-utils')
+    compile project(':metrics')
+    testCompile project(':test-utils')
 }

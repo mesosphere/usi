@@ -1,19 +1,25 @@
 package com.mesosphere.mesos
 
 import java.net.URL
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.CompletionStage
 
+import com.mesosphere.usi.metrics.Metrics
+import com.mesosphere.usi.storage.zookeeper.PersistenceStore.Node
+import com.mesosphere.usi.storage.zookeeper.{
+  AsyncCuratorBuilderFactory,
+  AsyncCuratorBuilderSettings,
+  ZooKeeperPersistenceStore
+}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.curator.framework.CuratorFrameworkFactory
 import org.apache.curator.retry.RetryOneTime
-import org.apache.curator.x.async.AsyncCuratorFramework
 import org.apache.mesos.v1.Protos
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 
 import scala.async.Async.{async, await}
-import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -39,16 +45,16 @@ object MasterDetector {
     *               zk://username:password@host1:port1,host2:port2,.../path
     * @return A master detector.
     */
-  def apply(master: String): MasterDetector = {
+  def apply(master: String, metrics: Metrics): MasterDetector = {
     if (master.startsWith("zk://")) {
-      Zookeeper(master)
+      Zookeeper(master, metrics)
     } else {
       Standalone(master)
     }
   }
 }
 
-case class Zookeeper(master: String) extends MasterDetector with StrictLogging {
+case class Zookeeper(master: String, metrics: Metrics) extends MasterDetector with StrictLogging {
   require(master.startsWith("zk://"), s"$master does not start with zk://")
 
   case class ZkUrl(auth: Option[String], servers: String, path: String)
@@ -80,19 +86,22 @@ case class Zookeeper(master: String) extends MasterDetector with StrictLogging {
       throw new IllegalStateException("Failed to connect to Zookeeper. Will exit now.")
     }
 
-    val asyncClient = AsyncCuratorFramework.wrap(client)
+    val clientSettings = AsyncCuratorBuilderSettings(createOptions = Set.empty, compressedData = false)
+    val factory: AsyncCuratorBuilderFactory = AsyncCuratorBuilderFactory(client, clientSettings)
+    val store: ZooKeeperPersistenceStore = new ZooKeeperPersistenceStore(metrics, factory, parallelism = 1)
 
     async {
-      val children = await(asyncClient.getChildren.forPath(path).toScala).asScala
+      val children = await(store.children(path, false)).get
+      logger.info(s"Found children $children")
       val leader = children.filter(_.startsWith("json.info")).min
 
       val leaderPath = s"$path/$leader"
       logger.info(s"Connecting to Zookeeper at $servers and fetching Mesos master from $leaderPath.")
 
-      val bytes = await(asyncClient.getData.forPath(leaderPath).toScala)
-      logger.info(s"Mesos leader data: ${new String(bytes)}")
+      val Node(_, bytes) = await(store.read(leaderPath)).get
+      logger.info(s"Mesos leader data: ${bytes.decodeString(StandardCharsets.UTF_8)}")
 
-      val masterInfo = Json.parse(bytes).as[Protos.MasterInfo]
+      val masterInfo = Json.parse(bytes.decodeString(StandardCharsets.UTF_8)).as[Protos.MasterInfo]
       // TODO: how do we know it's http or https.
       val url = new URL(s"http://${masterInfo.getHostname}:${masterInfo.getPort}")
       url
