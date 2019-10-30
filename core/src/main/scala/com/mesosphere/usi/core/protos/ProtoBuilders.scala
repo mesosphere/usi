@@ -26,9 +26,11 @@ private[usi] object ProtoBuilders {
   }
 
   def newDomainInfo(region: String, zone: String): Mesos.DomainInfo = {
-    Mesos.DomainInfo.newBuilder()
+    Mesos.DomainInfo
+      .newBuilder()
       .setFaultDomain(
-        Mesos.DomainInfo.FaultDomain.newBuilder()
+        Mesos.DomainInfo.FaultDomain
+          .newBuilder()
           .setRegion(Mesos.DomainInfo.FaultDomain.RegionInfo.newBuilder().setName(region))
           .setZone(Mesos.DomainInfo.FaultDomain.ZoneInfo.newBuilder().setName(zone)))
       .build()

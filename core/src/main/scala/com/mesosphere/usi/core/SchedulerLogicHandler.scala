@@ -72,7 +72,11 @@ import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
   * that a Mesos call will not be processed until after we store the associated PodRecord recording the offer chosen for
   * a given RunningPodSpec
   */
-private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, masterDomainInfo: DomainInfo, initialState: StateSnapshot, metrics: Metrics) {
+private[core] class SchedulerLogicHandler(
+    mesosCallFactory: MesosCalls,
+    masterDomainInfo: DomainInfo,
+    initialState: StateSnapshot,
+    metrics: Metrics) {
 
   private val schedulerLogic = new SpecLogic(mesosCallFactory)
   private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory, masterDomainInfo, metrics)

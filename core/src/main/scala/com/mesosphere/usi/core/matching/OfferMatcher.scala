@@ -42,13 +42,17 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) {
       case Nil =>
         result
 
-      case podSpec :: rest if !(podSpec.domainSelector(masterDomainInfo, originalOffer.getDomain)) =>
+      case podSpec :: rest if !(podSpec.domainFilter(masterDomainInfo, originalOffer.getDomain)) =>
         matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
 
       case podSpec :: rest =>
         maybeMatchResourceRequirements(remainingResources, Nil, podSpec.runSpec.allResourceRequirements) match {
           case Some((matchedResources, newRemainingResources)) =>
-            matchPodSpecsTaskRecords(originalOffer, newRemainingResources, result.updated(podSpec, matchedResources), rest)
+            matchPodSpecsTaskRecords(
+              originalOffer,
+              newRemainingResources,
+              result.updated(podSpec, matchedResources),
+              rest)
           case None =>
             matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
         }

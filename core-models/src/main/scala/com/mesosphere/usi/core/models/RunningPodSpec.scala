@@ -1,6 +1,6 @@
 package com.mesosphere.usi.core.models
 
-import com.mesosphere.usi.core.models.faultdomain.{DomainSelector, HomeRegionSelector}
+import com.mesosphere.usi.core.models.faultdomain.{DomainFilter, HomeRegionFilter}
 import com.mesosphere.usi.core.models.template.RunTemplate
 
 /**
@@ -28,6 +28,7 @@ case class TerminalPodSpec(id: PodId) extends PodSpec {
   * @param id Id of the pod
   * @param runSpec WIP the thing to run, and resource requirements, etc.
   */
-case class RunningPodSpec(id: PodId, runSpec: RunTemplate, domainSelector: DomainSelector = HomeRegionSelector) extends PodSpec {
+case class RunningPodSpec(id: PodId, runSpec: RunTemplate, domainFilter: DomainFilter = HomeRegionFilter)
+    extends PodSpec {
   override def shouldBeTerminal: Boolean = false
 }

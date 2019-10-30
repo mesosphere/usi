@@ -92,7 +92,8 @@ object Scheduler {
       metrics,
       Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource),
       schedulerSettings,
-      client.masterInfo.getDomain)
+      client.masterInfo.getDomain
+    )
   }
 
   private[usi] def fromFlow(

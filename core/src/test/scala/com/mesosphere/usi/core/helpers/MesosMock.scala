@@ -57,6 +57,7 @@ object MesosMock {
   def createMockOffer(
       cpus: Double = 4,
       mem: Double = 4096,
+      domain: Mesos.DomainInfo = masterDomainInfo
   ): Mesos.Offer = {
     newOffer(
       id = newOfferId("testing"),
@@ -64,7 +65,7 @@ object MesosMock {
       frameworkID = mockFrameworkId,
       hostname = "some-host",
       allocationInfo = newResourceAllocationInfo("some-role"),
-      domain = masterDomainInfo,
+      domain = domain,
       resources = Seq(
         newResource(
           "cpus",
