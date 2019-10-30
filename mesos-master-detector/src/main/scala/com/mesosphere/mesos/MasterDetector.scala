@@ -1,4 +1,5 @@
-package com.mesosphere.mesos.client
+package com.mesosphere.mesos
+
 import java.net.URL
 import java.util.concurrent.CompletionStage
 

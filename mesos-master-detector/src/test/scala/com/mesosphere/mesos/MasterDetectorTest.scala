@@ -1,4 +1,5 @@
-package com.mesosphere.mesos.client
+package com.mesosphere.mesos
+
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.{MesosClusterTest, MesosConfig}
 
