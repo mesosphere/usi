@@ -55,7 +55,7 @@ private[core] class MesosEventsLogic(
 
     val offerEvent = if (launchCommands.isEmpty) {
       logger.info(
-        s"Declining offer with id [{}] {}",
+        s"DELETEME@kjoshi Declining offer with id [{}] {}",
         offer.getId.getValue,
         if (specs.isEmpty) "as there are no specs to be launched"
         else s"due to unmet requirement for pods : [${specs.map(_.id.value).mkString(", ")}]"
