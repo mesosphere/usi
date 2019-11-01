@@ -6,7 +6,11 @@ import java.util.concurrent.CompletionStage
 
 import com.mesosphere.usi.metrics.Metrics
 import com.mesosphere.usi.storage.zookeeper.PersistenceStore.Node
-import com.mesosphere.usi.storage.zookeeper.{AsyncCuratorBuilderFactory, AsyncCuratorBuilderSettings, ZooKeeperPersistenceStore}
+import com.mesosphere.usi.storage.zookeeper.{
+  AsyncCuratorBuilderFactory,
+  AsyncCuratorBuilderSettings,
+  ZooKeeperPersistenceStore
+}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.curator.framework.CuratorFrameworkFactory
 import org.apache.curator.retry.RetryOneTime
