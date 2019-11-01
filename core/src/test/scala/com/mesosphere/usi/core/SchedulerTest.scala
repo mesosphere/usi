@@ -44,7 +44,8 @@ class SchedulerTest extends AkkaUnitTest with Inside {
           new MesosCalls(MesosMock.mockFrameworkId),
           InMemoryPodRecordRepository(),
           DummyMetrics,
-          SchedulerSettings.load())
+          SchedulerSettings.load(),
+          MesosMock.masterDomainInfo)
         .futureValue
     Flow.fromGraph {
       GraphDSL.create(unconnectedFlow, loggingMockMesosFlow)((_, materializedValue) => materializedValue) {

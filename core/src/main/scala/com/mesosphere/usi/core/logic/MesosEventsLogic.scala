@@ -5,7 +5,7 @@ import java.time.Instant
 import com.mesosphere.{ImplicitStrictLogging, LoggingArgs}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
-import com.mesosphere.usi.core.matching.{FCFSOfferMatcher, OfferMatcher}
+import com.mesosphere.usi.core.matching.OfferMatcher
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.metrics.Metrics
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
@@ -16,12 +16,10 @@ import scala.collection.JavaConverters._
 /**
   * The current home for USI Mesos event related logic
   */
-private[core] class MesosEventsLogic(
-    mesosCallFactory: MesosCalls,
-    metrics: Metrics,
-    offerMatcher: OfferMatcher = new FCFSOfferMatcher())
+private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, masterDomainInfo: Mesos.DomainInfo, metrics: Metrics)
     extends ImplicitStrictLogging {
 
+  val offerMatcher = new OfferMatcher(masterDomainInfo)
   val podTaskIdStrategy: PodTaskIdStrategy = PodTaskIdStrategy.DefaultStrategy
 
   private[core] def matchOffer(

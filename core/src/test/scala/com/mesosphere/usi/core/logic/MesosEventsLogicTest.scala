@@ -4,17 +4,20 @@ import com.google.protobuf.ByteString
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.SchedulerState
 import com.mesosphere.usi.core.helpers.MesosMock
+import com.mesosphere.usi.core.models.faultdomain.RegionFilter
 import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, RunningPodSpec, TaskId}
 import com.mesosphere.usi.core.models.resources.{ResourceRequirement, ResourceType, ScalarRequirement}
 import com.mesosphere.usi.core.models.template.{RunTemplate, SimpleRunTemplateFactory}
-import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newTaskStatus}
+import com.mesosphere.usi.core.protos.ProtoBuilders.{newAgentId, newDomainInfo, newTaskStatus}
 import com.mesosphere.utils.UnitTest
 import com.mesosphere.utils.metrics.DummyMetrics
 import org.apache.mesos.v1.{Protos => Mesos}
+import org.scalatest.Inside
 
-class MesosEventsLogicTest extends UnitTest {
+class MesosEventsLogicTest extends UnitTest with Inside {
 
-  private val mesosEventLogic = new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId), DummyMetrics)
+  private val mesosEventLogic =
+    new MesosEventsLogic(new MesosCalls(MesosMock.mockFrameworkId), MesosMock.masterDomainInfo, DummyMetrics)
 
   def testRunTemplate(cpus: Int = Integer.MAX_VALUE, mem: Int = 256): RunTemplate = {
     val resourceRequirements = List.newBuilder[ResourceRequirement]
@@ -50,6 +53,22 @@ class MesosEventsLogicTest extends UnitTest {
       val declines = schedulerEventsBuilder.result.mesosCalls.head.getDecline.getOfferIdsList
       declines.size() shouldBe 1
       declines.get(0) shouldEqual insufficientOffer.getId
+    }
+
+    "decline a remote region offer when the default region selector is used" in {
+      val remoteOffer =
+        MesosMock.createMockOffer(cpus = 10, mem = 1024, domain = newDomainInfo(region = "remote", zone = "a"))
+      val runTemplate = testRunTemplate(cpus = 1, mem = 256)
+      val defaultRegionPodSpec = RunningPodSpec(testPodId, runTemplate)
+      val remoteRegionPodSpec = RunningPodSpec(testPodId, runTemplate, domainFilter = RegionFilter("remote"))
+      inside(mesosEventLogic.matchOffer(remoteOffer, Seq(defaultRegionPodSpec))) {
+        case (_, schedulerEventsBuilder) =>
+          schedulerEventsBuilder.result.mesosCalls.map(_.hasAccept) shouldBe Seq(false)
+      }
+      inside(mesosEventLogic.matchOffer(remoteOffer, Seq(remoteRegionPodSpec))) {
+        case (_, schedulerEventsBuilder) =>
+          schedulerEventsBuilder.result.mesosCalls.map(_.hasAccept) shouldBe Seq(true)
+      }
     }
 
     "accept an offer when some PodSpec's resource requirements are met" in {

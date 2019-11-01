@@ -12,6 +12,7 @@ import com.mesosphere.usi.core.models.{
   StateSnapshot
 }
 import com.mesosphere.usi.metrics.Metrics
+import org.apache.mesos.v1.Protos.DomainInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
 
 /**
@@ -71,10 +72,14 @@ import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
   * that a Mesos call will not be processed until after we store the associated PodRecord recording the offer chosen for
   * a given RunningPodSpec
   */
-private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialState: StateSnapshot, metrics: Metrics) {
+private[core] class SchedulerLogicHandler(
+    mesosCallFactory: MesosCalls,
+    masterDomainInfo: DomainInfo,
+    initialState: StateSnapshot,
+    metrics: Metrics) {
 
   private val schedulerLogic = new SpecLogic(mesosCallFactory)
-  private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory, metrics)
+  private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory, masterDomainInfo, metrics)
 
   /**
     * State managed by the SchedulerLogicHandler. Statuses are derived from Mesos events.
@@ -160,12 +165,12 @@ private[core] class SchedulerLogicHandler(mesosCallFactory: MesosCalls, initialS
     val oldPodSpecIds = oldPodSpecs.keySet
     val newPodSpecRoles = state.podSpecs.valuesIterator.filterNot { podSpec =>
       oldPodSpecIds.contains(podSpec.id)
-    }.collect { case RunningPodSpec(_, runSpec) => runSpec.role }.toSet
+    }.collect { case runningPodSpec: RunningPodSpec => runningPodSpec.runSpec.role }.toSet
 
     val oldRoles: Set[String] =
-      oldPodSpecs.valuesIterator.collect { case RunningPodSpec(_, runSpec) => runSpec.role }.toSet
+      oldPodSpecs.valuesIterator.collect { case runningPodSpec: RunningPodSpec => runningPodSpec.runSpec.role }.toSet
     val currentLaunchingRoles =
-      state.podSpecs.valuesIterator.collect { case RunningPodSpec(_, runSpec) => runSpec.role }.toSet
+      state.podSpecs.valuesIterator.collect { case runningPodSpec: RunningPodSpec => runningPodSpec.runSpec.role }.toSet
     val rolesNoLongerWanted = oldRoles -- currentLaunchingRoles
 
     val reviveCalls: List[Call] = newPodSpecRoles.map { r =>

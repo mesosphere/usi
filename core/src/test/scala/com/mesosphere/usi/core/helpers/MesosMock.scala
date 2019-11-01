@@ -15,6 +15,7 @@ object MesosMock {
   import com.mesosphere.usi.core.protos.ProtoConversions._
   val mockAgentId: AgentId = AgentId("mock-agent")
   val mockFrameworkId: Mesos.FrameworkID = ProtoBuilders.newFrameworkId("mock-framework")
+  val masterDomainInfo: Mesos.DomainInfo = ProtoBuilders.newDomainInfo(region = "home", zone = "a")
 
   val flow: Flow[MesosCall, MesosEvent, NotUsed] = {
     Flow[MesosCall].async.mapConcat { call =>
@@ -56,13 +57,15 @@ object MesosMock {
   def createMockOffer(
       cpus: Double = 4,
       mem: Double = 4096,
+      domain: Mesos.DomainInfo = masterDomainInfo
   ): Mesos.Offer = {
     newOffer(
       id = newOfferId("testing"),
       agentId = mockAgentId.asProto,
       frameworkID = mockFrameworkId,
       hostname = "some-host",
-      newResourceAllocationInfo("some-role"),
+      allocationInfo = newResourceAllocationInfo("some-role"),
+      domain = domain,
       resources = Seq(
         newResource(
           "cpus",

@@ -9,6 +9,7 @@ import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.models.{PodRecordUpdatedEvent, StateEvent, StateSnapshot}
 import com.mesosphere.usi.metrics.Metrics
 import com.mesosphere.usi.repository.PodRecordRepository
+import org.apache.mesos.v1.Protos
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
@@ -90,7 +91,9 @@ object Scheduler {
       podRecordRepository,
       metrics,
       Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource),
-      schedulerSettings)
+      schedulerSettings,
+      client.masterInfo.getDomain
+    )
   }
 
   private[usi] def fromFlow(
@@ -98,8 +101,9 @@ object Scheduler {
       podRecordRepository: PodRecordRepository,
       metrics: Metrics,
       mesosFlow: Flow[MesosCall, MesosEvent, Any],
-      schedulerSettings: SchedulerSettings): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
-    unconnectedGraph(mesosCallFactory, podRecordRepository, metrics, schedulerSettings).map {
+      schedulerSettings: SchedulerSettings,
+      masterDomainInfo: Protos.DomainInfo): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
+    unconnectedGraph(mesosCallFactory, podRecordRepository, metrics, schedulerSettings, masterDomainInfo).map {
       case (snapshot, graph) =>
         val flow = Flow.fromGraph {
           GraphDSL.create(graph, mesosFlow)((_, _) => NotUsed) { implicit builder =>
@@ -121,13 +125,14 @@ object Scheduler {
       mesosCallFactory: MesosCalls,
       podRecordRepository: PodRecordRepository,
       metrics: Metrics,
-      schedulerSettings: SchedulerSettings)
+      schedulerSettings: SchedulerSettings,
+      masterDomainInfo: Protos.DomainInfo)
     : Future[(StateSnapshot, BidiFlow[SchedulerCommand, StateEvent, MesosEvent, MesosCall, NotUsed])] = {
     podRecordRepository
       .readAll()
       .map { podRecords =>
         val snapshot = StateSnapshot(podRecords = podRecords.values.toSeq, agentRecords = Nil)
-        val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, snapshot, metrics)
+        val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, masterDomainInfo, snapshot, metrics)
         val bidiFlow = BidiFlow.fromGraph {
           GraphDSL.create(schedulerLogicGraph) { implicit builder => (schedulerLogic) =>
             {

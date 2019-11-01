@@ -15,7 +15,7 @@ import akka.util.{ByteString, Timeout}
 import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.StrictLogging
 import com.mesosphere.mesos.conf.MesosClientSettings
-import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo}
+import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo, MasterInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 
 import scala.concurrent.Future
@@ -118,6 +118,8 @@ trait MesosClient {
     * terminate, for any reason, that the entire MesosClient is terminated.
     */
   def mesosSink: Sink[Call, Future[Done]]
+
+  def masterInfo: MasterInfo
 }
 
 object MesosClient extends StrictLogging with StrictLoggingFlow {
@@ -387,6 +389,8 @@ class MesosClientImpl(
   val frameworkId = subscribed.getFrameworkId
 
   val calls = new MesosCalls(frameworkId)
+
+  val masterInfo = subscribed.getMasterInfo
 
   override def killSwitch: KillSwitch = sharedKillSwitch
 
