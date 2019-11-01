@@ -22,7 +22,7 @@ import play.api.libs.json.Reads._
 import scala.async.Async.{async, await}
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 trait MasterDetector {
 
@@ -112,7 +112,8 @@ case class Zookeeper(master: String, metrics: Metrics) extends MasterDetector wi
       case Failure(t) =>
         logger.error("Failed to get Mesos master leader node from ZK: ", t)
         client.close()
-      case _ => ()
+      case Success(_) =>
+        client.close()
     }
 
     future.toJava
