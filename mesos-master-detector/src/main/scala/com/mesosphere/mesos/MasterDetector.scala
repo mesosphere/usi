@@ -6,11 +6,7 @@ import java.util.concurrent.CompletionStage
 
 import com.mesosphere.usi.metrics.Metrics
 import com.mesosphere.usi.storage.zookeeper.PersistenceStore.Node
-import com.mesosphere.usi.storage.zookeeper.{
-  AsyncCuratorBuilderFactory,
-  AsyncCuratorBuilderSettings,
-  ZooKeeperPersistenceStore
-}
+import com.mesosphere.usi.storage.zookeeper.{AsyncCuratorBuilderFactory, AsyncCuratorBuilderSettings, ZooKeeperPersistenceStore}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.curator.framework.CuratorFrameworkFactory
 import org.apache.curator.retry.RetryOneTime
@@ -22,7 +18,7 @@ import play.api.libs.json.Reads._
 import scala.async.Async.{async, await}
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
+import scala.util.{Failure, Try}
 
 trait MasterDetector {
 
@@ -90,9 +86,9 @@ case class Zookeeper(master: String, metrics: Metrics) extends MasterDetector wi
     val factory: AsyncCuratorBuilderFactory = AsyncCuratorBuilderFactory(client, clientSettings)
     val store: ZooKeeperPersistenceStore = new ZooKeeperPersistenceStore(metrics, factory, parallelism = 1)
 
-    async {
+    val future = async {
       val children = await(store.children(path, false)).get
-      logger.info(s"Found mesos leader node children $children")
+      logger.info(s"Found Mesos leader node children $children")
       val leader = children.filter(_.startsWith("json.info")).min
 
       val leaderPath = s"$path/$leader"
@@ -100,13 +96,22 @@ case class Zookeeper(master: String, metrics: Metrics) extends MasterDetector wi
 
       val Node(_, bytes) = await(store.read(leaderPath)).get
       logger.info(s"Mesos leader data: ${bytes.decodeString(StandardCharsets.UTF_8)}")
-      client.close()
 
       val masterInfo = Json.parse(bytes.decodeString(StandardCharsets.UTF_8)).as[Protos.MasterInfo]
       // TODO: how do we know it's http or https.
       val url = new URL(s"http://${masterInfo.getHostname}:${masterInfo.getPort}")
       url
-    }.toJava
+    }
+
+    // Ensure Zookeeper client ist closed.
+    future.onComplete {
+      case Failure(t) =>
+        logger.error("Failed to get Mesos master leader node from ZK: ", t)
+        client.close()
+      case _ => ()
+    }
+
+    future.toJava
   }
 
   /** @return proper Zookeeper connection string as per {@link ZooKeeper#ZooKeeper(String, int, Watcher)} etc. */
