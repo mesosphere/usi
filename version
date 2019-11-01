@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 # Version script for USI
 #
 MAJOR=0
@@ -9,7 +7,6 @@ MINOR=1
 BRANCH_POINT=8f32d291
 REF=HEAD
 CANON=origin/master
-REV=$(git rev-parse $REF)
 
 declare -a OTHERARGS
 help() {
@@ -49,6 +46,7 @@ done
 # Number of commits since branch point
 IS_DIRECT_CHILD=$( git log $CANON..$BRANCH_POINT)
 
+REV=$(git rev-parse $REF)
 MERGE_BASE=$(git merge-base $REF $CANON)
 COMMIT_NUMBER="$(git rev-list --count --first-parent $BRANCH_POINT..$MERGE_BASE)"
 COMMIT_HASH=${REV::7}
