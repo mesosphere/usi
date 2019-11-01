@@ -316,7 +316,6 @@ case class MesosCluster(
     Seq(
       "MESOS_WORK_DIR" -> mesosWorkDir.getAbsolutePath,
       "MESOS_RUNTIME_DIR" -> new File(mesosWorkDir, "runtime").getAbsolutePath,
-      "MESOS_LAUNCHER" -> "posix",
       "MESOS_CONTAINERIZERS" -> agentsConfig.containerizers,
       "MESOS_LAUNCHER" -> agentsConfig.launcher,
       "MESOS_ACLS" -> s"file://$aclsPath",
