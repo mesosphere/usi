@@ -100,6 +100,7 @@ case class Zookeeper(master: String, metrics: Metrics) extends MasterDetector wi
 
       val Node(_, bytes) = await(store.read(leaderPath)).get
       logger.info(s"Mesos leader data: ${bytes.decodeString(StandardCharsets.UTF_8)}")
+      client.close()
 
       val masterInfo = Json.parse(bytes.decodeString(StandardCharsets.UTF_8)).as[Protos.MasterInfo]
       // TODO: how do we know it's http or https.
