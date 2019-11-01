@@ -92,7 +92,7 @@ case class Zookeeper(master: String, metrics: Metrics) extends MasterDetector wi
 
     async {
       val children = await(store.children(path, false)).get
-      logger.info(s"Found children $children")
+      logger.info(s"Found mesos leader node children $children")
       val leader = children.filter(_.startsWith("json.info")).min
 
       val leaderPath = s"$path/$leader"
