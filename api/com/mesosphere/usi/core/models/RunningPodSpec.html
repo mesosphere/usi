@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.15 API  - com.mesosphere.usi.core.models.RunningPodSpec</title>
-          <meta name="description" content="usi 0.1.15 API - com.mesosphere.usi.core.models.RunningPodSpec" />
-          <meta name="keywords" content="usi 0.1.15 API com.mesosphere.usi.core.models.RunningPodSpec" />
+          <title>usi 0.1.17 API  - com.mesosphere.usi.core.models.RunningPodSpec</title>
+          <meta name="description" content="usi 0.1.17 API - com.mesosphere.usi.core.models.RunningPodSpec" />
+          <meta name="keywords" content="usi 0.1.17 API com.mesosphere.usi.core.models.RunningPodSpec" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.15 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.17 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -162,6 +162,22 @@
       </span>
       <span class="symbol">
         <a title="" href="commands/index.html"><span class="name">commands</span></a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.mesosphere.usi.core.models">models</a></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.faultdomain" visbl="pub" class="indented6 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="faultdomain"></a><a id="faultdomain:faultdomain"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#faultdomain" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="faultdomain/index.html"><span class="name">faultdomain</span></a>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.mesosphere.usi.core.models">models</a></dd></dl></div>
@@ -328,7 +344,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">RunningPodSpec</span><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>)</span><span class="result"> extends <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">RunningPodSpec</span><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>, <span name="domainFilter">domainFilter: <a href="faultdomain/DomainFilter.html" class="extype" name="com.mesosphere.usi.core.models.faultdomain.DomainFilter">DomainFilter</a> = <span class="symbol"><span class="name"><a href="../../../../index.html">HomeRegionFilter</a></span></span></span>)</span><span class="result"> extends <a href="PodSpec.html" class="extype" name="com.mesosphere.usi.core.models.PodSpec">PodSpec</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -385,9 +401,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.usi.core.models.RunningPodSpec#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(id:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate):com.mesosphere.usi.core.models.RunningPodSpec"></a><a id="&lt;init&gt;:RunningPodSpec"></a>
+      <a id="&lt;init&gt;(id:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate,domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter):com.mesosphere.usi.core.models.RunningPodSpec"></a><a id="&lt;init&gt;:RunningPodSpec"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/RunningPodSpec.html#&lt;init&gt;(id:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate):com.mesosphere.usi.core.models.RunningPodSpec" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/RunningPodSpec.html#&lt;init&gt;(id:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate,domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter):com.mesosphere.usi.core.models.RunningPodSpec" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -396,7 +412,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">RunningPodSpec</span><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>)</span>
+        <span class="name">RunningPodSpec</span><span class="params">(<span name="id">id: <a href="PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>, <span name="domainFilter">domainFilter: <a href="faultdomain/DomainFilter.html" class="extype" name="com.mesosphere.usi.core.models.faultdomain.DomainFilter">DomainFilter</a> = <span class="symbol"><span class="name"><a href="../../../../index.html">HomeRegionFilter</a></span></span></span>)</span>
       </span>
       
       <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Id of the pod</p></dd><dt class="param">runSpec</dt><dd class="cmt"><p>WIP the thing to run, and resource requirements, etc.</p></dd></dl></div>
@@ -498,6 +514,22 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.RunningPodSpec#domainFilter" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter"></a><a id="domainFilter:DomainFilter"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/RunningPodSpec.html#domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">domainFilter</span><span class="result">: <a href="faultdomain/DomainFilter.html" class="extype" name="com.mesosphere.usi.core.models.faultdomain.DomainFilter">DomainFilter</a></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">

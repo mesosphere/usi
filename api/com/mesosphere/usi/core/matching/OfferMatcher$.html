@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.15 API  - com.mesosphere.usi.core.matching.OfferMatcher</title>
-          <meta name="description" content="usi 0.1.15 API - com.mesosphere.usi.core.matching.OfferMatcher" />
-          <meta name="keywords" content="usi 0.1.15 API com.mesosphere.usi.core.matching.OfferMatcher" />
+          <title>usi 0.1.17 API  - com.mesosphere.usi.core.matching.OfferMatcher</title>
+          <meta name="description" content="usi 0.1.17 API - com.mesosphere.usi.core.matching.OfferMatcher" />
+          <meta name="keywords" content="usi 0.1.17 API com.mesosphere.usi.core.matching.OfferMatcher" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.15 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.17 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -151,16 +151,12 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
     </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="FCFSOfferMatcher.html" title="Simple first-come-first-served offer matcher implementation which tries to match RunningPodSpec one after the other, consuming resources from the Mesos.Offer (should there be enough)."></a>
-                        <a href="FCFSOfferMatcher.html" title="Simple first-come-first-served offer matcher implementation which tries to match RunningPodSpec one after the other, consuming resources from the Mesos.Offer (should there be enough).">FCFSOfferMatcher</a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
                         <a class="class" href="MesosRange.html" title=""></a>
                         <a href="MesosRange.html" title="">MesosRange</a>
                       </li><li class="current-entities indented5">
-                        <a class="object" href="" title=""></a>
-                        <a class="trait" href="OfferMatcher.html" title="Interface for the offer matcher implementations."></a>
-                        <a href="OfferMatcher.html" title="Interface for the offer matcher implementations.">OfferMatcher</a>
+                        <a class="object" href="" title="Simple first-come-first-served offer matcher implementation which tries to match RunningPodSpec one after the other, consuming resources from the Mesos.Offer (should there be enough)."></a>
+                        <a class="class" href="OfferMatcher.html" title=""></a>
+                        <a href="OfferMatcher.html" title="">OfferMatcher</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="object" href="RangeResourceMatcher$.html" title=""></a>
@@ -196,15 +192,15 @@
           <div id="content">
             <body class="object value">
       <div id="definition">
-        <a href="OfferMatcher.html" title="See companion trait"><div class="big-circle object-companion-trait">o</div></a>
+        <a href="OfferMatcher.html" title="See companion class"><div class="big-circle object-companion-class">o</div></a>
         <p id="owner"><a href="../../../../index.html" class="extype" name="com">com</a>.<a href="../../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../../index.html" class="extype" name="com.mesosphere.usi">usi</a>.<a href="../index.html" class="extype" name="com.mesosphere.usi.core">core</a>.<a href="index.html" class="extype" name="com.mesosphere.usi.core.matching">matching</a></p>
-        <h1><a href="OfferMatcher.html" title="See companion trait">OfferMatcher</a><span class="permalink">
+        <h1><a href="OfferMatcher.html" title="See companion class">OfferMatcher</a><span class="permalink">
       <a href="../../../../../com/mesosphere/usi/core/matching/OfferMatcher$.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
         <h3><span class="morelinks"><div>
-            Companion <a href="OfferMatcher.html" title="See companion trait">trait OfferMatcher</a>
+            Companion <a href="OfferMatcher.html" title="See companion class">class OfferMatcher</a>
           </div></span></h3>
       </div>
 
@@ -219,7 +215,10 @@
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Simple first-come-first-served offer matcher implementation which tries to match <span class="extype" name="RunningPodSpec">RunningPodSpec</span> one after the other,
+consuming resources from the <span class="extype" name="Mesos.Offer">Mesos.Offer</span> (should there be enough). Matcher goes over all passed specs *not*
+breaking out on the first unmatched PodSpec.
+</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
