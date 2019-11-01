@@ -107,7 +107,7 @@ case class Zookeeper(master: String, metrics: Metrics) extends MasterDetector wi
       url
     }
 
-    // Ensure Zookeeper client ist closed.
+    // Ensure Zookeeper client is closed.
     future.onComplete {
       case Failure(t) =>
         logger.error("Failed to get Mesos master leader node from ZK: ", t)
