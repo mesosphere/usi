@@ -31,6 +31,8 @@ import scala.util.Try
   * @param imageProviders Comma-separated list of supported image providers, e.g., APPC,DOCKER.
   * @param seccompConfigDir
   * @param seccompProfileName
+  * @param executorRegistrationTimeout Defaults to one minute.
+  * @param fetcherStallTimeout Defaults to one minute and must be lower or equal to the executor registration timeout.
   */
 case class MesosAgentConfig(
     launcher: String = "posix",
@@ -38,7 +40,14 @@ case class MesosAgentConfig(
     isolation: Option[String] = None,
     imageProviders: Option[String] = None,
     seccompConfigDir: Option[String] = None,
-    seccompProfileName: Option[String] = None) {
+    seccompProfileName: Option[String] = None,
+    executorRegistrationTimeout: Duration = 1.minute,
+    fetcherStallTimeout: Duration = 1.minute) {
+
+  require(
+    executorRegistrationTimeout >= fetcherStallTimeout,
+    s"Executor registration timeout $executorRegistrationTimeout must be bigger or equal than fetcher stall timeout $fetcherStallTimeout."
+  )
 
   require(
     validSeccompConfig,
@@ -165,7 +174,9 @@ case class MesosCluster(
     Agent(
       resources = new Resources(ports = PortAllocator.portsRange(), gpus = config.agentsGpus),
       extraArgs = Seq(
-        s"--attributes=$renderedAttributes"
+        s"--attributes=$renderedAttributes",
+        s"--executor_registration_timeout=${agentsConfig.executorRegistrationTimeout.toSeconds}secs",
+        s"--fetcher_stall_timeout=${agentsConfig.fetcherStallTimeout.toSeconds}secs"
       ) ++ mesosFaultDomainAgentCmdOption.map(fd => s"--domain=$fd")
         ++ agentsConfig.seccompConfigDir.map(dir => s"--seccomp_config_dir=$dir")
         ++ agentsConfig.seccompProfileName.map(prf => s"--seccomp_profile_name=$prf")
@@ -357,7 +368,14 @@ case class MesosCluster(
   }
 
 
-  case class Agent(resources: Resources, extraArgs: Seq[String], logVerbosityLevel: Int = 0) extends Mesos {
+  /**
+    * Mesos agent closure that captures work directory, cgroups, resources etc.
+    *
+    * @param resources The resources assigned to the agent.
+    * @param extraArgs Extra dash arguments in addition to ip, hostname, post, resources, work_dir, and log level.
+    * @param logVerbosityLevel The log level for GLOG_v.
+    */
+  case class Agent(resources: Resources, extraArgs: Seq[String], logVerbosityLevel: Int = 2) extends Mesos {
     /**
       * We can only specify the cgroups_root flag if running the integration tests under Linux; on Mac OS this flag is unrecognized.
       */
@@ -377,7 +395,7 @@ case class MesosCluster(
         s"--resources=${resources.resourceString()}",
         s"--master=$masterUrl",
         s"--work_dir=${workDir.getAbsolutePath}",
-        s"""--executor_environment_variables={"GLOG_v": "2"}""") ++
+        s"""--executor_environment_variables={"GLOG_v": "$logVerbosityLevel"}""") ++
         cgroupsRootArgs ++
         extraArgs,
       cwd = None, extraEnv = mesosEnv(workDir): _*)
