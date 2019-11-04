@@ -4,14 +4,16 @@ import java.net.URL
 import akka.NotUsed
 import akka.actor.{Actor, ActorRef, ActorSystem, Props, Stash, Status}
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.stream.Materializer
 import akka.stream.scaladsl.Flow
 import akka.util.Timeout
 import com.typesafe.scalalogging.StrictLogging
 
+import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future, TimeoutException}
 import scala.util.{Failure, Success}
 
 /**
@@ -25,7 +27,7 @@ import scala.util.{Failure, Success}
   * @param authorization A [[CredentialsProvider]] if the connection is secured.
   */
 case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None)(
-    implicit askTimout: Timeout) {
+    implicit askTimout: Timeout) extends StrictLogging {
 
   /**
     * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
@@ -52,6 +54,28 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
         Flow[Array[Byte]].map(createPostRequest(_, None)).via(connection)
     }
 
+  private def poolSettings():Future[ConnectionPoolSettings] = Future {
+    // Constructs the connection pool settings with defaults and overrides the max connections and pipelining limit so
+    // that only one request at a time is processed. See https://doc.akka.io/docs/akka-http/current/configuration.html
+    // for details.
+    // *IMPORTANT*: DO NOT CHANGE maxConnections OR pipeliningLimit! Otherwise, USI won't guarantee request order to Mesos!
+    ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
+  }(ExecutionContext.global)
+
+  private def poolSettingsWithTimeout():ConnectionPoolSettings = {
+    // We create the pool settings with a timeout: It seems by default, the creation of the settings requires a reverse
+    // dns lookup, which may take more than 5 seconds which triggers the akka streams subscription timeout.
+    // If we let the creation here take the full time, we won't start without any reasonable logging message
+    try {
+      Await.result(poolSettings(), 2.seconds)
+    } catch {
+      case e: TimeoutException => {
+        logger.error("Failed to create ConnectionPoolSettings. Is your reverse DNS lookup slow?", e)
+        throw e
+      }
+    }
+  }
+
   /**
     * A connection flow factory that will create a flow that only processes one request at a time.
     *
@@ -60,19 +84,15 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     * @return A connection flow for single requests.
     */
   private def connection(implicit system: ActorSystem, mat: Materializer): Flow[HttpRequest, HttpResponse, NotUsed] = {
-    // Constructs the connection pool settings with defaults and overrides the max connections and pipelining limit so
-    // that only one request at a time is processed. See https://doc.akka.io/docs/akka-http/current/configuration.html
-    // for details.
-    // *IMPORTANT*: DO NOT CHANGE maxConnections OR pipeliningLimit! Otherwise, USI won't guarantee request order to Mesos!
-    val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
+    val settings = poolSettingsWithTimeout()
 
     Flow[HttpRequest]
       .map(_ -> NotUsed)
       .via(if (Session.isSecured(url)) {
         Http()
-          .newHostConnectionPoolHttps(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings)
+          .newHostConnectionPoolHttps(host = url.getHost, port = Session.effectivePort(url), settings = settings)
       } else {
-        Http().newHostConnectionPool(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings)
+        Http().newHostConnectionPool(host = url.getHost, port = Session.effectivePort(url), settings = settings)
       })
       .map {
         case (Success(response), NotUsed) => response
