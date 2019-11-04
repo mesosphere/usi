@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.17 API  - com.mesosphere.utils.mesos.MesosCluster</title>
-          <meta name="description" content="usi 0.1.17 API - com.mesosphere.utils.mesos.MesosCluster" />
-          <meta name="keywords" content="usi 0.1.17 API com.mesosphere.utils.mesos.MesosCluster" />
+          <title>usi 0.1.18 API  - com.mesosphere.utils.mesos.MesosCluster</title>
+          <meta name="description" content="usi 0.1.18 API - com.mesosphere.utils.mesos.MesosCluster" />
+          <meta name="keywords" content="usi 0.1.18 API com.mesosphere.utils.mesos.MesosCluster" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.17 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.18 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -282,7 +282,7 @@ number of masters/agents.
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.mesosphere.utils.mesos.MesosCluster.Agent" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+              <ol><li name="com.mesosphere.utils.mesos.MesosCluster.Agent" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="AgentextendsMesosCluster.this.MesoswithProductwithSerializable"></a><a id="Agent:Agent"></a>
       <span class="permalink">
       <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#AgentextendsMesosCluster.this.MesoswithProductwithSerializable" title="Permalink">
@@ -294,10 +294,11 @@ number of masters/agents.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="" href="MesosCluster$Agent.html"><span class="name">Agent</span></a><span class="params">(<span name="resources">resources: <a href="MesosCluster$Resources.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Resources">Resources</a></span>, <span name="extraArgs">extraArgs: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="logVerbosityLevel">logVerbosityLevel: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Mesos agent closure that captures work directory, cgroups, resources etc." href="MesosCluster$Agent.html"><span class="name">Agent</span></a><span class="params">(<span name="resources">resources: <a href="MesosCluster$Resources.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Resources">Resources</a></span>, <span name="extraArgs">extraArgs: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="logVerbosityLevel">logVerbosityLevel: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">2</span></span>)</span><span class="result"> extends <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
-      
+      <p class="shortcomment cmt">Mesos agent closure that captures work directory, cgroups, resources etc.</p><div class="fullcomment"><div class="comment cmt"><p>Mesos agent closure that captures work directory, cgroups, resources etc.
+</p></div><dl class="paramcmts block"><dt class="param">resources</dt><dd class="cmt"><p>The resources assigned to the agent.</p></dd><dt class="param">extraArgs</dt><dd class="cmt"><p>Extra dash arguments in addition to ip, hostname, post, resources, work_dir, and log level.</p></dd><dt class="param">logVerbosityLevel</dt><dd class="cmt"><p>The log level for GLOG_v.</p></dd></dl></div>
     </li><li name="com.mesosphere.utils.mesos.MesosCluster.Master" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="MasterextendsMesosCluster.this.MesoswithProductwithSerializable"></a><a id="Master:Master"></a>
       <span class="permalink">

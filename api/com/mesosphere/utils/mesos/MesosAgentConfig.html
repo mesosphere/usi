@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.17 API  - com.mesosphere.utils.mesos.MesosAgentConfig</title>
-          <meta name="description" content="usi 0.1.17 API - com.mesosphere.utils.mesos.MesosAgentConfig" />
-          <meta name="keywords" content="usi 0.1.17 API com.mesosphere.utils.mesos.MesosAgentConfig" />
+          <title>usi 0.1.18 API  - com.mesosphere.utils.mesos.MesosAgentConfig</title>
+          <meta name="description" content="usi 0.1.18 API - com.mesosphere.utils.mesos.MesosAgentConfig" />
+          <meta name="keywords" content="usi 0.1.18 API com.mesosphere.utils.mesos.MesosAgentConfig" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.17 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.18 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -204,7 +204,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">MesosAgentConfig</span><span class="params">(<span name="launcher">launcher: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;posix&quot;</span></span>, <span name="containerizers">containerizers: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;mesos&quot;</span></span>, <span name="isolation">isolation: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="imageProviders">imageProviders: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="seccompConfigDir">seccompConfigDir: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="seccompProfileName">seccompProfileName: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">MesosAgentConfig</span><span class="params">(<span name="launcher">launcher: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;posix&quot;</span></span>, <span name="containerizers">containerizers: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;mesos&quot;</span></span>, <span name="isolation">isolation: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="imageProviders">imageProviders: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="seccompConfigDir">seccompConfigDir: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="seccompProfileName">seccompProfileName: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="executorRegistrationTimeout">executorRegistrationTimeout: <span class="extype" name="scala.concurrent.duration.Duration">Duration</span> = <span class="symbol">1.minute</span></span>, <span name="fetcherStallTimeout">fetcherStallTimeout: <span class="extype" name="scala.concurrent.duration.Duration">Duration</span> = <span class="symbol">1.minute</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -212,7 +212,7 @@
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Mesos gent configuration parameters. For more information see
 [Mesos documentation](http://mesos.apache.org/documentation/latest/configuration/agent/)
 </p></div><dl class="paramcmts block"><dt class="param">launcher</dt><dd class="cmt"><p>The launcher to be used for Mesos containerizer. It could either be linux or posix</p></dd><dt class="param">containerizers</dt><dd class="cmt"><p>Comma-separated list of containerizer implementations to compose in order to provide containerization.
-                      Available options are mesos and docker (on Linux).</p></dd><dt class="param">isolation</dt><dd class="cmt"><p>isolation mechanisms to use, e.g., posix/cpu,posix/mem</p></dd><dt class="param">imageProviders</dt><dd class="cmt"><p>Comma-separated list of supported image providers, e.g., APPC,DOCKER.</p></dd></dl><div class="toggleContainer block">
+                      Available options are mesos and docker (on Linux).</p></dd><dt class="param">isolation</dt><dd class="cmt"><p>isolation mechanisms to use, e.g., posix/cpu,posix/mem</p></dd><dt class="param">imageProviders</dt><dd class="cmt"><p>Comma-separated list of supported image providers, e.g., APPC,DOCKER.</p></dd><dt class="param">executorRegistrationTimeout</dt><dd class="cmt"><p>Defaults to one minute.</p></dd><dt class="param">fetcherStallTimeout</dt><dd class="cmt"><p>Defaults to one minute and must be lower or equal to the executor registration timeout.</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -263,9 +263,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.mesosphere.utils.mesos.MesosAgentConfig#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(launcher:String,containerizers:String,isolation:Option[String],imageProviders:Option[String],seccompConfigDir:Option[String],seccompProfileName:Option[String]):com.mesosphere.utils.mesos.MesosAgentConfig"></a><a id="&lt;init&gt;:MesosAgentConfig"></a>
+      <a id="&lt;init&gt;(launcher:String,containerizers:String,isolation:Option[String],imageProviders:Option[String],seccompConfigDir:Option[String],seccompProfileName:Option[String],executorRegistrationTimeout:scala.concurrent.duration.Duration,fetcherStallTimeout:scala.concurrent.duration.Duration):com.mesosphere.utils.mesos.MesosAgentConfig"></a><a id="&lt;init&gt;:MesosAgentConfig"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosAgentConfig.html#&lt;init&gt;(launcher:String,containerizers:String,isolation:Option[String],imageProviders:Option[String],seccompConfigDir:Option[String],seccompProfileName:Option[String]):com.mesosphere.utils.mesos.MesosAgentConfig" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosAgentConfig.html#&lt;init&gt;(launcher:String,containerizers:String,isolation:Option[String],imageProviders:Option[String],seccompConfigDir:Option[String],seccompProfileName:Option[String],executorRegistrationTimeout:scala.concurrent.duration.Duration,fetcherStallTimeout:scala.concurrent.duration.Duration):com.mesosphere.utils.mesos.MesosAgentConfig" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -274,11 +274,11 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">MesosAgentConfig</span><span class="params">(<span name="launcher">launcher: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;posix&quot;</span></span>, <span name="containerizers">containerizers: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;mesos&quot;</span></span>, <span name="isolation">isolation: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="imageProviders">imageProviders: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="seccompConfigDir">seccompConfigDir: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="seccompProfileName">seccompProfileName: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>)</span>
+        <span class="name">MesosAgentConfig</span><span class="params">(<span name="launcher">launcher: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;posix&quot;</span></span>, <span name="containerizers">containerizers: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;mesos&quot;</span></span>, <span name="isolation">isolation: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="imageProviders">imageProviders: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="seccompConfigDir">seccompConfigDir: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="seccompProfileName">seccompProfileName: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>, <span name="executorRegistrationTimeout">executorRegistrationTimeout: <span class="extype" name="scala.concurrent.duration.Duration">Duration</span> = <span class="symbol">1.minute</span></span>, <span name="fetcherStallTimeout">fetcherStallTimeout: <span class="extype" name="scala.concurrent.duration.Duration">Duration</span> = <span class="symbol">1.minute</span></span>)</span>
       </span>
       
       <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">launcher</dt><dd class="cmt"><p>The launcher to be used for Mesos containerizer. It could either be linux or posix</p></dd><dt class="param">containerizers</dt><dd class="cmt"><p>Comma-separated list of containerizer implementations to compose in order to provide containerization.
-                      Available options are mesos and docker (on Linux).</p></dd><dt class="param">isolation</dt><dd class="cmt"><p>isolation mechanisms to use, e.g., posix/cpu,posix/mem</p></dd><dt class="param">imageProviders</dt><dd class="cmt"><p>Comma-separated list of supported image providers, e.g., APPC,DOCKER.</p></dd></dl></div>
+                      Available options are mesos and docker (on Linux).</p></dd><dt class="param">isolation</dt><dd class="cmt"><p>isolation mechanisms to use, e.g., posix/cpu,posix/mem</p></dd><dt class="param">imageProviders</dt><dd class="cmt"><p>Comma-separated list of supported image providers, e.g., APPC,DOCKER.</p></dd><dt class="param">executorRegistrationTimeout</dt><dd class="cmt"><p>Defaults to one minute.</p></dd><dt class="param">fetcherStallTimeout</dt><dd class="cmt"><p>Defaults to one minute and must be lower or equal to the executor registration timeout.</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -409,6 +409,38 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosAgentConfig#executorRegistrationTimeout" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="executorRegistrationTimeout:scala.concurrent.duration.Duration"></a><a id="executorRegistrationTimeout:Duration"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosAgentConfig.html#executorRegistrationTimeout:scala.concurrent.duration.Duration" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">executorRegistrationTimeout</span><span class="result">: <span class="extype" name="scala.concurrent.duration.Duration">Duration</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.utils.mesos.MesosAgentConfig#fetcherStallTimeout" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="fetcherStallTimeout:scala.concurrent.duration.Duration"></a><a id="fetcherStallTimeout:Duration"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosAgentConfig.html#fetcherStallTimeout:scala.concurrent.duration.Duration" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fetcherStallTimeout</span><span class="result">: <span class="extype" name="scala.concurrent.duration.Duration">Duration</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">

@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.17 API  - com.mesosphere.utils.mesos.MesosCluster.Agent</title>
-          <meta name="description" content="usi 0.1.17 API - com.mesosphere.utils.mesos.MesosCluster.Agent" />
-          <meta name="keywords" content="usi 0.1.17 API com.mesosphere.utils.mesos.MesosCluster.Agent" />
+          <title>usi 0.1.18 API  - com.mesosphere.utils.mesos.MesosCluster.Agent</title>
+          <meta name="description" content="usi 0.1.18 API - com.mesosphere.utils.mesos.MesosCluster.Agent" />
+          <meta name="keywords" content="usi 0.1.18 API com.mesosphere.utils.mesos.MesosCluster.Agent" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.17 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.18 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -154,8 +154,8 @@ number of masters/agents.
 </p></div><dl class="paramcmts block"><dt class="param">suiteName</dt><dd class="cmt"><p>suite name that uses the cluster. will be included into logging messages</p></dd><dt class="param">masterUrl</dt><dd class="cmt"><p>Mesos master ZK url in the form of zk://zk-1/mesos</p></dd><dt class="param">autoStart</dt><dd class="cmt"><p>if true, the cluster will be started automatically</p></dd><dt class="param">config</dt><dd class="cmt"><p>Mesos master configuration</p></dd><dt class="param">agentsConfig</dt><dd class="cmt"><p>Mesos agent configuration</p></dd><dt class="param">waitForMesosTimeout</dt><dd class="cmt"><p>time to wait for Mesos master/agent to start</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.mesosphere.utils.mesos">mesos</a></dd></dl></div>
     </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="" title=""></a>
-                        <a href="" title="">Agent</a>
+                        <a class="class" href="" title="Mesos agent closure that captures work directory, cgroups, resources etc."></a>
+                        <a href="" title="Mesos agent closure that captures work directory, cgroups, resources etc.">Agent</a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="class" href="MesosCluster$Master.html" title=""></a>
@@ -195,12 +195,13 @@ number of masters/agents.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">Agent</span><span class="params">(<span name="resources">resources: <a href="MesosCluster$Resources.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Resources">Resources</a></span>, <span name="extraArgs">extraArgs: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="logVerbosityLevel">logVerbosityLevel: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span><span class="result"> extends <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">Agent</span><span class="params">(<span name="resources">resources: <a href="MesosCluster$Resources.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Resources">Resources</a></span>, <span name="extraArgs">extraArgs: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="logVerbosityLevel">logVerbosityLevel: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">2</span></span>)</span><span class="result"> extends <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Mesos agent closure that captures work directory, cgroups, resources etc.
+</p></div><dl class="paramcmts block"><dt class="param">resources</dt><dd class="cmt"><p>The resources assigned to the agent.</p></dd><dt class="param">extraArgs</dt><dd class="cmt"><p>Extra dash arguments in addition to ip, hostname, post, resources, work_dir, and log level.</p></dd><dt class="param">logVerbosityLevel</dt><dd class="cmt"><p>The log level for GLOG_v.</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -250,7 +251,7 @@ number of masters/agents.
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.mesosphere.utils.mesos.MesosCluster.Agent#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+              <ol><li name="com.mesosphere.utils.mesos.MesosCluster.Agent#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="&lt;init&gt;(resources:MesosCluster.this.Resources,extraArgs:Seq[String],logVerbosityLevel:Int):MesosCluster.this.Agent"></a><a id="&lt;init&gt;:Agent"></a>
       <span class="permalink">
       <a href="../../../../com/mesosphere/utils/mesos/MesosCluster$Agent.html#&lt;init&gt;(resources:MesosCluster.this.Resources,extraArgs:Seq[String],logVerbosityLevel:Int):MesosCluster.this.Agent" title="Permalink">
@@ -262,10 +263,10 @@ number of masters/agents.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Agent</span><span class="params">(<span name="resources">resources: <a href="MesosCluster$Resources.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Resources">Resources</a></span>, <span name="extraArgs">extraArgs: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="logVerbosityLevel">logVerbosityLevel: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>)</span>
+        <span class="name">Agent</span><span class="params">(<span name="resources">resources: <a href="MesosCluster$Resources.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Resources">Resources</a></span>, <span name="extraArgs">extraArgs: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="logVerbosityLevel">logVerbosityLevel: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">2</span></span>)</span>
       </span>
       
-      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">resources</dt><dd class="cmt"><p>The resources assigned to the agent.</p></dd><dt class="param">extraArgs</dt><dd class="cmt"><p>Extra dash arguments in addition to ip, hostname, post, resources, work_dir, and log level.</p></dd><dt class="param">logVerbosityLevel</dt><dd class="cmt"><p>The log level for GLOG_v.</p></dd></dl></div>
     </li></ol>
             </div>
 
