@@ -41,11 +41,11 @@ case class MesosAgentConfig(
     imageProviders: Option[String] = None,
     seccompConfigDir: Option[String] = None,
     seccompProfileName: Option[String] = None,
-    executorRegistrationTimeout: Option[Duration] = None,
-    fetcherStallTimeout: Option[Duration] = None) {
+    executorRegistrationTimeout: Duration = 1.minute,
+    fetcherStallTimeout: Duration = 1.minute) {
 
   require(
-    executorRegistrationTimeout.getOrElse(1.minute) >= fetcherStallTimeout.getOrElse(1.minute),
+    executorRegistrationTimeout >= fetcherStallTimeout,
     s"Executor registration timeout $executorRegistrationTimeout must be bigger or equal than fetcher stall timeout $fetcherStallTimeout."
   )
 
@@ -174,12 +174,12 @@ case class MesosCluster(
     Agent(
       resources = new Resources(ports = PortAllocator.portsRange(), gpus = config.agentsGpus),
       extraArgs = Seq(
-        s"--attributes=$renderedAttributes"
+        s"--attributes=$renderedAttributes",
+        s"--executor_registration_timeout=${agentsConfig.executorRegistrationTimeout.toSeconds}secs",
+        s"--fetcher_stall_timeout=${agentsConfig.fetcherStallTimeout.toSeconds}secs"
       ) ++ mesosFaultDomainAgentCmdOption.map(fd => s"--domain=$fd")
         ++ agentsConfig.seccompConfigDir.map(dir => s"--seccomp_config_dir=$dir")
         ++ agentsConfig.seccompProfileName.map(prf => s"--seccomp_profile_name=$prf")
-        ++ agentsConfig.executorRegistrationTimeout.map(t => s"--executor_registration_timeout=${t.toSeconds}secs")
-        ++ agentsConfig.fetcherStallTimeout.map(t => s"--fetcher_stall_timeout=${t.toSeconds}secs")
     )
   }
 
