@@ -44,8 +44,10 @@ case class MesosAgentConfig(
     executorRegistrationTimeout: Option[Duration] = None,
     fetcherStallTimeout: Option[Duration] = None) {
 
-  require(executorRegistrationTimeout.getOrElse(1.minute) >= fetcherStallTimeout.getOrElse(1.minute),
-    s"Executor registration timeout $executorRegistrationTimeout must be bigger than fetcher stall timout $fetcherStallTimeout.")
+  require(
+    executorRegistrationTimeout.getOrElse(1.minute) >= fetcherStallTimeout.getOrElse(1.minute),
+    s"Executor registration timeout $executorRegistrationTimeout must be bigger than fetcher stall timout $fetcherStallTimeout."
+  )
 
   require(
     validSeccompConfig,
