@@ -12,7 +12,7 @@ import com.mesosphere.usi.core.models.commands.LaunchPod
 import com.mesosphere.usi.core.models.resources.{RangeRequirement, ScalarRequirement}
 import com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory
 import com.mesosphere.utils.AkkaUnitTest
-import com.mesosphere.utils.mesos.MesosClusterTest
+import com.mesosphere.utils.mesos.{MesosAgentConfig, MesosClusterTest}
 import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import org.apache.mesos.v1.Protos

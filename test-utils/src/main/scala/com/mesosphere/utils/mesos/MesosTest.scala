@@ -179,7 +179,7 @@ case class MesosCluster(
         ++ agentsConfig.seccompConfigDir.map(dir => s"--seccomp_config_dir=$dir")
         ++ agentsConfig.seccompProfileName.map(prf => s"--seccomp_profile_name=$prf")
         ++ agentsConfig.executorRegistrationTimeout.map(t => s"--executor_registration_timeout=${t.toMinutes}")
-        ++ agentsConfig.fetcherStallTimeout.map(t => s"fetcher_stall_timeout=${t.toMinutes}")
+        ++ agentsConfig.fetcherStallTimeout.map(t => s"--fetcher_stall_timeout=${t.toMinutes}")
     )
   }
 
