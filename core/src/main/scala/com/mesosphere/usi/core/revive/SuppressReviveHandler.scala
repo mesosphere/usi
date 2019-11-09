@@ -5,6 +5,7 @@ import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{Flow, Source}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.models.{PodId, PodSpecUpdatedEvent, RunningPodSpec, TerminalPodSpec}
+import com.mesosphere.usi.core.revive.SuppressReviveHandler.Role
 import com.mesosphere.usi.core.util.RateLimiterFlow
 import com.mesosphere.usi.metrics.{Counter, Metrics}
 import com.typesafe.scalalogging.StrictLogging
@@ -14,7 +15,7 @@ import org.apache.mesos.v1.scheduler.Protos.Call
 import scala.concurrent.duration.FiniteDuration
 import scala.collection.JavaConverters._
 
-class SuppressReviveHandler(initialFrameworkInfo: Mesos.FrameworkInfo, metrics: Metrics, mesosCallFactory: MesosCalls, defaultRole: String) extends StrictLogging {
+class SuppressReviveHandler(initialFrameworkInfo: Mesos.FrameworkInfo, metrics: Metrics, mesosCallFactory: MesosCalls, defaultRole: String, minReviveOffersInterval: FiniteDuration) extends StrictLogging {
   import SuppressReviveHandler._
 
   private[this] val reviveCountMetric: Counter = metrics.counter("usi.mesos.calls.revive")
@@ -38,27 +39,21 @@ class SuppressReviveHandler(initialFrameworkInfo: Mesos.FrameworkInfo, metrics: 
     *
     * Revive rate is throttled and debounced using minReviveOffersInterval
     *
-    * @param minReviveOffersInterval - The maximum rate at which we allow suppress and revive commands to be applied
     * @return
     */
-  def suppressAndReviveFlow(
-      minReviveOffersInterval: FiniteDuration,
-      defaultRole: Role): Flow[PodSpecUpdatedEvent, RoleDirective, NotUsed] = {
+  private[revive] val suppressAndReviveFlow: Flow[PodSpecUpdatedEvent, RoleDirective, NotUsed] = {
 
     reviveStateFromPodSpecs
-      .map(l => { logger.info(s"DELETEME Input before buffing: ${l}"); l })
       .buffer(1, OverflowStrategy.dropHead) // While we are back-pressured, we drop older interim frames
       .via(RateLimiterFlow(minReviveOffersInterval))
       .via(reviveDirectiveFlow)
       .map(l => { logger.info(s"Issuing following suppress/revive directives: = ${l}"); l })
   }
 
-  val reviveDirectiveFlow: Flow[Map[Role, Set[PodId]], RoleDirective, NotUsed] = {
+  private[revive] val reviveDirectiveFlow: Flow[Map[Role, Set[PodId]], RoleDirective, NotUsed] = {
     Flow[Map[Role, Set[PodId]]]
-      .map(l => { logger.info(s"DELETEME state is ${l}"); l })
       .prepend(Source.single(Map.empty[Role, Set[PodId]]))
       .sliding(2)
-      .map(l => { logger.info(s"DELETEME sliding state is ${l}"); l })
       .mapConcat({
         case Seq(lastState, newState) =>
           directivesForDiff(lastState, newState)
@@ -92,7 +87,7 @@ class SuppressReviveHandler(initialFrameworkInfo: Mesos.FrameworkInfo, metrics: 
     }
   }
 
-  val reviveSuppressMetrics: Flow[RoleDirective, RoleDirective, NotUsed] = Flow[RoleDirective].map {
+  private [revive] val reviveSuppressMetrics: Flow[RoleDirective, RoleDirective, NotUsed] = Flow[RoleDirective].map {
     case directive @ UpdateFramework(_, newlyRevived, newlySuppressed) =>
       newlyRevived.foreach { _ => reviveCountMetric.increment() }
       newlySuppressed.foreach { _ => suppressCountMetric.increment() }
@@ -107,8 +102,8 @@ class SuppressReviveHandler(initialFrameworkInfo: Mesos.FrameworkInfo, metrics: 
   /**
     * Flow which applies the RoleDirectives, recording the appropriate metrics and emitting the corresponding Mesos calls
     */
-  val applyDirectivesFlow: Flow[RoleDirective, Call, NotUsed] = {
-    Flow[RoleDirective].via(reviveSuppressMetrics).map(directiveToMesosCall)
+  val flow: Flow[PodSpecUpdatedEvent, Call, NotUsed] = {
+    suppressAndReviveFlow.via(reviveSuppressMetrics).map(directiveToMesosCall)
   }
 
   private def offersNotWantedRoles(state: Map[Role, Set[PodId]]): Set[Role] =

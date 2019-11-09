@@ -40,7 +40,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
   def mockedScheduler: Flow[SchedulerCommand, StateEvent, Future[Done]] = {
     val (_, unconnectedFlow) =
       Scheduler
-        .unconnectedGraph(
+        .schedulerGraph(
           new MesosCalls(MesosMock.mockFrameworkId),
           InMemoryPodRecordRepository(),
           DummyMetrics,
