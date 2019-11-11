@@ -8,7 +8,7 @@ import akka.stream.{ActorMaterializer, KillSwitch, Materializer}
 import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
-import com.mesosphere.usi.core.Scheduler
+import com.mesosphere.usi.core.SchedulerFactory
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.commands.{LaunchPod, SchedulerCommand}
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
@@ -124,10 +124,9 @@ object CoreHelloWorldFramework extends StrictLogging {
       implicit system: ActorSystem,
       materializer: Materializer): (MesosClient, StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed]) = {
     val client: MesosClient = Await.result(MesosClient(clientSettings, frameworkInfo).runWith(Sink.head), 10.seconds)
+    val factory = new SchedulerFactory(client, InMemoryPodRecordRepository(), SchedulerSettings.load(), DummyMetrics)
     val (snapshot, schedulerFlow) =
-      Await.result(
-        Scheduler.fromClient(client, podRecordRepository, DummyMetrics, SchedulerSettings.load()),
-        10.seconds)
+      Await.result(factory.newSchedulerFlow(), 10.seconds)
     (client, snapshot, schedulerFlow)
   }
 

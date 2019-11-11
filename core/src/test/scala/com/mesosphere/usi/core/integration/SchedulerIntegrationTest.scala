@@ -4,13 +4,13 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
-import com.mesosphere.usi.core.Scheduler
+import com.mesosphere.usi.core.SchedulerFactory
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.commandInputSource
-import com.mesosphere.usi.core.models.{commands, _}
 import com.mesosphere.usi.core.models.commands.LaunchPod
 import com.mesosphere.usi.core.models.resources.{RangeRequirement, ScalarRequirement}
 import com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory
+import com.mesosphere.usi.core.models.{commands, _}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.metrics.DummyMetrics
@@ -32,8 +32,9 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     .build()
 
   lazy val mesosClient: MesosClient = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
+  val factory = new SchedulerFactory(mesosClient, InMemoryPodRecordRepository(), SchedulerSettings.load(), DummyMetrics)
   lazy val (snapshot, schedulerFlow) =
-    Scheduler.fromClient(mesosClient, InMemoryPodRecordRepository(), DummyMetrics, SchedulerSettings.load()).futureValue
+    factory.newSchedulerFlow().futureValue
   lazy val (input, output) = commandInputSource
     .via(schedulerFlow)
     .toMat(Sink.queue())(Keep.both)

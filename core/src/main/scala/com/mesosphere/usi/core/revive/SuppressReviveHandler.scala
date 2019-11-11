@@ -5,50 +5,39 @@ import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{Flow, Source}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.models.{PodId, PodSpecUpdatedEvent, RunningPodSpec, TerminalPodSpec}
-import com.mesosphere.usi.core.revive.SuppressReviveHandler.Role
 import com.mesosphere.usi.core.util.RateLimiterFlow
 import com.mesosphere.usi.metrics.{Counter, Metrics}
 import com.typesafe.scalalogging.StrictLogging
-import org.apache.mesos.v1.{Protos => Mesos}
 import org.apache.mesos.v1.scheduler.Protos.Call
+import org.apache.mesos.v1.{Protos => Mesos}
 
-import scala.concurrent.duration.FiniteDuration
 import scala.collection.JavaConverters._
+import scala.concurrent.duration.FiniteDuration
 
-class SuppressReviveHandler(initialFrameworkInfo: Mesos.FrameworkInfo, metrics: Metrics, mesosCallFactory: MesosCalls, defaultRole: String, minReviveOffersInterval: FiniteDuration) extends StrictLogging {
+class SuppressReviveHandler(
+    initialFrameworkInfo: Mesos.FrameworkInfo,
+    frameworkId: Mesos.FrameworkID,
+    metrics: Metrics,
+    mesosCallFactory: MesosCalls,
+    defaultRole: String,
+    debounceReviveInterval: FiniteDuration)
+    extends StrictLogging {
   import SuppressReviveHandler._
 
   private[this] val reviveCountMetric: Counter = metrics.counter("usi.mesos.calls.revive")
   private[this] val suppressCountMetric: Counter = metrics.counter("usi.mesos.calls.suppress")
 
-  def reviveStateFromPodSpecs: Flow[PodSpecUpdatedEvent, Map[String, Set[PodId]], NotUsed] = Flow[PodSpecUpdatedEvent].scan(ReviveOffersState.empty(defaultRole)) {
-    case (state, PodSpecUpdatedEvent(podId, Some(newPod: RunningPodSpec))) =>
-      state.withRoleWanted(podId, newPod.runSpec.role)
-    case (state, PodSpecUpdatedEvent(podId, Some(_: TerminalPodSpec))) =>
-      state.withoutPodId(podId)
-    case (state, PodSpecUpdatedEvent(podId, None)) =>
-      state.withoutPodId(podId)
-  }
-    .map(_.offersWantedState)
-
-
-  /**
-    * Core logic for suppress and revive
-    *
-    * Receives either instance updates or delay updates; based on the state of those, issues a suppress or a revive call
-    *
-    * Revive rate is throttled and debounced using minReviveOffersInterval
-    *
-    * @return
-    */
-  private[revive] val suppressAndReviveFlow: Flow[PodSpecUpdatedEvent, RoleDirective, NotUsed] = {
-
-    reviveStateFromPodSpecs
-      .buffer(1, OverflowStrategy.dropHead) // While we are back-pressured, we drop older interim frames
-      .via(RateLimiterFlow(minReviveOffersInterval))
-      .via(reviveDirectiveFlow)
-      .map(l => { logger.info(s"Issuing following suppress/revive directives: = ${l}"); l })
-  }
+  def reviveStateFromPodSpecs: Flow[PodSpecUpdatedEvent, Map[String, Set[PodId]], NotUsed] =
+    Flow[PodSpecUpdatedEvent]
+      .scan(ReviveOffersState.empty(defaultRole)) {
+        case (state, PodSpecUpdatedEvent(podId, Some(newPod: RunningPodSpec))) =>
+          state.withRoleWanted(podId, newPod.runSpec.role)
+        case (state, PodSpecUpdatedEvent(podId, Some(_: TerminalPodSpec))) =>
+          state.withoutPodId(podId)
+        case (state, PodSpecUpdatedEvent(podId, None)) =>
+          state.withoutPodId(podId)
+      }
+      .map(_.offersWantedState)
 
   private[revive] val reviveDirectiveFlow: Flow[Map[Role, Set[PodId]], RoleDirective, NotUsed] = {
     Flow[Map[Role, Set[PodId]]]
@@ -63,10 +52,27 @@ class SuppressReviveHandler(initialFrameworkInfo: Mesos.FrameworkInfo, metrics: 
       })
   }
 
+  /**
+    * Core logic for suppress and revive
+    *
+    * Revive rate is throttled and debounced using minReviveOffersInterval
+    *
+    * @return
+    */
+  private[revive] val suppressAndReviveFlow: Flow[PodSpecUpdatedEvent, RoleDirective, NotUsed] = {
+
+    reviveStateFromPodSpecs
+      .buffer(1, OverflowStrategy.dropHead) // While we are back-pressured, we drop older interim frames
+      .via(RateLimiterFlow(debounceReviveInterval))
+      .via(reviveDirectiveFlow)
+      .map(l => { logger.info(s"Issuing following suppress/revive directives: = ${l}"); l })
+  }
+
   private def frameworkInfoWithRoles(roles: Iterable[String]): Mesos.FrameworkInfo = {
     val b = initialFrameworkInfo.toBuilder
     b.clearRoles()
     b.addAllRoles(roles.asJava)
+    b.setId(frameworkId)
     b.build
   }
 
@@ -76,7 +82,8 @@ class SuppressReviveHandler(initialFrameworkInfo: Mesos.FrameworkInfo, metrics: 
         val newInfo = frameworkInfoWithRoles(roleState.keys)
         val suppressedRoles = offersNotWantedRoles(roleState)
 
-        val updateFramework = Call.UpdateFramework.newBuilder()
+        val updateFramework = Call.UpdateFramework
+          .newBuilder()
           .setFrameworkInfo(newInfo)
           .addAllSuppressedRoles(suppressedRoles.asJava)
           .build
@@ -87,14 +94,20 @@ class SuppressReviveHandler(initialFrameworkInfo: Mesos.FrameworkInfo, metrics: 
     }
   }
 
-  private [revive] val reviveSuppressMetrics: Flow[RoleDirective, RoleDirective, NotUsed] = Flow[RoleDirective].map {
+  private[revive] val reviveSuppressMetrics: Flow[RoleDirective, RoleDirective, NotUsed] = Flow[RoleDirective].map {
     case directive @ UpdateFramework(_, newlyRevived, newlySuppressed) =>
-      newlyRevived.foreach { _ => reviveCountMetric.increment() }
-      newlySuppressed.foreach { _ => suppressCountMetric.increment() }
+      newlyRevived.foreach { _ =>
+        reviveCountMetric.increment()
+      }
+      newlySuppressed.foreach { _ =>
+        suppressCountMetric.increment()
+      }
       directive
 
     case directive @ IssueRevive(roles) =>
-      roles.foreach { _ => reviveCountMetric.increment() }
+      roles.foreach { _ =>
+        reviveCountMetric.increment()
+      }
 
       directive
   }
@@ -109,7 +122,9 @@ class SuppressReviveHandler(initialFrameworkInfo: Mesos.FrameworkInfo, metrics: 
   private def offersNotWantedRoles(state: Map[Role, Set[PodId]]): Set[Role] =
     state.collect { case (role, podIds) if podIds.isEmpty => role }.toSet
 
-  private def directivesForDiff(lastState: Map[Role, Set[PodId]], newState: Map[Role, Set[PodId]]): List[RoleDirective] = {
+  private def directivesForDiff(
+      lastState: Map[Role, Set[PodId]],
+      newState: Map[Role, Set[PodId]]): List[RoleDirective] = {
     val directives = List.newBuilder[RoleDirective]
 
     val newWanted = newState.iterator.collect { case (role, podIds) if podIds.nonEmpty => role }.to[Set]

@@ -4,19 +4,27 @@ import java.time.Duration
 
 import com.typesafe.config.{Config, ConfigFactory}
 
-class SchedulerSettings private (val persistencePipelineLimit: Int, val persistenceLoadTimeout: Duration, val defaultRole: String) {
+class SchedulerSettings private (
+    val persistencePipelineLimit: Int,
+    val persistenceLoadTimeout: Duration,
+    val defaultRole: String,
+    val debounceReviveInterval: Duration) {
 
   private def copy(
       persistencePipelineLimit: Int = this.persistencePipelineLimit,
       persistenceLoadTimeout: Duration = this.persistenceLoadTimeout,
-      defaultRole: String = this.defaultRole): SchedulerSettings =
-    new SchedulerSettings(persistencePipelineLimit, persistenceLoadTimeout, defaultRole)
+      defaultRole: String = this.defaultRole,
+      debounceReviveInterval: Duration = this.debounceReviveInterval): SchedulerSettings =
+    new SchedulerSettings(persistencePipelineLimit, persistenceLoadTimeout, defaultRole, debounceReviveInterval)
 
   def withPersistencePipelineLimit(limit: Int): SchedulerSettings = copy(persistencePipelineLimit = limit)
 
   def withPersistenceLoadTimeout(timeout: Duration): SchedulerSettings = copy(persistenceLoadTimeout = timeout)
 
   def withDefaultRole(role: String): SchedulerSettings = copy(defaultRole = role)
+
+  def withDebounceReviveInterval(minReviveOffersInterval: Duration): SchedulerSettings =
+    copy(debounceReviveInterval = minReviveOffersInterval)
 }
 
 object SchedulerSettings {
@@ -25,7 +33,9 @@ object SchedulerSettings {
     val persistencePipelineLimit = persistenceConf.getInt("pipeline-limit")
     val persistenceLoadTimeout = persistenceConf.getDuration("load-timeout")
     val defaultRole = persistenceConf.getString("default-role")
-    new SchedulerSettings(persistencePipelineLimit, persistenceLoadTimeout, defaultRole)
+    val reviveConf = schedulerConf.getConfig("revive")
+    val debounceReviveInterval = reviveConf.getDuration("debounce-revive-interval")
+    new SchedulerSettings(persistencePipelineLimit, persistenceLoadTimeout, defaultRole, debounceReviveInterval)
   }
 
   def load(): SchedulerSettings = {

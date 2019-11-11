@@ -16,41 +16,62 @@ import org.scalatest.Inside
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class SuppressReviveHandlerTest extends AkkaUnitTest with Inside  {
+class SuppressReviveHandlerTest extends AkkaUnitTest with Inside {
   import SuppressReviveHandler.{RoleDirective, UpdateFramework, IssueRevive}
-  val webApp = SimpleRunTemplateFactory(Nil, "", "web")
-  val monitoringApp = SimpleRunTemplateFactory(Nil, "", "monitoring")
+  class Fixture(debounceReviveInterval: FiniteDuration = 1.seconds, defaultRole: String = "web") {
 
-  val inputSourceQueue = Source.queue[PodSpecUpdatedEvent](16, OverflowStrategy.fail)
-  val outputSinkQueue = Sink.queue[RoleDirective]()
-  val podIdIndex = new AtomicInteger()
-  def newPodId(prefix: String): PodId = PodId(s"prefix-${podIdIndex.incrementAndGet()}")
-  val initialFrameworkInfo = MesosMock.mockFrameworkInfo
-  val mesosCallFactory = new MesosCalls(MesosMock.mockFrameworkId)
-  val reviveOffersStreamLogic = new SuppressReviveHandler(initialFrameworkInfo, DummyMetrics, mesosCallFactory, "web")
+    val webApp = SimpleRunTemplateFactory(Nil, "", "web")
+    val monitoringApp = SimpleRunTemplateFactory(Nil, "", "monitoring")
+
+    val inputSourceQueue = Source.queue[PodSpecUpdatedEvent](16, OverflowStrategy.fail)
+    val outputSinkQueue = Sink.queue[RoleDirective]()
+    val podIdIndex = new AtomicInteger()
+    def newPodId(prefix: String): PodId = PodId(s"prefix-${podIdIndex.incrementAndGet()}")
+    val initialFrameworkInfo = MesosMock.mockFrameworkInfo
+    val mesosCallFactory = new MesosCalls(MesosMock.mockFrameworkId)
+    val reviveOffersStreamLogic = new SuppressReviveHandler(
+      initialFrameworkInfo,
+      MesosMock.mockFrameworkId,
+      DummyMetrics,
+      mesosCallFactory,
+      defaultRole = defaultRole,
+      debounceReviveInterval = debounceReviveInterval)
+  }
+
+  class NonDebouncedFixture(defaultRole: String = "web")
+      extends Fixture(debounceReviveInterval = 0.seconds, defaultRole = defaultRole) {
+    // Tests are more easily tested without time-dependent throttling logic
+    val nonDebouncedSuppressReviveFlow: Flow[PodSpecUpdatedEvent, RoleDirective, NotUsed] =
+      reviveOffersStreamLogic.reviveStateFromPodSpecs
+        .via(reviveOffersStreamLogic.reviveDirectiveFlow)
+  }
 
   "Suppress and revive logic" should {
-    "combine 3 revive-worthy events received within the throttle window into a single revive event" in {
+    "combine 3 revive-worthy events received within the throttle window into a single revive event" in new Fixture(
+      debounceReviveInterval = 200.millis,
+      defaultRole = "web") {
       val podSpec1 = RunningPodSpec(newPodId("webapp"), webApp)
       val podSpec2 = RunningPodSpec(newPodId("webapp"), webApp)
       val podSpec3 = RunningPodSpec(newPodId("webapp"), webApp)
 
       Given("A suppress/revive flow with suppression enabled and 200 millis revive interval")
-      val suppressReviveFlow = reviveOffersStreamLogic.suppressAndReviveFlow(minReviveOffersInterval = 200.millis, defaultRole = "web")
+      val suppressReviveFlow = reviveOffersStreamLogic.suppressAndReviveFlow
 
       val (input, output) = inputSourceQueue.via(suppressReviveFlow).toMat(outputSinkQueue)(Keep.both).run
 
       When("3 new podSpec updates are sent for the role 'web'")
-      Future.sequence(Seq(podSpec1, podSpec2, podSpec3).map { i =>
-        input.offer(PodSpecUpdatedEvent.forUpdate(i))
-      }).futureValue
+      Future
+        .sequence(Seq(podSpec1, podSpec2, podSpec3).map { i =>
+          input.offer(PodSpecUpdatedEvent.forUpdate(i))
+        })
+        .futureValue
 
       Then("The initial update framework message is emitted")
       // Note - we want to assert that this is emitted initially in order to create a clean-slate scenario with Mesos;
       // future updateFramework / revive calls are issues based on assumption of former state.
       inside(output.pull().futureValue) {
         case Some(UpdateFramework(roleState, _, _)) =>
-        roleState("web").shouldBe(Set.empty)
+          roleState("web").shouldBe(Set.empty)
       }
 
       Then("The revives from the instances get combined in to a single update framework call")
@@ -67,15 +88,10 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside  {
     }
 
     "Suppress and revive (without debouncing)" should {
-      // Many of these components are more easily tested without throttling logic
-      val suppressReviveFlow: Flow[PodSpecUpdatedEvent, RoleDirective, NotUsed] =
-        reviveOffersStreamLogic
-          .reviveStateFromPodSpecs
-          .via(reviveOffersStreamLogic.reviveDirectiveFlow)
 
-      "issues a suppress for the default role during initial materialization" in {
+      "issues a suppress for the default role during initial materialization" in new NonDebouncedFixture() {
         val results = Source.empty
-          .via(suppressReviveFlow)
+          .via(nonDebouncedSuppressReviveFlow)
           .runWith(Sink.seq)
           .futureValue
 
@@ -87,15 +103,12 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside  {
         }
       }
 
-      "emit a revive for each new scheduled instance added" in {
+      "emit a revive for each new scheduled instance added" in new NonDebouncedFixture() {
         val podSpec1 = RunningPodSpec(newPodId("web"), webApp)
         val podSpec2 = RunningPodSpec(newPodId("web"), webApp)
 
-        val results = Source(
-          List(
-            PodSpecUpdatedEvent.forUpdate(podSpec1),
-            PodSpecUpdatedEvent.forUpdate(podSpec2)))
-          .via(suppressReviveFlow)
+        val results = Source(List(PodSpecUpdatedEvent.forUpdate(podSpec1), PodSpecUpdatedEvent.forUpdate(podSpec2)))
+          .via(nonDebouncedSuppressReviveFlow)
           .runWith(Sink.seq)
           .futureValue
 
@@ -108,14 +121,11 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside  {
         }
       }
 
-      "does not emit a new revive for updates to existing scheduled instances" in {
+      "does not emit a new revive for updates to existing scheduled instances" in new NonDebouncedFixture() {
         val podSpec1 = RunningPodSpec(newPodId("web"), webApp)
 
-        val results = Source(
-          List(
-            PodSpecUpdatedEvent.forUpdate(podSpec1),
-            PodSpecUpdatedEvent.forUpdate(podSpec1)))
-          .via(suppressReviveFlow)
+        val results = Source(List(PodSpecUpdatedEvent.forUpdate(podSpec1), PodSpecUpdatedEvent.forUpdate(podSpec1)))
+          .via(nonDebouncedSuppressReviveFlow)
           .runWith(Sink.seq)
           .futureValue
 

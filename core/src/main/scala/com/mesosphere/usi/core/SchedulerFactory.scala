@@ -2,13 +2,16 @@ package com.mesosphere.usi.core
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
-import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
+import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.usi.core.conf.SchedulerSettings
-import com.mesosphere.usi.core.models.StateSnapshot
+import com.mesosphere.usi.core.models.{StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.revive.SuppressReviveHandler
+import com.mesosphere.usi.core.util.DurationConverters
 import com.mesosphere.usi.metrics.Metrics
 import com.mesosphere.usi.repository.PodRecordRepository
-import org.apache.mesos.v1.Protos.{DomainInfo, FrameworkID, FrameworkInfo}
+
+import scala.concurrent.Future
 
 trait SchedulerLogicFactory {
   def newSchedulerLogicGraph(snapshot: StateSnapshot): SchedulerLogicGraph
@@ -23,24 +26,32 @@ trait SuppressReviveFactory {
 }
 
 case class SchedulerFactory(
-  client: MesosClient,
-  podRecordRepository: PodRecordRepository,
-  schedulerSettings: SchedulerSettings,
-  frameworkId: FrameworkID,
-  initialFrameworkInfo: FrameworkInfo,
-  metrics: Metrics,
-  mesosCalls: MesosCalls,
-  masterDomainInfo: DomainInfo) extends SchedulerLogicFactory with PersistenceFlowFactory with SuppressReviveFactory {
+    client: MesosClient,
+    podRecordRepository: PodRecordRepository,
+    schedulerSettings: SchedulerSettings,
+    metrics: Metrics)
+    extends SchedulerLogicFactory
+    with PersistenceFlowFactory
+    with SuppressReviveFactory {
 
+  def newSchedulerFlow(): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] =
+    Scheduler.fromClient(this, client, podRecordRepository)
   override def newPersistenceFlow(): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
     Scheduler.newPersistenceFlow(podRecordRepository, schedulerSettings.persistencePipelineLimit)
   }
 
   override def newSchedulerLogicGraph(snapshot: StateSnapshot): SchedulerLogicGraph = {
-    new SchedulerLogicGraph(mesosCalls, masterDomainInfo, snapshot, metrics)
+    new SchedulerLogicGraph(client.calls, client.masterInfo.getDomain, snapshot, metrics)
   }
 
   override def newSuppressReviveHandler: SuppressReviveHandler = {
-    new SuppressReviveHandler(initialFrameworkInfo, metrics, mesosCalls, schedulerSettings.defaultRole)
+    new SuppressReviveHandler(
+      client.frameworkInfo,
+      client.frameworkId,
+      metrics,
+      client.calls,
+      schedulerSettings.defaultRole,
+      debounceReviveInterval = DurationConverters.toScala(schedulerSettings.debounceReviveInterval)
+    )
   }
 }

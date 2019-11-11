@@ -2,19 +2,23 @@ package com.mesosphere.usi.core
 
 import java.time.Instant
 
-import akka.Done
-import akka.stream.FlowShape
-import akka.stream.scaladsl.{Flow, GraphDSL, Keep, Sink}
+import akka.stream.scaladsl.{Flow, Keep, Sink}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
+import akka.{Done, NotUsed}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.commandInputSource
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
-import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord, PodRecordUpdatedEvent, StateEvent}
+import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord, PodRecordUpdatedEvent, StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.revive.SuppressReviveHandler
+import com.mesosphere.usi.core.util.DurationConverters
+import com.mesosphere.usi.metrics.Metrics
+import com.mesosphere.usi.repository.PodRecordRepository
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
+import org.apache.mesos.v1.Protos.{DomainInfo, FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.scalatest._
 
@@ -37,29 +41,47 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       event
     }
 
-  def mockedScheduler: Flow[SchedulerCommand, StateEvent, Future[Done]] = {
-    val (_, unconnectedFlow) =
-      Scheduler
-        .schedulerGraph(
-          new MesosCalls(MesosMock.mockFrameworkId),
-          InMemoryPodRecordRepository(),
-          DummyMetrics,
-          SchedulerSettings.load(),
-          MesosMock.masterDomainInfo)
-        .futureValue
-    Flow.fromGraph {
-      GraphDSL.create(unconnectedFlow, loggingMockMesosFlow)((_, materializedValue) => materializedValue) {
-        implicit builder =>
-          { (graph, mockMesos) =>
-            import GraphDSL.Implicits._
+  case class MockedFactory(
+      podRecordRepository: PodRecordRepository = InMemoryPodRecordRepository(),
+      schedulerSettings: SchedulerSettings = SchedulerSettings.load(),
+      frameworkId: FrameworkID = MesosMock.mockFrameworkId,
+      frameworkInfo: FrameworkInfo = MesosMock.mockFrameworkInfo,
+      masterDomainInfo: DomainInfo = MesosMock.masterDomainInfo,
+      metrics: Metrics = DummyMetrics)
+      extends SchedulerLogicFactory
+      with PersistenceFlowFactory
+      with SuppressReviveFactory {
 
-            mockMesos ~> graph.in2
-            graph.out2 ~> mockMesos
-
-            FlowShape(graph.in1, graph.out1)
-          }
-      }
+    val mesosCalls = new MesosCalls(frameworkId: FrameworkID)
+    override def newPersistenceFlow(): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
+      Scheduler.newPersistenceFlow(podRecordRepository, schedulerSettings.persistencePipelineLimit)
     }
+
+    override def newSchedulerLogicGraph(snapshot: StateSnapshot): SchedulerLogicGraph = {
+      new SchedulerLogicGraph(mesosCalls, masterDomainInfo, snapshot, metrics)
+    }
+
+    override def newSuppressReviveHandler: SuppressReviveHandler = {
+      new SuppressReviveHandler(
+        frameworkInfo,
+        frameworkId,
+        metrics,
+        mesosCalls,
+        schedulerSettings.defaultRole,
+        debounceReviveInterval = DurationConverters.toScala(schedulerSettings.debounceReviveInterval)
+      )
+    }
+  }
+
+  def mockedFactory() = MockedFactory()
+
+  def mockedScheduler: Flow[SchedulerCommand, StateEvent, Future[Done]] = {
+    val factory = mockedFactory()
+    val snapshot = StateSnapshot.empty
+    val unconnectedFlow =
+      Scheduler
+        .schedulerGraph(snapshot, factory)
+    unconnectedFlow.joinMat(loggingMockMesosFlow)(Keep.right)
   }
 
   "It closes the Mesos client when the specs input stream terminates" in {
@@ -94,7 +116,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     }
     val (pub, sub) = TestSource
       .probe[SchedulerEvents]
-      .via(Scheduler.persistenceFlow(fuzzyPodRecordRepo, SchedulerSettings.load()))
+      .via(Scheduler.newPersistenceFlow(fuzzyPodRecordRepo, persistencePipelineLimit = 128))
       .toMat(TestSink.probe[SchedulerEvents])(Keep.both)
       .run()
 
@@ -132,7 +154,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     val controlledRepository = new ControlledRepository()
     val (pub, sub) = TestSource
       .probe[SchedulerEvents]
-      .via(Scheduler.persistenceFlow(controlledRepository, SchedulerSettings.load()))
+      .via(Scheduler.newPersistenceFlow(controlledRepository, persistencePipelineLimit = 128))
       .toMat(TestSink.probe[SchedulerEvents])(Keep.both)
       .run()
 

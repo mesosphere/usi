@@ -21,12 +21,13 @@ private[usi] object ProtoBuilders {
     Mesos.OfferID.newBuilder().setValue(id).build
   }
 
-  def newFrameworkInfo(name: String, user: String, id: Option[Mesos.FrameworkID] ): Mesos.FrameworkInfo = {
-    val b = Mesos.FrameworkInfo.newBuilder()
+  def newFrameworkInfo(name: String, user: String, id: Option[Mesos.FrameworkID]): Mesos.FrameworkInfo = {
+    val b = Mesos.FrameworkInfo
+      .newBuilder()
       .setName(name)
       .setUser(user)
     id.foreach(b.setId)
-     b.build
+    b.build
   }
   def newFrameworkId(id: String): Mesos.FrameworkID = {
     Mesos.FrameworkID.newBuilder().setValue(id).build

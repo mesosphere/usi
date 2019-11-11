@@ -10,7 +10,7 @@ plugins {
 
 ext {
     scalaVersion = '2.12'
-    mesosVersion = '1.7.0'
+    mesosVersion = '1.9.0'
     akkaVersion = '2.5.23'
 }
 

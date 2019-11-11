@@ -61,68 +61,68 @@ object Scheduler {
     *
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
-  def asSourceAndSink(
-      factory: Factory,
-      client: MesosClient,
-      podRecordRepository: PodRecordRepository)(implicit mat: Materializer): Future[(StateSnapshot, Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]])] = {
-    podRecordRepository
-      .readAll()
-      .map { podRecords =>
-        val snapshot = StateSnapshot(podRecords = podRecords.values.toSeq, agentRecords = Nil)
-        val flow = fromClient(factory, snapshot, client)
-        val (source, sink) = FlowHelpers.asSourceAndSink(flow)(mat)
+  def asSourceAndSink(factory: Factory, client: MesosClient, podRecordRepository: PodRecordRepository)(
+      implicit mat: Materializer)
+    : Future[(StateSnapshot, Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]])] = {
+    fromClient(factory, client, podRecordRepository).map {
+      case (snapshot, schedulerFlow) =>
+        val (source, sink) = FlowHelpers.asSourceAndSink(schedulerFlow)(mat)
         (snapshot, source, sink)
-      }(CallerThreadExecutionContext.context)
+    }(CallerThreadExecutionContext.context)
   }
 
-  private[usi] def fromClient(
-      factory: Factory,
-      stateSnapshot: StateSnapshot,
-      client: MesosClient): Flow[SchedulerCommand, StateEvent, NotUsed] = {
+  private[usi] def fromClient(factory: Factory, client: MesosClient, podRecordRepository: PodRecordRepository)
+    : Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
           "Please provide a MesosClient with FrameworkInfo that has capability MULTI_ROLE")
     }
-    val graph = schedulerGraph(stateSnapshot, factory)
-    val mesosFlow = Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource)
-    graph.join(mesosFlow)
+    podRecordRepository
+      .readAll()
+      .map { podRecords =>
+        val snapshot = StateSnapshot(podRecords = podRecords.values.toSeq, agentRecords = Nil)
+        val graph = schedulerGraph(snapshot, factory)
+        val mesosFlow = Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource)
+        snapshot -> graph.join(mesosFlow)
+      }(CallerThreadExecutionContext.context)
+
   }
 
   private[core] def schedulerGraph(
       snapshot: StateSnapshot,
-      factory: Factory)
-  : BidiFlow[SchedulerCommand, MesosCall, MesosEvent, StateEvent, NotUsed] = {
+      factory: Factory): BidiFlow[SchedulerCommand, MesosCall, MesosEvent, StateEvent, NotUsed] = {
     val schedulerLogicGraph = factory.newSchedulerLogicGraph(snapshot)
     val suppressReviveFlow = factory.newSuppressReviveHandler.flow
     BidiFlow.fromGraph {
-      GraphDSL.create(schedulerLogicGraph, suppressReviveFlow)((_, _) => NotUsed) { implicit builder =>
-        (schedulerLogic, suppressRevive) => {
-          import GraphDSL.Implicits._
+      GraphDSL.create(schedulerLogicGraph, suppressReviveFlow)((_, _) => NotUsed) {
+        implicit builder => (schedulerLogic, suppressRevive) =>
+          {
+            import GraphDSL.Implicits._
 
-          val (schedulerEventsInput, allStateEventsOut, podSpecEventsOut, reviveMesosCallsIn, allMesosCallsOut) = {
-            val stateEventsBroadcast = builder.add(Broadcast[StateEvent](2, eagerCancel = true))
-            val mesosCallsFanIn = builder.add(Merge[MesosCall](2, eagerComplete = true))
-            val eventSplitter = builder.add(splitEvents)
+            val (schedulerEventsInput, allStateEventsOut, podSpecEventsOut, reviveMesosCallsIn, allMesosCallsOut) = {
+              val stateEventsBroadcast = builder.add(Broadcast[StateEvent](2, eagerCancel = true))
+              val mesosCallsFanIn = builder.add(Merge[MesosCall](2, eagerComplete = true))
+              val eventSplitter = builder.add(splitEvents)
 
-            eventSplitter.out0 ~> stateEventsBroadcast
-            eventSplitter.out1 ~> mesosCallsFanIn.in(0)
+              eventSplitter.out0 ~> stateEventsBroadcast
+              eventSplitter.out1 ~> mesosCallsFanIn.in(0)
 
-            val allStateEventsOut = stateEventsBroadcast.out(1)
-            val podSpecEventsOut = stateEventsBroadcast.out(0).collect { case psu: PodSpecUpdatedEvent => psu }
-            val reviveMesosCallsIn = mesosCallsFanIn.in(1)
+              val allStateEventsOut = stateEventsBroadcast.out(1)
+              val podSpecEventsOut = stateEventsBroadcast.out(0).collect { case psu: PodSpecUpdatedEvent => psu }
+              val reviveMesosCallsIn = mesosCallsFanIn.in(1)
 
-            (eventSplitter.in, allStateEventsOut, podSpecEventsOut, reviveMesosCallsIn, mesosCallsFanIn.out)
+              (eventSplitter.in, allStateEventsOut, podSpecEventsOut, reviveMesosCallsIn, mesosCallsFanIn.out)
+            }
+
+            val persistenceStorageFlow = builder.add(factory.newPersistenceFlow)
+
+            schedulerLogic.out ~> persistenceStorageFlow ~> schedulerEventsInput
+
+            podSpecEventsOut ~> suppressRevive ~> reviveMesosCallsIn
+
+            BidiShape.apply(schedulerLogic.in0, allMesosCallsOut, schedulerLogic.in1, allStateEventsOut)
           }
-
-          val persistenceStorageFlow = builder.add(factory.newPersistenceFlow)
-
-          schedulerLogic.out ~> persistenceStorageFlow ~> schedulerEventsInput
-
-          podSpecEventsOut ~> suppressRevive ~> reviveMesosCallsIn
-
-          BidiShape.apply(schedulerLogic.in0, allMesosCallsOut, schedulerLogic.in1, allStateEventsOut)
-        }
       }
     }
   }
@@ -165,4 +165,3 @@ object Scheduler {
   private def isMultiRoleFramework(frameworkInfo: FrameworkInfo): Boolean =
     frameworkInfo.getCapabilitiesList.asScala.exists(_.getType == FrameworkInfo.Capability.Type.MULTI_ROLE)
 }
-
