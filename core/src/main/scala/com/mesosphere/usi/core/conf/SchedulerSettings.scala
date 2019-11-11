@@ -32,7 +32,7 @@ object SchedulerSettings {
     val persistenceConf = schedulerConf.getConfig("persistence")
     val persistencePipelineLimit = persistenceConf.getInt("pipeline-limit")
     val persistenceLoadTimeout = persistenceConf.getDuration("load-timeout")
-    val defaultRole = persistenceConf.getString("default-role")
+    val defaultRole = schedulerConf.getString("default-role")
     val reviveConf = schedulerConf.getConfig("revive")
     val debounceReviveInterval = reviveConf.getDuration("debounce-revive-interval")
     new SchedulerSettings(persistencePipelineLimit, persistenceLoadTimeout, defaultRole, debounceReviveInterval)

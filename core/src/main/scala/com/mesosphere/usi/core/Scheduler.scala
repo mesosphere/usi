@@ -133,7 +133,7 @@ object Scheduler {
 
       val b = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true))
       val events = b.out(0).mapConcat(_.stateEvents).outlet
-      val mesosCalls = b.out(0).mapConcat(_.mesosCalls).outlet
+      val mesosCalls = b.out(1).mapConcat(_.mesosCalls).outlet
 
       new FanOutShape2(b.in, events, mesosCalls)
     }
