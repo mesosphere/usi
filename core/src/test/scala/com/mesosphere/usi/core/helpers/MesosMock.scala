@@ -16,8 +16,8 @@ object MesosMock {
   val mockAgentId: AgentId = AgentId("mock-agent")
   val mockFrameworkId: Mesos.FrameworkID = ProtoBuilders.newFrameworkId("mock-framework")
   val masterDomainInfo: Mesos.DomainInfo = ProtoBuilders.newDomainInfo(region = "home", zone = "a")
-  val mockFrameworkInfo: Mesos.FrameworkInfo =
-    ProtoBuilders.newFrameworkInfo(user = "mock", name = "mock-mesos", id = Some(mockFrameworkId))
+  def mockFrameworkInfo(roles: Seq[String] = Seq("*")): Mesos.FrameworkInfo =
+    ProtoBuilders.newFrameworkInfo(user = "mock", name = "mock-mesos", id = Some(mockFrameworkId), roles = roles)
 
   val flow: Flow[MesosCall, MesosEvent, NotUsed] = {
     Flow[MesosCall].async.mapConcat { call =>

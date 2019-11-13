@@ -50,7 +50,6 @@ case class SchedulerFactory(
       client.frameworkId,
       metrics,
       client.calls,
-      schedulerSettings.defaultRole,
       debounceReviveInterval = DurationConverters.toScala(schedulerSettings.debounceReviveInterval)
     )
   }

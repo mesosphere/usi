@@ -45,7 +45,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       podRecordRepository: PodRecordRepository = InMemoryPodRecordRepository(),
       schedulerSettings: SchedulerSettings = SchedulerSettings.load(),
       frameworkId: FrameworkID = MesosMock.mockFrameworkId,
-      frameworkInfo: FrameworkInfo = MesosMock.mockFrameworkInfo,
+      frameworkInfo: FrameworkInfo = MesosMock.mockFrameworkInfo(),
       masterDomainInfo: DomainInfo = MesosMock.masterDomainInfo,
       metrics: Metrics = DummyMetrics)
       extends SchedulerLogicFactory
@@ -67,7 +67,6 @@ class SchedulerTest extends AkkaUnitTest with Inside {
         frameworkId,
         metrics,
         mesosCalls,
-        schedulerSettings.defaultRole,
         debounceReviveInterval = DurationConverters.toScala(schedulerSettings.debounceReviveInterval)
       )
     }
@@ -174,6 +173,10 @@ class SchedulerTest extends AkkaUnitTest with Inside {
       assertThrows[AssertionError](sub.expectNext(10.millis))
       controlledRepository.pendingWrites shouldEqual limit - 1
     }
+  }
+
+  "suppress and revive calls are generated in response to podspecs" in {
+    ???
   }
 
   class ControlledRepository extends InMemoryPodRecordRepository {

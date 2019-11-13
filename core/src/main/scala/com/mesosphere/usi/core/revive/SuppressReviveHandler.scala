@@ -19,17 +19,20 @@ class SuppressReviveHandler(
     frameworkId: Mesos.FrameworkID,
     metrics: Metrics,
     mesosCallFactory: MesosCalls,
-    defaultRole: String,
     debounceReviveInterval: FiniteDuration)
     extends StrictLogging {
   import SuppressReviveHandler._
 
+  require(defaultRoles.nonEmpty, "initialFramework rolls must be non-empty!")
+
   private[this] val reviveCountMetric: Counter = metrics.counter("usi.mesos.calls.revive")
   private[this] val suppressCountMetric: Counter = metrics.counter("usi.mesos.calls.suppress")
 
+  private def defaultRoles = initialFrameworkInfo.getRolesList.asScala
+
   def reviveStateFromPodSpecs: Flow[PodSpecUpdatedEvent, Map[String, Set[PodId]], NotUsed] =
     Flow[PodSpecUpdatedEvent]
-      .scan(ReviveOffersState.empty(defaultRole)) {
+      .scan(ReviveOffersState.empty(defaultRoles)) {
         case (state, PodSpecUpdatedEvent(podId, Some(newPod: RunningPodSpec))) =>
           state.withRoleWanted(podId, newPod.runSpec.role)
         case (state, PodSpecUpdatedEvent(podId, Some(_: TerminalPodSpec))) =>
@@ -65,7 +68,7 @@ class SuppressReviveHandler(
       .buffer(1, OverflowStrategy.dropHead) // While we are back-pressured, we drop older interim frames
       .via(RateLimiterFlow(debounceReviveInterval))
       .via(reviveDirectiveFlow)
-      .map(l => { logger.info(s"Issuing following suppress/revive directives: = ${l}"); l })
+      .log("SuppressRevive handler directive")
   }
 
   private def frameworkInfoWithRoles(roles: Iterable[String]): Mesos.FrameworkInfo = {
@@ -94,29 +97,30 @@ class SuppressReviveHandler(
     }
   }
 
-  private[revive] val reviveSuppressMetrics: Flow[RoleDirective, RoleDirective, NotUsed] = Flow[RoleDirective].map {
-    case directive @ UpdateFramework(_, newlyRevived, newlySuppressed) =>
-      newlyRevived.foreach { _ =>
-        reviveCountMetric.increment()
-      }
-      newlySuppressed.foreach { _ =>
-        suppressCountMetric.increment()
-      }
-      directive
+  private[revive] val reviveSuppressMetrics: Flow[RoleDirective, RoleDirective, NotUsed] =
+    Flow[RoleDirective].log("SuppressRevive - B").map {
+      case directive @ UpdateFramework(_, newlyRevived, newlySuppressed) =>
+        newlyRevived.foreach { _ =>
+          reviveCountMetric.increment()
+        }
+        newlySuppressed.foreach { _ =>
+          suppressCountMetric.increment()
+        }
+        directive
 
-    case directive @ IssueRevive(roles) =>
-      roles.foreach { _ =>
-        reviveCountMetric.increment()
-      }
+      case directive @ IssueRevive(roles) =>
+        roles.foreach { _ =>
+          reviveCountMetric.increment()
+        }
 
-      directive
-  }
+        directive
+    }
 
   /**
     * Flow which applies the RoleDirectives, recording the appropriate metrics and emitting the corresponding Mesos calls
     */
   val flow: Flow[PodSpecUpdatedEvent, Call, NotUsed] = {
-    suppressAndReviveFlow.via(reviveSuppressMetrics).map(directiveToMesosCall)
+    suppressAndReviveFlow.via(reviveSuppressMetrics).map(directiveToMesosCall).log("SuppressRevive Mesos call")
   }
 
   private def offersNotWantedRoles(state: Map[Role, Set[PodId]]): Set[Role] =

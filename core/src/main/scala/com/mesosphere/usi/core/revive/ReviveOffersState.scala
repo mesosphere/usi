@@ -7,7 +7,7 @@ private[revive] class ReviveOffersState protected (
     val podIdRoles: Map[PodId, String]) {
   def withRoleWanted(podId: PodId, role: String): ReviveOffersState = {
     new ReviveOffersState(
-      offersWantedState.updated(role, offersWantedState(role) + podId),
+      offersWantedState.updated(role, offersWantedState.getOrElse(role, Set.empty) + podId),
       podIdRoles.updated(podId, role))
   }
 
@@ -15,7 +15,7 @@ private[revive] class ReviveOffersState protected (
     podIdRoles.get(podId) match {
       case Some(role) =>
         new ReviveOffersState(
-          offersWantedState.updated(role, offersWantedState(role) + podId),
+          offersWantedState.updated(role, offersWantedState(role) - podId),
           podIdRoles.updated(podId, role))
       case None =>
         this
@@ -24,6 +24,10 @@ private[revive] class ReviveOffersState protected (
 }
 
 object ReviveOffersState {
-  def empty(defaultRole: String) =
-    new ReviveOffersState(offersWantedState = Map(defaultRole -> Set.empty), podIdRoles = Map.empty)
+  def empty(defaultRoles: Iterable[String]) = {
+    val initialMap = defaultRoles.iterator.map { r =>
+      r -> Set.empty[PodId]
+    }.toMap
+    new ReviveOffersState(offersWantedState = initialMap, podIdRoles = Map.empty)
+  }
 }

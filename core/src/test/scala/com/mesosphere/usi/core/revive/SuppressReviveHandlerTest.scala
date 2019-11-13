@@ -27,14 +27,13 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside {
     val outputSinkQueue = Sink.queue[RoleDirective]()
     val podIdIndex = new AtomicInteger()
     def newPodId(prefix: String): PodId = PodId(s"prefix-${podIdIndex.incrementAndGet()}")
-    val initialFrameworkInfo = MesosMock.mockFrameworkInfo
+    val initialFrameworkInfo = MesosMock.mockFrameworkInfo(Seq("web"))
     val mesosCallFactory = new MesosCalls(MesosMock.mockFrameworkId)
     val reviveOffersStreamLogic = new SuppressReviveHandler(
       initialFrameworkInfo,
       MesosMock.mockFrameworkId,
       DummyMetrics,
       mesosCallFactory,
-      defaultRole = defaultRole,
       debounceReviveInterval = debounceReviveInterval)
   }
 
@@ -103,21 +102,34 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside {
         }
       }
 
-      "emit a revive for each new scheduled instance added" in new NonDebouncedFixture() {
-        val podSpec1 = RunningPodSpec(newPodId("web"), webApp)
-        val podSpec2 = RunningPodSpec(newPodId("web"), webApp)
+      "emit a revive for each new scheduled instance added, and suppresses once all instances are launched" in new NonDebouncedFixture() {
+        val podId1 = newPodId("web")
+        val podId2 = newPodId("web")
 
-        val results = Source(List(PodSpecUpdatedEvent.forUpdate(podSpec1), PodSpecUpdatedEvent.forUpdate(podSpec2)))
+        val events = List(
+          PodSpecUpdatedEvent.forUpdate(RunningPodSpec(podId1, webApp)),
+          PodSpecUpdatedEvent.forUpdate(RunningPodSpec(podId2, webApp)),
+          PodSpecUpdatedEvent(podId1, None),
+          PodSpecUpdatedEvent(podId2, None)
+        )
+        val results = Source(events)
           .via(nonDebouncedSuppressReviveFlow)
           .runWith(Sink.seq)
           .futureValue
 
         inside(results) {
-          case Seq(initialMessage: UpdateFramework, reviveForPodSpec1: IssueRevive, reviveForPodSpec2: IssueRevive) =>
+          case Seq(
+              initialMessage: UpdateFramework,
+              reviveForPodSpec1: IssueRevive,
+              reviveForPodSpec2: IssueRevive,
+              finalSuppress: UpdateFramework) =>
             initialMessage.roleState shouldBe Map("web" -> Set.empty)
 
             reviveForPodSpec1.roles shouldBe Set("web")
             reviveForPodSpec2.roles shouldBe Set("web")
+
+            finalSuppress.roleState shouldBe Map("web" -> Set.empty)
+            finalSuppress.newlySuppressed shouldBe Set("web")
         }
       }
 

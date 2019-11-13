@@ -7,6 +7,7 @@ import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.models.{PodRecordUpdatedEvent, PodSpecUpdatedEvent, StateEvent, StateSnapshot}
 import com.mesosphere.usi.repository.PodRecordRepository
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
@@ -51,7 +52,7 @@ import scala.concurrent.Future
   *                                     +----------------------+
   * }}}
   */
-object Scheduler {
+object Scheduler extends StrictLogging {
   type Factory = SchedulerLogicFactory with PersistenceFlowFactory with SuppressReviveFactory
 
   /**
@@ -83,10 +84,18 @@ object Scheduler {
       .map { podRecords =>
         val snapshot = StateSnapshot(podRecords = podRecords.values.toSeq, agentRecords = Nil)
         val graph = schedulerGraph(snapshot, factory)
-        val mesosFlow = Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource)
+        val mesosFlow = Flow.fromSinkAndSourceCoupled(logMesosCallException(client.mesosSink), client.mesosSource)
         snapshot -> graph.join(mesosFlow)
       }(CallerThreadExecutionContext.context)
+  }
 
+  private def logMesosCallException[T](s: Sink[T, Future[Done]]): Sink[T, NotUsed] = {
+    s.mapMaterializedValue { f =>
+      f.failed.foreach { ex =>
+        logger.error("Mesos client hanging up due to error in stream", ex)
+      }(CallerThreadExecutionContext.context)
+      NotUsed
+    }
   }
 
   private[core] def schedulerGraph(
@@ -101,8 +110,13 @@ object Scheduler {
             import GraphDSL.Implicits._
 
             val (schedulerEventsInput, allStateEventsOut, podSpecEventsOut, reviveMesosCallsIn, allMesosCallsOut) = {
-              val stateEventsBroadcast = builder.add(Broadcast[StateEvent](2, eagerCancel = true))
-              val mesosCallsFanIn = builder.add(Merge[MesosCall](2, eagerComplete = true))
+
+              // We disable eagerComplete for the fanin because:
+              // * It can cause a circular cancellation / failure race.
+              // * In the case of upstream cancellation, we want to finish processing any pending elements for the fan-in
+              // * A failure on either side will cause the merge to fail, anyways
+              val stateEventsBroadcast = builder.add(Broadcast[StateEvent](2, eagerCancel = false))
+              val mesosCallsFanIn = builder.add(Merge[MesosCall](2, eagerComplete = false))
               val eventSplitter = builder.add(splitEvents)
 
               eventSplitter.out0 ~> stateEventsBroadcast
@@ -132,8 +146,8 @@ object Scheduler {
       import GraphDSL.Implicits._
 
       val b = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true))
-      val events = b.out(0).mapConcat(_.stateEvents).outlet
-      val mesosCalls = b.out(1).mapConcat(_.mesosCalls).outlet
+      val events = b.out(0).mapConcat(_.stateEvents).log("splitEvents - state events").outlet
+      val mesosCalls = b.out(1).mapConcat(_.mesosCalls).log("splitEvents - mesos calls").outlet
 
       new FanOutShape2(b.in, events, mesosCalls)
     }
