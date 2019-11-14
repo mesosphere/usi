@@ -33,7 +33,7 @@ class MesosEventsLogicTest extends UnitTest with Inside {
 
   "MesosEventsLogic" should {
     "decline an offer when there is no PodSpec to launch" in {
-      val someOffer = MesosMock.createMockOffer()
+      val someOffer = MesosMock.createMockOffer(allocationRole = "test")
       val (_, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
         someOffer,
         Seq()
@@ -45,7 +45,7 @@ class MesosEventsLogicTest extends UnitTest with Inside {
     }
 
     "decline an offer when none of the PodSpec's resource requirements are met" in {
-      val insufficientOffer = MesosMock.createMockOffer(cpus = 1)
+      val insufficientOffer = MesosMock.createMockOffer(cpus = 1, allocationRole = "test")
       val (_, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
         insufficientOffer,
         Seq(RunningPodSpec(testPodId, testRunTemplate(cpus = Integer.MAX_VALUE))))
@@ -57,7 +57,11 @@ class MesosEventsLogicTest extends UnitTest with Inside {
 
     "decline a remote region offer when the default region selector is used" in {
       val remoteOffer =
-        MesosMock.createMockOffer(cpus = 10, mem = 1024, domain = newDomainInfo(region = "remote", zone = "a"))
+        MesosMock.createMockOffer(
+          cpus = 10,
+          mem = 1024,
+          domain = newDomainInfo(region = "remote", zone = "a"),
+          allocationRole = "test")
       val runTemplate = testRunTemplate(cpus = 1, mem = 256)
       val defaultRegionPodSpec = RunningPodSpec(testPodId, runTemplate)
       val remoteRegionPodSpec = RunningPodSpec(testPodId, runTemplate, domainFilter = RegionFilter("remote"))
@@ -72,7 +76,7 @@ class MesosEventsLogicTest extends UnitTest with Inside {
     }
 
     "accept an offer when some PodSpec's resource requirements are met" in {
-      val offerFor4Pods = MesosMock.createMockOffer(cpus = 1 * 10, mem = 256 * 4)
+      val offerFor4Pods = MesosMock.createMockOffer(cpus = 1 * 10, mem = 256 * 4, allocationRole = "test")
       val (matchedPodIds, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
         offerFor4Pods,
         Seq(
