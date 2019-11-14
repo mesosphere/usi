@@ -115,7 +115,7 @@ object Scheduler extends StrictLogging {
               // * It can cause a circular cancellation / failure race.
               // * In the case of upstream cancellation, we want to finish processing any pending elements for the fan-in
               // * A failure on either side will cause the merge to fail, anyways
-              val stateEventsBroadcast = builder.add(Broadcast[StateEvent](2, eagerCancel = false))
+              val stateEventsBroadcast = builder.add(Broadcast[StateEvent](2, eagerCancel = true))
               val mesosCallsFanIn = builder.add(Merge[MesosCall](2, eagerComplete = false))
               val eventSplitter = builder.add(splitEvents)
 

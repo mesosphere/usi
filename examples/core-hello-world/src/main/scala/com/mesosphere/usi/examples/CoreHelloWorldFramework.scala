@@ -124,7 +124,7 @@ object CoreHelloWorldFramework extends StrictLogging {
       implicit system: ActorSystem,
       materializer: Materializer): (MesosClient, StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed]) = {
     val client: MesosClient = Await.result(MesosClient(clientSettings, frameworkInfo).runWith(Sink.head), 10.seconds)
-    val factory = new SchedulerFactory(client, InMemoryPodRecordRepository(), SchedulerSettings.load(), DummyMetrics)
+    val factory = new SchedulerFactory(client, podRecordRepository, SchedulerSettings.load(), DummyMetrics)
     val (snapshot, schedulerFlow) =
       Await.result(factory.newSchedulerFlow(), 10.seconds)
     (client, snapshot, schedulerFlow)

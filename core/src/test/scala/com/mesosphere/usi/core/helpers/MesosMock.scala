@@ -16,7 +16,7 @@ object MesosMock {
   val mockAgentId: AgentId = AgentId("mock-agent")
   val mockFrameworkId: Mesos.FrameworkID = ProtoBuilders.newFrameworkId("mock-framework")
   val masterDomainInfo: Mesos.DomainInfo = ProtoBuilders.newDomainInfo(region = "home", zone = "a")
-  def mockFrameworkInfo(roles: Seq[String] = Seq("*")): Mesos.FrameworkInfo =
+  def mockFrameworkInfo(roles: Seq[String] = Seq("test")): Mesos.FrameworkInfo =
     ProtoBuilders.newFrameworkInfo(user = "mock", name = "mock-mesos", id = Some(mockFrameworkId), roles = roles)
 
   val flow: Flow[MesosCall, MesosEvent, NotUsed] = {
@@ -60,27 +60,20 @@ object MesosMock {
       cpus: Double = 4,
       mem: Double = 4096,
       domain: Mesos.DomainInfo = masterDomainInfo,
-      allocationRole: String = "some-role"
+      allocationRole: String = "test"
   ): Mesos.Offer = {
+    val allocationInfo = newResourceAllocationInfo(allocationRole)
     newOffer(
       id = newOfferId("testing"),
       agentId = mockAgentId.asProto,
       frameworkID = mockFrameworkId,
       hostname = "some-host",
-      allocationInfo = newResourceAllocationInfo(allocationRole),
+      allocationInfo = allocationInfo,
       domain = domain,
       resources = Seq(
-        newResource(
-          "cpus",
-          Mesos.Value.Type.SCALAR,
-          newResourceAllocationInfo("some-role"),
-          scalar = cpus.asProtoScalar),
-        newResource("mem", Mesos.Value.Type.SCALAR, newResourceAllocationInfo("some-role"), scalar = mem.asProtoScalar),
-        newResource(
-          "disk",
-          Mesos.Value.Type.SCALAR,
-          newResourceAllocationInfo("some-role"),
-          scalar = 256000.asProtoScalar)
+        newResource("cpus", Mesos.Value.Type.SCALAR, allocationInfo, scalar = cpus.asProtoScalar),
+        newResource("mem", Mesos.Value.Type.SCALAR, allocationInfo, scalar = mem.asProtoScalar),
+        newResource("disk", Mesos.Value.Type.SCALAR, allocationInfo, scalar = 256000.asProtoScalar)
       )
     )
   }
