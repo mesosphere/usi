@@ -31,7 +31,11 @@ class SuppressReviveHandler(
 
   private def defaultRoles = initialFrameworkInfo.getRolesList.asScala
 
-  def reviveStateFromPodSpecs: Flow[PodSpecUpdatedEvent, PodIdsWantingRoles, NotUsed] =
+  /**
+    * Given a stream of PodSpecUpdatedEvent (which gives us the signal of which pods want offers), we emit a snapshot
+    * describing all roles to which the framework is subscribed, and the set of podIds which want offers for each role.
+    */
+  private[revive] def reviveStateFromPodSpecs: Flow[PodSpecUpdatedEvent, PodIdsWantingRoles, NotUsed] =
     Flow[PodSpecUpdatedEvent]
       .scan(ReviveOffersState.empty(defaultRoles)) {
         case (state, PodSpecUpdatedEvent(podId, Some(newPod: RunningPodSpec))) =>
@@ -44,9 +48,16 @@ class SuppressReviveHandler(
       .map(_.offersWantedState)
       .named("reviveStateFromPodSpecs")
 
+  /**
+    * Takes two snapshot PodIdsWantingRoles and compares them, computing the appropriate role directive
+    * (IssueUpdateFramework or IssueRevive). We use directives instead of Mesos calls directly so additional metadata
+    * can be attached for metrics, and because it is easier to test.
+    */
   private[revive] val reviveDirectiveFlow: Flow[PodIdsWantingRoles, RoleDirective, NotUsed] = {
+    // By prepending an initial emptyRoles state, we enable the suppressRevive stream to send the initial suppress call,
+    // effectively clearing the slate for whatever the revive state was for a previous instance of the Mesos framework
     Flow[Map[Role, Set[PodId]]]
-      .prepend(Source.single(Map.empty[Role, Set[PodId]]).named("initialEmptyRolesWantedState"))
+      .prepend(Source.single[PodIdsWantingRoles](Map.empty).named("initialEmptyRolesWantedState"))
       .sliding(2)
       .mapConcat({
         case Seq(lastState, newState) =>
@@ -61,7 +72,7 @@ class SuppressReviveHandler(
   /**
     * Core logic for suppress and revive
     *
-    * Revive rate is throttled and debounced using minReviveOffersInterval
+    * Revive rate is throttled and debounced using the minReviveOffersInterval as specified above
     *
     * @return
     */
@@ -90,7 +101,7 @@ class SuppressReviveHandler(
 
   private def directiveToMesosCall(directive: RoleDirective): Call = {
     directive match {
-      case UpdateFramework(roleState, _, _) =>
+      case IssueUpdateFramework(roleState, _, _) =>
         val newInfo = frameworkInfoWithRoles(roleState.keys)
         val suppressedRoles = offersNotWantedRoles(roleState)
 
@@ -108,7 +119,7 @@ class SuppressReviveHandler(
 
   private[revive] val reviveSuppressMetrics: Flow[RoleDirective, RoleDirective, NotUsed] =
     Flow[RoleDirective].map {
-      case directive @ UpdateFramework(_, newlyRevived, newlySuppressed) =>
+      case directive @ IssueUpdateFramework(_, newlyRevived, newlySuppressed) =>
         newlyRevived.foreach { _ =>
           reviveCountMetric.increment()
         }
@@ -145,7 +156,7 @@ class SuppressReviveHandler(
     val rolesChanged = lastState.keySet != newState.keySet
 
     if (newlyNotWanted.nonEmpty || rolesChanged) {
-      directives += UpdateFramework(newState, newlyRevived = newlyWanted, newlySuppressed = newlyNotWanted)
+      directives += IssueUpdateFramework(newState, newlyRevived = newlyWanted, newlySuppressed = newlyNotWanted)
     }
 
     val rolesNeedingRevive = newState.iterator.collect {
@@ -171,7 +182,7 @@ object SuppressReviveHandler {
     * @param newlyRevived    Convenience metadata - Set of roles that were previously non-existent or suppressed
     * @param newlySuppressed Convenience metadata - Set of roles that were previously not suppressed
     */
-  private[revive] case class UpdateFramework(
+  private[revive] case class IssueUpdateFramework(
       roleState: Map[String, Set[PodId]],
       newlyRevived: Set[String],
       newlySuppressed: Set[String])

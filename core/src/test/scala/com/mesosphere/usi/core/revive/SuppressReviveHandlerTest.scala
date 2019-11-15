@@ -17,7 +17,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class SuppressReviveHandlerTest extends AkkaUnitTest with Inside {
-  import SuppressReviveHandler.{RoleDirective, UpdateFramework, IssueRevive}
+  import SuppressReviveHandler.{RoleDirective, IssueUpdateFramework, IssueRevive}
   class Fixture(debounceReviveInterval: FiniteDuration = 1.seconds, defaultRole: String = "web") {
 
     val webApp = SimpleRunTemplateFactory(Nil, "", "web")
@@ -69,7 +69,7 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside {
       // Note - we want to assert that this is emitted initially in order to create a clean-slate scenario with Mesos;
       // future updateFramework / revive calls are issues based on assumption of former state.
       inside(output.pull().futureValue) {
-        case Some(UpdateFramework(roleState, _, _)) =>
+        case Some(IssueUpdateFramework(roleState, _, _)) =>
           roleState("web").shouldBe(Set.empty)
       }
 
@@ -95,7 +95,7 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside {
           .futureValue
 
         inside(results) {
-          case Seq(UpdateFramework(roleState, newlyRevived, newlySuppressed)) =>
+          case Seq(IssueUpdateFramework(roleState, newlyRevived, newlySuppressed)) =>
             roleState shouldBe Map("web" -> Set.empty)
             newlyRevived shouldBe Set.empty
             newlySuppressed shouldBe Set.empty
@@ -119,10 +119,10 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside {
 
         inside(results) {
           case Seq(
-              initialMessage: UpdateFramework,
+              initialMessage: IssueUpdateFramework,
               reviveForPodSpec1: IssueRevive,
               reviveForPodSpec2: IssueRevive,
-              finalSuppress: UpdateFramework) =>
+              finalSuppress: IssueUpdateFramework) =>
             initialMessage.roleState shouldBe Map("web" -> Set.empty)
 
             reviveForPodSpec1.roles shouldBe Set("web")
@@ -142,7 +142,7 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside {
           .futureValue
 
         inside(results) {
-          case Seq(updateFramework: UpdateFramework, reviveForFirstUpdate: IssueRevive) =>
+          case Seq(updateFramework: IssueUpdateFramework, reviveForFirstUpdate: IssueRevive) =>
             updateFramework.roleState shouldBe Map("web" -> Set.empty)
 
             reviveForFirstUpdate.roles shouldBe Set("web")

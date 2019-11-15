@@ -21,8 +21,7 @@ class SchedulerVisualizationGeneratorTest extends UnitTest with Inside {
   implicit def fakeFlow[A <: Any: TypeTag, B <: AnyRef: TypeTag]: Flow[A, B, NotUsed] = {
     Flow[A].register.map { _ =>
       ???
-    }.asInstanceOf[Flow[A, B, NotUsed]]
-      .register
+    }.asInstanceOf[Flow[A, B, NotUsed]].register
   }
 
   "generate a graph of the scheduler" in {
