@@ -4,12 +4,13 @@ import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.usi.core.conf.SchedulerSettings
-import com.mesosphere.usi.core.models.{StateEvent, StateSnapshot}
+import com.mesosphere.usi.core.models.{PodSpecUpdatedEvent, StateEvent, StateSnapshot}
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.revive.SuppressReviveHandler
 import com.mesosphere.usi.core.util.DurationConverters
 import com.mesosphere.usi.metrics.Metrics
 import com.mesosphere.usi.repository.PodRecordRepository
+import org.apache.mesos.v1.scheduler.Protos
 
 import scala.concurrent.Future
 
@@ -22,7 +23,7 @@ trait PersistenceFlowFactory {
 }
 
 trait SuppressReviveFactory {
-  def newSuppressReviveHandler: SuppressReviveHandler
+  def newSuppressReviveFlow: Flow[PodSpecUpdatedEvent, Protos.Call, NotUsed]
 }
 
 case class SchedulerFactory(
@@ -44,13 +45,13 @@ case class SchedulerFactory(
     new SchedulerLogicGraph(client.calls, client.masterInfo.getDomain, snapshot, metrics)
   }
 
-  override def newSuppressReviveHandler: SuppressReviveHandler = {
+  override def newSuppressReviveFlow: Flow[PodSpecUpdatedEvent, Protos.Call, NotUsed] = {
     new SuppressReviveHandler(
       client.frameworkInfo,
       client.frameworkId,
       metrics,
       client.calls,
       debounceReviveInterval = DurationConverters.toScala(schedulerSettings.debounceReviveInterval)
-    )
+    ).flow
   }
 }

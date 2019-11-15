@@ -21,6 +21,7 @@ class SuppressReviveHandler(
     mesosCallFactory: MesosCalls,
     debounceReviveInterval: FiniteDuration)
     extends StrictLogging {
+
   import SuppressReviveHandler._
 
   require(defaultRoles.nonEmpty, "initialFramework rolls must be non-empty!")
@@ -30,7 +31,7 @@ class SuppressReviveHandler(
 
   private def defaultRoles = initialFrameworkInfo.getRolesList.asScala
 
-  def reviveStateFromPodSpecs: Flow[PodSpecUpdatedEvent, Map[String, Set[PodId]], NotUsed] =
+  def reviveStateFromPodSpecs: Flow[PodSpecUpdatedEvent, PodIdsWantingRoles, NotUsed] =
     Flow[PodSpecUpdatedEvent]
       .scan(ReviveOffersState.empty(defaultRoles)) {
         case (state, PodSpecUpdatedEvent(podId, Some(newPod: RunningPodSpec))) =>
@@ -41,10 +42,11 @@ class SuppressReviveHandler(
           state.withoutPodId(podId)
       }
       .map(_.offersWantedState)
+      .named("reviveStateFromPodSpecs")
 
-  private[revive] val reviveDirectiveFlow: Flow[Map[Role, Set[PodId]], RoleDirective, NotUsed] = {
+  private[revive] val reviveDirectiveFlow: Flow[PodIdsWantingRoles, RoleDirective, NotUsed] = {
     Flow[Map[Role, Set[PodId]]]
-      .prepend(Source.single(Map.empty[Role, Set[PodId]]))
+      .prepend(Source.single(Map.empty[Role, Set[PodId]]).named("initialEmptyRolesWantedState"))
       .sliding(2)
       .mapConcat({
         case Seq(lastState, newState) =>
@@ -53,6 +55,7 @@ class SuppressReviveHandler(
           logger.info(s"Revive stream is terminating")
           Nil
       })
+      .named("reviveDirectiveFlow")
   }
 
   /**
@@ -64,7 +67,13 @@ class SuppressReviveHandler(
     */
   private[revive] val suppressAndReviveFlow: Flow[PodSpecUpdatedEvent, RoleDirective, NotUsed] = {
 
+    val debouncedReviveState = Flow[PodIdsWantingRoles]
+      .buffer(1, OverflowStrategy.dropHead) // While we are back-pressured, we drop older interim frames
+      .via(RateLimiterFlow(debounceReviveInterval))
+      .named("debouncedReviveState")
+
     reviveStateFromPodSpecs
+      .via(debouncedReviveState)
       .buffer(1, OverflowStrategy.dropHead) // While we are back-pressured, we drop older interim frames
       .via(RateLimiterFlow(debounceReviveInterval))
       .via(reviveDirectiveFlow)
@@ -98,7 +107,7 @@ class SuppressReviveHandler(
   }
 
   private[revive] val reviveSuppressMetrics: Flow[RoleDirective, RoleDirective, NotUsed] =
-    Flow[RoleDirective].log("SuppressRevive - B").map {
+    Flow[RoleDirective].map {
       case directive @ UpdateFramework(_, newlyRevived, newlySuppressed) =>
         newlyRevived.foreach { _ =>
           reviveCountMetric.increment()
@@ -123,12 +132,10 @@ class SuppressReviveHandler(
     suppressAndReviveFlow.via(reviveSuppressMetrics).map(directiveToMesosCall).log("SuppressRevive Mesos call")
   }
 
-  private def offersNotWantedRoles(state: Map[Role, Set[PodId]]): Set[Role] =
+  private def offersNotWantedRoles(state: PodIdsWantingRoles): Set[Role] =
     state.collect { case (role, podIds) if podIds.isEmpty => role }.toSet
 
-  private def directivesForDiff(
-      lastState: Map[Role, Set[PodId]],
-      newState: Map[Role, Set[PodId]]): List[RoleDirective] = {
+  private def directivesForDiff(lastState: PodIdsWantingRoles, newState: PodIdsWantingRoles): List[RoleDirective] = {
     val directives = List.newBuilder[RoleDirective]
 
     val newWanted = newState.iterator.collect { case (role, podIds) if podIds.nonEmpty => role }.to[Set]
@@ -153,7 +160,8 @@ class SuppressReviveHandler(
 }
 
 object SuppressReviveHandler {
-  type Role = String
+  private[SuppressReviveHandler] type Role = String
+  private[SuppressReviveHandler] type PodIdsWantingRoles = Map[String, Set[PodId]]
 
   private[revive] sealed trait RoleDirective
 

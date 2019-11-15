@@ -26,30 +26,34 @@ import scala.concurrent.Future
   *    First, a scheduler state snapshot, followed by state updates.
   * 2) MesosCalls - Actions, such as revive, kill, accept offer, etc., used to realize the specification.
   *
-  * Fully wired, the graph looks like this at a high-level view:
+  * For a detailed visualization of a connected graph, please see the generated file docs/scheduler-stream.svg
+  *
+  * At a high level, the graph looks like this:
   * {{{
   *
   *                                                 *** SCHEDULER ***
-  *                    +------------------------------------------------------------------------+
-  *                    |                                                                        |
-  *                    |  +------------------+           +-------------+        StateOutput     |
-  *  SchedulerCommands |  |                  |           |             |     /------------------>----> (framework)
-  * (framework) >------>-->                  | Scheduler |             |    /                   |
-  *                    |  |                  |  Events   |             |   /                    |
-  *                    |  |  SchedulerLogic  o-----------> Persistence o--+                     |
-  *                    |  |                  |           |             |   \                    |
-  *       MesosEvents  |  |                  |           |             |    \   MesosCalls      |
-  *       /------------>-->                  |           |             |     \------------------>
-  *      /             |  |                  |           |             |                        |\
-  *     /              |  +------------------+           +-------------+                        | \
-  *    /               |                                                                        |  \
-  *   |                +------------------------------------------------------------------------+  |
-  *    \                                                                                           |
-  *     \                               +----------------------+                                  /
-  *      \                              |                      |                                 /
-  *       \-----------------------------<        Mesos         <---------------------------------
-  *                                     |                      |
-  *                                     +----------------------+
+  *                    +-------------------------------------------------------------------------------------------+
+  *                    |                                                                                           |
+  *                    |  +------------------+                                                    USI State Events |
+  *  SchedulerCommands |  |                  |                                                  /------------------>----> (framework)
+  * (framework) >------>-->                  | Scheduler                  +-------------+      /                   |
+  *                    |  |                  |  Events                    |             |     /                    |
+  *                    |  |  SchedulerLogic  o-------o--------------------> Persistence o----+                     |
+  *                    |  |                  |        \                   |             |     \                    |
+  *       Mesos Events |  |                  |         \                  +-------------+      \   Mesos Calls     |
+  *       /------------>-->                  |          \           +---------------------+     +------------------>
+  *      /             |  |                  |           \          |                     |    /                   |\
+  *     /              |  +------------------+            ---------->  Suppress / Revive  o---/                    | \
+  *    /               |                            PodSpecUpdated  |                     |                        |  \
+  *   |                |                               Events       +---------------------+                        |  \
+  *   |                |                                                                                           |  \
+  *   |                +-------------------------------------------------------------------------------------------+  |
+  *    \                                                                                                              |
+  *     \                                         +----------------------+                                           /
+  *      \                                        |                      |                                          /
+  *       \---------------------------------------<        Mesos         <------------------------------------------
+  *                                               |                      |
+  *                                               +----------------------+
   * }}}
   */
 object Scheduler extends StrictLogging {
@@ -102,54 +106,57 @@ object Scheduler extends StrictLogging {
       snapshot: StateSnapshot,
       factory: Factory): BidiFlow[SchedulerCommand, MesosCall, MesosEvent, StateEvent, NotUsed] = {
     val schedulerLogicGraph = factory.newSchedulerLogicGraph(snapshot)
-    val suppressReviveFlow = factory.newSuppressReviveHandler.flow
+    val suppressReviveFlow = factory.newSuppressReviveFlow
     BidiFlow.fromGraph {
       GraphDSL.create(schedulerLogicGraph, suppressReviveFlow)((_, _) => NotUsed) {
         implicit builder => (schedulerLogic, suppressRevive) =>
           {
             import GraphDSL.Implicits._
 
-            val (schedulerEventsInput, allStateEventsOut, podSpecEventsOut, reviveMesosCallsIn, allMesosCallsOut) = {
+            // We disable eagerComplete for the fanin because:
+            // * It can cause a circular cancellation / failure race.
+            // * In the case of upstream cancellation, we want to finish processing any pending elements for the fan-in
+            // * A failure on either side will cause the merge to fail, anyways
+            val schedulerEventsBroadcast =
+              builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true).named("schedulerEventsBroadcast"))
+            val mesosCallsFanIn = builder.add(Merge[MesosCall](2, eagerComplete = false).named("mergeMesosCalls"))
+            val (schedulerEventsRouterIn, stateEvents, mesosCalls) = {
+              val g = builder.add(routeEvents)
+              (g.in, g.out0, g.out1)
 
-              // We disable eagerComplete for the fanin because:
-              // * It can cause a circular cancellation / failure race.
-              // * In the case of upstream cancellation, we want to finish processing any pending elements for the fan-in
-              // * A failure on either side will cause the merge to fail, anyways
-              val stateEventsBroadcast = builder.add(Broadcast[StateEvent](2, eagerCancel = true))
-              val mesosCallsFanIn = builder.add(Merge[MesosCall](2, eagerComplete = false))
-              val eventSplitter = builder.add(splitEvents)
-
-              eventSplitter.out0 ~> stateEventsBroadcast
-              eventSplitter.out1 ~> mesosCallsFanIn.in(0)
-
-              val allStateEventsOut = stateEventsBroadcast.out(1)
-              val podSpecEventsOut = stateEventsBroadcast.out(0).collect { case psu: PodSpecUpdatedEvent => psu }
-              val reviveMesosCallsIn = mesosCallsFanIn.in(1)
-
-              (eventSplitter.in, allStateEventsOut, podSpecEventsOut, reviveMesosCallsIn, mesosCallsFanIn.out)
             }
+            val collectPodSpecEvents = builder.add(
+              Flow[SchedulerEvents]
+                .mapConcat(_.stateEvents)
+                .collect { case psu: PodSpecUpdatedEvent => psu }
+                .named("collectPodSpecEvents"))
+            val persistenceStorageFlow = builder.add(factory.newPersistenceFlow.named("persistenceFlow"))
 
-            val persistenceStorageFlow = builder.add(factory.newPersistenceFlow)
+            schedulerLogic.out ~> schedulerEventsBroadcast
+            schedulerEventsBroadcast ~> collectPodSpecEvents ~> suppressRevive ~> mesosCallsFanIn
+            schedulerEventsBroadcast ~> persistenceStorageFlow ~> schedulerEventsRouterIn
 
-            schedulerLogic.out ~> persistenceStorageFlow ~> schedulerEventsInput
+            mesosCalls ~> mesosCallsFanIn
 
-            podSpecEventsOut ~> suppressRevive ~> reviveMesosCallsIn
-
-            BidiShape.apply(schedulerLogic.in0, allMesosCallsOut, schedulerLogic.in1, allStateEventsOut)
+            BidiShape.apply(schedulerLogic.in0, mesosCallsFanIn.out, schedulerLogic.in1, stateEvents)
           }
       }
     }
   }
 
-  private def splitEvents: Graph[FanOutShape2[SchedulerEvents, StateEvent, MesosCall], NotUsed] = {
+  private def routeEvents: Graph[FanOutShape2[SchedulerEvents, StateEvent, MesosCall], NotUsed] = {
     GraphDSL.create() { implicit builder =>
       import GraphDSL.Implicits._
 
-      val b = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true))
-      val events = b.out(0).mapConcat(_.stateEvents).log("splitEvents - state events").outlet
-      val mesosCalls = b.out(1).mapConcat(_.mesosCalls).log("splitEvents - mesos calls").outlet
+      val b = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true).named("routeSchedulerEvents"))
+      val getStateEvents = builder.add(
+        Flow[SchedulerEvents].mapConcat(_.stateEvents).named("stateEvents").log("routeEvents - state events"))
+      val getMesosCalls =
+        builder.add(Flow[SchedulerEvents].mapConcat(_.mesosCalls).named("mesosCalls").log("routeEvents - mesos calls"))
+      b ~> getStateEvents
+      b ~> getMesosCalls
 
-      new FanOutShape2(b.in, events, mesosCalls)
+      new FanOutShape2(b.in, getStateEvents.out, getMesosCalls.out)
     }
   }
 

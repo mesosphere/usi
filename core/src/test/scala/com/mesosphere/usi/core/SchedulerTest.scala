@@ -5,29 +5,22 @@ import java.time.Instant
 import akka.stream.scaladsl.{BidiFlow, Flow, Keep, Sink, SinkQueue}
 import akka.stream.testkit.scaladsl.{TestSink, TestSource}
 import akka.{Done, NotUsed}
-import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.conf.SchedulerSettings
-import com.mesosphere.usi.core.helpers.MesosMock
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.commandInputSource
+import com.mesosphere.usi.core.helpers.{MesosMock, MockedFactory}
 import com.mesosphere.usi.core.models.commands.{LaunchPod, SchedulerCommand}
 import com.mesosphere.usi.core.models.resources.{ResourceRequirement, ResourceType, ScalarRequirement}
 import com.mesosphere.usi.core.models.template.{RunTemplate, SimpleRunTemplateFactory}
 import com.mesosphere.usi.core.models.{AgentId, PodId, PodRecord, PodRecordUpdatedEvent, StateEvent, StateSnapshot}
-import com.mesosphere.usi.core.revive.SuppressReviveHandler
-import com.mesosphere.usi.core.util.DurationConverters
-import com.mesosphere.usi.metrics.Metrics
-import com.mesosphere.usi.repository.PodRecordRepository
 import com.mesosphere.utils.AkkaUnitTest
-import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
-import org.apache.mesos.v1.Protos.{DomainInfo, FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 import org.scalatest._
 
 import scala.annotation.tailrec
+import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
-import scala.collection.JavaConverters._
 import scala.util.Random
 
 class SchedulerTest extends AkkaUnitTest with Inside {
@@ -67,42 +60,8 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     }
   }
 
-  case class MockedFactory(
-      podRecordRepository: PodRecordRepository = InMemoryPodRecordRepository(),
-      schedulerSettings: SchedulerSettings =
-        SchedulerSettings.load().withDebounceReviveInterval(DurationConverters.toJava(50.millis)),
-      frameworkId: FrameworkID = MesosMock.mockFrameworkId,
-      frameworkInfo: FrameworkInfo = MesosMock.mockFrameworkInfo(),
-      masterDomainInfo: DomainInfo = MesosMock.masterDomainInfo,
-      metrics: Metrics = DummyMetrics)
-      extends SchedulerLogicFactory
-      with PersistenceFlowFactory
-      with SuppressReviveFactory {
-
-    val mesosCalls = new MesosCalls(frameworkId: FrameworkID)
-    override def newPersistenceFlow(): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
-      Scheduler.newPersistenceFlow(podRecordRepository, schedulerSettings.persistencePipelineLimit)
-    }
-
-    override def newSchedulerLogicGraph(snapshot: StateSnapshot): SchedulerLogicGraph = {
-      new SchedulerLogicGraph(mesosCalls, masterDomainInfo, snapshot, metrics)
-    }
-
-    override def newSuppressReviveHandler: SuppressReviveHandler = {
-      new SuppressReviveHandler(
-        frameworkInfo,
-        frameworkId,
-        metrics,
-        mesosCalls,
-        debounceReviveInterval = DurationConverters.toScala(schedulerSettings.debounceReviveInterval)
-      )
-    }
-  }
-
-  def mockedFactory() = MockedFactory()
-
   def mockedUnconnectedFlow: BidiFlow[SchedulerCommand, MesosCall, MesosEvent, StateEvent, NotUsed] = {
-    val factory = mockedFactory()
+    val factory = MockedFactory()
     val snapshot = StateSnapshot.empty
     Scheduler
       .schedulerGraph(snapshot, factory)
@@ -205,9 +164,9 @@ class SchedulerTest extends AkkaUnitTest with Inside {
 
   "suppress and revive calls are generated in response to podspecs" in {
     val watchingMockMesosFlow = Flow[MesosCall].alsoToMat(Sink.queue())(Keep.right).via(loggingMockMesosFlow)
-    val lol = mockedUnconnectedFlow.joinMat(watchingMockMesosFlow)(Keep.right)
+    val schedulerWithWatchingMesos = mockedUnconnectedFlow.joinMat(watchingMockMesosFlow)(Keep.right)
     val ((input, mesosCallsOutput), stateEventsOutput) = commandInputSource
-      .viaMat(lol)(Keep.both)
+      .viaMat(schedulerWithWatchingMesos)(Keep.both)
       .toMat(Sink.queue())(Keep.both)
       .run
     val testPodId = PodId("test-podId")

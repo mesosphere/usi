@@ -41,6 +41,9 @@ allprojects {
 
     repositories {
         jcenter()
+        maven {
+            url "https://raw.githubusercontent.com/indvd00m/maven-repo/master/repository"
+        }
     }
 
     // compiler warnings + unused imports are reported as errors
