@@ -9,6 +9,8 @@ include 'metrics-dropwizard'
 include 'persistence'
 include 'persistence-zookeeper'
 include 'test-utils'
+include ':scheduler-vis'
+project(':scheduler-vis').projectDir = new File("docs/scheduler-vis")
 
 /* example projects*/
 include 'core-hello-world'

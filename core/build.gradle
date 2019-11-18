@@ -5,7 +5,6 @@ dependencies {
     compile project(':mesos-client')
     compile project(':metrics')
     testCompile project(':test-utils')
-    testCompile "net.mikolak:travesty_$scalaVersion:0.9.1_2.5.17"
 }
 
 test {

@@ -44,7 +44,7 @@ object SchedulerLogicGraph {
   * It's existence is only warranted by forecasted future needs. It's kept as a graph with an internal buffer as we will
   * likely need timers, other callbacks, and additional output ports (such as an offer event stream?).
   */
-private[core] class SchedulerLogicGraph(
+private[usi] class SchedulerLogicGraph(
     mesosCallFactory: MesosCalls,
     masterDomainInfo: DomainInfo,
     initialState: StateSnapshot,

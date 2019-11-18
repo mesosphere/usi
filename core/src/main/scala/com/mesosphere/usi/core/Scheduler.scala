@@ -102,7 +102,7 @@ object Scheduler extends StrictLogging {
     }
   }
 
-  private[core] def schedulerGraph(
+  private[usi] def schedulerGraph(
       snapshot: StateSnapshot,
       factory: Factory): BidiFlow[SchedulerCommand, MesosCall, MesosEvent, StateEvent, NotUsed] = {
     val schedulerLogicGraph = factory.newSchedulerLogicGraph(snapshot)
