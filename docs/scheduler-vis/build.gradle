@@ -1,0 +1,13 @@
+plugins {
+    id "application"
+}
+
+dependencies {
+    compile "net.mikolak:travesty_$scalaVersion:0.9.1_2.5.17"
+    compile project(':test-utils')
+    compile project(':core')
+}
+
+application {
+    mainClassName = "com.mesosphere.usi.schedulervis.Main"
+}

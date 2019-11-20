@@ -244,11 +244,16 @@ case class MesosCluster(
       start()
     }
 
+    def isAlive(): Boolean = {
+      process.exists(_.isAlive())
+    }
+
     /**
       * Starts a Mesos master or agent.
       * @param prefix May be defined to override the log prefix. It defaults to [[suiteName]].
       */
     def start(prefix: Option[String] = None): Unit = if (process.isEmpty) {
+      assert(!isAlive(), s"Mesos process ${processName} already started")
       val name = prefix.getOrElse(suiteName)
       process = Some(processBuilder.run(ProcessOutputToLogStream(s"$name-Mesos$processName-$port")))
     }
@@ -438,7 +443,13 @@ trait MesosClusterTest extends Suite with ZookeeperServerTest with MesosTest wit
     agentsConfig = agentConfig,
     waitForMesosTimeout = mesosLeaderTimeout,
   )
-  lazy val mesosFacade = new MesosFacade(mesosCluster.waitForLeader())
+  lazy val mesosFacade = {
+    assert(
+      mesosCluster.masters.exists(_.isAlive()),
+      "Order of initialization error! Reference to MesosFacade obtained before Mesos master is started. Did you accidentally access something non lazily (before the test suite beforeAll is run)?"
+    )
+    new MesosFacade(mesosCluster.waitForLeader())
+  }
 
   abstract override def beforeAll(): Unit = {
     super.beforeAll()

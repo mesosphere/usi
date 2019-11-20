@@ -25,7 +25,10 @@ class MesosEventsLogicTest extends UnitTest with Inside {
       resourceRequirements += ScalarRequirement(ResourceType.CPUS, cpus)
     if (mem > 0)
       resourceRequirements += ScalarRequirement(ResourceType.MEM, mem)
-    SimpleRunTemplateFactory(resourceRequirements = resourceRequirements.result(), shellCommand = "sleep 3600", "test")
+    SimpleRunTemplateFactory(
+      resourceRequirements = resourceRequirements.result(),
+      shellCommand = "sleep 3600",
+      role = "test")
   }
 
   val testPodId = PodId("mock-podId")

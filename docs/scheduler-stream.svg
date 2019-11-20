@@ -1,0 +1,200 @@
+<svg width="3129pt" height="246pt"
+ viewBox="0.00 0.00 3128.99 246.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 242)">
+<title>%3</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-242 3124.99,-242 3124.99,4 -4,4"/>
+<text text-anchor="middle" x="1560.5" y="-222.8" font-family="Times,serif" font-size="14.00">Flow[com.mesosphere.usi.core.models.commands.SchedulerCommand,com.mesosphere.usi.core.models.StateEvent,akka.NotUsed]</text>
+<!-- *OUTLET* -->
+<g id="node1" class="node">
+<title>*OUTLET*</title>
+<ellipse fill="none" stroke="black" cx="3067.66" cy="-198" rx="53.16" ry="18"/>
+<text text-anchor="middle" x="3067.66" y="-193.8" font-family="Times,serif" font-size="14.00">*OUTLET*</text>
+</g>
+<!-- *INLET* -->
+<g id="node2" class="node">
+<title>*INLET*</title>
+<ellipse fill="none" stroke="black" cx="44.49" cy="-18" rx="44.48" ry="18"/>
+<text text-anchor="middle" x="44.49" y="-13.8" font-family="Times,serif" font-size="14.00">*INLET*</text>
+</g>
+<!-- SchedulerLogicGraph -->
+<g id="node3" class="node">
+<title>SchedulerLogicGraph</title>
+<ellipse fill="none" stroke="black" cx="1523.72" cy="-41" rx="88.39" ry="18"/>
+<text text-anchor="middle" x="1523.72" y="-36.8" font-family="Times,serif" font-size="14.00">SchedulerLogicGraph</text>
+</g>
+<!-- *INLET*&#45;&gt;SchedulerLogicGraph -->
+<g id="edge16" class="edge">
+<title>*INLET*&#45;&gt;SchedulerLogicGraph</title>
+<path fill="none" stroke="black" d="M89.24,-18C140.01,-18 226.26,-18 300.39,-18 300.39,-18 300.39,-18 1093.2,-18 1210.29,-18 1345.07,-26.63 1431.95,-33.31"/>
+<polygon fill="black" stroke="black" points="1431.8,-36.81 1442.04,-34.1 1432.34,-29.83 1431.8,-36.81"/>
+</g>
+<!-- schedulerEventsBroadcast -->
+<g id="node4" class="node">
+<title>schedulerEventsBroadcast</title>
+<ellipse fill="none" stroke="black" cx="1768.55" cy="-41" rx="103.34" ry="18"/>
+<text text-anchor="middle" x="1768.55" y="-36.8" font-family="Times,serif" font-size="14.00">schedulerEventsBroadcast</text>
+</g>
+<!-- SchedulerLogicGraph&#45;&gt;schedulerEventsBroadcast -->
+<g id="edge1" class="edge">
+<title>SchedulerLogicGraph&#45;&gt;schedulerEventsBroadcast</title>
+<path fill="none" stroke="black" d="M1612.04,-41C1625.83,-41 1640.25,-41 1654.52,-41"/>
+<polygon fill="black" stroke="black" points="1654.87,-44.5 1664.87,-41 1654.87,-37.5 1654.87,-44.5"/>
+</g>
+<!-- collectPodSpecEvents -->
+<g id="node10" class="node">
+<title>collectPodSpecEvents</title>
+<ellipse fill="none" stroke="black" cx="2251.58" cy="-21" rx="88.89" ry="18"/>
+<text text-anchor="middle" x="2251.58" y="-16.8" font-family="Times,serif" font-size="14.00">collectPodSpecEvents</text>
+</g>
+<!-- schedulerEventsBroadcast&#45;&gt;collectPodSpecEvents -->
+<g id="edge5" class="edge">
+<title>schedulerEventsBroadcast&#45;&gt;collectPodSpecEvents</title>
+<path fill="none" stroke="black" d="M1869.22,-36.86C1952.83,-33.38 2071.5,-28.45 2154.18,-25.01"/>
+<polygon fill="black" stroke="black" points="2154.49,-28.5 2164.33,-24.59 2154.2,-21.5 2154.49,-28.5"/>
+</g>
+<!-- persistenceFlow -->
+<g id="node11" class="node">
+<title>persistenceFlow</title>
+<ellipse fill="none" stroke="black" cx="2251.58" cy="-146" rx="67.65" ry="18"/>
+<text text-anchor="middle" x="2251.58" y="-141.8" font-family="Times,serif" font-size="14.00">persistenceFlow</text>
+</g>
+<!-- schedulerEventsBroadcast&#45;&gt;persistenceFlow -->
+<g id="edge6" class="edge">
+<title>schedulerEventsBroadcast&#45;&gt;persistenceFlow</title>
+<path fill="none" stroke="black" d="M1833.92,-55.05C1926.83,-75.33 2097.35,-112.55 2188.79,-132.51"/>
+<polygon fill="black" stroke="black" points="2188.22,-135.97 2198.73,-134.68 2189.71,-129.13 2188.22,-135.97"/>
+<text text-anchor="middle" x="2025.53" y="-122.8" font-family="Times,serif" font-size="14.00">com.mesosphere.usi.core.SchedulerEvents</text>
+</g>
+<!-- mesosCalls -->
+<g id="node5" class="node">
+<title>mesosCalls</title>
+<ellipse fill="none" stroke="black" cx="369.78" cy="-113" rx="50.29" ry="18"/>
+<text text-anchor="middle" x="369.78" y="-108.8" font-family="Times,serif" font-size="14.00">mesosCalls</text>
+</g>
+<!-- ??? -->
+<g id="node6" class="node">
+<title>???</title>
+<ellipse fill="none" stroke="black" cx="484.18" cy="-109" rx="27" ry="18"/>
+<text text-anchor="middle" x="484.18" y="-104.8" font-family="Times,serif" font-size="14.00">???</text>
+</g>
+<!-- mesosCalls&#45;&gt;??? -->
+<g id="edge2" class="edge">
+<title>mesosCalls&#45;&gt;???</title>
+<path fill="none" stroke="black" d="M420.08,-111.25C429.14,-110.92 438.44,-110.59 447.02,-110.29"/>
+<polygon fill="black" stroke="black" points="447.2,-113.78 457.07,-109.93 446.95,-106.79 447.2,-113.78"/>
+</g>
+<!-- mergeMesosCalls -->
+<g id="node8" class="node">
+<title>mergeMesosCalls</title>
+<ellipse fill="none" stroke="black" cx="684.89" cy="-106" rx="73.14" ry="18"/>
+<text text-anchor="middle" x="684.89" y="-101.8" font-family="Times,serif" font-size="14.00">mergeMesosCalls</text>
+</g>
+<!-- ???&#45;&gt;mergeMesosCalls -->
+<g id="edge15" class="edge">
+<title>???&#45;&gt;mergeMesosCalls</title>
+<path fill="none" stroke="black" d="M511.57,-108.6C534.52,-108.26 569.07,-107.73 601.21,-107.25"/>
+<polygon fill="black" stroke="black" points="601.6,-110.74 611.55,-107.09 601.49,-103.74 601.6,-110.74"/>
+</g>
+<!-- suppressAndReviveFlow -->
+<g id="node7" class="node">
+<title>suppressAndReviveFlow</title>
+<ellipse fill="none" stroke="black" cx="2897.3" cy="-85" rx="99.06" ry="18"/>
+<text text-anchor="middle" x="2897.3" y="-80.8" font-family="Times,serif" font-size="14.00">suppressAndReviveFlow</text>
+</g>
+<!-- suppressAndReviveFlow&#45;&gt;mergeMesosCalls -->
+<g id="edge3" class="edge">
+<title>suppressAndReviveFlow&#45;&gt;mergeMesosCalls</title>
+<path fill="none" stroke="black" d="M2804.4,-91.36C2707.02,-97.54 2548.72,-106 2411.95,-106 1091.2,-106 1091.2,-106 1091.2,-106 979.52,-106 850.53,-106 768.62,-106"/>
+<polygon fill="black" stroke="black" points="768.37,-102.5 758.37,-106 768.37,-109.5 768.37,-102.5"/>
+<text text-anchor="middle" x="1768.55" y="-108.8" font-family="Times,serif" font-size="14.00">org.apache.mesos.v1.scheduler.Protos.Call</text>
+</g>
+<!-- mesos&#45;master -->
+<g id="node12" class="node">
+<title>mesos&#45;master</title>
+<ellipse fill="none" stroke="black" cx="1092.2" cy="-64" rx="58.97" ry="18"/>
+<text text-anchor="middle" x="1092.2" y="-59.8" font-family="Times,serif" font-size="14.00">mesos&#45;master</text>
+</g>
+<!-- mergeMesosCalls&#45;&gt;mesos&#45;master -->
+<g id="edge8" class="edge">
+<title>mergeMesosCalls&#45;&gt;mesos&#45;master</title>
+<path fill="none" stroke="black" d="M726.26,-91.06C741.67,-86 759.55,-80.9 776.21,-78 860.37,-63.33 958.98,-61.35 1023.15,-62.03"/>
+<polygon fill="black" stroke="black" points="1023.49,-65.53 1033.53,-62.17 1023.58,-58.54 1023.49,-65.53"/>
+<text text-anchor="middle" x="895.84" y="-80.8" font-family="Times,serif" font-size="14.00">org.apache.mesos.v1.scheduler.Protos.Call</text>
+</g>
+<!-- collect -->
+<g id="node9" class="node">
+<title>collect</title>
+<ellipse fill="none" stroke="black" cx="2410.95" cy="-55" rx="33.85" ry="18"/>
+<text text-anchor="middle" x="2410.95" y="-50.8" font-family="Times,serif" font-size="14.00">collect</text>
+</g>
+<!-- collect&#45;&gt;suppressAndReviveFlow -->
+<g id="edge4" class="edge">
+<title>collect&#45;&gt;suppressAndReviveFlow</title>
+<path fill="none" stroke="black" d="M2444.48,-57.01C2514.72,-61.37 2683.12,-71.8 2793.31,-78.62"/>
+<polygon fill="black" stroke="black" points="2793.26,-82.12 2803.46,-79.25 2793.69,-75.14 2793.26,-82.12"/>
+<text text-anchor="middle" x="2621.45" y="-80.8" font-family="Times,serif" font-size="14.00">com.mesosphere.usi.core.models.PodSpecUpdatedEvent</text>
+</g>
+<!-- collectPodSpecEvents&#45;&gt;collect -->
+<g id="edge7" class="edge">
+<title>collectPodSpecEvents&#45;&gt;collect</title>
+<path fill="none" stroke="black" d="M2312.97,-34.05C2331.78,-38.11 2352.06,-42.49 2369.19,-46.19"/>
+<polygon fill="black" stroke="black" points="2368.9,-49.71 2379.41,-48.4 2370.38,-42.87 2368.9,-49.71"/>
+</g>
+<!-- routeSchedulerEvents -->
+<g id="node13" class="node">
+<title>routeSchedulerEvents</title>
+<ellipse fill="none" stroke="black" cx="194.68" cy="-152" rx="87.92" ry="18"/>
+<text text-anchor="middle" x="194.68" y="-147.8" font-family="Times,serif" font-size="14.00">routeSchedulerEvents</text>
+</g>
+<!-- persistenceFlow&#45;&gt;routeSchedulerEvents -->
+<g id="edge9" class="edge">
+<title>persistenceFlow&#45;&gt;routeSchedulerEvents</title>
+<path fill="none" stroke="black" d="M2184.05,-147.35C2091.23,-149.12 1917.59,-152 1769.55,-152 368.78,-152 368.78,-152 368.78,-152 344.09,-152 317.41,-152 292.57,-152"/>
+<polygon fill="black" stroke="black" points="292.41,-148.5 282.41,-152 292.41,-155.5 292.41,-148.5"/>
+<text text-anchor="middle" x="895.84" y="-154.8" font-family="Times,serif" font-size="14.00">com.mesosphere.usi.core.SchedulerEvents</text>
+</g>
+<!-- mesos&#45;master&#45;&gt;SchedulerLogicGraph -->
+<g id="edge13" class="edge">
+<title>mesos&#45;master&#45;&gt;SchedulerLogicGraph</title>
+<path fill="none" stroke="black" d="M1150.24,-60.95C1221.07,-57.15 1342.91,-50.63 1427.88,-46.08"/>
+<polygon fill="black" stroke="black" points="1428.26,-49.56 1438.06,-45.53 1427.88,-42.57 1428.26,-49.56"/>
+<text text-anchor="middle" x="1293.23" y="-62.8" font-family="Times,serif" font-size="14.00">org.apache.mesos.v1.scheduler.Protos.Event</text>
+</g>
+<!-- routeSchedulerEvents&#45;&gt;mesosCalls -->
+<g id="edge11" class="edge">
+<title>routeSchedulerEvents&#45;&gt;mesosCalls</title>
+<path fill="none" stroke="black" d="M254.77,-138.69C274.87,-134.16 297.18,-129.13 316.69,-124.74"/>
+<polygon fill="black" stroke="black" points="317.62,-128.11 326.61,-122.5 316.09,-121.29 317.62,-128.11"/>
+</g>
+<!-- stateEvents -->
+<g id="node14" class="node">
+<title>stateEvents</title>
+<ellipse fill="none" stroke="black" cx="369.78" cy="-195" rx="50.26" ry="18"/>
+<text text-anchor="middle" x="369.78" y="-190.8" font-family="Times,serif" font-size="14.00">stateEvents</text>
+</g>
+<!-- routeSchedulerEvents&#45;&gt;stateEvents -->
+<g id="edge10" class="edge">
+<title>routeSchedulerEvents&#45;&gt;stateEvents</title>
+<path fill="none" stroke="black" d="M251.41,-165.84C272.81,-171.16 297.11,-177.19 318.02,-182.39"/>
+<polygon fill="black" stroke="black" points="317.44,-185.85 327.99,-184.87 319.13,-179.06 317.44,-185.85"/>
+</g>
+<!-- ???(1) -->
+<g id="node15" class="node">
+<title>???(1)</title>
+<ellipse fill="none" stroke="black" cx="561.37" cy="-198" rx="32.39" ry="18"/>
+<text text-anchor="middle" x="561.37" y="-193.8" font-family="Times,serif" font-size="14.00">???(1)</text>
+</g>
+<!-- stateEvents&#45;&gt;???(1) -->
+<g id="edge14" class="edge">
+<title>stateEvents&#45;&gt;???(1)</title>
+<path fill="none" stroke="black" d="M420.6,-195.79C451.18,-196.27 489.9,-196.88 518.82,-197.34"/>
+<polygon fill="black" stroke="black" points="518.95,-200.84 529,-197.5 519.06,-193.85 518.95,-200.84"/>
+</g>
+<!-- ???(1)&#45;&gt;*OUTLET* -->
+<g id="edge12" class="edge">
+<title>???(1)&#45;&gt;*OUTLET*</title>
+<path fill="none" stroke="black" d="M594,-198C653.1,-198 784.31,-198 894.84,-198 894.84,-198 894.84,-198 2622.45,-198 2758.44,-198 2917.84,-198 3003.89,-198"/>
+<polygon fill="black" stroke="black" points="3004.01,-201.5 3014.01,-198 3004.01,-194.5 3004.01,-201.5"/>
+</g>
+</g>
+</svg>

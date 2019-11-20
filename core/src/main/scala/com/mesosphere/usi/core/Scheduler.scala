@@ -1,20 +1,18 @@
 package com.mesosphere.usi.core
 
-import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Sink, Source}
-import akka.stream.{BidiShape, FlowShape, Materializer}
+import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Merge, Sink, Source}
+import akka.stream.{BidiShape, FanOutShape2, Graph, Materializer}
 import akka.{Done, NotUsed}
-import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
-import com.mesosphere.usi.core.conf.SchedulerSettings
+import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
-import com.mesosphere.usi.core.models.{PodRecordUpdatedEvent, StateEvent, StateSnapshot}
-import com.mesosphere.usi.metrics.Metrics
+import com.mesosphere.usi.core.models.{PodRecordUpdatedEvent, PodSpecUpdatedEvent, StateEvent, StateSnapshot}
 import com.mesosphere.usi.repository.PodRecordRepository
-import org.apache.mesos.v1.Protos
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 /**
   * Provides the scheduler graph component. The component has two inputs, and two outputs:
@@ -28,33 +26,38 @@ import scala.concurrent.{ExecutionContext, Future}
   *    First, a scheduler state snapshot, followed by state updates.
   * 2) MesosCalls - Actions, such as revive, kill, accept offer, etc., used to realize the specification.
   *
-  * Fully wired, the graph looks like this at a high-level view:
+  * For a detailed visualization of a connected graph, please see the generated file docs/scheduler-stream.svg
+  *
+  * At a high level, the graph looks like this:
   * {{{
   *
   *                                                 *** SCHEDULER ***
-  *                    +------------------------------------------------------------------------+
-  *                    |                                                                        |
-  *                    |  +------------------+           +-------------+        StateOutput     |
-  *  SchedulerCommands |  |                  |           |             |     /------------------>----> (framework)
-  * (framework) >------>-->                  | Scheduler |             |    /                   |
-  *                    |  |                  |  Events   |             |   /                    |
-  *                    |  |  SchedulerLogic  o-----------> Persistence o--+                     |
-  *                    |  |                  |           |             |   \                    |
-  *       MesosEvents  |  |                  |           |             |    \   MesosCalls      |
-  *       /------------>-->                  |           |             |     \------------------>
-  *      /             |  |                  |           |             |                        |\
-  *     /              |  +------------------+           +-------------+                        | \
-  *    /               |                                                                        |  \
-  *   |                +------------------------------------------------------------------------+  |
-  *    \                                                                                           |
-  *     \                               +----------------------+                                  /
-  *      \                              |                      |                                 /
-  *       \-----------------------------<        Mesos         <---------------------------------
-  *                                     |                      |
-  *                                     +----------------------+
+  *                    +-------------------------------------------------------------------------------------------+
+  *                    |                                                                                           |
+  *                    |  +------------------+                                                    USI State Events |
+  *  SchedulerCommands |  |                  |                                                  /------------------>----> (framework)
+  * (framework) >------>-->                  | Scheduler                  +-------------+      /                   |
+  *                    |  |                  |  Events                    |             |     /                    |
+  *                    |  |  SchedulerLogic  o-------o--------------------> Persistence o----+                     |
+  *                    |  |                  |        \                   |             |     \                    |
+  *       Mesos Events |  |                  |         \                  +-------------+      \   Mesos Calls     |
+  *       /------------>-->                  |          \           +---------------------+     +------------------>
+  *      /             |  |                  |           \          |                     |    /                   |\
+  *     /              |  +------------------+            ---------->  Suppress / Revive  o---/                    | \
+  *    /               |                            PodSpecUpdated  |                     |                        |  \
+  *   |                |                               Events       +---------------------+                        |  \
+  *   |                |                                                                                           |  \
+  *   |                +-------------------------------------------------------------------------------------------+  |
+  *    \                                                                                                              |
+  *     \                                         +----------------------+                                           /
+  *      \                                        |                      |                                          /
+  *       \---------------------------------------<        Mesos         <------------------------------------------
+  *                                               |                      |
+  *                                               +----------------------+
   * }}}
   */
-object Scheduler {
+object Scheduler extends StrictLogging {
+  type Factory = SchedulerLogicFactory with PersistenceFlowFactory with SuppressReviveFactory
 
   /**
     * Represents the scheduler as a Sink and Source.
@@ -63,108 +66,106 @@ object Scheduler {
     *
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
-  def asSourceAndSink(
-      client: MesosClient,
-      podRecordRepository: PodRecordRepository,
-      metrics: Metrics,
-      schedulerSettings: SchedulerSettings)(implicit mat: Materializer)
+  def asSourceAndSink(factory: Factory, client: MesosClient, podRecordRepository: PodRecordRepository)(
+      implicit mat: Materializer)
     : Future[(StateSnapshot, Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]])] = {
-    fromClient(client, podRecordRepository, metrics, schedulerSettings).map {
-      case (snapshot, flow) =>
-        val (source, sink) = FlowHelpers.asSourceAndSink(flow)(mat)
+    fromClient(factory, client, podRecordRepository).map {
+      case (snapshot, schedulerFlow) =>
+        val (source, sink) = FlowHelpers.asSourceAndSink(schedulerFlow)(mat)
         (snapshot, source, sink)
     }(CallerThreadExecutionContext.context)
   }
 
-  private[usi] def fromClient(
-      client: MesosClient,
-      podRecordRepository: PodRecordRepository,
-      metrics: Metrics,
-      schedulerSettings: SchedulerSettings): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
+  private[usi] def fromClient(factory: Factory, client: MesosClient, podRecordRepository: PodRecordRepository)
+    : Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
     if (!isMultiRoleFramework(client.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
           "Please provide a MesosClient with FrameworkInfo that has capability MULTI_ROLE")
     }
-    fromFlow(
-      client.calls,
-      podRecordRepository,
-      metrics,
-      Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource),
-      schedulerSettings,
-      client.masterInfo.getDomain
-    )
-  }
-
-  private[usi] def fromFlow(
-      mesosCallFactory: MesosCalls,
-      podRecordRepository: PodRecordRepository,
-      metrics: Metrics,
-      mesosFlow: Flow[MesosCall, MesosEvent, Any],
-      schedulerSettings: SchedulerSettings,
-      masterDomainInfo: Protos.DomainInfo): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
-    unconnectedGraph(mesosCallFactory, podRecordRepository, metrics, schedulerSettings, masterDomainInfo).map {
-      case (snapshot, graph) =>
-        val flow = Flow.fromGraph {
-          GraphDSL.create(graph, mesosFlow)((_, _) => NotUsed) { implicit builder =>
-            { (graph, mesos) =>
-              import GraphDSL.Implicits._
-
-              mesos ~> graph.in2
-              graph.out2 ~> mesos
-
-              FlowShape(graph.in1, graph.out1)
-            }
-          }
-        }
-        snapshot -> flow
-    }(CallerThreadExecutionContext.context)
-  }
-
-  private[core] def unconnectedGraph(
-      mesosCallFactory: MesosCalls,
-      podRecordRepository: PodRecordRepository,
-      metrics: Metrics,
-      schedulerSettings: SchedulerSettings,
-      masterDomainInfo: Protos.DomainInfo)
-    : Future[(StateSnapshot, BidiFlow[SchedulerCommand, StateEvent, MesosEvent, MesosCall, NotUsed])] = {
     podRecordRepository
       .readAll()
       .map { podRecords =>
         val snapshot = StateSnapshot(podRecords = podRecords.values.toSeq, agentRecords = Nil)
-        val schedulerLogicGraph = new SchedulerLogicGraph(mesosCallFactory, masterDomainInfo, snapshot, metrics)
-        val bidiFlow = BidiFlow.fromGraph {
-          GraphDSL.create(schedulerLogicGraph) { implicit builder => (schedulerLogic) =>
-            {
-              import GraphDSL.Implicits._
-
-              val broadcast = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true))
-              val persistenceStorageFlow = builder.add(persistenceFlow(podRecordRepository, schedulerSettings))
-
-              schedulerLogic.out ~> persistenceStorageFlow ~> broadcast.in
-
-              val mesosCalls = broadcast.out(0).mapConcat { frameResult =>
-                frameResult.mesosCalls
-              }
-              val stateEvents = broadcast.out(1).mapConcat { frameResult =>
-                frameResult.stateEvents
-              }
-
-              BidiShape.apply(schedulerLogic.in0, stateEvents.outlet, schedulerLogic.in1, mesosCalls.outlet)
-            }
-          }
-        }
-        snapshot -> bidiFlow
-
-      }(ExecutionContext.global)
+        val graph = schedulerGraph(snapshot, factory)
+        val mesosFlow = Flow.fromSinkAndSourceCoupled(logMesosCallException(client.mesosSink), client.mesosSource)
+        snapshot -> graph.join(mesosFlow)
+      }(CallerThreadExecutionContext.context)
   }
 
-  private[core] def persistenceFlow(
+  private def logMesosCallException[T](s: Sink[T, Future[Done]]): Sink[T, NotUsed] = {
+    s.mapMaterializedValue { f =>
+      f.failed.foreach { ex =>
+        logger.error("Mesos client hanging up due to error in stream", ex)
+      }(CallerThreadExecutionContext.context)
+      NotUsed
+    }
+  }
+
+  private[usi] def schedulerGraph(
+      snapshot: StateSnapshot,
+      factory: Factory): BidiFlow[SchedulerCommand, MesosCall, MesosEvent, StateEvent, NotUsed] = {
+    val schedulerLogicGraph = factory.newSchedulerLogicGraph(snapshot)
+    val suppressReviveFlow = factory.newSuppressReviveFlow
+    BidiFlow.fromGraph {
+      GraphDSL.create(schedulerLogicGraph, suppressReviveFlow)((_, _) => NotUsed) {
+        implicit builder => (schedulerLogic, suppressRevive) =>
+          {
+            import GraphDSL.Implicits._
+
+            // We disable eagerComplete for the fanin because:
+            // * It can cause a circular cancellation / failure race.
+            // * In the case of upstream cancellation, we want to finish processing any pending elements for the fan-in
+            // * A failure on either side will cause the merge to fail, anyways
+            val schedulerEventsBroadcast =
+              builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true).named("schedulerEventsBroadcast"))
+            val mesosCallsFanIn = builder.add(Merge[MesosCall](2, eagerComplete = false).named("mergeMesosCalls"))
+            val (schedulerEventsRouterIn, stateEvents, mesosCalls) = {
+              val g = builder.add(routeEvents)
+              (g.in, g.out0, g.out1)
+
+            }
+            val collectPodSpecEvents = builder.add(
+              Flow[SchedulerEvents]
+                .mapConcat(_.stateEvents)
+                .collect { case psu: PodSpecUpdatedEvent => psu }
+                .named("collectPodSpecEvents"))
+            val persistenceStorageFlow = builder.add(factory.newPersistenceFlow.named("persistenceFlow"))
+
+            schedulerLogic.out ~> schedulerEventsBroadcast
+            schedulerEventsBroadcast ~> collectPodSpecEvents ~> suppressRevive ~> mesosCallsFanIn
+            schedulerEventsBroadcast ~> persistenceStorageFlow ~> schedulerEventsRouterIn
+
+            mesosCalls ~> mesosCallsFanIn
+
+            BidiShape.apply(schedulerLogic.in0, mesosCallsFanIn.out, schedulerLogic.in1, stateEvents)
+          }
+      }
+    }
+  }
+
+  private def routeEvents: Graph[FanOutShape2[SchedulerEvents, StateEvent, MesosCall], NotUsed] = {
+    GraphDSL.create() { implicit builder =>
+      import GraphDSL.Implicits._
+
+      val b = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true).named("routeSchedulerEvents"))
+      val getStateEvents = builder.add(
+        Flow[SchedulerEvents].mapConcat(_.stateEvents).named("stateEvents").log("routeEvents - state events"))
+      val getMesosCalls =
+        builder.add(Flow[SchedulerEvents].mapConcat(_.mesosCalls).named("mesosCalls").log("routeEvents - mesos calls"))
+      b ~> getStateEvents
+      b ~> getMesosCalls
+
+      new FanOutShape2(b.in, getStateEvents.out, getMesosCalls.out)
+    }
+  }
+
+  private[core] def newPersistenceFlow(
       podRecordRepository: PodRecordRepository,
-      schedulerSettings: SchedulerSettings): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
+      persistencePipelineLimit: Int): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
     Flow[SchedulerEvents]
       .mapConcat(persistEvents(_, podRecordRepository))
-      .mapAsync(schedulerSettings.persistencePipelineLimit)(call => call())
+      .mapAsync(persistencePipelineLimit)(call => call())
       .collect { case Some(events) => events }
   }
 

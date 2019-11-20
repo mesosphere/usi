@@ -3,17 +3,10 @@ package com.mesosphere.usi.core
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
-import com.mesosphere.usi.core.models.{
-  PodId,
-  PodSpec,
-  PodSpecUpdatedEvent,
-  PodStatusUpdatedEvent,
-  RunningPodSpec,
-  StateSnapshot
-}
+import com.mesosphere.usi.core.models.{PodId, PodSpecUpdatedEvent, PodStatusUpdatedEvent, StateSnapshot}
 import com.mesosphere.usi.metrics.Metrics
 import org.apache.mesos.v1.Protos.DomainInfo
-import org.apache.mesos.v1.scheduler.Protos.{Call, Event => MesosEvent}
+import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
 /**
   * Container class responsible for keeping track of the scheduler state.
@@ -108,7 +101,6 @@ private[core] class SchedulerLogicHandler(
     val frameResultBuilder = handler(FrameResultBuilder.givenState(this.state))
       .process(prunePodStatuses)
       .process(pruneKilledTerminalSpecs)
-      .process(suppressAndRevive(state.podSpecs))
 
     // update our state for the next frame processing
     this.state = frameResultBuilder.state
@@ -151,39 +143,6 @@ private[core] class SchedulerLogicHandler(
         events.withStateEvent(PodStatusUpdatedEvent(podId, None))
       }
       .result
-  }
-
-  /**
-    * Given the state at the beginning of the frame, emit the appropriate suppress and revived functions based on new or
-    * removed podSpecs
-    *
-    * @param oldPodSpecs The podSpecs state at the very beginning of the frame
-    */
-  private def suppressAndRevive(
-      oldPodSpecs: Map[PodId, PodSpec])(state: SchedulerState, dirtyPodIds: Set[PodId]): SchedulerEvents = {
-
-    val oldPodSpecIds = oldPodSpecs.keySet
-    val newPodSpecRoles = state.podSpecs.valuesIterator.filterNot { podSpec =>
-      oldPodSpecIds.contains(podSpec.id)
-    }.collect { case runningPodSpec: RunningPodSpec => runningPodSpec.runSpec.role }.toSet
-
-    val oldRoles: Set[String] =
-      oldPodSpecs.valuesIterator.collect { case runningPodSpec: RunningPodSpec => runningPodSpec.runSpec.role }.toSet
-    val currentLaunchingRoles =
-      state.podSpecs.valuesIterator.collect { case runningPodSpec: RunningPodSpec => runningPodSpec.runSpec.role }.toSet
-    val rolesNoLongerWanted = oldRoles -- currentLaunchingRoles
-
-    val reviveCalls: List[Call] = newPodSpecRoles.map { r =>
-      metrics.meter(s"usi.scheduler.offers.revive.$r").mark()
-      mesosCallFactory.newRevive(Some(r))
-    }(collection.breakOut)
-
-    val suppressCalls = rolesNoLongerWanted.map { r =>
-      metrics.meter(s"usi.scheduler.offers.suppress.$r").mark()
-      mesosCallFactory.newSuppress(Some(r))
-    }.toList
-
-    SchedulerEvents(mesosCalls = reviveCalls ++ suppressCalls)
   }
 
   /**
