@@ -2,6 +2,7 @@ package com.mesosphere.usi.helloworld
 
 import java.util.UUID
 
+import com.mesosphere.usi.core.models.faultdomain.HomeRegionFilter
 import com.mesosphere.usi.core.models.resources.{ResourceType, ScalarRequirement}
 import com.mesosphere.usi.core.models.template.{RunTemplate, SimpleRunTemplateFactory}
 import com.mesosphere.usi.core.models.{PodId, RunningPodSpec}
@@ -20,7 +21,7 @@ object KeepAlivePodSpecHelper {
   def generatePodSpec(): RunningPodSpec = {
     val podId = PodId(s"hello-world.${UUID.randomUUID()}.1")
 
-    val podSpec = RunningPodSpec(id = podId, runSpec = runSpec)
+    val podSpec = RunningPodSpec(id = podId, runSpec = runSpec, HomeRegionFilter)
     podSpec
   }
 
