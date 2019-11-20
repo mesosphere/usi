@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.19 API  - com.mesosphere.usi.core</title>
-          <meta name="description" content="usi 0.1.19 API - com.mesosphere.usi.core" />
-          <meta name="keywords" content="usi 0.1.19 API com.mesosphere.usi.core" />
+          <title>usi 0.1.20 API  - com.mesosphere.usi.core</title>
+          <meta name="description" content="usi 0.1.20 API - com.mesosphere.usi.core" />
+          <meta name="keywords" content="usi 0.1.20 API com.mesosphere.usi.core" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.19 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.20 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -229,10 +229,30 @@
       </span>
       
       
+    </li><li name="com.mesosphere.usi.core.revive" visbl="pub" class="indented5 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="revive"></a><a id="revive:revive"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#revive" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="revive/index.html"><span class="name">revive</span></a>
+      </span>
+      
+      
     </li><li class="current-entities indented4">
                         <a class="object" href="FrameResultBuilder$.html" title=""></a>
                         <a class="class" href="FrameResultBuilder.html" title="Immutable helper data structure which:"></a>
                         <a href="FrameResultBuilder.html" title="Immutable helper data structure which:">FrameResultBuilder</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="trait" href="PersistenceFlowFactory.html" title=""></a>
+                        <a href="PersistenceFlowFactory.html" title="">PersistenceFlowFactory</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
                         <a class="object" href="ResourceUtil$.html" title=""></a>
@@ -251,12 +271,24 @@
                         <a href="SchedulerEventsBuilder.html" title="Immutable intents builder">SchedulerEventsBuilder</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="class" href="SchedulerFactory.html" title=""></a>
+                        <a href="SchedulerFactory.html" title="">SchedulerFactory</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="trait" href="SchedulerLogicFactory.html" title=""></a>
+                        <a href="SchedulerLogicFactory.html" title="">SchedulerLogicFactory</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="object" href="SchedulerLogicGraph$.html" title=""></a>
                         <a href="SchedulerLogicGraph$.html" title="">SchedulerLogicGraph</a>
                       </li><li class="current-entities indented4">
                         <a class="object" href="SchedulerState$.html" title=""></a>
                         <a class="class" href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic."></a>
                         <a href="SchedulerState.html" title="Data structure that contains all the state used for the SchedulerLogic.">SchedulerState</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="trait" href="SuppressReviveFactory.html" title=""></a>
+                        <a href="SuppressReviveFactory.html" title="">SuppressReviveFactory</a>
                       </li><li name="com.mesosphere.usi.examples" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="examples"></a><a id="examples:examples"></a>
       <span class="permalink">
@@ -318,6 +350,22 @@
       </span>
       <span class="symbol">
         <a title="" href="../repository/index.html"><span class="name">repository</span></a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi">usi</a></dd></dl></div>
+    </li><li name="com.mesosphere.usi.schedulervis" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="schedulervis"></a><a id="schedulervis:schedulervis"></a>
+      <span class="permalink">
+      <a href="../../../com/mesosphere/usi/index.html#schedulervis" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="../schedulervis/index.html"><span class="name">schedulervis</span></a>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi">usi</a></dd></dl></div>
@@ -420,6 +468,22 @@
 - keeps track of which podIds have changed state (for cache invalidation)</p><p>This data structure enables various stages of the transformation of a frame to be expressed via a pipeline of chained
 calls
 </p></div><dl class="paramcmts block"><dt class="param">state</dt><dd class="cmt"><p>The current SchedulerLogic state</p></dd><dt class="param">appliedStateEvents</dt><dd class="cmt"><p>The cumulative stateEvents applied to the frame; will be included in the FrameResult</p></dd><dt class="param">mesosCalls</dt><dd class="cmt"><p>The cumulative Mesos calls that are intended to be sent</p></dd><dt class="param">dirtyPodIds</dt><dd class="cmt"><p>The podIds that have been changed during the lifecycle of this FrameWithEvents instance</p></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.PersistenceFlowFactory" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PersistenceFlowFactoryextendsAnyRef"></a><a id="PersistenceFlowFactory:PersistenceFlowFactory"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#PersistenceFlowFactoryextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="PersistenceFlowFactory.html"><span class="name">PersistenceFlowFactory</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      
     </li><li name="com.mesosphere.usi.core.SchedulerEvents" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="SchedulerEventsextendsProductwithSerializable"></a><a id="SchedulerEvents:SchedulerEvents"></a>
       <span class="permalink">
@@ -454,6 +518,38 @@ calls
       <p class="shortcomment cmt">Immutable intents builder</p><div class="fullcomment"><div class="comment cmt"><p>Immutable intents builder</p><p>Effects are appended in lazy fashion by using the exposed effect methods.</p><p>Effects preserve order. For append-efficiency a link-list data structure is used. List is lazily reversed when
 effects are asked for.</p><p>Note, SchedulerEventsBuilder will accumulate state events. The scheduler logic loop happens to consume this.
 </p></div></div>
+    </li><li name="com.mesosphere.usi.core.SchedulerFactory" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SchedulerFactoryextendsSchedulerLogicFactorywithPersistenceFlowFactorywithSuppressReviveFactorywithProductwithSerializable"></a><a id="SchedulerFactory:SchedulerFactory"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#SchedulerFactoryextendsSchedulerLogicFactorywithPersistenceFlowFactorywithSuppressReviveFactorywithProductwithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="SchedulerFactory.html"><span class="name">SchedulerFactory</span></a><span class="params">(<span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="schedulerSettings">schedulerSettings: <a href="conf/SchedulerSettings.html" class="extype" name="com.mesosphere.usi.core.conf.SchedulerSettings">SchedulerSettings</a></span>, <span name="metrics">metrics: <a href="../metrics/Metrics.html" class="extype" name="com.mesosphere.usi.metrics.Metrics">Metrics</a></span>)</span><span class="result"> extends <a href="SchedulerLogicFactory.html" class="extype" name="com.mesosphere.usi.core.SchedulerLogicFactory">SchedulerLogicFactory</a> with <a href="PersistenceFlowFactory.html" class="extype" name="com.mesosphere.usi.core.PersistenceFlowFactory">PersistenceFlowFactory</a> with <a href="SuppressReviveFactory.html" class="extype" name="com.mesosphere.usi.core.SuppressReviveFactory">SuppressReviveFactory</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.SchedulerLogicFactory" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SchedulerLogicFactoryextendsAnyRef"></a><a id="SchedulerLogicFactory:SchedulerLogicFactory"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#SchedulerLogicFactoryextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="SchedulerLogicFactory.html"><span class="name">SchedulerLogicFactory</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      
     </li><li name="com.mesosphere.usi.core.SchedulerState" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="SchedulerStateextendsProductwithSerializable"></a><a id="SchedulerState:SchedulerState"></a>
       <span class="permalink">
@@ -472,6 +568,22 @@ effects are asked for.</p><p>Note, SchedulerEventsBuilder will accumulate state 
       <p class="shortcomment cmt">Data structure that contains all the state used for the SchedulerLogic.</p><div class="fullcomment"><div class="comment cmt"><p>Data structure that contains all the state used for the SchedulerLogic. It's state is manipulated through Effects,
 so that the state can be reliably subscribed to by other components.
 </p></div></div>
+    </li><li name="com.mesosphere.usi.core.SuppressReviveFactory" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SuppressReviveFactoryextendsAnyRef"></a><a id="SuppressReviveFactory:SuppressReviveFactory"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#SuppressReviveFactoryextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="SuppressReviveFactory.html"><span class="name">SuppressReviveFactory</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      
     </li></ol>
             </div>
 
@@ -524,7 +636,7 @@ so that the state can be reliably subscribed to by other components.
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a title="Provides the scheduler graph component." href="Scheduler$.html"><span class="name">Scheduler</span></a>
+        <a title="Provides the scheduler graph component." href="Scheduler$.html"><span class="name">Scheduler</span></a><span class="result"> extends <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></span>
       </span>
       
       <p class="shortcomment cmt">Provides the scheduler graph component.</p><div class="fullcomment"><div class="comment cmt"><p>Provides the scheduler graph component. The component has two inputs, and two outputs:</p><p>Input:
@@ -532,27 +644,29 @@ so that the state can be reliably subscribed to by other components.
 2) MesosEvents - Events from Mesos; offers, task status updates, etc.</p><p>Output:
 1) StateEvents - Used to replicate the state of pods, agents, and reservations to the framework
    First, a scheduler state snapshot, followed by state updates.
-2) MesosCalls - Actions, such as revive, kill, accept offer, etc., used to realize the specification.</p><p>Fully wired, the graph looks like this at a high-level view:</p><pre>                                                *** SCHEDULER ***
-                   +------------------------------------------------------------------------+
-                   |                                                                        |
-                   |  +------------------+           +-------------+        StateOutput     |
- SchedulerCommands |  |                  |           |             |     /------------------&gt;----&gt; (framework)
-(framework) &gt;------&gt;--&gt;                  | Scheduler |             |    /                   |
-                   |  |                  |  Events   |             |   /                    |
-                   |  |  SchedulerLogic  o-----------&gt; Persistence o--+                     |
-                   |  |                  |           |             |   \                    |
-      MesosEvents  |  |                  |           |             |    \   MesosCalls      |
-      /------------&gt;--&gt;                  |           |             |     \------------------&gt;
-     /             |  |                  |           |             |                        |\
-    /              |  +------------------+           +-------------+                        | \
-   /               |                                                                        |  \
-  |                +------------------------------------------------------------------------+  |
-   \                                                                                           |
-    \                               +----------------------+                                  /
-     \                              |                      |                                 /
-      \-----------------------------&lt;        Mesos         <span class="kw">&lt;-</span>--------------------------------
-                                    |                      |
-                                    +----------------------+</pre></div></div>
+2) MesosCalls - Actions, such as revive, kill, accept offer, etc., used to realize the specification.</p><p>For a detailed visualization of a connected graph, please see the generated file docs/scheduler-stream.svg</p><p>At a high level, the graph looks like this:</p><pre>                                                *** SCHEDULER ***
+                   +-------------------------------------------------------------------------------------------+
+                   |                                                                                           |
+                   |  +------------------+                                                    USI State Events |
+ SchedulerCommands |  |                  |                                                  /------------------&gt;----&gt; (framework)
+(framework) &gt;------&gt;--&gt;                  | Scheduler                  +-------------+      /                   |
+                   |  |                  |  Events                    |             |     /                    |
+                   |  |  SchedulerLogic  o-------o--------------------&gt; Persistence o----+                     |
+                   |  |                  |        \                   |             |     \                    |
+      Mesos Events |  |                  |         \                  +-------------+      \   Mesos Calls     |
+      /------------&gt;--&gt;                  |          \           +---------------------+     +------------------&gt;
+     /             |  |                  |           \          |                     |    /                   |\
+    /              |  +------------------+            ----------&gt;  Suppress / Revive  o---/                    | \
+   /               |                            PodSpecUpdated  |                     |                        |  \
+  |                |                               Events       +---------------------+                        |  \
+  |                |                                                                                           |  \
+  |                +-------------------------------------------------------------------------------------------+  |
+   \                                                                                                              |
+    \                                         +----------------------+                                           /
+     \                                        |                      |                                          /
+      \---------------------------------------&lt;        Mesos         <span class="kw">&lt;-</span>-----------------------------------------
+                                              |                      |
+                                              +----------------------+</pre></div></div>
     </li><li name="com.mesosphere.usi.core.SchedulerEvents" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="SchedulerEvents"></a><a id="SchedulerEvents:SchedulerEvents"></a>
       <span class="permalink">
