@@ -27,6 +27,8 @@ case class TerminalPodSpec(id: PodId) extends PodSpec {
   *
   * @param id Id of the pod
   * @param runSpec WIP the thing to run, and resource requirements, etc.
+  * @param domainFilter  Specifies on which [[http://mesos.apache.org/documentation/latest/fault-domains/ fault domains]]
+  *                      the pod will be launched.
   */
 case class RunningPodSpec(id: PodId, runSpec: RunTemplate, domainFilter: DomainFilter = HomeRegionFilter)
     extends PodSpec {
