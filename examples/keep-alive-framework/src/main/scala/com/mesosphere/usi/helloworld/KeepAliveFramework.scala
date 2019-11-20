@@ -50,7 +50,7 @@ class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Op
       import TaskState._
       def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
       // We're only interested in the bad task statuses for our pod
-      val failedTasks = taskStatuses.filterNot { case (id, status) => activeTask(status) }
+      val failedTasks = taskStatuses.filterNot { case (taskId, status) => activeTask(status) }
       if (failedTasks.nonEmpty) {
         logger.info(s"Restarting Pod $id")
         val newId = KeepAlivePodSpecHelper.createNewIncarnationId(id)
@@ -109,6 +109,7 @@ class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Op
   // We let the framework run "forever"
   val result = Await.result(end, Duration.Inf)
   logger.warn(s"Framework finished with $result")
+  Await.result(system.terminate(), Duration.Inf)
 }
 
 object KeepAliveFramework {
@@ -201,7 +202,14 @@ object KeepAliveFramework {
           MesosClientSettings.fromConfig(conf).withMasters(Seq(mesosUrl.toURL)),
           conf.getInt("keep-alive-framework.tasks-started"),
           mesosRole)
-        new KeepAliveFramework(settings, provider)
+        try {
+          new KeepAliveFramework(settings, provider)
+        } catch {
+          case _: Throwable => {
+            Await.result(system.terminate(), Duration.Inf)
+            sys.exit(1)
+          }
+        }
       case _ =>
         sys.exit(1)
     }
