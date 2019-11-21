@@ -4,11 +4,15 @@ import java.util.concurrent.CompletableFuture
 
 import akka.stream.{Materializer, javadsl}
 import akka.{Done, NotUsed}
-import com.mesosphere.mesos.client.MesosClient
+import com.mesosphere.mesos.client.{MesosCalls, MesosClient}
+import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.models.{StateEvent, StateSnapshot}
-import com.mesosphere.usi.core.{CallerThreadExecutionContext, SchedulerFactory, Scheduler => ScalaScheduler}
+import com.mesosphere.usi.core.{CallerThreadExecutionContext, Scheduler => ScalaScheduler}
+import com.mesosphere.usi.metrics.Metrics
 import com.mesosphere.usi.repository.PodRecordRepository
+import org.apache.mesos.v1.Protos.DomainInfo
+import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
 import scala.compat.java8.FutureConverters._
 
@@ -23,18 +27,46 @@ object Scheduler {
     * The input is a [[javadsl.Source]] of [[SchedulerCommand]]. The output is a [[akka.japi.Pair]]
     * of [[StateSnapshot]] and [[javadsl.Source]] of [[StateEvent]].
     *
-    * @param factory SchedulerFactory instance; used for constructing dependencies
-    * @param client MesosClient instance
-    * @param podRecordRepository Repository
+    * @param client The [[MesosClient]] used to interact with Mesos.
+    * @param podRecordRepository The persistent backend used to recover from a crash.
+    * @param metrics The Metrics backend.
+    * @param schedulerSettings Settings for USI.
     * @return A [[javadsl]] flow from pod specs to state events.
     */
   def fromClient(
-      factory: SchedulerFactory,
       client: MesosClient,
-      podRecordRepository: PodRecordRepository): CompletableFuture[FlowResult] = {
+      podRecordRepository: PodRecordRepository,
+      metrics: Metrics,
+      schedulerSettings: SchedulerSettings): CompletableFuture[FlowResult] = {
+    val flow = javadsl.Flow.fromSinkAndSourceCoupled(client.mesosSink, client.mesosSource)
+    fromFlow(client.calls, podRecordRepository, metrics, flow, schedulerSettings, client.masterInfo.getDomain)
+  }
+
+  /**
+    * Constructs a USI scheduler flow to managing pods.
+    *
+    * See [[Scheduler.fromClient()]] for a simpler constructor.
+    *
+    * @param mesosCallFactory A factory for construct [[MesosCall]]s.
+    * @param metrics The Metrics backend.
+    * @param mesosFlow A flow from [[MesosCall]]s to [[MesosEvent]]s.
+    * @param schedulerSettings Settings for USI.
+    * @return A [[javadsl]] flow from pod specs to state events.
+    */
+  def fromFlow(
+      mesosCallFactory: MesosCalls,
+      podRecordRepository: PodRecordRepository,
+      metrics: Metrics,
+      mesosFlow: javadsl.Flow[MesosCall, MesosEvent, NotUsed],
+      schedulerSettings: SchedulerSettings,
+      masterDomainInfo: DomainInfo): CompletableFuture[FlowResult] = {
+
     ScalaScheduler
-      .fromClient(factory, client, podRecordRepository)
-      .map { case (snapshot, flow) => new FlowResult(snapshot, flow.asJava) }(CallerThreadExecutionContext.context)
+      .fromFlow(mesosCallFactory, podRecordRepository, metrics, mesosFlow.asScala, schedulerSettings, masterDomainInfo)
+      .map {
+        case (snapshot, flow) =>
+          new FlowResult(snapshot, flow.asJava)
+      }(CallerThreadExecutionContext.context)
       .toJava
       .toCompletableFuture
   }
@@ -47,12 +79,13 @@ object Scheduler {
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
   def asSourceAndSink(
-      factory: SchedulerFactory,
       client: MesosClient,
       podRecordRepository: PodRecordRepository,
+      metrics: Metrics,
+      schedulerSettings: SchedulerSettings,
       materializer: Materializer): CompletableFuture[SourceAndSinkResult] = {
     ScalaScheduler
-      .asSourceAndSink(factory, client, podRecordRepository)(materializer)
+      .asSourceAndSink(client, podRecordRepository, metrics, schedulerSettings)(materializer)
       .map {
         case (snap, source, sink) =>
           new SourceAndSinkResult(snap, source.asJava, sink.mapMaterializedValue(_.toJava.toCompletableFuture).asJava)

@@ -50,10 +50,6 @@ object StateSnapshot {
   */
 case class PodSpecUpdatedEvent(id: PodId, newState: Option[PodSpec]) extends StateEvent with PodStateEvent
 
-object PodSpecUpdatedEvent {
-  def forUpdate(podSpec: PodSpec) = PodSpecUpdatedEvent(podSpec.id, Some(podSpec))
-}
-
 /** Sent each time a Mesos task status is received for one of the tasks in a pod.
   */
 case class PodStatusUpdatedEvent(id: PodId, newStatus: Option[PodStatus]) extends StateEvent with PodStateEvent

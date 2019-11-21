@@ -1,18 +1,16 @@
 package com.mesosphere.usi.core.integration
 
-import akka.event.Logging
+import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink}
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Attributes}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
-import com.mesosphere.usi.core.SchedulerFactory
+import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.commandInputSource
+import com.mesosphere.usi.core.models.{commands, _}
 import com.mesosphere.usi.core.models.commands.LaunchPod
 import com.mesosphere.usi.core.models.resources.{RangeRequirement, ScalarRequirement}
 import com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory
-import com.mesosphere.usi.core.models.{commands, _}
-import com.mesosphere.usi.core.util.DurationConverters
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.metrics.DummyMetrics
@@ -21,13 +19,10 @@ import org.apache.mesos.v1.Protos
 import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.scalatest.Inside
 
-import scala.concurrent.duration._
-
 class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with Inside {
-  override lazy val actorMaterializerSettings = ActorMaterializerSettings(system).withDebugLogging(true)
-  override implicit lazy val mat = ActorMaterializer()
+  implicit val materializer = ActorMaterializer()
 
-  lazy val mesosClientSettings = MesosClientSettings.load().withMasters(Seq(mesosFacade.url))
+  lazy val settings = MesosClientSettings.load().withMasters(Seq(mesosFacade.url))
   val frameworkInfo = Protos.FrameworkInfo
     .newBuilder()
     .setUser("test")
@@ -36,21 +31,12 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
     .build()
 
-  lazy val mesosClient: MesosClient = MesosClient(mesosClientSettings, frameworkInfo).runWith(Sink.head).futureValue
-  val schedulerSettings = SchedulerSettings
-    .load()
-    .withDebounceReviveInterval(DurationConverters.toJava(50.millis))
-  lazy val factory =
-    new SchedulerFactory(mesosClient, InMemoryPodRecordRepository(), schedulerSettings, DummyMetrics)
+  lazy val mesosClient: MesosClient = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
   lazy val (snapshot, schedulerFlow) =
-    factory.newSchedulerFlow().futureValue
+    Scheduler.fromClient(mesosClient, InMemoryPodRecordRepository(), DummyMetrics, SchedulerSettings.load()).futureValue
   lazy val (input, output) = commandInputSource
-    .log("scheduler commands")
     .via(schedulerFlow)
-    .log("scheduler events")
     .toMat(Sink.queue())(Keep.both)
-    .withAttributes(Attributes
-      .logLevels(onElement = Logging.DebugLevel, onFinish = Logging.InfoLevel, onFailure = Logging.ErrorLevel))
     .run
 
   override def beforeAll(): Unit = {
@@ -73,7 +59,6 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
       case Some(specUpdated: PodSpecUpdatedEvent) =>
         specUpdated.id shouldBe podId
     }
-
     inside(output.pull().futureValue) {
       case Some(recordUpdated: PodRecordUpdatedEvent) =>
         recordUpdated.id shouldBe podId

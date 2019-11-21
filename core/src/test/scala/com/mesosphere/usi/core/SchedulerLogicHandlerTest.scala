@@ -12,7 +12,8 @@ import com.mesosphere.usi.core.models.{
   PodSpecUpdatedEvent,
   PodStatusUpdatedEvent,
   StateEventOrSnapshot,
-  StateSnapshot
+  StateSnapshot,
+  commands
 }
 import com.mesosphere.usi.core.protos.ProtoBuilders
 import com.mesosphere.utils.UnitTest
@@ -22,7 +23,7 @@ import org.apache.mesos.v1.{Protos => Mesos}
 import org.scalatest.Inside
 
 class SchedulerLogicHandlerTest extends UnitTest with Inside {
-  val testRoleRunSpec = SimpleRunTemplateFactory(Seq.empty, "", "test")
+  val testRoleRunSpec = SimpleRunTemplateFactory(Seq.empty, "", "test-role")
 
   def declineCallsIn(calls: Seq[Call]): Seq[Call.Decline] = calls.collect {
     case call if call.hasDecline => call.getDecline
@@ -215,6 +216,57 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
         case Some(acknowledge) =>
           acknowledge.getUuid shouldBe taskStatusUUID
       }
+    }
+  }
+
+  "suppress and revive logic" should {
+    "produces a Mesos revive call for a newly launched podSpec's role" in {
+      Given("Scheduler logic handler with empty state")
+      val handler = new SchedulerLogicHandler(
+        new MesosCalls(MesosMock.mockFrameworkId),
+        MesosMock.masterDomainInfo,
+        StateSnapshot.empty,
+        DummyMetrics)
+      val podId = PodId("pod")
+
+      When("pod with role 'test-role' is launched")
+      val result = handler.handleCommand(commands.LaunchPod(podId, testRoleRunSpec))
+
+      Then("revive call is generated for that role")
+      inside(result.mesosCalls.collectFirst { case c if c.hasRevive => c.getRevive }) {
+        case Some(revive) =>
+          revive.getRoles(0).shouldBe("test-role")
+      } withClue s"Expecting revive call with role 'test-role' but got ${result.mesosCalls}"
+
+      And("Another revive is generated for the same role when another podSpec is updated")
+      val podId2 = PodId("pod2")
+      val result2 = handler.handleCommand(commands.LaunchPod(podId2, testRoleRunSpec))
+      inside(result2.mesosCalls.collectFirst { case c if c.hasRevive => c.getRevive }) {
+        case Some(revive) =>
+          revive.getRoles(0).shouldBe("test-role")
+      } withClue s"Expecting revive call with role 'test-role' but got ${result.mesosCalls}"
+    }
+
+    "produces a Mesos suppress call when all podSpecs for a given role are launched" in {
+      Given("Scheduler logic handler with not launched pod")
+      val handler = new SchedulerLogicHandler(
+        new MesosCalls(MesosMock.mockFrameworkId),
+        MesosMock.masterDomainInfo,
+        StateSnapshot.empty,
+        DummyMetrics)
+      val podId = PodId("pod")
+      // creates not launched pod in the internal state of scheduler logic
+      handler.handleCommand(commands.LaunchPod(podId, testRoleRunSpec))
+
+      When("that pod is launched")
+      val offer = MesosMock.createMockOffer()
+      val result = handler.handleMesosEvent(ProtoBuilders.newOfferEvent(offer))
+
+      Then("suppress call is generated for that role")
+      inside(result.mesosCalls.collectFirst { case c if c.hasSuppress => c.getSuppress }) {
+        case Some(suppress) =>
+          suppress.getRoles(0) == "test-role"
+      } withClue s"Expecting suppress call with role 'test-role' but got ${result.mesosCalls}"
     }
   }
 }

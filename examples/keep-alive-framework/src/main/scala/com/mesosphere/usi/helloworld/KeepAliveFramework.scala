@@ -9,7 +9,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Source}
 import com.mesosphere.mesos.client.{CredentialsProvider, DcosServiceAccountProvider, MesosClient}
 import com.mesosphere.mesos.conf.MesosClientSettings
-import com.mesosphere.usi.core.{Scheduler, SchedulerFactory}
+import com.mesosphere.usi.core.Scheduler
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.{commands, _}
 import com.mesosphere.usi.core.models.commands.{ExpungePod, LaunchPod, SchedulerCommand}
@@ -68,10 +68,11 @@ class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Op
   }
 
   val podRecordRepository = InMemoryPodRecordRepository()
-  val schedulerFactory = new SchedulerFactory(client, podRecordRepository, SchedulerSettings.load(), DummyMetrics)
 
   val (stateSnapshot, source, sink) =
-    Await.result(Scheduler.asSourceAndSink(schedulerFactory, client, podRecordRepository), 10.seconds)
+    Await.result(
+      Scheduler.asSourceAndSink(client, podRecordRepository, DummyMetrics, SchedulerSettings.load()),
+      10.seconds)
 
   /**
     * This is the core part of this framework. Source with SpecEvents is pushing events to the keepAliveWatcher,

@@ -363,12 +363,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           .map {
             case (Seq(subscribedEvent), events) if subscribedEvent.getType == Event.Type.SUBSCRIBED =>
               val subscribed = subscribedEvent.getSubscribed
-              new MesosClientImpl(
-                frameworkInfo,
-                sharedKillSwitch,
-                subscribed,
-                session,
-                events.log("mesosSource events"))
+              new MesosClientImpl(frameworkInfo, sharedKillSwitch, subscribed, session, events)
             case (other, _) =>
               throw new RuntimeException(s"Expected subscribed event, got $other")
           }
@@ -417,7 +412,7 @@ class MesosClientImpl(
   override val mesosSink: Sink[Call, Future[Done]] =
     Flow[Call]
       .via(sharedKillSwitch.flow[Call])
-      .log("mesosSink calls")
+      .via(debug("Sending "))
       .via(callSerializer)
       .via(session.post)
       .toMat(responseHandler)(Keep.right)

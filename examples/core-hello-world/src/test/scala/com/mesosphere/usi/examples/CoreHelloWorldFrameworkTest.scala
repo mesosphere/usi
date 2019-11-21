@@ -5,7 +5,7 @@ import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.testkit.{TestPublisher, TestSubscriber}
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
-import com.mesosphere.usi.core.models.{PodRecordUpdatedEvent, PodStatusUpdatedEvent, StateEvent}
+import com.mesosphere.usi.core.models.{PodStatusUpdatedEvent, StateEvent}
 import com.mesosphere.utils.AkkaUnitTest
 import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.mesos.MesosFacade.ITFramework
@@ -53,9 +53,6 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     pub.sendNext(launchCommand)
 
     Then("receive an empty snapshot followed by other state events")
-    eventually {
-      inside(sub.requestNext()) { case podRecord: PodRecordUpdatedEvent => podRecord.newRecord shouldBe defined }
-    }
     eventually {
       inside(sub.requestNext()) { case podStatus: PodStatusUpdatedEvent => podStatus.newStatus shouldBe defined }
     }
