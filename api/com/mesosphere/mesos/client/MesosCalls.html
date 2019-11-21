@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.20 API  - com.mesosphere.mesos.client.MesosCalls</title>
-          <meta name="description" content="usi 0.1.20 API - com.mesosphere.mesos.client.MesosCalls" />
-          <meta name="keywords" content="usi 0.1.20 API com.mesosphere.mesos.client.MesosCalls" />
+          <title>usi 0.1.21 API  - com.mesosphere.mesos.client.MesosCalls</title>
+          <meta name="description" content="usi 0.1.21 API - com.mesosphere.mesos.client.MesosCalls" />
+          <meta name="keywords" content="usi 0.1.21 API com.mesosphere.mesos.client.MesosCalls" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.20 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.21 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -659,9 +659,9 @@ If the list of tasks is empty, master will send UPDATE events for all currently 
 simply ignores this request but other allocators (modules) can interpret this in a customizable fashion.</p><p>http://mesos.apache.org/documentation/latest/scheduler-http-api/#request
 </p></div></div>
     </li><li name="com.mesosphere.mesos.client.MesosCalls#newRevive" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="newRevive(role:Iterable[String]):org.apache.mesos.v1.scheduler.Protos.Call"></a><a id="newRevive(Iterable[String]):Call"></a>
+      <a id="newRevive(role:Option[String]):org.apache.mesos.v1.scheduler.Protos.Call"></a><a id="newRevive(Option[String]):Call"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/MesosCalls.html#newRevive(role:Iterable[String]):org.apache.mesos.v1.scheduler.Protos.Call" title="Permalink">
+      <a href="../../../../com/mesosphere/mesos/client/MesosCalls.html#newRevive(role:Option[String]):org.apache.mesos.v1.scheduler.Protos.Call" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -670,7 +670,7 @@ simply ignores this request but other allocators (modules) can interpret this in
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">newRevive</span><span class="params">(<span name="role">role: <span class="extype" name="scala.Iterable">Iterable</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">Nil</span></span>)</span><span class="result">: <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span></span>
+        <span class="name">newRevive</span><span class="params">(<span name="role">role: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>)</span><span class="result">: <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span></span>
       </span>
       
       <p class="shortcomment cmt">Factory method to construct a REVIVE Mesos Call event.</p><div class="fullcomment"><div class="comment cmt"><p>Factory method to construct a REVIVE Mesos Call event. Calling this method has no side effects.</p><p>Sent by the scheduler to remove any/all filters that it has previously set via ACCEPT or DECLINE calls.</p><p>http://mesos.apache.org/documentation/latest/scheduler-http-api/#revive
@@ -730,22 +730,6 @@ of the role the framework is currently subscribed to.</p><p>http://mesos.apache.
 shut down all executors (and consequently kill tasks). It then removes the framework and closes all open
 connections from this scheduler to the Master.</p><p>http://mesos.apache.org/documentation/latest/scheduler-http-api/#teardown
 </p></div></div>
-    </li><li name="com.mesosphere.mesos.client.MesosCalls#newUpdateFramework" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="newUpdateFramework(updateFramework:org.apache.mesos.v1.scheduler.Protos.Call.UpdateFramework):org.apache.mesos.v1.scheduler.Protos.Call"></a><a id="newUpdateFramework(UpdateFramework):Call"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/mesos/client/MesosCalls.html#newUpdateFramework(updateFramework:org.apache.mesos.v1.scheduler.Protos.Call.UpdateFramework):org.apache.mesos.v1.scheduler.Protos.Call" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">newUpdateFramework</span><span class="params">(<span name="updateFramework">updateFramework: <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call.UpdateFramework">UpdateFramework</span></span>)</span><span class="result">: <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
