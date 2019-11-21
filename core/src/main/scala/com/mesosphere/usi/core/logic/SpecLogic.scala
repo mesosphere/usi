@@ -4,7 +4,6 @@ import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
 import com.mesosphere.usi.core.models._
 import com.mesosphere.usi.core.models.commands.{CreateReservation, ExpungePod, KillPod, LaunchPod, SchedulerCommand}
-import com.mesosphere.usi.core.models.faultdomain.HomeRegionFilter
 
 /**
   * The current home for USI business logic for dealing with spec commands
@@ -22,9 +21,7 @@ private[core] class SpecLogic(mesosCallFactory: MesosCalls) {
           // if we already have a record for the pod, ignore
           SchedulerEvents.empty
         } else {
-          SchedulerEvents(
-            stateEvents = List(
-              PodSpecUpdatedEvent(id, Some(RunningPodSpec(id, runSpec, domainFilter.getOrElse(HomeRegionFilter))))))
+          SchedulerEvents(stateEvents = List(PodSpecUpdatedEvent(id, Some(RunningPodSpec(id, runSpec, domainFilter)))))
         }
       case ExpungePod(podId) =>
         var b = SchedulerEventsBuilder.empty
