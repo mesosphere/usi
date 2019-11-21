@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.21 API  - com.mesosphere.usi.core.models.commands</title>
-          <meta name="description" content="usi 0.1.21 API - com.mesosphere.usi.core.models.commands" />
-          <meta name="keywords" content="usi 0.1.21 API com.mesosphere.usi.core.models.commands" />
+          <title>usi 0.1.22 API  - com.mesosphere.usi.core.models.commands</title>
+          <meta name="description" content="usi 0.1.22 API - com.mesosphere.usi.core.models.commands" />
+          <meta name="keywords" content="usi 0.1.22 API com.mesosphere.usi.core.models.commands" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.21 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.22 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -334,7 +334,7 @@ not cause the actual tasks in the pod to be killed.</p><p>The associated <a href
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Launch the specified pod at-most-once." href="LaunchPod.html"><span class="name">LaunchPod</span></a><span class="params">(<span name="podId">podId: <a href="../PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="../template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>)</span><span class="result"> extends <a href="SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.commands.SchedulerCommand">SchedulerCommand</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Launch the specified pod at-most-once." href="LaunchPod.html"><span class="name">LaunchPod</span></a><span class="params">(<span name="podId">podId: <a href="../PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="../template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>, <span name="domainFilter">domainFilter: <a href="../faultdomain/DomainFilter.html" class="extype" name="com.mesosphere.usi.core.models.faultdomain.DomainFilter">DomainFilter</a> = <span class="symbol"><span class="name"><a href="../../../../../index.html">HomeRegionFilter</a></span></span></span>)</span><span class="result"> extends <a href="SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.commands.SchedulerCommand">SchedulerCommand</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Launch the specified pod at-most-once.</p><div class="fullcomment"><div class="comment cmt"><p>Launch the specified pod at-most-once. Frameworks *SHOULD NOT* reuse podIds; if restarting a pod, kill the old and
@@ -342,7 +342,7 @@ launch a new with a different id.</p><p>Submitting a pod to the scheduler for la
 received with suitable resources for the pod, a record of the matching pod is created, persisted, prior to the pod
 being launched.</p><p>Submitting a launch command for a pod that is already launched (has record of being launched), or is pending launch,
 is a no-op.
-</p></div></div>
+</p></div><dl class="paramcmts block"><dt class="param">domainFilter</dt><dd class="cmt"><p>A filter for default domains. See <span class="extype" name="DomainFilter">DomainFilter</span> for details.</p></dd></dl></div>
     </li><li name="com.mesosphere.usi.core.models.commands.SchedulerCommand" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="SchedulerCommandextendsAnyRef"></a><a id="SchedulerCommand:SchedulerCommand"></a>
       <span class="permalink">
