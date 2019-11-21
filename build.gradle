@@ -10,7 +10,7 @@ plugins {
 
 ext {
     scalaVersion = '2.12'
-    mesosVersion = '1.7.0'
+    mesosVersion = '1.9.0'
     akkaVersion = '2.5.23'
 }
 
@@ -61,8 +61,8 @@ allprojects {
         testRuntimeOnly "org.scala-lang.modules:scala-xml_$scalaVersion:1.1.1"
 
         // Logging
-        testRuntime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
-        
+        testRuntime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
         // Transitive dependencies
         compile "com.typesafe.scala-logging:scala-logging_$scalaVersion:3.9.2"
         compile "org.scala-lang.modules:scala-async_$scalaVersion:0.10.0"

@@ -4,7 +4,7 @@ import akka.util.ByteString
 import com.google.protobuf
 import org.apache.mesos.v1.Protos.{AgentID, ExecutorID, Filters, FrameworkID, KillPolicy, OfferID, Request, TaskID}
 import org.apache.mesos.v1.scheduler.Protos.Call
-import org.apache.mesos.v1.scheduler.Protos.Call.{Accept, Decline, Reconcile, Revive}
+import org.apache.mesos.v1.scheduler.Protos.Call.{Accept, Decline, Reconcile, Revive, UpdateFramework}
 
 class MesosCalls(frameworkId: FrameworkID) {
 
@@ -51,6 +51,15 @@ class MesosCalls(frameworkId: FrameworkID) {
       .build()
   }
 
+  def newUpdateFramework(updateFramework: UpdateFramework): Call = {
+    Call
+      .newBuilder()
+      .setType(Call.Type.UPDATE_FRAMEWORK)
+      .setUpdateFramework(updateFramework)
+      .setFrameworkId(frameworkId)
+      .build()
+  }
+
   /**
     * Factory method to construct a DECLINE Mesos Call event. Calling this method has no side effects.
     *
@@ -79,7 +88,7 @@ class MesosCalls(frameworkId: FrameworkID) {
     *
     * http://mesos.apache.org/documentation/latest/scheduler-http-api/#revive
     */
-  def newRevive(role: Option[String] = None): Call = {
+  def newRevive(role: Iterable[String] = Nil): Call = {
     val reviveBuilder = Revive.newBuilder()
     role.foreach(reviveBuilder.addRoles)
 
