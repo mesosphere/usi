@@ -20,15 +20,19 @@ case class AgentStringAttributeFilter(requiredAttributes: Map[String, String]) e
    * Java constructor.
    */
   def this(javaAttributes: util.HashMap[String, String]) = {
-    this(requiredAttributes = javaAttributes)
+    this(requiredAttributes = javaAttributes.asScala.toMap)
   }
 
   override def apply(offer: Protos.Offer): Boolean = {
-    val agentAttributes: Map[String, String] = offer.getAttributesList.asScala.filter(_.getType == Protos.Value.Type.TEXT)
-      .map { attribute => attribute.getName -> attribute.getText.getValue }(collection.breakOut)
+    val agentAttributes: Map[String, String] = offer.getAttributesList.asScala
+      .filter(_.getType == Protos.Value.Type.TEXT)
+      .map { attribute =>
+        attribute.getName -> attribute.getText.getValue
+      }(collection.breakOut)
 
-    requiredAttributes.forall { case (key, value) =>
-      agentAttributes.get(key).contains(value)
+    requiredAttributes.forall {
+      case (key, value) =>
+        agentAttributes.get(key).contains(value)
     }
   }
 }
