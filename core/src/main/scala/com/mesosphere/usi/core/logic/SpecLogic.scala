@@ -16,12 +16,12 @@ private[core] class SpecLogic(mesosCallFactory: MesosCalls) {
   }
   private[core] def handleCommand(state: SchedulerState)(command: SchedulerCommand): SchedulerEvents = {
     command match {
-      case LaunchPod(id, runSpec) =>
+      case LaunchPod(id, runSpec, domainFilter) =>
         if (state.podRecords.contains(id) || getRunningPodSpec(state.podSpecs, id).exists(_.runSpec == runSpec)) {
           // if we already have a record for the pod, ignore
           SchedulerEvents.empty
         } else {
-          SchedulerEvents(stateEvents = List(PodSpecUpdatedEvent(id, Some(RunningPodSpec(id, runSpec)))))
+          SchedulerEvents(stateEvents = List(PodSpecUpdatedEvent(id, Some(RunningPodSpec(id, runSpec, domainFilter)))))
         }
       case ExpungePod(podId) =>
         var b = SchedulerEventsBuilder.empty

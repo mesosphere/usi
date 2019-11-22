@@ -1,5 +1,6 @@
 package com.mesosphere.usi.core.models.commands
 
+import com.mesosphere.usi.core.models.faultdomain.{DomainFilter, HomeRegionFilter}
 import com.mesosphere.usi.core.models.template.RunTemplate
 import com.mesosphere.usi.core.models.{PodId, ReservationId, ReservationSpec}
 
@@ -28,8 +29,10 @@ sealed trait SchedulerCommand
   *
   * @param podId
   * @param runSpec
+  * @param domainFilter A filter for default domains. See [[DomainFilter]] for details.
   */
-case class LaunchPod(podId: PodId, runSpec: RunTemplate) extends SchedulerCommand
+case class LaunchPod(podId: PodId, runSpec: RunTemplate, domainFilter: DomainFilter = HomeRegionFilter)
+    extends SchedulerCommand
 
 /**
   * Send a kill for tasks associated with the specified podId.
