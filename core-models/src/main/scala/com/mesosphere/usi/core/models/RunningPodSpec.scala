@@ -1,7 +1,7 @@
 package com.mesosphere.usi.core.models
 
-import com.mesosphere.usi.core.models.faultdomain.{DomainFilter, HomeRegionFilter}
 import com.mesosphere.usi.core.models.constraints.{AgentFilter, DefaultAgentFilter}
+import com.mesosphere.usi.core.models.faultdomain.{DomainFilter, HomeRegionFilter}
 import com.mesosphere.usi.core.models.template.RunTemplate
 
 /**
@@ -28,6 +28,8 @@ case class TerminalPodSpec(id: PodId) extends PodSpec {
   *
   * @param id Id of the pod
   * @param runSpec WIP the thing to run, and resource requirements, etc.
+  * @param domainFilter  Specifies on which [[http://mesos.apache.org/documentation/latest/fault-domains/ fault domains]]
+  *                      the pod will be launched.
   */
 case class RunningPodSpec(
     id: PodId,
