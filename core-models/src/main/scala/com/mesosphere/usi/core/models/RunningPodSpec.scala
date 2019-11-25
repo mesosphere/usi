@@ -1,6 +1,7 @@
 package com.mesosphere.usi.core.models
 
-import com.mesosphere.usi.core.models.faultdomain.DomainFilter
+import com.mesosphere.usi.core.models.constraints.{AgentFilter, DefaultAgentFilter}
+import com.mesosphere.usi.core.models.faultdomain.{DomainFilter, HomeRegionFilter}
 import com.mesosphere.usi.core.models.template.RunTemplate
 
 /**
@@ -30,6 +31,11 @@ case class TerminalPodSpec(id: PodId) extends PodSpec {
   * @param domainFilter  Specifies on which [[http://mesos.apache.org/documentation/latest/fault-domains/ fault domains]]
   *                      the pod will be launched.
   */
-case class RunningPodSpec(id: PodId, runSpec: RunTemplate, domainFilter: DomainFilter) extends PodSpec {
+case class RunningPodSpec(
+    id: PodId,
+    runSpec: RunTemplate,
+    domainFilter: DomainFilter = HomeRegionFilter,
+    agentFilter: AgentFilter = DefaultAgentFilter)
+    extends PodSpec {
   override def shouldBeTerminal: Boolean = false
 }
