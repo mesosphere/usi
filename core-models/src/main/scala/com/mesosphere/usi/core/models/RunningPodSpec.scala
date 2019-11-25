@@ -1,6 +1,6 @@
 package com.mesosphere.usi.core.models
 
-import com.mesosphere.usi.core.models.constraints.{AgentFilter, DefaultAgentFilter}
+import com.mesosphere.usi.core.models.constraints.AgentFilter
 import com.mesosphere.usi.core.models.faultdomain.{DomainFilter, HomeRegionFilter}
 import com.mesosphere.usi.core.models.template.RunTemplate
 
@@ -35,7 +35,7 @@ case class RunningPodSpec(
     id: PodId,
     runSpec: RunTemplate,
     domainFilter: DomainFilter = HomeRegionFilter,
-    agentFilter: AgentFilter = DefaultAgentFilter)
+    agentFilter: Iterable[AgentFilter] = Nil)
     extends PodSpec {
   override def shouldBeTerminal: Boolean = false
 }

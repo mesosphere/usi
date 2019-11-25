@@ -261,4 +261,13 @@ private[usi] object ProtoBuilders {
       .setOffers(MesosEvent.Offers.newBuilder().addOffers(offer))
       .build()
   }
+
+  def newTextAttribute(name: String, value: String): Mesos.Attribute = {
+    Mesos.Attribute
+      .newBuilder()
+      .setName(name)
+      .setType(Mesos.Value.Type.TEXT)
+      .setText(Mesos.Value.Text.newBuilder().setValue(value))
+      .build
+  }
 }

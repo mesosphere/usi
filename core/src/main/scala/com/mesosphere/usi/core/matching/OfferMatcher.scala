@@ -2,12 +2,13 @@ package com.mesosphere.usi.core.matching
 import com.mesosphere.usi.core.models.template.RunTemplate.KeyedResourceRequirement
 import com.mesosphere.usi.core.models.resources.ResourceType
 import com.mesosphere.usi.core.models.{RunningPodSpec, TaskName}
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.{Protos => Mesos}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
-class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) {
+class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
   @tailrec private def maybeMatchResourceRequirements(
       remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
       matchedResources: List[OfferMatcher.ResourceMatch],
@@ -42,14 +43,23 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) {
       case Nil =>
         result
 
-      case podSpec :: rest if !(podSpec.domainFilter(masterDomainInfo, originalOffer.getDomain)) =>
-        matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
-
-      case podSpec :: rest if !(podSpec.agentFilter(originalOffer)) =>
-        matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
-
       case podSpec :: rest =>
-        maybeMatchResourceRequirements(remainingResources, Nil, podSpec.runSpec.allResourceRequirements) match {
+        Some(podSpec).filter { podSpec =>
+          podSpec.domainFilter(masterDomainInfo, originalOffer.getDomain)
+        }.filter { podSpec =>
+          podSpec.agentFilter.find { filter =>
+            !filter(originalOffer)
+          } match {
+            case Some(nonMatchingfilter) =>
+              logger.debug(
+                s"Declining offer ${originalOffer.getId.getValue} for pod ${podSpec.id}; first non-matching agent filter: ${nonMatchingfilter.description}")
+              false
+            case None =>
+              true
+          }
+        }.flatMap { podSpec =>
+          maybeMatchResourceRequirements(remainingResources, Nil, podSpec.runSpec.allResourceRequirements)
+        } match {
           case Some((matchedResources, newRemainingResources)) =>
             matchPodSpecsTaskRecords(
               originalOffer,

@@ -3,7 +3,7 @@ package com.mesosphere.usi.core.models.commands
 import com.mesosphere.usi.core.models.faultdomain.{DomainFilter, HomeRegionFilter}
 import com.mesosphere.usi.core.models.template.RunTemplate
 import com.mesosphere.usi.core.models.{PodId, ReservationId, ReservationSpec}
-import com.mesosphere.usi.core.models.constraints.{AgentFilter, DefaultAgentFilter}
+import com.mesosphere.usi.core.models.constraints.AgentFilter
 
 /**
   * Trait which includes all possible events that can describe the evolution of the framework implementation's
@@ -36,7 +36,7 @@ case class LaunchPod(
     podId: PodId,
     runSpec: RunTemplate,
     domainFilter: DomainFilter = HomeRegionFilter,
-    agentFilter: AgentFilter = DefaultAgentFilter)
+    agentFilter: Iterable[AgentFilter] = Nil)
     extends SchedulerCommand
 
 /**
