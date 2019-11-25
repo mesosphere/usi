@@ -67,6 +67,3 @@ object ScalarRequirement {
   def disk(amount: Double): ScalarRequirement = ScalarRequirement(ResourceType.DISK, amount)
   def gpus(amount: Double): ScalarRequirement = ScalarRequirement(ResourceType.GPUS, amount)
 }
-
-//TODO@kjoshi flush this out.
-case class ConstraintRequirement()
