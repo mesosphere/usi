@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.23 API  - com.mesosphere.usi.core.models.commands</title>
-          <meta name="description" content="usi 0.1.23 API - com.mesosphere.usi.core.models.commands" />
-          <meta name="keywords" content="usi 0.1.23 API com.mesosphere.usi.core.models.commands" />
+          <title>usi 0.1.24 API  - com.mesosphere.usi.core.models.commands</title>
+          <meta name="description" content="usi 0.1.24 API - com.mesosphere.usi.core.models.commands" />
+          <meta name="keywords" content="usi 0.1.24 API com.mesosphere.usi.core.models.commands" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.23 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.24 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -185,7 +185,23 @@
                         <span class="separator"></span>
                         <a class="trait" href="SchedulerCommand.html" title="Trait which includes all possible events that can describe the evolution of the framework implementation's Specification state."></a>
                         <a href="SchedulerCommand.html" title="Trait which includes all possible events that can describe the evolution of the framework implementation's Specification state.">SchedulerCommand</a>
-                      </li><li name="com.mesosphere.usi.core.models.faultdomain" visbl="pub" class="indented6 " data-isabs="false" fullComment="yes" group="Ungrouped">
+                      </li><li name="com.mesosphere.usi.core.models.constraints" visbl="pub" class="indented6 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="constraints"></a><a id="constraints:constraints"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#constraints" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="../constraints/index.html"><span class="name">constraints</span></a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi.core.models">models</a></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.faultdomain" visbl="pub" class="indented6 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="faultdomain"></a><a id="faultdomain:faultdomain"></a>
       <span class="permalink">
       <a href="../../../../../com/mesosphere/usi/core/models/index.html#faultdomain" title="Permalink">
@@ -334,7 +350,7 @@ not cause the actual tasks in the pod to be killed.</p><p>The associated <a href
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Launch the specified pod at-most-once." href="LaunchPod.html"><span class="name">LaunchPod</span></a><span class="params">(<span name="podId">podId: <a href="../PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="../template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>, <span name="domainFilter">domainFilter: <a href="../faultdomain/DomainFilter.html" class="extype" name="com.mesosphere.usi.core.models.faultdomain.DomainFilter">DomainFilter</a> = <span class="symbol"><span class="name"><a href="../../../../../index.html">HomeRegionFilter</a></span></span></span>)</span><span class="result"> extends <a href="SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.commands.SchedulerCommand">SchedulerCommand</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Launch the specified pod at-most-once." href="LaunchPod.html"><span class="name">LaunchPod</span></a><span class="params">(<span name="podId">podId: <a href="../PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="../template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>, <span name="domainFilter">domainFilter: <a href="../faultdomain/DomainFilter.html" class="extype" name="com.mesosphere.usi.core.models.faultdomain.DomainFilter">DomainFilter</a> = <span class="symbol"><span class="name"><a href="../../../../../index.html">HomeRegionFilter</a></span></span></span>, <span name="agentFilter">agentFilter: <a href="../constraints/AgentFilter.html" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentFilter">AgentFilter</a> = <span class="symbol"><span class="name"><a href="../../../../../index.html">DefaultAgentFilter</a></span></span></span>)</span><span class="result"> extends <a href="SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.commands.SchedulerCommand">SchedulerCommand</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Launch the specified pod at-most-once.</p><div class="fullcomment"><div class="comment cmt"><p>Launch the specified pod at-most-once. Frameworks *SHOULD NOT* reuse podIds; if restarting a pod, kill the old and
