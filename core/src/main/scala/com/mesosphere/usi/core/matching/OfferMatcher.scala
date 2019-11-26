@@ -1,4 +1,5 @@
 package com.mesosphere.usi.core.matching
+import com.mesosphere.usi.core.models.constraints.AgentFilter
 import com.mesosphere.usi.core.models.template.RunTemplate.KeyedResourceRequirement
 import com.mesosphere.usi.core.models.resources.ResourceType
 import com.mesosphere.usi.core.models.{RunningPodSpec, TaskName}
@@ -39,27 +40,31 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
       result: Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]],
       pendingLaunchPodSpecs: List[RunningPodSpec]): Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = {
 
+    def matchesAgentFilter(agentFilters: Iterable[AgentFilter]): Boolean = {
+      agentFilters.find { filter =>
+        !filter(originalOffer)
+      } match {
+        case Some(nonMatchingfilter) =>
+          logger.debug(
+            s"Declining offer ${originalOffer.getId.getValue} for pod ${podSpec.id}; first non-matching agent filter: ${nonMatchingfilter.description}")
+          false
+        case None =>
+          true
+      }
+    }
+
     pendingLaunchPodSpecs match {
       case Nil =>
         result
 
+      case podSpec :: rest if !podSpec.domainFilter(masterDomainInfo, originalOffer.getDomain) =>
+        matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
+
+      case podSpec :: rest if !matchesAgentFilter(podSpec.agentFilters) =>
+        matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
+
       case podSpec :: rest =>
-        Some(podSpec).filter { podSpec =>
-          podSpec.domainFilter(masterDomainInfo, originalOffer.getDomain)
-        }.filter { podSpec =>
-          podSpec.agentFilter.find { filter =>
-            !filter(originalOffer)
-          } match {
-            case Some(nonMatchingfilter) =>
-              logger.debug(
-                s"Declining offer ${originalOffer.getId.getValue} for pod ${podSpec.id}; first non-matching agent filter: ${nonMatchingfilter.description}")
-              false
-            case None =>
-              true
-          }
-        }.flatMap { podSpec =>
-          maybeMatchResourceRequirements(remainingResources, Nil, podSpec.runSpec.allResourceRequirements)
-        } match {
+        maybeMatchResourceRequirements(remainingResources, Nil, podSpec.runSpec.allResourceRequirements) match {
           case Some((matchedResources, newRemainingResources)) =>
             matchPodSpecsTaskRecords(
               originalOffer,
