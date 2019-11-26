@@ -35,7 +35,7 @@ case class RunningPodSpec(
     id: PodId,
     runSpec: RunTemplate,
     domainFilter: DomainFilter = HomeRegionFilter,
-    agentFilter: Iterable[AgentFilter] = Nil)
+    agentFilters: Iterable[AgentFilter] = Nil)
     extends PodSpec {
   override def shouldBeTerminal: Boolean = false
 }

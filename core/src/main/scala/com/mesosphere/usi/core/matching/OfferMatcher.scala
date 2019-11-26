@@ -2,7 +2,7 @@ package com.mesosphere.usi.core.matching
 import com.mesosphere.usi.core.models.constraints.AgentFilter
 import com.mesosphere.usi.core.models.template.RunTemplate.KeyedResourceRequirement
 import com.mesosphere.usi.core.models.resources.ResourceType
-import com.mesosphere.usi.core.models.{RunningPodSpec, TaskName}
+import com.mesosphere.usi.core.models.{PodId, RunningPodSpec, TaskName}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.{Protos => Mesos}
 
@@ -40,13 +40,13 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
       result: Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]],
       pendingLaunchPodSpecs: List[RunningPodSpec]): Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = {
 
-    def matchesAgentFilter(agentFilters: Iterable[AgentFilter]): Boolean = {
+    def matchesAgentFilter(podId: PodId, agentFilters: Iterable[AgentFilter]): Boolean = {
       agentFilters.find { filter =>
         !filter(originalOffer)
       } match {
         case Some(nonMatchingfilter) =>
           logger.debug(
-            s"Declining offer ${originalOffer.getId.getValue} for pod ${podSpec.id}; first non-matching agent filter: ${nonMatchingfilter.description}")
+            s"Declining offer ${originalOffer.getId.getValue} for pod $podId; first non-matching agent filter: ${nonMatchingfilter.description}")
           false
         case None =>
           true
@@ -60,7 +60,7 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
       case podSpec :: rest if !podSpec.domainFilter(masterDomainInfo, originalOffer.getDomain) =>
         matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
 
-      case podSpec :: rest if !matchesAgentFilter(podSpec.agentFilters) =>
+      case podSpec :: rest if !matchesAgentFilter(podSpec.id, podSpec.agentFilters) =>
         matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
 
       case podSpec :: rest =>
