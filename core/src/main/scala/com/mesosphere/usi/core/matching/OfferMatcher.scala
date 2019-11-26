@@ -40,7 +40,7 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
       result: Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]],
       pendingLaunchPodSpecs: List[RunningPodSpec]): Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = {
 
-    def matchesAgentFilter(podId: PodId, agentFilters: Iterable[AgentFilter]): Boolean = {
+    def matchesAgentFilters(podId: PodId, agentFilters: Iterable[AgentFilter]): Boolean = {
       agentFilters.find { filter =>
         !filter(originalOffer)
       } match {
@@ -60,7 +60,7 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
       case podSpec :: rest if !podSpec.domainFilter(masterDomainInfo, originalOffer.getDomain) =>
         matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
 
-      case podSpec :: rest if !matchesAgentFilter(podSpec.id, podSpec.agentFilters) =>
+      case podSpec :: rest if !matchesAgentFilters(podSpec.id, podSpec.agentFilters) =>
         matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
 
       case podSpec :: rest =>

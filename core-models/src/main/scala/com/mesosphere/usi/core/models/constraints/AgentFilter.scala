@@ -7,9 +7,6 @@ import org.apache.mesos.v1.Protos
 trait AgentFilter {
   def apply(offer: Protos.Offer): Boolean
 
-  /**
-    * Return a text description of the matcher
-    * @return
-    */
+  /** @return a text description of the matcher */
   def description: String
 }
