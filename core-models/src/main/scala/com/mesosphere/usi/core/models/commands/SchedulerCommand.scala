@@ -3,7 +3,8 @@ package com.mesosphere.usi.core.models.commands
 import com.mesosphere.usi.core.models.faultdomain.{DomainFilter, HomeRegionFilter}
 import com.mesosphere.usi.core.models.template.RunTemplate
 import com.mesosphere.usi.core.models.{PodId, ReservationId, ReservationSpec}
-import com.mesosphere.usi.core.models.constraints.{AgentFilter, DefaultAgentFilter}
+import com.mesosphere.usi.core.models.constraints.AgentFilter
+import scala.collection.JavaConverters._
 
 /**
   * Trait which includes all possible events that can describe the evolution of the framework implementation's
@@ -32,12 +33,59 @@ sealed trait SchedulerCommand
   * @param runSpec
   * @param domainFilter A filter for default domains. See [[DomainFilter]] for details.
   */
-case class LaunchPod(
-    podId: PodId,
-    runSpec: RunTemplate,
-    domainFilter: DomainFilter = HomeRegionFilter,
-    agentFilter: AgentFilter = DefaultAgentFilter)
+class LaunchPod private (
+    val podId: PodId,
+    val runSpec: RunTemplate,
+    val domainFilter: DomainFilter,
+    val agentFilter: Iterable[AgentFilter])
     extends SchedulerCommand
+
+object LaunchPod {
+
+  /**
+    * Factory method for instantiating a pod; Scala API
+    */
+  def apply(podId: PodId, runSpec: RunTemplate): LaunchPod =
+    apply(podId, runSpec, HomeRegionFilter)
+
+  /**
+    * Factory method for instantiating a pod; Scala API
+    */
+  def apply(
+      podId: PodId,
+      runSpec: RunTemplate,
+      domainFilter: DomainFilter,
+      agentFilter: Iterable[AgentFilter]): LaunchPod =
+    new LaunchPod(podId, runSpec, domainFilter, agentFilter)
+
+  /**
+    * Factory method for instantiating a pod; Scala API
+    */
+  def apply(podId: PodId, runSpec: RunTemplate, domainFilter: DomainFilter): LaunchPod =
+    apply(podId, runSpec, domainFilter, Nil)
+
+  /**
+    * Java constructor for LaunchPod
+    */
+  def create(
+      podId: PodId,
+      runSpec: RunTemplate,
+      domainFilter: DomainFilter,
+      agentFilter: java.lang.Iterable[AgentFilter]): LaunchPod =
+    apply(podId, runSpec, domainFilter, agentFilter.asScala)
+
+  /**
+    * Java constructor for LaunchPod
+    */
+  def create(podId: PodId, runSpec: RunTemplate, domainFilter: DomainFilter): LaunchPod =
+    apply(podId, runSpec, domainFilter)
+
+  /**
+    * Java constructor for LaunchPod
+    */
+  def create(podId: PodId, runSpec: RunTemplate): LaunchPod =
+    apply(podId, runSpec)
+}
 
 /**
   * Send a kill for tasks associated with the specified podId.

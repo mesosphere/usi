@@ -1,13 +1,15 @@
 package com.mesosphere.usi.core.matching
+import com.mesosphere.usi.core.models.constraints.AgentFilter
 import com.mesosphere.usi.core.models.template.RunTemplate.KeyedResourceRequirement
 import com.mesosphere.usi.core.models.resources.ResourceType
-import com.mesosphere.usi.core.models.{RunningPodSpec, TaskName}
+import com.mesosphere.usi.core.models.{PodId, RunningPodSpec, TaskName}
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.{Protos => Mesos}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
-class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) {
+class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
   @tailrec private def maybeMatchResourceRequirements(
       remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
       matchedResources: List[OfferMatcher.ResourceMatch],
@@ -38,14 +40,27 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) {
       result: Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]],
       pendingLaunchPodSpecs: List[RunningPodSpec]): Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = {
 
+    def matchesAgentFilters(podId: PodId, agentFilters: Iterable[AgentFilter]): Boolean = {
+      agentFilters.find { filter =>
+        !filter(originalOffer)
+      } match {
+        case Some(nonMatchingfilter) =>
+          logger.debug(
+            s"Declining offer ${originalOffer.getId.getValue} for pod $podId; first non-matching agent filter: ${nonMatchingfilter.description}")
+          false
+        case None =>
+          true
+      }
+    }
+
     pendingLaunchPodSpecs match {
       case Nil =>
         result
 
-      case podSpec :: rest if !(podSpec.domainFilter(masterDomainInfo, originalOffer.getDomain)) =>
+      case podSpec :: rest if !podSpec.domainFilter(masterDomainInfo, originalOffer.getDomain) =>
         matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
 
-      case podSpec :: rest if !(podSpec.agentFilter(originalOffer)) =>
+      case podSpec :: rest if !matchesAgentFilters(podSpec.id, podSpec.agentFilters) =>
         matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
 
       case podSpec :: rest =>

@@ -6,4 +6,7 @@ import org.apache.mesos.v1.Protos
 // Mostly used for attribute filtering.
 trait AgentFilter {
   def apply(offer: Protos.Offer): Boolean
+
+  /** @return a text description of the matcher */
+  def description: String
 }
