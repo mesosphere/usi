@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.24 API  - com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter</title>
-          <meta name="description" content="usi 0.1.24 API - com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter" />
-          <meta name="keywords" content="usi 0.1.24 API com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter" />
+          <title>usi 0.1.25 API  - com.mesosphere.usi.core.models.commands.LaunchPod</title>
+          <meta name="description" content="usi 0.1.25 API - com.mesosphere.usi.core.models.commands.LaunchPod" />
+          <meta name="keywords" content="usi 0.1.25 API com.mesosphere.usi.core.models.commands.LaunchPod" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.24 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.25 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -149,10 +149,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../index.html" class="extype" name="com.mesosphere.usi.core">core</a></dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.models.constraints" visbl="pub" class="indented6 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="constraints"></a><a id="constraints:constraints"></a>
+    </li><li name="com.mesosphere.usi.core.models.commands" visbl="pub" class="indented6 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="commands"></a><a id="commands:commands"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/models/index.html#constraints" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/models/index.html#commands" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -161,56 +161,65 @@
         <span class="kind">package</span>
       </span>
       <span class="symbol">
-        <a title="" href="index.html"><span class="name">constraints</span></a>
+        <a title="" href="index.html"><span class="name">commands</span></a>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.mesosphere.usi.core.models">models</a></dd></dl></div>
     </li><li class="current-entities indented6">
                         <span class="separator"></span>
-                        <a class="trait" href="AgentFilter.html" title=""></a>
-                        <a href="AgentFilter.html" title="">AgentFilter</a>
+                        <a class="class" href="CreateReservation.html" title="Not implemented yet; command will be used to make new reservations."></a>
+                        <a href="CreateReservation.html" title="Not implemented yet; command will be used to make new reservations.">CreateReservation</a>
                       </li><li class="current-entities indented6">
                         <span class="separator"></span>
-                        <a class="class" href="" title="An agent attribute filter that will only accept offers from agents that contain all required string attributes."></a>
-                        <a href="" title="An agent attribute filter that will only accept offers from agents that contain all required string attributes.">AgentStringAttributeFilter</a>
+                        <a class="class" href="ExpungePod.html" title="Delete the pod record and any pending PodSpec (RunningPodSpec or TerminalPodSpec) for a given pod."></a>
+                        <a href="ExpungePod.html" title="Delete the pod record and any pending PodSpec (RunningPodSpec or TerminalPodSpec) for a given pod.">ExpungePod</a>
                       </li><li class="current-entities indented6">
                         <span class="separator"></span>
-                        <a class="object" href="DefaultAgentFilter$.html" title=""></a>
-                        <a href="DefaultAgentFilter$.html" title="">DefaultAgentFilter</a>
+                        <a class="class" href="KillPod.html" title="Send a kill for tasks associated with the specified podId."></a>
+                        <a href="KillPod.html" title="Send a kill for tasks associated with the specified podId.">KillPod</a>
+                      </li><li class="current-entities indented6">
+                        <a class="object" href="" title=""></a>
+                        <a class="class" href="LaunchPod.html" title="Launch the specified pod at-most-once."></a>
+                        <a href="LaunchPod.html" title="Launch the specified pod at-most-once.">LaunchPod</a>
+                      </li><li class="current-entities indented6">
+                        <span class="separator"></span>
+                        <a class="trait" href="SchedulerCommand.html" title="Trait which includes all possible events that can describe the evolution of the framework implementation's Specification state."></a>
+                        <a href="SchedulerCommand.html" title="Trait which includes all possible events that can describe the evolution of the framework implementation's Specification state.">SchedulerCommand</a>
                       </li>
               </ul>
             </div>
           </div>
           <div id="content">
-            <body class="class type">
+            <body class="object value">
       <div id="definition">
-        <div class="big-circle class">c</div>
-        <p id="owner"><a href="../../../../../index.html" class="extype" name="com">com</a>.<a href="../../../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../../../index.html" class="extype" name="com.mesosphere.usi">usi</a>.<a href="../../index.html" class="extype" name="com.mesosphere.usi.core">core</a>.<a href="../index.html" class="extype" name="com.mesosphere.usi.core.models">models</a>.<a href="index.html" class="extype" name="com.mesosphere.usi.core.models.constraints">constraints</a></p>
-        <h1>AgentStringAttributeFilter<span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html" title="Permalink">
+        <a href="LaunchPod.html" title="See companion class"><div class="big-circle object-companion-class">o</div></a>
+        <p id="owner"><a href="../../../../../index.html" class="extype" name="com">com</a>.<a href="../../../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../../../index.html" class="extype" name="com.mesosphere.usi">usi</a>.<a href="../../index.html" class="extype" name="com.mesosphere.usi.core">core</a>.<a href="../index.html" class="extype" name="com.mesosphere.usi.core.models">models</a>.<a href="index.html" class="extype" name="com.mesosphere.usi.core.models.commands">commands</a></p>
+        <h1><a href="LaunchPod.html" title="See companion class">LaunchPod</a><span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"></span></h3>
+        <h3><span class="morelinks"><div>
+            Companion <a href="LaunchPod.html" title="See companion class">class LaunchPod</a>
+          </div></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">case class</span>
+        <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">AgentStringAttributeFilter</span><span class="params">(<span name="requiredAttributes">requiredAttributes: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <a href="AgentFilter.html" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentFilter">AgentFilter</a> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">LaunchPod</span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>An agent attribute filter that will only accept offers from agents that contain all required string attributes.</p><p>The agent may contain more attributes.
-</p></div><dl class="paramcmts block"><dt class="param">requiredAttributes</dt><dd class="cmt"><p>The subset of agent attributes the agent *must* have.</p></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span>, <a href="AgentFilter.html" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentFilter">AgentFilter</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -236,7 +245,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter"><span>AgentStringAttributeFilter</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="com.typesafe.scalalogging.StrictLogging"><span>StrictLogging</span></li><li class="in" name="com.mesosphere.usi.core.models.constraints.AgentFilter"><span>AgentFilter</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.usi.core.models.commands.LaunchPod"><span>LaunchPod</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -254,42 +263,7 @@
 
       <div id="template">
         <div id="allMembers">
-        <div id="constructors" class="members">
-              <h3>Instance Constructors</h3>
-              <ol><li name="com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(javaAttributes:java.util.HashMap[String,String]):com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter"></a><a id="&lt;init&gt;:AgentStringAttributeFilter"></a>
-      <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#&lt;init&gt;(javaAttributes:java.util.HashMap[String,String]):com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">AgentStringAttributeFilter</span><span class="params">(<span name="javaAttributes">javaAttributes: <span class="extype" name="java.util.HashMap">HashMap</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(requiredAttributes:Map[String,String]):com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter"></a><a id="&lt;init&gt;:AgentStringAttributeFilter"></a>
-      <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#&lt;init&gt;(requiredAttributes:Map[String,String]):com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">AgentStringAttributeFilter</span><span class="params">(<span name="requiredAttributes">requiredAttributes: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
-      </span>
-      
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">requiredAttributes</dt><dd class="cmt"><p>The subset of agent attributes the agent *must* have.</p></dd></dl></div>
-    </li></ol>
-            </div>
+        
 
         
 
@@ -301,7 +275,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -317,7 +291,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html###():Int" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -333,7 +307,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -346,10 +320,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(offer:org.apache.mesos.v1.Protos.Offer):Boolean"></a><a id="apply(Offer):Boolean"></a>
+    </li><li name="com.mesosphere.usi.core.models.commands.LaunchPod#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="apply(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate,domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter):com.mesosphere.usi.core.models.commands.LaunchPod"></a><a id="apply(PodId,RunTemplate,DomainFilter):LaunchPod"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#apply(offer:org.apache.mesos.v1.Protos.Offer):Boolean" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#apply(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate,domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter):com.mesosphere.usi.core.models.commands.LaunchPod" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -358,14 +332,49 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="offer">offer: <span class="extype" name="org.apache.mesos.v1.Protos.Offer">Offer</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="name">apply</span><span class="params">(<span name="podId">podId: <a href="../PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="../template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>, <span name="domainFilter">domainFilter: <a href="../faultdomain/DomainFilter.html" class="extype" name="com.mesosphere.usi.core.models.faultdomain.DomainFilter">DomainFilter</a></span>)</span><span class="result">: <a href="LaunchPod.html" class="extype" name="com.mesosphere.usi.core.models.commands.LaunchPod">LaunchPod</a></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter">AgentStringAttributeFilter</a> → <a href="AgentFilter.html" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentFilter">AgentFilter</a></dd></dl></div>
+      <p class="shortcomment cmt">Factory method for instantiating a pod; Scala API
+</p>
+    </li><li name="com.mesosphere.usi.core.models.commands.LaunchPod#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="apply(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate,domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter,agentFilter:Iterable[com.mesosphere.usi.core.models.constraints.AgentFilter]):com.mesosphere.usi.core.models.commands.LaunchPod"></a><a id="apply(PodId,RunTemplate,DomainFilter,Iterable[AgentFilter]):LaunchPod"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#apply(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate,domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter,agentFilter:Iterable[com.mesosphere.usi.core.models.constraints.AgentFilter]):com.mesosphere.usi.core.models.commands.LaunchPod" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="params">(<span name="podId">podId: <a href="../PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="../template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>, <span name="domainFilter">domainFilter: <a href="../faultdomain/DomainFilter.html" class="extype" name="com.mesosphere.usi.core.models.faultdomain.DomainFilter">DomainFilter</a></span>, <span name="agentFilter">agentFilter: <span class="extype" name="scala.Iterable">Iterable</span>[<a href="../constraints/AgentFilter.html" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentFilter">AgentFilter</a>]</span>)</span><span class="result">: <a href="LaunchPod.html" class="extype" name="com.mesosphere.usi.core.models.commands.LaunchPod">LaunchPod</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Factory method for instantiating a pod; Scala API
+</p>
+    </li><li name="com.mesosphere.usi.core.models.commands.LaunchPod#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="apply(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate):com.mesosphere.usi.core.models.commands.LaunchPod"></a><a id="apply(PodId,RunTemplate):LaunchPod"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#apply(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate):com.mesosphere.usi.core.models.commands.LaunchPod" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="params">(<span name="podId">podId: <a href="../PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="../template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>)</span><span class="result">: <a href="LaunchPod.html" class="extype" name="com.mesosphere.usi.core.models.commands.LaunchPod">LaunchPod</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Factory method for instantiating a pod; Scala API
+</p>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -381,7 +390,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#clone():Object" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -402,10 +411,61 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.commands.LaunchPod#create" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="create(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate):com.mesosphere.usi.core.models.commands.LaunchPod"></a><a id="create(PodId,RunTemplate):LaunchPod"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#create(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate):com.mesosphere.usi.core.models.commands.LaunchPod" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">create</span><span class="params">(<span name="podId">podId: <a href="../PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="../template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>)</span><span class="result">: <a href="LaunchPod.html" class="extype" name="com.mesosphere.usi.core.models.commands.LaunchPod">LaunchPod</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Java constructor for LaunchPod
+</p>
+    </li><li name="com.mesosphere.usi.core.models.commands.LaunchPod#create" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="create(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate,domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter):com.mesosphere.usi.core.models.commands.LaunchPod"></a><a id="create(PodId,RunTemplate,DomainFilter):LaunchPod"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#create(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate,domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter):com.mesosphere.usi.core.models.commands.LaunchPod" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">create</span><span class="params">(<span name="podId">podId: <a href="../PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="../template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>, <span name="domainFilter">domainFilter: <a href="../faultdomain/DomainFilter.html" class="extype" name="com.mesosphere.usi.core.models.faultdomain.DomainFilter">DomainFilter</a></span>)</span><span class="result">: <a href="LaunchPod.html" class="extype" name="com.mesosphere.usi.core.models.commands.LaunchPod">LaunchPod</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Java constructor for LaunchPod
+</p>
+    </li><li name="com.mesosphere.usi.core.models.commands.LaunchPod#create" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="create(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate,domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter,agentFilter:Iterable[com.mesosphere.usi.core.models.constraints.AgentFilter]):com.mesosphere.usi.core.models.commands.LaunchPod"></a><a id="create(PodId,RunTemplate,DomainFilter,Iterable[AgentFilter]):LaunchPod"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#create(podId:com.mesosphere.usi.core.models.PodId,runSpec:com.mesosphere.usi.core.models.template.RunTemplate,domainFilter:com.mesosphere.usi.core.models.faultdomain.DomainFilter,agentFilter:Iterable[com.mesosphere.usi.core.models.constraints.AgentFilter]):com.mesosphere.usi.core.models.commands.LaunchPod" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">create</span><span class="params">(<span name="podId">podId: <a href="../PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="../template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>, <span name="domainFilter">domainFilter: <a href="../faultdomain/DomainFilter.html" class="extype" name="com.mesosphere.usi.core.models.faultdomain.DomainFilter">DomainFilter</a></span>, <span name="agentFilter">agentFilter: <span class="extype" name="java.lang.Iterable">Iterable</span>[<a href="../constraints/AgentFilter.html" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentFilter">AgentFilter</a>]</span>)</span><span class="result">: <a href="LaunchPod.html" class="extype" name="com.mesosphere.usi.core.models.commands.LaunchPod">LaunchPod</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Java constructor for LaunchPod
+</p>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -418,10 +478,26 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#equals(x$1:Any):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#finalize():Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -443,7 +519,7 @@
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -459,10 +535,29 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#hashCode():Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd><dt>Annotations</dt><dd>
+                <span class="name">@native</span><span class="args">()</span>
+              
+        </dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -475,26 +570,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.typesafe.scalalogging.StrictLogging#logger" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="logger:com.typesafe.scalalogging.Logger"></a><a id="logger:Logger"></a>
-      <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#logger:com.typesafe.scalalogging.Logger" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">logger</span><span class="result">: <span class="extype" name="com.typesafe.scalalogging.Logger">Logger</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>StrictLogging</dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -510,7 +589,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#notify():Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -529,7 +608,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -545,26 +624,10 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter#requiredAttributes" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="requiredAttributes:Map[String,String]"></a>
-      <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#requiredAttributes:Map[String,String]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">requiredAttributes</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -577,10 +640,26 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#toString():String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#wait():Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -602,7 +681,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -624,7 +703,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/AgentStringAttributeFilter.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/LaunchPod$.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -655,19 +734,7 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.Serializable">
-              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="java.io.Serializable">
-              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="scala.Product">
-              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
-            </div><div class="parent" name="scala.Equals">
-              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
-            </div><div class="parent" name="com.typesafe.scalalogging.StrictLogging">
-              <h3>Inherited from <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></h3>
-            </div><div class="parent" name="com.mesosphere.usi.core.models.constraints.AgentFilter">
-              <h3>Inherited from <a href="AgentFilter.html" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentFilter">AgentFilter</a></h3>
-            </div><div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>

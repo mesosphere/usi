@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.24 API  - com.mesosphere.usi.core.models.commands</title>
-          <meta name="description" content="usi 0.1.24 API - com.mesosphere.usi.core.models.commands" />
-          <meta name="keywords" content="usi 0.1.24 API com.mesosphere.usi.core.models.commands" />
+          <title>usi 0.1.25 API  - com.mesosphere.usi.core.models.commands</title>
+          <meta name="description" content="usi 0.1.25 API - com.mesosphere.usi.core.models.commands" />
+          <meta name="keywords" content="usi 0.1.25 API com.mesosphere.usi.core.models.commands" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.24 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.25 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -178,7 +178,7 @@
                         <a class="class" href="KillPod.html" title="Send a kill for tasks associated with the specified podId."></a>
                         <a href="KillPod.html" title="Send a kill for tasks associated with the specified podId.">KillPod</a>
                       </li><li class="current-entities indented6">
-                        <span class="separator"></span>
+                        <a class="object" href="LaunchPod$.html" title=""></a>
                         <a class="class" href="LaunchPod.html" title="Launch the specified pod at-most-once."></a>
                         <a href="LaunchPod.html" title="Launch the specified pod at-most-once.">LaunchPod</a>
                       </li><li class="current-entities indented6">
@@ -280,7 +280,31 @@
           <div id="comment" class="fullcommenttop"></div>
         
 
-      
+      <div id="mbrsel">
+        <div class="toggle"></div>
+        <div id="memberfilter">
+          <i class="material-icons arrow"></i>
+          <span class="input">
+            <input id="mbrsel-input" placeholder="Filter all members" type="text" accesskey="/" />
+          </span>
+          <i class="clear material-icons"></i>
+        </div>
+        <div id="filterby">
+          <div id="order">
+            <span class="filtertype">Ordering</span>
+            <ol>
+              
+              <li class="alpha in"><span>Alphabetic</span></li>
+              
+            </ol>
+          </div>
+          
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+            </div>
+        </div>
+      </div>
 
       <div id="template">
         <div id="allMembers">
@@ -339,18 +363,18 @@ not cause the actual tasks in the pod to be killed.</p><p>The associated <a href
       
       <p class="shortcomment cmt">Send a kill for tasks associated with the specified podId.</p><div class="fullcomment"><div class="comment cmt"><p>Send a kill for tasks associated with the specified podId.</p><p>If no task status is known for the specified podId, then the kill is a no-op.</p></div></div>
     </li><li name="com.mesosphere.usi.core.models.commands.LaunchPod" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="LaunchPodextendsSchedulerCommandwithProductwithSerializable"></a><a id="LaunchPod:LaunchPod"></a>
+      <a id="LaunchPodextendsSchedulerCommand"></a><a id="LaunchPod:LaunchPod"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/commands/index.html#LaunchPodextendsSchedulerCommandwithProductwithSerializable" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/index.html#LaunchPodextendsSchedulerCommand" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">case class</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a title="Launch the specified pod at-most-once." href="LaunchPod.html"><span class="name">LaunchPod</span></a><span class="params">(<span name="podId">podId: <a href="../PodId.html" class="extype" name="com.mesosphere.usi.core.models.PodId">PodId</a></span>, <span name="runSpec">runSpec: <a href="../template/RunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.RunTemplate">RunTemplate</a></span>, <span name="domainFilter">domainFilter: <a href="../faultdomain/DomainFilter.html" class="extype" name="com.mesosphere.usi.core.models.faultdomain.DomainFilter">DomainFilter</a> = <span class="symbol"><span class="name"><a href="../../../../../index.html">HomeRegionFilter</a></span></span></span>, <span name="agentFilter">agentFilter: <a href="../constraints/AgentFilter.html" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentFilter">AgentFilter</a> = <span class="symbol"><span class="name"><a href="../../../../../index.html">DefaultAgentFilter</a></span></span></span>)</span><span class="result"> extends <a href="SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.commands.SchedulerCommand">SchedulerCommand</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Launch the specified pod at-most-once." href="LaunchPod.html"><span class="name">LaunchPod</span></a><span class="result"> extends <a href="SchedulerCommand.html" class="extype" name="com.mesosphere.usi.core.models.commands.SchedulerCommand">SchedulerCommand</a></span>
       </span>
       
       <p class="shortcomment cmt">Launch the specified pod at-most-once.</p><div class="fullcomment"><div class="comment cmt"><p>Launch the specified pod at-most-once. Frameworks *SHOULD NOT* reuse podIds; if restarting a pod, kill the old and
@@ -358,7 +382,7 @@ launch a new with a different id.</p><p>Submitting a pod to the scheduler for la
 received with suitable resources for the pod, a record of the matching pod is created, persisted, prior to the pod
 being launched.</p><p>Submitting a launch command for a pod that is already launched (has record of being launched), or is pending launch,
 is a no-op.
-</p></div><dl class="paramcmts block"><dt class="param">domainFilter</dt><dd class="cmt"><p>A filter for default domains. See <span class="extype" name="DomainFilter">DomainFilter</span> for details.</p></dd></dl></div>
+</p></div></div>
     </li><li name="com.mesosphere.usi.core.models.commands.SchedulerCommand" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="SchedulerCommandextendsAnyRef"></a><a id="SchedulerCommand:SchedulerCommand"></a>
       <span class="permalink">
@@ -387,7 +411,28 @@ Specification state.</p><p>Supported commands:
 
         
 
-        
+        <div class="values members">
+              <h3>Value Members</h3>
+              <ol>
+                <li name="com.mesosphere.usi.core.models.commands.LaunchPod" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="LaunchPod"></a><a id="LaunchPod:LaunchPod"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/commands/index.html#LaunchPod" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="LaunchPod$.html"><span class="name">LaunchPod</span></a>
+      </span>
+      
+      
+    </li>
+              </ol>
+            </div>
 
         
 

@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.24 API  - com.mesosphere.usi.core.models.constraints</title>
-          <meta name="description" content="usi 0.1.24 API - com.mesosphere.usi.core.models.constraints" />
-          <meta name="keywords" content="usi 0.1.24 API com.mesosphere.usi.core.models.constraints" />
+          <title>usi 0.1.25 API  - com.mesosphere.usi.core.models.constraints</title>
+          <meta name="description" content="usi 0.1.25 API - com.mesosphere.usi.core.models.constraints" />
+          <meta name="keywords" content="usi 0.1.25 API com.mesosphere.usi.core.models.constraints" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.24 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.25 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -187,12 +187,8 @@
                         <a href="AgentFilter.html" title="">AgentFilter</a>
                       </li><li class="current-entities indented6">
                         <span class="separator"></span>
-                        <a class="class" href="AgentStringAttributeFilter.html" title="An agent attribute filter that will only accept offers from agents that contain all required string attributes."></a>
-                        <a href="AgentStringAttributeFilter.html" title="An agent attribute filter that will only accept offers from agents that contain all required string attributes.">AgentStringAttributeFilter</a>
-                      </li><li class="current-entities indented6">
-                        <span class="separator"></span>
-                        <a class="object" href="DefaultAgentFilter$.html" title=""></a>
-                        <a href="DefaultAgentFilter$.html" title="">DefaultAgentFilter</a>
+                        <a class="class" href="AttributeStringIsFilter.html" title="An agent attribute filter which exactly compares two strings (including case)"></a>
+                        <a href="AttributeStringIsFilter.html" title="An agent attribute filter which exactly compares two strings (including case)">AttributeStringIsFilter</a>
                       </li><li name="com.mesosphere.usi.core.models.faultdomain" visbl="pub" class="indented6 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="faultdomain"></a><a id="faultdomain:faultdomain"></a>
       <span class="permalink">
@@ -272,31 +268,7 @@
           <div id="comment" class="fullcommenttop"></div>
         
 
-      <div id="mbrsel">
-        <div class="toggle"></div>
-        <div id="memberfilter">
-          <i class="material-icons arrow"></i>
-          <span class="input">
-            <input id="mbrsel-input" placeholder="Filter all members" type="text" accesskey="/" />
-          </span>
-          <i class="clear material-icons"></i>
-        </div>
-        <div id="filterby">
-          <div id="order">
-            <span class="filtertype">Ordering</span>
-            <ol>
-              
-              <li class="alpha in"><span>Alphabetic</span></li>
-              
-            </ol>
-          </div>
-          
-          <div id="visbl">
-              <span class="filtertype">Visibility</span>
-              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
-            </div>
-        </div>
-      </div>
+      
 
       <div id="template">
         <div id="allMembers">
@@ -320,10 +292,10 @@
       </span>
       
       
-    </li><li name="com.mesosphere.usi.core.models.constraints.AgentStringAttributeFilter" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="AgentStringAttributeFilterextendsAgentFilterwithStrictLoggingwithProductwithSerializable"></a><a id="AgentStringAttributeFilter:AgentStringAttributeFilter"></a>
+    </li><li name="com.mesosphere.usi.core.models.constraints.AttributeStringIsFilter" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AttributeStringIsFilterextendsAgentFilterwithStrictLoggingwithProductwithSerializable"></a><a id="AttributeStringIsFilter:AttributeStringIsFilter"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/index.html#AgentStringAttributeFilterextendsAgentFilterwithStrictLoggingwithProductwithSerializable" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/index.html#AttributeStringIsFilterextendsAgentFilterwithStrictLoggingwithProductwithSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -332,38 +304,18 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="An agent attribute filter that will only accept offers from agents that contain all required string attributes." href="AgentStringAttributeFilter.html"><span class="name">AgentStringAttributeFilter</span></a><span class="params">(<span name="requiredAttributes">requiredAttributes: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <a href="AgentFilter.html" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentFilter">AgentFilter</a> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="An agent attribute filter which exactly compares two strings (including case)" href="AttributeStringIsFilter.html"><span class="name">AttributeStringIsFilter</span></a><span class="params">(<span name="attributeName">attributeName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="value">value: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="AgentFilter.html" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentFilter">AgentFilter</a> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
-      <p class="shortcomment cmt">An agent attribute filter that will only accept offers from agents that contain all required string attributes.</p><div class="fullcomment"><div class="comment cmt"><p>An agent attribute filter that will only accept offers from agents that contain all required string attributes.</p><p>The agent may contain more attributes.
-</p></div><dl class="paramcmts block"><dt class="param">requiredAttributes</dt><dd class="cmt"><p>The subset of agent attributes the agent *must* have.</p></dd></dl></div>
+      <p class="shortcomment cmt">An agent attribute filter which exactly compares two strings (including case)
+</p><div class="fullcomment"><div class="comment cmt"><p>An agent attribute filter which exactly compares two strings (including case)
+</p></div><dl class="paramcmts block"><dt class="param">attributeName</dt><dd class="cmt"><p>the name of the attribute to compare</p></dd><dt class="param">value</dt><dd class="cmt"><p>The value of the attribute.</p></dd></dl></div>
     </li></ol>
             </div>
 
         
 
-        <div class="values members">
-              <h3>Value Members</h3>
-              <ol>
-                <li name="com.mesosphere.usi.core.models.constraints.DefaultAgentFilter" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="DefaultAgentFilter"></a><a id="DefaultAgentFilter:DefaultAgentFilter"></a>
-      <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/constraints/index.html#DefaultAgentFilter" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="DefaultAgentFilter$.html"><span class="name">DefaultAgentFilter</span></a><span class="result"> extends <a href="AgentFilter.html" class="extype" name="com.mesosphere.usi.core.models.constraints.AgentFilter">AgentFilter</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
-      </span>
-      
-      
-    </li>
-              </ol>
-            </div>
+        
 
         
 
