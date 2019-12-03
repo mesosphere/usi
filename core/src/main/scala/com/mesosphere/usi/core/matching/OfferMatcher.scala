@@ -64,7 +64,12 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
         matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
 
       case podSpec :: rest =>
-        maybeMatchResourceRequirements(remainingResources, Nil, podSpec.runSpec.allResourceRequirements) match {
+        Some(podSpec)
+          .filter(_.domainFilter(masterDomainInfo, originalOffer.getDomain))
+          .filter(_.runSpec.role == originalOffer.getAllocationInfo.getRole)
+          .flatMap { ps =>
+            maybeMatchResourceRequirements(remainingResources, Nil, ps.runSpec.allResourceRequirements)
+          } match {
           case Some((matchedResources, newRemainingResources)) =>
             matchPodSpecsTaskRecords(
               originalOffer,

@@ -4,16 +4,23 @@ import java.time.Duration
 
 import com.typesafe.config.{Config, ConfigFactory}
 
-class SchedulerSettings private (val persistencePipelineLimit: Int, val persistenceLoadTimeout: Duration) {
+class SchedulerSettings private (
+    val persistencePipelineLimit: Int,
+    val persistenceLoadTimeout: Duration,
+    val debounceReviveInterval: Duration) {
 
   private def copy(
       persistencePipelineLimit: Int = this.persistencePipelineLimit,
-      persistenceLoadTimeout: Duration = this.persistenceLoadTimeout): SchedulerSettings =
-    new SchedulerSettings(persistencePipelineLimit, persistenceLoadTimeout)
+      persistenceLoadTimeout: Duration = this.persistenceLoadTimeout,
+      debounceReviveInterval: Duration = this.debounceReviveInterval): SchedulerSettings =
+    new SchedulerSettings(persistencePipelineLimit, persistenceLoadTimeout, debounceReviveInterval)
 
   def withPersistencePipelineLimit(limit: Int): SchedulerSettings = copy(persistencePipelineLimit = limit)
 
   def withPersistenceLoadTimeout(timeout: Duration): SchedulerSettings = copy(persistenceLoadTimeout = timeout)
+
+  def withDebounceReviveInterval(minReviveOffersInterval: Duration): SchedulerSettings =
+    copy(debounceReviveInterval = minReviveOffersInterval)
 }
 
 object SchedulerSettings {
@@ -21,7 +28,9 @@ object SchedulerSettings {
     val persistenceConf = schedulerConf.getConfig("persistence")
     val persistencePipelineLimit = persistenceConf.getInt("pipeline-limit")
     val persistenceLoadTimeout = persistenceConf.getDuration("load-timeout")
-    new SchedulerSettings(persistencePipelineLimit, persistenceLoadTimeout)
+    val reviveConf = schedulerConf.getConfig("revive")
+    val debounceReviveInterval = reviveConf.getDuration("debounce-revive-interval")
+    new SchedulerSettings(persistencePipelineLimit, persistenceLoadTimeout, debounceReviveInterval)
   }
 
   def load(): SchedulerSettings = {

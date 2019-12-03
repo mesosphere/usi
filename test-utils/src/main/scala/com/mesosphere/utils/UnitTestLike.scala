@@ -81,7 +81,8 @@ trait AkkaUnitTestLike extends UnitTestLike {
 
   implicit lazy val system: ActorSystem = ActorSystem(suiteName, akkaConfig)
   implicit lazy val scheduler: Scheduler = system.scheduler
-  implicit lazy val mat: Materializer = ActorMaterializer(ActorMaterializerSettings(system))
+  def materializerSettings: ActorMaterializerSettings = ActorMaterializerSettings(system).withDebugLogging(true)
+  implicit lazy val mat: Materializer = ActorMaterializer(materializerSettings)
   implicit lazy val ctx: ExecutionContextExecutor = system.dispatcher
 
   abstract override def afterAll(): Unit = {

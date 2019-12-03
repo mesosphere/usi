@@ -52,6 +52,8 @@ private[core] class SchedulerLogicGraph(
     extends GraphStage[FanInShape2[SchedulerCommand, MesosEvent, SchedulerEvents]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
+  override def initialAttributes: Attributes = super.initialAttributes.and(Attributes.name("SchedulerLogicGraph"))
+
   private val mesosEventsInlet = Inlet[MesosEvent]("mesos-events")
   private val schedulerCommandsInlet = Inlet[SchedulerCommand]("commands")
   private val frameResultOutlet = Outlet[SchedulerEvents]("effects")
