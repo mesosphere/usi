@@ -3,7 +3,6 @@ package com.mesosphere.usi.core
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Merge, Sink, Source}
 import akka.stream.{BidiShape, FanOutShape2, Graph, Materializer}
 import akka.{Done, NotUsed}
-import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.models.{PodRecordUpdatedEvent, PodSpecUpdatedEvent, StateEvent, StateSnapshot}
 import com.mesosphere.usi.repository.PodRecordRepository
@@ -55,49 +54,41 @@ import scala.concurrent.Future
   * }}}
   */
 object Scheduler extends StrictLogging {
-  type Factory = SchedulerLogicFactory with PersistenceFlowFactory with SuppressReviveFactory
+  type Factory = SchedulerLogicFactory with PersistenceFlowFactory with SuppressReviveFactory with MesosFlowFactory
 
   /**
     * Represents the scheduler as a Sink and Source.
     *
     * This method will materialize the scheduler first, then Sink and Source can be materialized independently, but only once.
     *
-    * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
+    * @return Snapshot of the current state, as well as Source which produces [[StateEvent]]s and Sink which accepts [[SchedulerCommand]]s.
     */
-  def asSourceAndSink(factory: Factory, client: MesosClient, podRecordRepository: PodRecordRepository)(
-      implicit mat: Materializer)
+  def asSourceAndSink(factory: Factory)(implicit mat: Materializer)
     : Future[(StateSnapshot, Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]])] = {
-    fromClient(factory, client, podRecordRepository).map {
+    asFlow(factory).map {
       case (snapshot, schedulerFlow) =>
         val (source, sink) = FlowHelpers.asSourceAndSink(schedulerFlow)(mat)
         (snapshot, source, sink)
     }(CallerThreadExecutionContext.context)
   }
 
-  private[usi] def fromClient(factory: Factory, client: MesosClient, podRecordRepository: PodRecordRepository)
-    : Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
-    if (!isMultiRoleFramework(client.frameworkInfo)) {
+  /**
+    * Represents the scheduler as a Flow.
+    * @param factory
+    * @return Snapshot of the current state, as well as Flow that produces [[StateEvent]]s and accepts [[SchedulerCommand]]s.
+    */
+  def asFlow(factory: Factory): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] = {
+    if (!isMultiRoleFramework(factory.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
           "Please provide a MesosClient with FrameworkInfo that has capability MULTI_ROLE")
     }
-    podRecordRepository
-      .readAll()
-      .map { podRecords =>
-        val snapshot = StateSnapshot(podRecords = podRecords.values.toSeq, agentRecords = Nil)
+    factory
+      .loadSnapshot()
+      .map { snapshot =>
         val graph = schedulerGraph(snapshot, factory)
-        val mesosFlow = Flow.fromSinkAndSourceCoupled(logMesosCallException(client.mesosSink), client.mesosSource)
-        snapshot -> graph.join(mesosFlow)
+        snapshot -> graph.join(factory.newMesosFlow)
       }(CallerThreadExecutionContext.context)
-  }
-
-  private def logMesosCallException[T](s: Sink[T, Future[Done]]): Sink[T, NotUsed] = {
-    s.mapMaterializedValue { f =>
-      f.failed.foreach { ex =>
-        logger.error("Mesos client hanging up due to error in stream", ex)
-      }(CallerThreadExecutionContext.context)
-      NotUsed
-    }
   }
 
   private[usi] def schedulerGraph(

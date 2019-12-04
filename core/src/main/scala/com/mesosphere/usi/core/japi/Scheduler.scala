@@ -4,11 +4,9 @@ import java.util.concurrent.CompletableFuture
 
 import akka.stream.{Materializer, javadsl}
 import akka.{Done, NotUsed}
-import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.models.{StateEvent, StateSnapshot}
 import com.mesosphere.usi.core.{CallerThreadExecutionContext, SchedulerFactory, Scheduler => ScalaScheduler}
-import com.mesosphere.usi.repository.PodRecordRepository
 
 import scala.compat.java8.FutureConverters._
 
@@ -28,12 +26,9 @@ object Scheduler {
     * @param podRecordRepository Repository
     * @return A [[javadsl]] flow from pod specs to state events.
     */
-  def fromClient(
-      factory: SchedulerFactory,
-      client: MesosClient,
-      podRecordRepository: PodRecordRepository): CompletableFuture[FlowResult] = {
+  def asFlow(factory: SchedulerFactory): CompletableFuture[FlowResult] = {
     ScalaScheduler
-      .fromClient(factory, client, podRecordRepository)
+      .asFlow(factory)
       .map { case (snapshot, flow) => new FlowResult(snapshot, flow.asJava) }(CallerThreadExecutionContext.context)
       .toJava
       .toCompletableFuture
@@ -46,13 +41,9 @@ object Scheduler {
     *
     * @return Snapshot of the current state, as well as Source which produces StateEvents and Sink which accepts SpecEvents
     */
-  def asSourceAndSink(
-      factory: SchedulerFactory,
-      client: MesosClient,
-      podRecordRepository: PodRecordRepository,
-      materializer: Materializer): CompletableFuture[SourceAndSinkResult] = {
+  def asSourceAndSink(factory: SchedulerFactory, materializer: Materializer): CompletableFuture[SourceAndSinkResult] = {
     ScalaScheduler
-      .asSourceAndSink(factory, client, podRecordRepository)(materializer)
+      .asSourceAndSink(factory)(materializer)
       .map {
         case (snap, source, sink) =>
           new SourceAndSinkResult(snap, source.asJava, sink.mapMaterializedValue(_.toJava.toCompletableFuture).asJava)
