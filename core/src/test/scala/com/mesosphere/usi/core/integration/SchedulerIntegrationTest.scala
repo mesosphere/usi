@@ -40,8 +40,7 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
   val schedulerSettings = SchedulerSettings
     .load()
     .withDebounceReviveInterval(DurationConverters.toJava(50.millis))
-  lazy val factory =
-    new SchedulerFactory(mesosClient, InMemoryPodRecordRepository(), schedulerSettings, DummyMetrics)
+  lazy val factory = SchedulerFactory(mesosClient, InMemoryPodRecordRepository(), schedulerSettings, DummyMetrics)
   lazy val (snapshot, schedulerFlow) =
     factory.newSchedulerFlow().futureValue
   lazy val (input, output) = commandInputSource
