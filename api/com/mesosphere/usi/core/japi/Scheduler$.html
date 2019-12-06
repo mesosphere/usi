@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.26 API  - com.mesosphere.usi.core.japi.Scheduler</title>
-          <meta name="description" content="usi 0.1.26 API - com.mesosphere.usi.core.japi.Scheduler" />
-          <meta name="keywords" content="usi 0.1.26 API com.mesosphere.usi.core.japi.Scheduler" />
+          <title>usi 0.1.27 API  - com.mesosphere.usi.core.japi.Scheduler</title>
+          <meta name="description" content="usi 0.1.27 API - com.mesosphere.usi.core.japi.Scheduler" />
+          <meta name="keywords" content="usi 0.1.27 API com.mesosphere.usi.core.japi.Scheduler" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.26 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.27 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -322,6 +322,24 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.japi.Scheduler#asFlow" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asFlow(factory:com.mesosphere.usi.core.SchedulerFactory):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.FlowResult]"></a><a id="asFlow(SchedulerFactory):CompletableFuture[FlowResult]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#asFlow(factory:com.mesosphere.usi.core.SchedulerFactory):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.FlowResult]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asFlow</span><span class="params">(<span name="factory">factory: <a href="../SchedulerFactory.html" class="extype" name="com.mesosphere.usi.core.SchedulerFactory">SchedulerFactory</a></span>)</span><span class="result">: <span class="extype" name="java.util.concurrent.CompletableFuture">CompletableFuture</span>[<a href="Scheduler$$FlowResult.html" class="extype" name="com.mesosphere.usi.core.japi.Scheduler.FlowResult">FlowResult</a>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">Constructs a USI scheduler flow to managing pods.</p><div class="fullcomment"><div class="comment cmt"><p>Constructs a USI scheduler flow to managing pods.</p><p>The input is a <span class="extype" name="javadsl.Source">javadsl.Source</span> of <span class="extype" name="SchedulerCommand">SchedulerCommand</span>. The output is a <span class="extype" name="akka.japi.Pair">akka.japi.Pair</span>
+of <span class="extype" name="StateSnapshot">StateSnapshot</span> and <span class="extype" name="javadsl.Source">javadsl.Source</span> of <span class="extype" name="StateEvent">StateEvent</span>.
+</p></div><dl class="paramcmts block"><dt class="param">factory</dt><dd class="cmt"><p>SchedulerFactory instance; used for constructing dependencies</p></dd><dt>returns</dt><dd class="cmt"><p>A <span class="extype" name="javadsl">javadsl</span> flow from pod specs to state events.</p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
@@ -339,9 +357,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.mesosphere.usi.core.japi.Scheduler#asSourceAndSink" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="asSourceAndSink(factory:com.mesosphere.usi.core.SchedulerFactory,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,materializer:akka.stream.Materializer):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult]"></a><a id="asSourceAndSink(SchedulerFactory,MesosClient,PodRecordRepository,Materializer):CompletableFuture[SourceAndSinkResult]"></a>
+      <a id="asSourceAndSink(factory:com.mesosphere.usi.core.SchedulerFactory,materializer:akka.stream.Materializer):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult]"></a><a id="asSourceAndSink(SchedulerFactory,Materializer):CompletableFuture[SourceAndSinkResult]"></a>
       <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#asSourceAndSink(factory:com.mesosphere.usi.core.SchedulerFactory,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,materializer:akka.stream.Materializer):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult]" title="Permalink">
+      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#asSourceAndSink(factory:com.mesosphere.usi.core.SchedulerFactory,materializer:akka.stream.Materializer):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -350,7 +368,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">asSourceAndSink</span><span class="params">(<span name="factory">factory: <a href="../SchedulerFactory.html" class="extype" name="com.mesosphere.usi.core.SchedulerFactory">SchedulerFactory</a></span>, <span name="client">client: <a href="../../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="materializer">materializer: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: <span class="extype" name="java.util.concurrent.CompletableFuture">CompletableFuture</span>[<a href="Scheduler$$SourceAndSinkResult.html" class="extype" name="com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult">SourceAndSinkResult</a>]</span>
+        <span class="name">asSourceAndSink</span><span class="params">(<span name="factory">factory: <a href="../SchedulerFactory.html" class="extype" name="com.mesosphere.usi.core.SchedulerFactory">SchedulerFactory</a></span>, <span name="materializer">materializer: <span class="extype" name="akka.stream.Materializer">Materializer</span></span>)</span><span class="result">: <span class="extype" name="java.util.concurrent.CompletableFuture">CompletableFuture</span>[<a href="Scheduler$$SourceAndSinkResult.html" class="extype" name="com.mesosphere.usi.core.japi.Scheduler.SourceAndSinkResult">SourceAndSinkResult</a>]</span>
       </span>
       
       <p class="shortcomment cmt">Constructs the scheduler as a Sink and Source.</p><div class="fullcomment"><div class="comment cmt"><p>Constructs the scheduler as a Sink and Source.</p><p>This method will materialize the scheduler first, then Sink and Source can be materialized independently.
@@ -433,24 +451,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.japi.Scheduler#fromClient" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="fromClient(factory:com.mesosphere.usi.core.SchedulerFactory,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.FlowResult]"></a><a id="fromClient(SchedulerFactory,MesosClient,PodRecordRepository):CompletableFuture[FlowResult]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/mesosphere/usi/core/japi/Scheduler$.html#fromClient(factory:com.mesosphere.usi.core.SchedulerFactory,client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository):java.util.concurrent.CompletableFuture[com.mesosphere.usi.core.japi.Scheduler.FlowResult]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">fromClient</span><span class="params">(<span name="factory">factory: <a href="../SchedulerFactory.html" class="extype" name="com.mesosphere.usi.core.SchedulerFactory">SchedulerFactory</a></span>, <span name="client">client: <a href="../../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>)</span><span class="result">: <span class="extype" name="java.util.concurrent.CompletableFuture">CompletableFuture</span>[<a href="Scheduler$$FlowResult.html" class="extype" name="com.mesosphere.usi.core.japi.Scheduler.FlowResult">FlowResult</a>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">Constructs a USI scheduler flow to managing pods.</p><div class="fullcomment"><div class="comment cmt"><p>Constructs a USI scheduler flow to managing pods.</p><p>The input is a <span class="extype" name="javadsl.Source">javadsl.Source</span> of <span class="extype" name="SchedulerCommand">SchedulerCommand</span>. The output is a <span class="extype" name="akka.japi.Pair">akka.japi.Pair</span>
-of <span class="extype" name="StateSnapshot">StateSnapshot</span> and <span class="extype" name="javadsl.Source">javadsl.Source</span> of <span class="extype" name="StateEvent">StateEvent</span>.
-</p></div><dl class="paramcmts block"><dt class="param">factory</dt><dd class="cmt"><p>SchedulerFactory instance; used for constructing dependencies</p></dd><dt class="param">client</dt><dd class="cmt"><p>MesosClient instance</p></dd><dt class="param">podRecordRepository</dt><dd class="cmt"><p>Repository</p></dd><dt>returns</dt><dd class="cmt"><p>A <span class="extype" name="javadsl">javadsl</span> flow from pod specs to state events.</p></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">

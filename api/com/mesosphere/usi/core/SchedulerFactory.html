@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.26 API  - com.mesosphere.usi.core.SchedulerFactory</title>
-          <meta name="description" content="usi 0.1.26 API - com.mesosphere.usi.core.SchedulerFactory" />
-          <meta name="keywords" content="usi 0.1.26 API com.mesosphere.usi.core.SchedulerFactory" />
+          <title>usi 0.1.27 API  - com.mesosphere.usi.core.SchedulerFactory</title>
+          <meta name="description" content="usi 0.1.27 API - com.mesosphere.usi.core.SchedulerFactory" />
+          <meta name="keywords" content="usi 0.1.27 API com.mesosphere.usi.core.SchedulerFactory" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.26 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.27 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -234,7 +234,7 @@
                         <a class="class" href="SchedulerEventsBuilder.html" title="Immutable intents builder"></a>
                         <a href="SchedulerEventsBuilder.html" title="Immutable intents builder">SchedulerEventsBuilder</a>
                       </li><li class="current-entities indented4">
-                        <span class="separator"></span>
+                        <a class="object" href="SchedulerFactory$.html" title=""></a>
                         <a class="class" href="" title="Factory used for instantiating the scheduler stream."></a>
                         <a href="" title="Factory used for instantiating the scheduler stream.">SchedulerFactory</a>
                       </li><li class="current-entities indented4">
@@ -252,33 +252,35 @@
           <div id="content">
             <body class="class type">
       <div id="definition">
-        <div class="big-circle class">c</div>
+        <a href="SchedulerFactory$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
         <p id="owner"><a href="../../../index.html" class="extype" name="com">com</a>.<a href="../../index.html" class="extype" name="com.mesosphere">mesosphere</a>.<a href="../index.html" class="extype" name="com.mesosphere.usi">usi</a>.<a href="index.html" class="extype" name="com.mesosphere.usi.core">core</a></p>
-        <h1>SchedulerFactory<span class="permalink">
+        <h1><a href="SchedulerFactory$.html" title="See companion object">SchedulerFactory</a><span class="permalink">
       <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"></span></h3>
+        <h3><span class="morelinks"><div>
+            Companion <a href="SchedulerFactory$.html" title="See companion object">object SchedulerFactory</a>
+          </div></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">case class</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">SchedulerFactory</span><span class="params">(<span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="schedulerSettings">schedulerSettings: <a href="conf/SchedulerSettings.html" class="extype" name="com.mesosphere.usi.core.conf.SchedulerSettings">SchedulerSettings</a></span>, <span name="metrics">metrics: <a href="../metrics/Metrics.html" class="extype" name="com.mesosphere.usi.metrics.Metrics">Metrics</a></span>)</span><span class="result"> extends <span class="extype" name="com.mesosphere.usi.core.SchedulerLogicFactory">SchedulerLogicFactory</span> with <span class="extype" name="com.mesosphere.usi.core.PersistenceFlowFactory">PersistenceFlowFactory</span> with <span class="extype" name="com.mesosphere.usi.core.SuppressReviveFactory">SuppressReviveFactory</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">SchedulerFactory</span><span class="result"> extends <span class="extype" name="com.mesosphere.usi.core.SchedulerLogicFactory">SchedulerLogicFactory</span> with <span class="extype" name="com.mesosphere.usi.core.PersistenceFlowFactory">PersistenceFlowFactory</span> with <span class="extype" name="com.mesosphere.usi.core.SuppressReviveFactory">SuppressReviveFactory</span> with <span class="extype" name="com.mesosphere.usi.core.MesosFlowFactory">MesosFlowFactory</span> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></span>
       </span>
       </h4>
 
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Factory used for instantiating the scheduler stream.
-</p></div><dl class="paramcmts block"><dt class="param">client</dt><dd class="cmt"><p>Reference to the Mesos client</p></dd><dt class="param">podRecordRepository</dt><dd class="cmt"><p>The persistence layer for podRecords / reservationRecords</p></dd><dt class="param">schedulerSettings</dt><dd class="cmt"><p>Settings, usually loaded from application.conf</p></dd><dt class="param">metrics</dt><dd class="cmt"><p>Metrics</p></dd></dl><div class="toggleContainer block">
+</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="com.mesosphere.usi.core.SuppressReviveFactory">SuppressReviveFactory</span>, <span class="extype" name="com.mesosphere.usi.core.PersistenceFlowFactory">PersistenceFlowFactory</span>, <span class="extype" name="com.mesosphere.usi.core.SchedulerLogicFactory">SchedulerLogicFactory</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span>, <span class="extype" name="com.mesosphere.usi.core.MesosFlowFactory">MesosFlowFactory</span>, <span class="extype" name="com.mesosphere.usi.core.SuppressReviveFactory">SuppressReviveFactory</span>, <span class="extype" name="com.mesosphere.usi.core.PersistenceFlowFactory">PersistenceFlowFactory</span>, <span class="extype" name="com.mesosphere.usi.core.SchedulerLogicFactory">SchedulerLogicFactory</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -304,7 +306,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.mesosphere.usi.core.SchedulerFactory"><span>SchedulerFactory</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="com.mesosphere.usi.core.SuppressReviveFactory"><span>SuppressReviveFactory</span></li><li class="in" name="com.mesosphere.usi.core.PersistenceFlowFactory"><span>PersistenceFlowFactory</span></li><li class="in" name="com.mesosphere.usi.core.SchedulerLogicFactory"><span>SchedulerLogicFactory</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.mesosphere.usi.core.SchedulerFactory"><span>SchedulerFactory</span></li><li class="in" name="com.typesafe.scalalogging.StrictLogging"><span>StrictLogging</span></li><li class="in" name="com.mesosphere.usi.core.MesosFlowFactory"><span>MesosFlowFactory</span></li><li class="in" name="com.mesosphere.usi.core.SuppressReviveFactory"><span>SuppressReviveFactory</span></li><li class="in" name="com.mesosphere.usi.core.PersistenceFlowFactory"><span>PersistenceFlowFactory</span></li><li class="in" name="com.mesosphere.usi.core.SchedulerLogicFactory"><span>SchedulerLogicFactory</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -322,26 +324,7 @@
 
       <div id="template">
         <div id="allMembers">
-        <div id="constructors" class="members">
-              <h3>Instance Constructors</h3>
-              <ol><li name="com.mesosphere.usi.core.SchedulerFactory#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,schedulerSettings:com.mesosphere.usi.core.conf.SchedulerSettings,metrics:com.mesosphere.usi.metrics.Metrics):com.mesosphere.usi.core.SchedulerFactory"></a><a id="&lt;init&gt;:SchedulerFactory"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#&lt;init&gt;(client:com.mesosphere.mesos.client.MesosClient,podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository,schedulerSettings:com.mesosphere.usi.core.conf.SchedulerSettings,metrics:com.mesosphere.usi.metrics.Metrics):com.mesosphere.usi.core.SchedulerFactory" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">SchedulerFactory</span><span class="params">(<span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="schedulerSettings">schedulerSettings: <a href="conf/SchedulerSettings.html" class="extype" name="com.mesosphere.usi.core.conf.SchedulerSettings">SchedulerSettings</a></span>, <span name="metrics">metrics: <a href="../metrics/Metrics.html" class="extype" name="com.mesosphere.usi.metrics.Metrics">Metrics</a></span>)</span>
-      </span>
-      
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">client</dt><dd class="cmt"><p>Reference to the Mesos client</p></dd><dt class="param">podRecordRepository</dt><dd class="cmt"><p>The persistence layer for podRecords / reservationRecords</p></dd><dt class="param">schedulerSettings</dt><dd class="cmt"><p>Settings, usually loaded from application.conf</p></dd><dt class="param">metrics</dt><dd class="cmt"><p>Metrics</p></dd></dl></div>
-    </li></ol>
-            </div>
+        
 
         
 
@@ -414,22 +397,6 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.SchedulerFactory#client" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="client:com.mesosphere.mesos.client.MesosClient"></a><a id="client:MesosClient"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#client:com.mesosphere.mesos.client.MesosClient" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">client</span><span class="result">: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
@@ -470,6 +437,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#equals(x$1:Any):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
@@ -492,6 +475,22 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.SchedulerFactory#frameworkInfo" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo"></a><a id="frameworkInfo:FrameworkInfo"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#frameworkInfo:org.apache.mesos.v1.Protos.FrameworkInfo" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">frameworkInfo</span><span class="result">: <span class="extype" name="org.apache.mesos.v1.Protos.FrameworkInfo">FrameworkInfo</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.usi.core.SchedulerFactory">SchedulerFactory</a> → SchedulerLogicFactory</dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
@@ -505,6 +504,25 @@
       </span>
       <span class="symbol">
         <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd><dt>Annotations</dt><dd>
+                <span class="name">@native</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#hashCode():Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd><dt>Annotations</dt><dd>
@@ -527,10 +545,26 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.SchedulerFactory#metrics" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="metrics:com.mesosphere.usi.metrics.Metrics"></a><a id="metrics:Metrics"></a>
+    </li><li name="com.mesosphere.usi.core.SchedulerFactory#loadSnapshot" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="loadSnapshot():scala.concurrent.Future[com.mesosphere.usi.core.models.StateSnapshot]"></a><a id="loadSnapshot():Future[StateSnapshot]"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#metrics:com.mesosphere.usi.metrics.Metrics" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#loadSnapshot():scala.concurrent.Future[com.mesosphere.usi.core.models.StateSnapshot]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">loadSnapshot</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<a href="models/StateSnapshot.html" class="extype" name="com.mesosphere.usi.core.models.StateSnapshot">StateSnapshot</a>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.usi.core.SchedulerFactory">SchedulerFactory</a> → PersistenceFlowFactory</dd></dl></div>
+    </li><li name="com.typesafe.scalalogging.StrictLogging#logger" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="logger:com.typesafe.scalalogging.Logger"></a><a id="logger:Logger"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#logger:com.typesafe.scalalogging.Logger" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -539,10 +573,10 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">metrics</span><span class="result">: <a href="../metrics/Metrics.html" class="extype" name="com.mesosphere.usi.metrics.Metrics">Metrics</a></span>
+        <span class="name">logger</span><span class="result">: <span class="extype" name="com.typesafe.scalalogging.Logger">Logger</span></span>
       </span>
       
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>StrictLogging</dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -559,6 +593,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.SchedulerFactory#newMesosFlow" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="newMesosFlow:akka.stream.scaladsl.Flow[org.apache.mesos.v1.scheduler.Protos.Call,org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed]"></a><a id="newMesosFlow:Flow[Call,Event,NotUsed]"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#newMesosFlow:akka.stream.scaladsl.Flow[org.apache.mesos.v1.scheduler.Protos.Call,org.apache.mesos.v1.scheduler.Protos.Event,akka.NotUsed]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">newMesosFlow</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Flow">Flow</span>[<span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Call">Call</span>, <span class="extype" name="org.apache.mesos.v1.scheduler.Protos.Event">Event</span>, <span class="extype" name="akka.NotUsed">NotUsed</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.mesosphere.usi.core.SchedulerFactory">SchedulerFactory</a> → MesosFlowFactory</dd></dl></div>
     </li><li name="com.mesosphere.usi.core.SchedulerFactory#newPersistenceFlow" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="newPersistenceFlow():akka.stream.scaladsl.Flow[com.mesosphere.usi.core.SchedulerEvents,com.mesosphere.usi.core.SchedulerEvents,akka.NotUsed]"></a><a id="newPersistenceFlow():Flow[SchedulerEvents,SchedulerEvents,NotUsed]"></a>
       <span class="permalink">
@@ -661,38 +711,6 @@
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="com.mesosphere.usi.core.SchedulerFactory#podRecordRepository" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository"></a><a id="podRecordRepository:PodRecordRepository"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#podRecordRepository:com.mesosphere.usi.repository.PodRecordRepository" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">podRecordRepository</span><span class="result">: <a href="../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>
-      </span>
-      
-      
-    </li><li name="com.mesosphere.usi.core.SchedulerFactory#schedulerSettings" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="schedulerSettings:com.mesosphere.usi.core.conf.SchedulerSettings"></a><a id="schedulerSettings:SchedulerSettings"></a>
-      <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#schedulerSettings:com.mesosphere.usi.core.conf.SchedulerSettings" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">schedulerSettings</span><span class="result">: <a href="conf/SchedulerSettings.html" class="extype" name="com.mesosphere.usi.core.conf.SchedulerSettings">SchedulerSettings</a></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
@@ -709,6 +727,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/SchedulerFactory.html#toString():String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
@@ -787,14 +821,10 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.Serializable">
-              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="java.io.Serializable">
-              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="scala.Product">
-              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
-            </div><div class="parent" name="scala.Equals">
-              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+        <div class="parent" name="com.typesafe.scalalogging.StrictLogging">
+              <h3>Inherited from <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></h3>
+            </div><div class="parent" name="com.mesosphere.usi.core.MesosFlowFactory">
+              <h3>Inherited from <span class="extype" name="com.mesosphere.usi.core.MesosFlowFactory">MesosFlowFactory</span></h3>
             </div><div class="parent" name="com.mesosphere.usi.core.SuppressReviveFactory">
               <h3>Inherited from <span class="extype" name="com.mesosphere.usi.core.SuppressReviveFactory">SuppressReviveFactory</span></h3>
             </div><div class="parent" name="com.mesosphere.usi.core.PersistenceFlowFactory">

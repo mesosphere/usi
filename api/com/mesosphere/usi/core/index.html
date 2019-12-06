@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.26 API  - com.mesosphere.usi.core</title>
-          <meta name="description" content="usi 0.1.26 API - com.mesosphere.usi.core" />
-          <meta name="keywords" content="usi 0.1.26 API com.mesosphere.usi.core" />
+          <title>usi 0.1.27 API  - com.mesosphere.usi.core</title>
+          <meta name="description" content="usi 0.1.27 API - com.mesosphere.usi.core" />
+          <meta name="keywords" content="usi 0.1.27 API com.mesosphere.usi.core" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.26 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.27 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -250,7 +250,7 @@
                         <a class="class" href="SchedulerEventsBuilder.html" title="Immutable intents builder"></a>
                         <a href="SchedulerEventsBuilder.html" title="Immutable intents builder">SchedulerEventsBuilder</a>
                       </li><li class="current-entities indented4">
-                        <span class="separator"></span>
+                        <a class="object" href="SchedulerFactory$.html" title=""></a>
                         <a class="class" href="SchedulerFactory.html" title="Factory used for instantiating the scheduler stream."></a>
                         <a href="SchedulerFactory.html" title="Factory used for instantiating the scheduler stream.">SchedulerFactory</a>
                       </li><li class="current-entities indented4">
@@ -458,23 +458,22 @@ calls
       <p class="shortcomment cmt">Immutable intents builder</p><div class="fullcomment"><div class="comment cmt"><p>Immutable intents builder</p><p>Effects are appended in lazy fashion by using the exposed effect methods.</p><p>Effects preserve order. For append-efficiency a link-list data structure is used. List is lazily reversed when
 effects are asked for.</p><p>Note, SchedulerEventsBuilder will accumulate state events. The scheduler logic loop happens to consume this.
 </p></div></div>
-    </li><li name="com.mesosphere.usi.core.SchedulerFactory" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="SchedulerFactoryextendsSchedulerLogicFactorywithPersistenceFlowFactorywithSuppressReviveFactorywithProductwithSerializable"></a><a id="SchedulerFactory:SchedulerFactory"></a>
+    </li><li name="com.mesosphere.usi.core.SchedulerFactory" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SchedulerFactoryextendsSchedulerLogicFactorywithPersistenceFlowFactorywithSuppressReviveFactorywithMesosFlowFactorywithStrictLogging"></a><a id="SchedulerFactory:SchedulerFactory"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/usi/core/index.html#SchedulerFactoryextendsSchedulerLogicFactorywithPersistenceFlowFactorywithSuppressReviveFactorywithProductwithSerializable" title="Permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#SchedulerFactoryextendsSchedulerLogicFactorywithPersistenceFlowFactorywithSuppressReviveFactorywithMesosFlowFactorywithStrictLogging" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">case class</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a title="Factory used for instantiating the scheduler stream." href="SchedulerFactory.html"><span class="name">SchedulerFactory</span></a><span class="params">(<span name="client">client: <a href="../../mesos/client/MesosClient.html" class="extype" name="com.mesosphere.mesos.client.MesosClient">MesosClient</a></span>, <span name="podRecordRepository">podRecordRepository: <a href="../repository/PodRecordRepository.html" class="extype" name="com.mesosphere.usi.repository.PodRecordRepository">PodRecordRepository</a></span>, <span name="schedulerSettings">schedulerSettings: <a href="conf/SchedulerSettings.html" class="extype" name="com.mesosphere.usi.core.conf.SchedulerSettings">SchedulerSettings</a></span>, <span name="metrics">metrics: <a href="../metrics/Metrics.html" class="extype" name="com.mesosphere.usi.metrics.Metrics">Metrics</a></span>)</span><span class="result"> extends <span class="extype" name="com.mesosphere.usi.core.SchedulerLogicFactory">SchedulerLogicFactory</span> with <span class="extype" name="com.mesosphere.usi.core.PersistenceFlowFactory">PersistenceFlowFactory</span> with <span class="extype" name="com.mesosphere.usi.core.SuppressReviveFactory">SuppressReviveFactory</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Factory used for instantiating the scheduler stream." href="SchedulerFactory.html"><span class="name">SchedulerFactory</span></a><span class="result"> extends <span class="extype" name="com.mesosphere.usi.core.SchedulerLogicFactory">SchedulerLogicFactory</span> with <span class="extype" name="com.mesosphere.usi.core.PersistenceFlowFactory">PersistenceFlowFactory</span> with <span class="extype" name="com.mesosphere.usi.core.SuppressReviveFactory">SuppressReviveFactory</span> with <span class="extype" name="com.mesosphere.usi.core.MesosFlowFactory">MesosFlowFactory</span> with <span class="extype" name="com.typesafe.scalalogging.StrictLogging">StrictLogging</span></span>
       </span>
       
-      <p class="shortcomment cmt">Factory used for instantiating the scheduler stream.</p><div class="fullcomment"><div class="comment cmt"><p>Factory used for instantiating the scheduler stream.
-</p></div><dl class="paramcmts block"><dt class="param">client</dt><dd class="cmt"><p>Reference to the Mesos client</p></dd><dt class="param">podRecordRepository</dt><dd class="cmt"><p>The persistence layer for podRecords / reservationRecords</p></dd><dt class="param">schedulerSettings</dt><dd class="cmt"><p>Settings, usually loaded from application.conf</p></dd><dt class="param">metrics</dt><dd class="cmt"><p>Metrics</p></dd></dl></div>
+      <p class="shortcomment cmt">Factory used for instantiating the scheduler stream.</p>
     </li><li name="com.mesosphere.usi.core.SchedulerState" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="SchedulerStateextendsProductwithSerializable"></a><a id="SchedulerState:SchedulerState"></a>
       <span class="permalink">
@@ -605,6 +604,22 @@ so that the state can be reliably subscribed to by other components.
       </span>
       <span class="symbol">
         <a title="" href="SchedulerEventsBuilder$.html"><span class="name">SchedulerEventsBuilder</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.SchedulerFactory" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SchedulerFactory"></a><a id="SchedulerFactory:SchedulerFactory"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/usi/core/index.html#SchedulerFactory" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="SchedulerFactory$.html"><span class="name">SchedulerFactory</span></a>
       </span>
       
       
