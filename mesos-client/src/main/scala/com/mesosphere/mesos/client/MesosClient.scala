@@ -14,7 +14,7 @@ import akka.stream.{Materializer, OverflowStrategy, _}
 import akka.util.{ByteString, Timeout}
 import akka.{Done, NotUsed}
 import com.typesafe.scalalogging.StrictLogging
-import com.mesosphere.mesos.conf.MesosClientSettings
+import com.mesosphere.mesos.conf.{MesosClientSettings, SemanticVersion}
 import org.apache.mesos.v1.Protos.{FrameworkID, FrameworkInfo, MasterInfo}
 import org.apache.mesos.v1.scheduler.Protos.{Call, Event}
 
@@ -396,6 +396,12 @@ class MesosClientImpl(
   val calls = new MesosCalls(frameworkId)
 
   val masterInfo = subscribed.getMasterInfo
+
+  val minimalVersion = SemanticVersion(1, 9, 0)
+  val version = SemanticVersion(masterInfo.getVersion).get
+  require(
+    version >= minimalVersion,
+    s"Mesos master version $version is not compatible with required version $minimalVersion.")
 
   override def killSwitch: KillSwitch = sharedKillSwitch
 
