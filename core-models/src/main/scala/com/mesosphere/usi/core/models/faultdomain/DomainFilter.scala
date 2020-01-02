@@ -8,4 +8,7 @@ import org.apache.mesos.v1.Protos.DomainInfo
   */
 trait DomainFilter {
   def apply(masterDomain: DomainInfo, nodeDomain: DomainInfo): Boolean
+
+  /** @return a text description of the matcher */
+  def description: String
 }

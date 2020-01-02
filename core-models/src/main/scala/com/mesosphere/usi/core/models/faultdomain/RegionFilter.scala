@@ -5,4 +5,6 @@ case class RegionFilter(region: String) extends DomainFilter {
   override def apply(masterDomain: Protos.DomainInfo, nodeDomain: Protos.DomainInfo): Boolean = {
     region == nodeDomain.getFaultDomain.getRegion.getName
   }
+
+  override def description: String = s"expect region $region"
 }
