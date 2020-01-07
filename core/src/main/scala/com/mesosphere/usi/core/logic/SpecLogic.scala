@@ -1,6 +1,6 @@
 package com.mesosphere.usi.core.logic
 
-import com.mesosphere.LoggingArgs
+import com.mesosphere.{ImplicitStrictLogging, LoggingArgs}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core._
 import com.mesosphere.usi.core.models._
@@ -11,7 +11,7 @@ import com.typesafe.scalalogging.StrictLogging
   * The current home for USI business logic for dealing with spec commands
   *
   */
-private[core] class SpecLogic(mesosCallFactory: MesosCalls) extends StrictLogging {
+private[core] class SpecLogic(mesosCallFactory: MesosCalls) extends StrictLogging with ImplicitStrictLogging {
 
   private def getRunningPodSpec(podSpecs: Map[PodId, PodSpec], id: PodId): Option[RunningPodSpec] = {
     podSpecs.get(id).collect { case r: RunningPodSpec => r }
