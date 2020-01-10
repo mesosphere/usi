@@ -59,8 +59,8 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
       if (!result)
         logger.debug(
           s"Declining offer ${originalOffer.getId.getValue} for pod $podId; domain filter did not match: ${domainFilter.description}.")(
-            LoggingArgs("podId" -> podId)
-          )
+          LoggingArgs("podId" -> podId)
+        )
       result
     }
 
