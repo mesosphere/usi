@@ -1,6 +1,6 @@
 package com.mesosphere.usi.core.matching
 
-import com.mesosphere.ImplicitStrictLogging
+import com.mesosphere.{ImplicitStrictLogging, LoggingArgs}
 import com.mesosphere.usi.core.models.constraints.AgentFilter
 import com.mesosphere.usi.core.models.faultdomain.DomainFilter
 import com.mesosphere.usi.core.models.template.RunTemplate.KeyedResourceRequirement
