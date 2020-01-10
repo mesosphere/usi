@@ -1,16 +1,17 @@
 package com.mesosphere.usi.core.matching
+
+import com.mesosphere.ImplicitStrictLogging
 import com.mesosphere.usi.core.models.constraints.AgentFilter
 import com.mesosphere.usi.core.models.faultdomain.DomainFilter
 import com.mesosphere.usi.core.models.template.RunTemplate.KeyedResourceRequirement
 import com.mesosphere.usi.core.models.resources.ResourceType
 import com.mesosphere.usi.core.models.{PodId, RunningPodSpec, TaskName}
-import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.{Protos => Mesos}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
-class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
+class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends ImplicitStrictLogging {
   @tailrec private def maybeMatchResourceRequirements(
       remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
       matchedResources: List[OfferMatcher.ResourceMatch],
