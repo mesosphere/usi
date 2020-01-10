@@ -56,6 +56,10 @@ case class SchedulerState(
     copy(podRecords = newPodRecords, podStatuses = newPodStatuses, podSpecs = newPodSpecs)
   }
 
+  /** @return a summary for debug logs. */
+  def summary(): String = {
+    s"${podRecords.size} records, ${podStatuses.size} statuses, ${podSpecs.size} specs"
+  }
 }
 
 object SchedulerState {

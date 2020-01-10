@@ -5,6 +5,7 @@ import com.mesosphere.usi.core.logic.{MesosEventsLogic, SpecLogic}
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.models.{PodId, PodSpecUpdatedEvent, PodStatusUpdatedEvent, StateSnapshot}
 import com.mesosphere.usi.metrics.Metrics
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.Protos.DomainInfo
 import org.apache.mesos.v1.scheduler.Protos.{Event => MesosEvent}
 
@@ -69,7 +70,8 @@ private[core] class SchedulerLogicHandler(
     mesosCallFactory: MesosCalls,
     masterDomainInfo: DomainInfo,
     initialState: StateSnapshot,
-    metrics: Metrics) {
+    metrics: Metrics)
+    extends StrictLogging {
 
   private val schedulerLogic = new SpecLogic(mesosCallFactory)
   private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory, masterDomainInfo, metrics)
@@ -104,6 +106,7 @@ private[core] class SchedulerLogicHandler(
 
     // update our state for the next frame processing
     this.state = frameResultBuilder.state
+    logger.debug(s"Scheduler state after frame handling: ${this.state.summary()}")
 
     // Return our result
     frameResultBuilder.result

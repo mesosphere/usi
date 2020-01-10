@@ -113,6 +113,9 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, masterDomainI
         val (schedulerEventsBuilder, _) =
           offersList.asScala.foldLeft((SchedulerEventsBuilder.empty, pendingLaunchPodSpecs)) {
             case ((builder, pending), offer) =>
+              logger.debug(s"Processing offer ${offer.getId.getValue} from agent ${offer.getAgentId.getValue}")(
+                LoggingArgs("offerId" -> offer.getId.getValue).and("agentId" -> offer.getAgentId.getValue)
+              )
               metrics.timer("usi.scheduler.offer.processing").blocking {
 
                 val (matchedPodIds, offerMatchSchedulerEvents) = matchOffer(

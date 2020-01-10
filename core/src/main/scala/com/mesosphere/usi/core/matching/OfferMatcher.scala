@@ -1,15 +1,17 @@
 package com.mesosphere.usi.core.matching
+
+import com.mesosphere.{ImplicitStrictLogging, LoggingArgs}
 import com.mesosphere.usi.core.models.constraints.AgentFilter
+import com.mesosphere.usi.core.models.faultdomain.DomainFilter
 import com.mesosphere.usi.core.models.template.RunTemplate.KeyedResourceRequirement
 import com.mesosphere.usi.core.models.resources.ResourceType
 import com.mesosphere.usi.core.models.{PodId, RunningPodSpec, TaskName}
-import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.{Protos => Mesos}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
-class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
+class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends ImplicitStrictLogging {
   @tailrec private def maybeMatchResourceRequirements(
       remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
       matchedResources: List[OfferMatcher.ResourceMatch],
@@ -53,11 +55,21 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends StrictLogging {
       }
     }
 
+    def matchesDomainFilter(podId: PodId, domainFilter: DomainFilter): Boolean = {
+      val result = domainFilter(masterDomainInfo, originalOffer.getDomain)
+      if (!result)
+        logger.debug(
+          s"Declining offer ${originalOffer.getId.getValue} for pod $podId; domain filter did not match: ${domainFilter.description}.")(
+          LoggingArgs("podId" -> podId)
+        )
+      result
+    }
+
     pendingLaunchPodSpecs match {
       case Nil =>
         result
 
-      case podSpec :: rest if !podSpec.domainFilter(masterDomainInfo, originalOffer.getDomain) =>
+      case podSpec :: rest if !matchesDomainFilter(podSpec.id, podSpec.domainFilter) =>
         matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
 
       case podSpec :: rest if !matchesAgentFilters(podSpec.id, podSpec.agentFilters) =>
