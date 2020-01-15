@@ -35,7 +35,8 @@ object MesosFacade {
       usedResources: ITResources,
       offeredResources: ITResources,
       reservedResourcesByRole: Map[String, ITResources],
-      unreservedResources: ITResources)
+      unreservedResources: ITResources,
+      active: Boolean)
 
   case class ITAttributes(attributes: Map[String, ITResourceValue])
 
@@ -89,15 +90,17 @@ object MesosFacade {
     override def toString: String = '"' + portString + '"'
   }
 
-  case class ITask(id: String, name: String, framework_id: String, state: Option[String])
+  case class ITTask(id: String, name: String, slave_id: String, framework_id: String, state: Option[String])
+
+  case class ITAgents(slaves: Seq[ITAgent], recovered_slaves: Seq[ITAgent])
 
   case class ITFramework(
       id: String,
       name: String,
       active: Boolean,
       connected: Boolean,
-      tasks: Seq[ITask],
-      unreachable_tasks: Seq[ITask])
+      tasks: Seq[ITTask],
+      unreachable_tasks: Seq[ITTask])
 
   case class ITFrameworks(
       frameworks: Seq[ITFramework],
@@ -118,12 +121,16 @@ class MesosFacade(val url: URL, val waitTime: FiniteDuration = 30.seconds)(
 
   // `waitTime` is passed implicitly to the `request` and `requestFor` methods
   implicit val requestTimeout = waitTime
-  def state: RestResult[ITMesosState] = {
+  def state(): RestResult[ITMesosState] = {
     result(requestFor[ITMesosState](Get(s"$url/state")), waitTime)
   }
 
   def frameworks(): RestResult[ITFrameworks] = {
     result(requestFor[ITFrameworks](Get(s"$url/frameworks")), waitTime)
+  }
+
+  def agents(): RestResult[ITAgents] = {
+    result(requestFor[ITAgents](Get(s"$url/slaves")), waitTime)
   }
 
   def frameworkIds(): RestResult[Seq[String]] = {
