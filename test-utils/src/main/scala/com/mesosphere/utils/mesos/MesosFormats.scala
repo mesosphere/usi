@@ -61,7 +61,7 @@ object MesosFormats {
       (__ \ "unregistered_frameworks").format[Seq[String]]
   )(ITMesosState.apply, unlift(ITMesosState.unapply))
 
-  implicit lazy val ITaskFormat: Format[ITask] = Json.format[ITask]
+  implicit lazy val ITaskFormat: Format[ITTask] = Json.format[ITTask]
 
   implicit lazy val ITFrameworkFormat: Format[ITFramework] = Json.format[ITFramework]
 

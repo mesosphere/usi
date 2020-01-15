@@ -90,7 +90,7 @@ object MesosFacade {
     override def toString: String = '"' + portString + '"'
   }
 
-  case class ITask(id: String, name: String, framework_id: String, state: Option[String])
+  case class ITTask(id: String, name: String, slave_id: String, framework_id: String, state: Option[String])
 
   case class ITAgents(slaves: Seq[ITAgent], recovered_agents: Seq[ITAgent])
 
@@ -99,8 +99,8 @@ object MesosFacade {
       name: String,
       active: Boolean,
       connected: Boolean,
-      tasks: Seq[ITask],
-      unreachable_tasks: Seq[ITask])
+      tasks: Seq[ITTask],
+      unreachable_tasks: Seq[ITTask])
 
   case class ITFrameworks(
       frameworks: Seq[ITFramework],
