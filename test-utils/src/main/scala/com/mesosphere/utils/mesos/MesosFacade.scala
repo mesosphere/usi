@@ -92,7 +92,7 @@ object MesosFacade {
 
   case class ITTask(id: String, name: String, slave_id: String, framework_id: String, state: Option[String])
 
-  case class ITAgents(slaves: Seq[ITAgent], recovered_agents: Seq[ITAgent])
+  case class ITAgents(slaves: Seq[ITAgent], recovered_slaves: Seq[ITAgent])
 
   case class ITFramework(
       id: String,
