@@ -129,7 +129,7 @@ class MesosFacade(val url: URL, val waitTime: FiniteDuration = 30.seconds)(
     result(requestFor[ITFrameworks](Get(s"$url/frameworks")), waitTime)
   }
 
-  def agents(): RestResult[ITAgent] = {
+  def agents(): RestResult[ITAgents] = {
     result(requestFor[ITAgents](Get(s"$url/slaves")), waitTime)
   }
 
