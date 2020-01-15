@@ -11,7 +11,7 @@ import com.mesosphere.utils.zookeeper.ZookeeperServerTest
 import com.mesosphere.utils.{PortAllocator, ProcessOutputToLogStream}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.io.FileUtils
-import org.scalatest.Suite
+import org.scalatest.{Matchers, Suite}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 
 import scala.collection.JavaConverters._
@@ -419,7 +419,13 @@ trait MesosTest {
   * Basic trait to include in tests. It comes with Zookeeper (in-memory) and a minimal Mesos cluster: one master, one
   * agent with default configuration parameters. To use, simply extend your test class from it.
   */
-trait MesosClusterTest extends Suite with ZookeeperServerTest with MesosTest with ScalaFutures {
+trait MesosClusterTest
+    extends Suite
+    with ZookeeperServerTest
+    with MesosTest
+    with ScalaFutures
+    with Eventually
+    with Matchers {
   implicit val system: ActorSystem
   implicit val mat: Materializer
   implicit val ctx: ExecutionContext
@@ -457,6 +463,14 @@ trait MesosClusterTest extends Suite with ZookeeperServerTest with MesosTest wit
   }
 
   abstract override def afterAll(): Unit = {
+    mesosCluster.agents.filterNot(_.isAlive()).foreach(_.start())
+    withClue("In order for teardown to complete successfully, all agents must be active") {
+      eventually {
+        val inactiveAgents = mesosFacade.agents().value.slaves.filterNot(_.active)
+        inactiveAgents shouldBe (Nil)
+      }
+    }
+
     mesosCluster.close()
     super.afterAll()
   }
