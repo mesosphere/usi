@@ -490,7 +490,7 @@ trait MesosClusterTest
     mesosCluster.agents.foreach(_.start())
     eventually {
       val state = mesosFacade.state().value
-      state.agents.size shouldBe mesosCluster.agents.size
+      forAll(state.agents) { _.active should be(true)}
       forAll(state.frameworks) { _.unreachable_tasks should be('empty) }
     }
 
