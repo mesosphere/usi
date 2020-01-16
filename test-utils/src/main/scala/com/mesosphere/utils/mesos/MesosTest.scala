@@ -489,7 +489,7 @@ trait MesosClusterTest
     // We need to start all the agents for the teardown to be able to kill all the (UNREACHABLE) executors/tasks
     mesosCluster.agents.foreach(_.start())
     eventually {
-      val state = mesosFacade.state.value
+      val state = mesosFacade.state().value
       state.agents.size shouldBe mesosCluster.agents.size
       forAll(state.frameworks) { _.unreachable_tasks should be('empty) }
     }
