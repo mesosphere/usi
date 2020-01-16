@@ -7,12 +7,14 @@ import java.nio.file.{Files, Paths}
 
 import akka.actor.{ActorSystem, Scheduler}
 import akka.stream.Materializer
+import com.mesosphere.utils.mesos.MesosFacade.ITAgentDetails
+import com.mesosphere.utils.mesos.MesosTest.AgentLike
 import com.mesosphere.utils.zookeeper.ZookeeperServerTest
 import com.mesosphere.utils.{PortAllocator, ProcessOutputToLogStream}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.io.FileUtils
-import org.scalatest.Suite
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.{Matchers, Suite}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
@@ -133,6 +135,8 @@ case class MesosCluster(
       .map(fd => s"--domain=$fd"))
   }
 
+  private var initialCachedAgentDetails: Map[AgentLike, ITAgentDetails] = Map.empty
+
   lazy val agents: Seq[Agent] = 0.until(config.numAgents).map { i =>
     val (faultDomainAgentAttributes: Map[String, Option[String]], mesosFaultDomainAgentCmdOption) =
       if (config.agentsFaultDomains.nonEmpty && config.agentsFaultDomains(i).nonEmpty) {
@@ -209,9 +213,27 @@ case class MesosCluster(
   def waitForAgents(masterUrl: URL): Unit = {
     val mesosFacade = new MesosFacade(masterUrl)
     eventually(timeout(waitForMesosTimeout), interval(1.seconds)) {
-      mesosFacade.state.value.agents.size == agents.size
+      assert(mesosFacade.agents().value.slaves.size == agents.size)
     }
+    initialCachedAgentDetails = agents.map { a =>
+      a -> mesosFacade.agentDetails(a).value
+    }.toMap
   }
+
+  /** Returns a agent id for an agent as it was initially queried during test cluster launch
+    *
+    * @param agent
+    */
+  def agentIdFor(agent: AgentLike): String = {
+    initialCachedAgentDetails(agent).id
+  }
+
+  /**
+    * Return the cached agent details that were returned when the agent first initialized
+    * @param agent Reference to the MesosTest Agent process
+    */
+  def initialAgentDetailsFor(agent: AgentLike): ITAgentDetails =
+    initialCachedAgentDetails(agent)
 
   // format: OFF
   case class Resources(cpus: Option[Int] = None, mem: Option[Int] = None, ports: (Int, Int), gpus: Option[Int] = None) {
@@ -380,7 +402,7 @@ case class MesosCluster(
     * @param extraArgs Extra dash arguments in addition to ip, hostname, post, resources, work_dir, and log level.
     * @param logVerbosityLevel The log level for GLOG_v.
     */
-  case class Agent(resources: Resources, extraArgs: Seq[String], logVerbosityLevel: Int = 2) extends Mesos {
+  case class Agent(resources: Resources, extraArgs: Seq[String], logVerbosityLevel: Int = 2) extends Mesos with MesosTest.AgentLike {
     /**
       * We can only specify the cgroups_root flag if running the integration tests under Linux; on Mac OS this flag is unrecognized.
       */
@@ -419,7 +441,13 @@ trait MesosTest {
   * Basic trait to include in tests. It comes with Zookeeper (in-memory) and a minimal Mesos cluster: one master, one
   * agent with default configuration parameters. To use, simply extend your test class from it.
   */
-trait MesosClusterTest extends Suite with ZookeeperServerTest with MesosTest with ScalaFutures {
+trait MesosClusterTest
+    extends Suite
+    with ZookeeperServerTest
+    with MesosTest
+    with ScalaFutures
+    with Eventually
+    with Matchers {
   implicit val system: ActorSystem
   implicit val mat: Materializer
   implicit val ctx: ExecutionContext
@@ -466,6 +494,10 @@ object MesosTest {
   import sys.process._
   lazy val isLinux: Boolean =
     Seq("uname").!!.trim.startsWith("Linux")
+  trait AgentLike {
+    def ip: String
+    def port: Int
+  }
 }
 
 object IP extends StrictLogging {
