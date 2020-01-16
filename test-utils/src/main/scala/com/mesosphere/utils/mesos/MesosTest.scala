@@ -11,8 +11,8 @@ import com.mesosphere.utils.zookeeper.ZookeeperServerTest
 import com.mesosphere.utils.{PortAllocator, ProcessOutputToLogStream}
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.io.FileUtils
-import org.scalatest.{Matchers, Suite}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.{Matchers, Suite}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
@@ -404,6 +404,21 @@ case class MesosCluster(
         cgroupsRootArgs ++
         extraArgs,
       cwd = None, extraEnv = mesosEnv(workDir): _*)
+
+    def agentId: Option[String] = {
+      val files = new File(workDir, "slaves")
+      files.listFiles().filter(_.isDirectory).toSeq match {
+        case Seq(singleFolder) =>
+          Some(singleFolder.getName)
+        case Nil =>
+          // agent hasn't been launched yet
+          None
+        case other =>
+          // multiple folders is an error
+          logger.error(s"Multiple agent folders exist, can't deduce agentId: ${other.map(_.toString).mkString(", ")}")
+          throw new IllegalStateException("Multiple agent folders exist, can't deduce agentId")
+      }
+    }
 
     override val processName = "Agent"
   }
