@@ -15,6 +15,7 @@ import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.io.FileUtils
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
+import org.scalatest.Inspectors.forAll
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
@@ -485,6 +486,14 @@ trait MesosClusterTest
   }
 
   abstract override def afterAll(): Unit = {
+    // We need to start all the agents for the teardown to be able to kill all the (UNREACHABLE) executors/tasks
+    mesosCluster.agents.foreach(_.start())
+    eventually {
+      val state = mesosFacade.state.value
+      state.agents.size shouldBe mesosCluster.agents.size
+      forAll(state.frameworks) { _.unreachable_tasks should be('empty) }
+    }
+
     mesosCluster.close()
     super.afterAll()
   }
