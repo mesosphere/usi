@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.30 API  - com.mesosphere.utils.mesos.MesosCluster</title>
-          <meta name="description" content="usi 0.1.30 API - com.mesosphere.utils.mesos.MesosCluster" />
-          <meta name="keywords" content="usi 0.1.30 API com.mesosphere.utils.mesos.MesosCluster" />
+          <title>usi 0.1.31 API  - com.mesosphere.utils.mesos.MesosCluster</title>
+          <meta name="description" content="usi 0.1.31 API - com.mesosphere.utils.mesos.MesosCluster" />
+          <meta name="keywords" content="usi 0.1.31 API com.mesosphere.utils.mesos.MesosCluster" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.30 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.31 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -283,9 +283,9 @@ number of masters/agents.
         <div id="types" class="types members">
               <h3>Type Members</h3>
               <ol><li name="com.mesosphere.utils.mesos.MesosCluster.Agent" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="AgentextendsMesosCluster.this.MesoswithProductwithSerializable"></a><a id="Agent:Agent"></a>
+      <a id="AgentextendsMesosCluster.this.MesoswithMesosTest.AgentLikewithProductwithSerializable"></a><a id="Agent:Agent"></a>
       <span class="permalink">
-      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#AgentextendsMesosCluster.this.MesoswithProductwithSerializable" title="Permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#AgentextendsMesosCluster.this.MesoswithMesosTest.AgentLikewithProductwithSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -294,7 +294,7 @@ number of masters/agents.
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="Mesos agent closure that captures work directory, cgroups, resources etc." href="MesosCluster$Agent.html"><span class="name">Agent</span></a><span class="params">(<span name="resources">resources: <a href="MesosCluster$Resources.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Resources">Resources</a></span>, <span name="extraArgs">extraArgs: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="logVerbosityLevel">logVerbosityLevel: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">2</span></span>)</span><span class="result"> extends <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Mesos agent closure that captures work directory, cgroups, resources etc." href="MesosCluster$Agent.html"><span class="name">Agent</span></a><span class="params">(<span name="resources">resources: <a href="MesosCluster$Resources.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Resources">Resources</a></span>, <span name="extraArgs">extraArgs: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="logVerbosityLevel">logVerbosityLevel: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">2</span></span>)</span><span class="result"> extends <a href="MesosCluster$Mesos.html" class="extype" name="com.mesosphere.utils.mesos.MesosCluster.Mesos">Mesos</a> with <a href="MesosTest$$AgentLike.html" class="extype" name="com.mesosphere.utils.mesos.MesosTest.AgentLike">AgentLike</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Mesos agent closure that captures work directory, cgroups, resources etc.</p><div class="fullcomment"><div class="comment cmt"><p>Mesos agent closure that captures work directory, cgroups, resources etc.
@@ -421,6 +421,23 @@ up after the execution which included collecting agent sandboxes.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster#agentIdFor" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="agentIdFor(agent:com.mesosphere.utils.mesos.MesosTest.AgentLike):String"></a><a id="agentIdFor(AgentLike):String"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#agentIdFor(agent:com.mesosphere.utils.mesos.MesosTest.AgentLike):String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">agentIdFor</span><span class="params">(<span name="agent">agent: <a href="MesosTest$$AgentLike.html" class="extype" name="com.mesosphere.utils.mesos.MesosTest.AgentLike">AgentLike</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Returns a agent id for an agent as it was initially queried during test cluster launch
+</p>
     </li><li name="com.mesosphere.utils.mesos.MesosCluster#agents" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="agents:Seq[MesosCluster.this.Agent]"></a><a id="agents:Seq[Agent]"></a>
       <span class="permalink">
@@ -662,6 +679,22 @@ up after the execution which included collecting agent sandboxes.
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.utils.mesos.MesosCluster#initialAgentDetailsFor" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="initialAgentDetailsFor(agent:com.mesosphere.utils.mesos.MesosTest.AgentLike):com.mesosphere.utils.mesos.MesosFacade.ITAgentDetails"></a><a id="initialAgentDetailsFor(AgentLike):ITAgentDetails"></a>
+      <span class="permalink">
+      <a href="../../../../com/mesosphere/utils/mesos/MesosCluster.html#initialAgentDetailsFor(agent:com.mesosphere.utils.mesos.MesosTest.AgentLike):com.mesosphere.utils.mesos.MesosFacade.ITAgentDetails" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">initialAgentDetailsFor</span><span class="params">(<span name="agent">agent: <a href="MesosTest$$AgentLike.html" class="extype" name="com.mesosphere.utils.mesos.MesosTest.AgentLike">AgentLike</a></span>)</span><span class="result">: <a href="MesosFacade$$ITAgentDetails.html" class="extype" name="com.mesosphere.utils.mesos.MesosFacade.ITAgentDetails">ITAgentDetails</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Return the cached agent details that were returned when the agent first initialized</p><div class="fullcomment"><div class="comment cmt"><p>Return the cached agent details that were returned when the agent first initialized</p></div><dl class="paramcmts block"><dt class="param">agent</dt><dd class="cmt"><p>Reference to the MesosTest Agent process</p></dd></dl></div>
     </li><li name="org.scalatest.concurrent.PatienceConfiguration#interval" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="interval(value:org.scalatest.time.Span):org.scalatest.concurrent.PatienceConfiguration.Interval"></a><a id="interval(Span):Interval"></a>
       <span class="permalink">
