@@ -486,14 +486,6 @@ trait MesosClusterTest
   }
 
   abstract override def afterAll(): Unit = {
-    // We need to start all the agents for the teardown to be able to kill all the (UNREACHABLE) executors/tasks
-    mesosCluster.agents.foreach(_.start())
-    eventually {
-      val state = mesosFacade.state().value
-      forAll(state.agents) { _.active should be(true)}
-      forAll(state.frameworks) { _.unreachable_tasks should be('empty) }
-    }
-
     mesosCluster.close()
     super.afterAll()
   }
