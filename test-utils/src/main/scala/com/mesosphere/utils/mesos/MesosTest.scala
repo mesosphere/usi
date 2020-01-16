@@ -220,9 +220,20 @@ case class MesosCluster(
     }.toMap
   }
 
-  def agentIdFor(a: AgentLike): String = {
-    initialCachedAgentDetails(a).id
+  /** Returns a agent id for an agent as it was initially queried during test cluster launch
+    *
+    * @param agent
+    */
+  def agentIdFor(agent: AgentLike): String = {
+    initialCachedAgentDetails(agent).id
   }
+
+  /**
+    * Return the cached agent details that were returned when the agent first initialized
+    * @param agent Reference to the MesosTest Agent process
+    */
+  def initialAgentDetailsFor(agent: AgentLike): ITAgentDetails =
+    initialCachedAgentDetails(agent)
 
   // format: OFF
   case class Resources(cpus: Option[Int] = None, mem: Option[Int] = None, ports: (Int, Int), gpus: Option[Int] = None) {
