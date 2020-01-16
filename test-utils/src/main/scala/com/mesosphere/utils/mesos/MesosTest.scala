@@ -485,14 +485,6 @@ trait MesosClusterTest
   }
 
   abstract override def afterAll(): Unit = {
-    mesosCluster.agents.filterNot(_.isAlive()).foreach(_.start())
-    withClue("In order for teardown to complete successfully, all agents must be active") {
-      eventually {
-        val inactiveAgents = mesosFacade.agents().value.slaves.filterNot(_.active)
-        inactiveAgents shouldBe (Nil)
-      }
-    }
-
     mesosCluster.close()
     super.afterAll()
   }
