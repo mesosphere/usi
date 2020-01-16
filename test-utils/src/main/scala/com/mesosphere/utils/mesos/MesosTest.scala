@@ -15,7 +15,6 @@ import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.io.FileUtils
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
-import org.scalatest.Inspectors.forAll
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
