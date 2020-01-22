@@ -25,7 +25,8 @@ import scala.util.{Failure, Success}
   * @param authorization A [[CredentialsProvider]] if the connection is secured.
   */
 case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None)(
-    implicit askTimout: Timeout) extends StrictLogging {
+    implicit askTimout: Timeout)
+    extends StrictLogging {
 
   /**
     * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
