@@ -65,6 +65,55 @@ class MasterDetectorTest extends AkkaUnitTest with MesosClusterTest {
       MasterDetector("host:port1", metrics).isValid() should be(false)
       MasterDetector("host:5050", metrics).isValid() should be(true)
     }
+
+    "parse the master info data" in {
+      Given("a string from a Zookeeper node")
+      val nodeData =
+        """
+          |{
+          |   "address":{
+          |      "hostname":"172.16.4.200",
+          |      "ip":"172.16.4.200",
+          |      "port":5050
+          |   },
+          |   "capabilities":[
+          |      {
+          |         "type":"AGENT_UPDATE"
+          |      },
+          |      {
+          |         "type":"AGENT_DRAINING"
+          |      },
+          |      {
+          |         "type":"QUOTA_V2"
+          |      }
+          |   ],
+          |   "domain":{
+          |      "fault_domain":{
+          |         "region":{
+          |            "name":"us-west-2"
+          |         },
+          |         "zone":{
+          |            "name":"us-west-2a"
+          |         }
+          |      }
+          |   },
+          |   "hostname":"172.16.4.200",
+          |   "id":"some-id",
+          |   "ip":3355709612,
+          |   "pid":"master@172.16.4.200:5050",
+          |   "port":5050,
+          |   "version":"1.9.1"
+          |}
+          |
+        """.stripMargin
+
+      When("we parse it")
+      val masterInfo = Zookeeper("zk://user:password@host1:port1,host2:port2", metrics).parserMasterInfo(nodeData)
+
+      Then("we have the hostname and port")
+      masterInfo.getHostname should be("172.16.4.200")
+      masterInfo.getPort should be(5050)
+    }
   }
 
   "The master detector" should {
