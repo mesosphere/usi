@@ -47,10 +47,11 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
   def post(implicit system: ActorSystem, mat: Materializer): Flow[Array[Byte], HttpResponse, NotUsed] =
     authorization match {
       case Some(credentialsProvider) =>
-        logger.info(s"Creating authenticated session flow for stream $streamId")
+        logger.info(s"Create authenticated session flow for stream $streamId")
         val sessionActor = system.actorOf(SessionActor.props(credentialsProvider, createPostRequest))
         Flow[Array[Byte]].ask[HttpResponse](1)(sessionActor)
       case None =>
+        logger.info(s"Create unauthenticated flow for stream $streamId")
         Flow[Array[Byte]].map(createPostRequest(_, None)).via(connection)
     }
 
