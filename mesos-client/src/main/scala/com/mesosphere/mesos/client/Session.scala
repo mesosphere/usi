@@ -154,7 +154,7 @@ class SessionActor(
 
   def initializing: Receive = {
     case credentials: HttpCredentials =>
-      logger.info("Retrieved IAM authentication token")
+      logger.debug("Retrieved IAM authentication token")
       context.become(initialized(credentials))
       unstashAll()
     case Status.Failure(ex) =>
@@ -167,13 +167,13 @@ class SessionActor(
     case call: Array[Byte] =>
       val request = requestFactory(call, Some(credentials))
       val originalSender = sender()
-      logger.info("Processing next Mesos call.")
+      logger.debug("Processing next Mesos call.")
       // The TLS handshake for each connection might be an overhead. We could potentially reuse a connection.
       Http()(context.system)
         .singleRequest(request)
         .onComplete {
           case Success(response) =>
-            logger.info(s"Mesos call HTTP response: ${response.status}")
+            logger.debug(s"Mesos call HTTP response: ${response.status}")
             self ! SessionActor.Response(call, originalSender, response)
           case Failure(ex) =>
             logger.error("Mesos call HTTP request failed", ex)
@@ -191,7 +191,7 @@ class SessionActor(
         // Queue current call again.
         self.tell(originalCall, originalSender)
       } else {
-        logger.info("Responding to original sender")
+        logger.debug("Responding to original sender")
         originalSender ! response
       }
   }
