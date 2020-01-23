@@ -82,6 +82,7 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
   override def nextToken(): Future[HttpCredentials] = async {
     logger.info(s"Fetching next authentication token from $root")
     val response = await(Http().singleRequest(loginRequest))
+    logger.info(s"Mesos response ${response.status}")
     val AuthenticationToken(acsToken) = await(Unmarshal(response.entity).to[AuthenticationToken])
     GenericHttpCredentials("", Map("token" -> acsToken))
   }

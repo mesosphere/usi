@@ -68,4 +68,11 @@ object MesosFormats {
   implicit lazy val ITFrameworksFormat: Format[ITFrameworks] = Json.format[ITFrameworks]
 
   implicit lazy val ITAgentsFormat: Format[ITAgents] = Json.format[ITAgents]
+
+  implicit val ITFaultDomainFormat: Format[ITFaultDomain] = (
+    (__ \ "fault_domain" \ "region" \ "name").format[String] ~
+      (__ \ "fault_domain" \ "zone" \ "name").format[String]
+  )(ITFaultDomain.apply, unlift(ITFaultDomain.unapply))
+
+  implicit val ITAgentDetailsFormat: Format[ITAgentDetails] = Json.format[ITAgentDetails]
 }

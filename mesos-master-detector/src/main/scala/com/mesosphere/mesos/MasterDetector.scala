@@ -59,13 +59,37 @@ case class Zookeeper(master: String, metrics: Metrics) extends MasterDetector wi
 
   case class ZkUrl(auth: Option[String], servers: String, path: String)
 
-  implicit val mesosInfoRead: Reads[Protos.MasterInfo] = (
+  implicit val mesosAddressRead: Reads[Protos.Address] = (
     (JsPath \ "hostname").read[String] ~
+      (JsPath \ "ip").read[String] ~
+      (JsPath \ "port").read[Int]
+  ) { (hostname, ip, port) =>
+    Protos.Address.newBuilder().setHostname(hostname).setPort(port).setIp(ip).build()
+  }
+
+  // This is the JSON format for the Mesos master information saved in Zookeeper.
+  // According to the docs of `setIp`:
+  // The IP address (only IPv4) as a packed 4-bytes integer, stored in network order.
+  //
+  // Scala has no unsigned integer. That means we cannot read eg `3355709612` as int but as long. The `toInt` call
+  // converts the long to a signed integer `-939257684`. Note that we do not care about the number but the bytes.
+  // According to https://www.scala-lang.org/files/archive/spec/2.11/12-the-scala-standard-library.html#numeric-value-types
+  // `toInt` just drops bytes which is what we want.
+  implicit val mesosInfoRead: Reads[Protos.MasterInfo] = (
+    (JsPath \ "address").read[Protos.Address] ~
+      (JsPath \ "hostname").read[String] ~
       (JsPath \ "port").read[Int] ~
       (JsPath \ "id").read[String] ~
-      (JsPath \ "ip").read[Int]
-  ) { (hostname, port, id, ip) =>
-    Protos.MasterInfo.newBuilder().setHostname(hostname).setPort(port).setId(id).setIp(ip).build()
+      (JsPath \ "ip").read[Long]
+  ) { (address, hostname, port, id, ip) =>
+    Protos.MasterInfo
+      .newBuilder()
+      .setAddress(address)
+      .setHostname(hostname)
+      .setPort(port)
+      .setId(id)
+      .setIp(ip.toInt)
+      .build()
   }
 
   override def isValid(): Boolean = Try(parse()).map(_ => true).getOrElse(false)
@@ -101,9 +125,9 @@ case class Zookeeper(master: String, metrics: Metrics) extends MasterDetector wi
       val Node(_, bytes) = await(store.read(leaderPath)).get
       logger.info(s"Mesos leader data: ${bytes.decodeString(StandardCharsets.UTF_8)}")
 
-      val masterInfo = Json.parse(bytes.decodeString(StandardCharsets.UTF_8)).as[Protos.MasterInfo]
+      val masterInfo = parserMasterInfo(bytes.decodeString(StandardCharsets.UTF_8))
       // TODO: how do we know it's http or https.
-      val url = new URL(s"http://${masterInfo.getHostname}:${masterInfo.getPort}")
+      val url = new URL(s"http://${masterInfo.getAddress.getHostname}:${masterInfo.getAddress.getPort}")
       url
     }
 
@@ -118,6 +142,9 @@ case class Zookeeper(master: String, metrics: Metrics) extends MasterDetector wi
 
     future.toJava
   }
+
+  /** @return the parsed [[MasterInfo]] from the ZooKeeper node data. */
+  def parserMasterInfo(input: String): Protos.MasterInfo = Json.parse(input).as[Protos.MasterInfo]
 
   /** @return proper Zookeeper connection string as per {@link ZooKeeper#ZooKeeper(String, int, Watcher)} etc. */
   def parse(): ZkUrl = {

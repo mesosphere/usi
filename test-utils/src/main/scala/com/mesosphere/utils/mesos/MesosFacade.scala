@@ -106,6 +106,15 @@ object MesosFacade {
       frameworks: Seq[ITFramework],
       completed_frameworks: Seq[ITFramework],
       unregistered_frameworks: Seq[ITFramework])
+
+  case class ITFaultDomain(region: String, Zone: String)
+  case class ITAgentDetails(
+      id: String,
+      pid: String,
+      hostname: String,
+      capabilities: Seq[String],
+      domain: Option[ITFaultDomain],
+      flags: Map[String, String])
 }
 
 class MesosFacade(val url: URL, val waitTime: FiniteDuration = 30.seconds)(
@@ -131,6 +140,10 @@ class MesosFacade(val url: URL, val waitTime: FiniteDuration = 30.seconds)(
 
   def agents(): RestResult[ITAgents] = {
     result(requestFor[ITAgents](Get(s"$url/slaves")), waitTime)
+  }
+
+  def agentDetails(agent: MesosTest.AgentLike): RestResult[ITAgentDetails] = {
+    result(requestFor[ITAgentDetails](Get(s"http://${agent.ip}:${agent.port}/state")), waitTime)
   }
 
   def frameworkIds(): RestResult[Seq[String]] = {
