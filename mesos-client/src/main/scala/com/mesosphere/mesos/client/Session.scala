@@ -8,7 +8,7 @@ import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.stream.Materializer
-import akka.stream.scaladsl.{ Flow, FlowWithContext}
+import akka.stream.scaladsl.{Flow, FlowWithContext}
 import akka.util.Timeout
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.mesos.v1.scheduler.Protos.Call
@@ -26,7 +26,8 @@ import scala.util.{Failure, Success}
   * @param authorization A [[CredentialsProvider]] if the connection is secured.
   */
 case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None)(
-    implicit askTimout: Timeout) extends StrictLogging {
+    implicit askTimout: Timeout)
+    extends StrictLogging {
 
   /**
     * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
@@ -44,15 +45,19 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
   }
 
   /** @return A flow that makes Mesos calls and outputs HTTP responses. */
-  def post[C](implicit system: ActorSystem, mat: Materializer): FlowWithContext[Array[Byte], C, HttpResponse, C, NotUsed] =
+  def post[C](
+      implicit system: ActorSystem,
+      mat: Materializer): FlowWithContext[Array[Byte], C, HttpResponse, C, NotUsed] =
     authorization match {
       case Some(credentialsProvider) =>
         logger.info(s"Create authenticated session for stream $streamId.")
         val sessionActor = system.actorOf(SessionActor.props(credentialsProvider, createPostRequest))
         // TODO: mapAsync is not handling all error cases such as ask.
-        FlowWithContext[Array[Byte], C].mapAsync(1) { el =>
-          akka.pattern.ask(sessionActor).?(el)
-        }.map(_.asInstanceOf[HttpResponse])//.ask[HttpResponse](1)(sessionActor)
+        FlowWithContext[Array[Byte], C]
+          .mapAsync(1) { el =>
+            akka.pattern.ask(sessionActor).?(el)
+          }
+          .map(_.asInstanceOf[HttpResponse]) //.ask[HttpResponse](1)(sessionActor)
       case None =>
         logger.info(s"Create unauthenticated session for stream $streamId.")
         FlowWithContext[Array[Byte], C].map(createPostRequest(_, None)).via(connection)
@@ -65,7 +70,9 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     *
     * @return A connection flow for single requests.
     */
-  private def connection[C](implicit system: ActorSystem, mat: Materializer): FlowWithContext[HttpRequest, C, HttpResponse, C, NotUsed] = {
+  private def connection[C](
+      implicit system: ActorSystem,
+      mat: Materializer): FlowWithContext[HttpRequest, C, HttpResponse, C, NotUsed] = {
     // Constructs the connection pool settings with defaults and overrides the max connections and pipelining limit so
     // that only one request at a time is processed. See https://doc.akka.io/docs/akka-http/current/configuration.html
     // for details.
