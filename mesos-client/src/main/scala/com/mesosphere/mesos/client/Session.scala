@@ -11,7 +11,6 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.{Flow, FlowWithContext}
 import akka.util.Timeout
 import com.typesafe.scalalogging.StrictLogging
-import org.apache.mesos.v1.scheduler.Protos.Call
 
 import scala.util.{Failure, Success}
 
