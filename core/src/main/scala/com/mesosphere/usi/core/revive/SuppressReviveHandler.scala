@@ -132,7 +132,7 @@ private[core] class SuppressReviveHandler(
   private[revive] val reviveSuppressMetrics: Flow[RoleDirective, RoleDirective, NotUsed] =
     Flow[RoleDirective].map {
       case directive @ IssueUpdateFramework(_, newlyRevived, newlySuppressed) =>
-        logger.debug(
+        logger.info(
           s"Newly suppress roles ${newlySuppressed.mkString(", ")}, newly revived roles ${newlyRevived.mkString(", ")}")
         newlyRevived.foreach { _ =>
           reviveCountMetric.increment()
@@ -143,7 +143,7 @@ private[core] class SuppressReviveHandler(
         directive
 
       case directive @ IssueRevive(roles) =>
-        logger.debug(s"Reviving ${roles.mkString(", ")}")
+        logger.info(s"Reviving ${roles.mkString(", ")}")
         roles.foreach { _ =>
           reviveCountMetric.increment()
         }
