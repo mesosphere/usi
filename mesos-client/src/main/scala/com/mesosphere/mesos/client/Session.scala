@@ -25,8 +25,7 @@ import scala.util.{Failure, Success}
   * @param authorization A [[CredentialsProvider]] if the connection is secured.
   */
 case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None)(
-    implicit askTimout: Timeout)
-    extends StrictLogging {
+    implicit askTimout: Timeout) {
 
   /**
     * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
@@ -47,11 +46,9 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
   def post(implicit system: ActorSystem, mat: Materializer): Flow[Array[Byte], HttpResponse, NotUsed] =
     authorization match {
       case Some(credentialsProvider) =>
-        logger.info(s"Create authenticated session flow for stream $streamId")
         val sessionActor = system.actorOf(SessionActor.props(credentialsProvider, createPostRequest))
         Flow[Array[Byte]].ask[HttpResponse](1)(sessionActor)
       case None =>
-        logger.info(s"Create unauthenticated flow for stream $streamId")
         Flow[Array[Byte]].map(createPostRequest(_, None)).via(connection)
     }
 
@@ -157,13 +154,13 @@ class SessionActor(
     case call: Array[Byte] =>
       val request = requestFactory(call, Some(credentials))
       val originalSender = sender()
-      logger.info("Processing next Mesos call.")
+      logger.debug("Processing next Mesos call.")
       // The TLS handshake for each connection might be an overhead. We could potentially reuse a connection.
       Http()(context.system)
         .singleRequest(request)
         .onComplete {
           case Success(response) =>
-            logger.info(s"Mesos call HTTP response: ${response.status}")
+            logger.debug(s"Mesos call HTTP response: ${response.status}")
             self ! SessionActor.Response(call, originalSender, response)
           case Failure(ex) =>
             logger.error("Mesos call HTTP request failed", ex)
@@ -171,7 +168,7 @@ class SessionActor(
             originalSender ! Status.Failure(ex)
         }
     case SessionActor.Response(originalCall, originalSender, response) =>
-      logger.info(s"Call replied with ${response.status}")
+      logger.debug(s"Call replied with ${response.status}")
       if (response.status == StatusCodes.Unauthorized) {
         logger.info("Refreshing IAM authentication token")
 
@@ -181,7 +178,7 @@ class SessionActor(
         // Queue current call again.
         self.tell(originalCall, originalSender)
       } else {
-        logger.info("Responding to original sender")
+        logger.debug("Responding to original sender")
         originalSender ! response
       }
   }
