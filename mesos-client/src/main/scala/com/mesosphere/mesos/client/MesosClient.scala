@@ -405,26 +405,26 @@ class MesosClientImpl(
 
   override def killSwitch: KillSwitch = sharedKillSwitch
 
-  private val responseHandler: Sink[HttpResponse, Future[Done]] =
-    Sink.foreach[HttpResponse] { response =>
+  private val responseHandler: Sink[(HttpResponse, Call.Type), Future[Done]] =
+    Sink.foreach[(HttpResponse, Call.Type)] { case (response, callType) =>
       if (response.status.isFailure()) {
         logger.info(s"A request to Mesos failed with response: ${response.status}")
         response.discardEntityBytes()
-        throw new IllegalStateException(s"Failed to send a call to Mesos.")
+        throw new IllegalStateException(s"Failed to send $callType call to Mesos.")
       } else {
-        logger.debug(s"Mesos call response: $response")
+        logger.info(s"Mesos $callType call response: $response")
         response.discardEntityBytes()
       }
     }
 
-  private val callSerializer: Flow[Call, Array[Byte], NotUsed] = Flow[Call]
-    .map(call => call.toByteArray)
+  private val callSerializer: Flow[Call, (Array[Byte], Call.Type), NotUsed] = Flow[Call]
+    .map(call => call.toByteArray -> call.getType)
 
   override val mesosSink: Sink[Call, Future[Done]] =
     Flow[Call]
       .via(sharedKillSwitch.flow[Call])
       .log("mesosSink calls")
       .via(callSerializer)
-      .via(session.post)
+      .via(session.post[Call.Type].asFlow)
       .toMat(responseHandler)(Keep.right)
 }
