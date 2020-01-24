@@ -341,6 +341,10 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       system: ActorSystem,
       materializer: Materializer): Source[MesosClient, NotUsed] = {
 
+    if(authorization.nonEmpty) {
+      require(frameworkInfo.hasPrincipal, "The framework info must have a principal set if authorization is used.")
+    }
+
     implicit val askTimeout = Timeout(conf.callTimeout)
     val httpConnection: Source[(HttpResponse, Session), NotUsed] =
       mesosHttpConnection(frameworkInfo, conf, authorization)
