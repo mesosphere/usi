@@ -13,10 +13,10 @@ import scala.collection.JavaConverters._
 
 class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends ImplicitStrictLogging {
   @tailrec private def maybeMatchResourceRequirements(
-      remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
+      remainingResources: Map[ResourceType, Iterable[Mesos.Resource]],
       matchedResources: List[OfferMatcher.ResourceMatch],
       resourceRequirements: List[KeyedResourceRequirement])
-    : Option[(List[OfferMatcher.ResourceMatch], Map[ResourceType, Seq[Mesos.Resource]])] = {
+    : Option[(List[OfferMatcher.ResourceMatch], Map[ResourceType, Iterable[Mesos.Resource]])] = {
 
     resourceRequirements match {
       case Nil =>
@@ -38,7 +38,7 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends ImplicitStrictLog
 
   @tailrec private def matchPodSpecsTaskRecords(
       originalOffer: Mesos.Offer,
-      remainingResources: Map[ResourceType, Seq[Mesos.Resource]],
+      remainingResources: Map[ResourceType, Iterable[Mesos.Resource]],
       result: Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]],
       pendingLaunchPodSpecs: List[RunningPodSpec]): Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = {
 

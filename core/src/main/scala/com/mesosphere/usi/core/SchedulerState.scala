@@ -67,7 +67,7 @@ object SchedulerState {
   def fromSnapshot(snapshot: StateSnapshot): SchedulerState = {
     apply(
       podStatuses = Map.empty,
-      podRecords = snapshot.podRecords.map(record => record.podId -> record)(collection.breakOut),
+      podRecords = snapshot.podRecords.iterator.map(record => record.podId -> record).toMap,
       podSpecs = Map.empty)
   }
 }

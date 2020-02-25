@@ -8,7 +8,6 @@ import akka.actor.{Actor, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpEntity, HttpMethods, HttpRequest, HttpResponse, MediaTypes, StatusCodes}
 import akka.pattern.pipe
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
 import com.codahale.metrics.{Counter, Gauge, Histogram, Metered, MetricRegistry, Snapshot, Timer}
 import com.mesosphere.usi.metrics.dropwizard.conf.DataDogApiReporterSettings
@@ -28,9 +27,8 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
 
   private case object Tick
 
+  import context.system
   import scala.concurrent.ExecutionContext.Implicits.global
-
-  private implicit val materializer: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(context.system))
 
   override def preStart(): Unit = {
     self ! Tick

@@ -7,7 +7,6 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.StrictLogging
 import org.scalactic.source.Position
 import org.scalatest.concurrent.{Eventually, JavaFutures, ScalaFutures, TimeLimitedTests}
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.time.{Minute, Seconds, Span}
 import org.scalatest.{
   AppendedClues,
@@ -24,6 +23,7 @@ import org.scalatest.{
   WordSpec,
   WordSpecLike
 }
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.concurrent.ExecutionContextExecutor
 

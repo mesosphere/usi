@@ -9,9 +9,10 @@ plugins {
 }
 
 ext {
-    scalaVersion = '2.12'
+    scalaVersion = '2.13'
     mesosVersion = '1.9.0'
-    akkaVersion = '2.5.23'
+    akkaVersion = '2.6.3'
+    scalaTestVersion = '3.1.1'
 }
 
 def readCurrentVersion = {
@@ -45,17 +46,18 @@ allprojects {
 
     // compiler warnings + unused imports are reported as errors
     tasks.withType(ScalaCompile) {
-        scalaCompileOptions.additionalParameters = ["-Xlint", "-Xfatal-warnings"]
+        // we cannot use fatal warnings with cross-building
+        scalaCompileOptions.additionalParameters = ["-Xlint"]
     }
 
     compileScala.dependsOn scalafmtAll
 
     dependencies {
-        // Use Scala 2.12 in our library project
-        implementation 'org.scala-lang:scala-library:2.12.7'
+        // Use Scala 2.13 in our library project
+        implementation 'org.scala-lang:scala-library:2.13.1'
 
         // Use Scalatest for testing our library
-        testImplementation "org.scalatest:scalatest_$scalaVersion:3.0.5"
+        testImplementation "org.scalatest:scalatest_$scalaVersion:$scalaTestVersion"
 
         // Need scala-xml at test runtime
         testRuntimeOnly "org.scala-lang.modules:scala-xml_$scalaVersion:1.1.1"
@@ -68,7 +70,7 @@ allprojects {
         compile "org.scala-lang.modules:scala-async_$scalaVersion:0.10.0"
 
         // Akka and akka-http
-        compile group: 'com.typesafe.akka', name: "akka-http_$scalaVersion", version: '10.0.15'
+        compile group: 'com.typesafe.akka', name: "akka-http_$scalaVersion", version: '10.1.11'
         compile group: 'com.typesafe.akka', name: "akka-stream_$scalaVersion", version: akkaVersion
         compile group: 'com.typesafe.akka', name: "akka-slf4j_$scalaVersion", version: akkaVersion
 

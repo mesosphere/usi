@@ -30,7 +30,7 @@ object ScalarResourceMatcher {
 
   def matchAndConsume(
       scalarRequirement: ScalarRequirement,
-      resources: Seq[Mesos.Resource]): Option[ResourceMatchResult] = {
+      resources: Iterable[Mesos.Resource]): Option[ResourceMatchResult] = {
     matchAndConsumeIter(scalarRequirement, Nil, resources.toList)
   }
 }

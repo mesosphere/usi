@@ -171,7 +171,7 @@ class ZooKeeperPersistenceStore(metrics: Metrics, factory: AsyncCuratorBuilderFa
         Try(
           JavaConverters
             .asScalaBuffer(list)
-            .to[Seq]
+            .toSeq
             .map(child => if (absolute) Paths.get(path, child).toString else child))
       }
       .recover {
