@@ -7,7 +7,7 @@ language: scala
 install:
   - true
 scala:
-  - 2.12.7
+  - 2.13.1
 script:
   - ./gradlew --parallel checkScalaFmtAll && sudo ./gradlew provision && ./gradlew ci --info
 before_cache:
