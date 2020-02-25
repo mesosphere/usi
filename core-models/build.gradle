@@ -2,9 +2,3 @@ dependencies {
     compile "org.apache.mesos:mesos:$mesosVersion"
     testCompile project(':test-utils')
 }
-
-publishing.publications {
-    mavenJava(MavenPublication) {
-        artifactId 'core-models'
-    }
-}

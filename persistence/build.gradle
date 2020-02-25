@@ -1,9 +1,3 @@
 dependencies {
     compile project(':core-models')
 }
-
-publishing.publications {
-    mavenJava(MavenPublication) {
-        artifactId 'persistence'
-    }
-}

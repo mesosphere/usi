@@ -13,9 +13,3 @@ test {
         showStandardStreams = true
     }
 }
-
-publishing.publications {
-    mavenJava(MavenPublication) {
-        artifactId 'core'
-    }
-}
