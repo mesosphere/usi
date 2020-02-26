@@ -4,7 +4,7 @@ pipeline {
     stage("Build") {
       agent {
         docker {
-	  image 'gradle:6.2.1-jdk8'
+	  image 'gradle:5.1.1-jdk8-slim'
           label 'large'
         }
       }
