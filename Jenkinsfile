@@ -11,7 +11,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
           sh '''
-            ./gradlew --parallel checkScalaFmtAll && sudo ./gradlew provision && ./gradlew ci --info
+            ./gradlew --parallel checkScalaFmtAll && ./gradlew assemble --info
 	  '''
 	}
       }
