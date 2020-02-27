@@ -32,7 +32,7 @@ object SimpleRunTemplateFactory {
     *
     * @param args A list of arguments passed.
     */
-  case class DockerEntrypoint(args: List[String]) extends Command {
+  class DockerEntrypoint private (args: Seq[String]) extends Command {
     def build(): Mesos.CommandInfo.Builder = {
       val builder = Mesos.CommandInfo
         .newBuilder()
@@ -42,6 +42,18 @@ object SimpleRunTemplateFactory {
 
       builder
     }
+  }
+
+  object DockerEntrypoint {
+
+    /** Factory method for [[com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.DockerEntrypoint]]; Scala Api. */
+    def apply(args: Seq[String]) = new DockerEntrypoint(args)
+
+    /** Factory method for [[com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.DockerEntrypoint]]; Java Api. */
+    def create(args: java.util.List[String]) = new DockerEntrypoint(args.asScala)
+
+    /** Factory method for [[com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.DockerEntrypoint]]; Java Api. */
+    def create(arg: String) = new DockerEntrypoint(Seq(arg))
   }
 
   /**
@@ -123,11 +135,11 @@ object SimpleRunTemplateFactory {
 
     def create(
         resourceRequirements: java.util.List[ResourceRequirement],
-        shellCommand: String,
+        command: Command,
         role: String,
         fetch: java.util.List[FetchUri],
         dockerImageName: Option[String]): SimpleTaskInfoBuilder =
-      apply(resourceRequirements.asScala, Shell(shellCommand), role, fetch.asScala, dockerImageName)
+      apply(resourceRequirements.asScala, command, role, fetch.asScala, dockerImageName)
   }
 
   /**
