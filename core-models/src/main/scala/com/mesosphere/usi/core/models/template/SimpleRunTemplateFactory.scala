@@ -8,6 +8,42 @@ import scala.collection.JavaConverters._
 
 object SimpleRunTemplateFactory {
 
+  sealed trait Command {
+    def build(): Mesos.CommandInfo.Builder
+  }
+
+  /**
+    * Use `/bin/sh -c` to execute passed command.
+    *
+    * @param cmd The shell command that is executed.
+    */
+  case class Shell(cmd: String) extends Command {
+    def build(): Mesos.CommandInfo.Builder = {
+      Mesos.CommandInfo
+        .newBuilder()
+        .setShell(true)
+        .setValue(cmd)
+    }
+  }
+
+  /**
+    * Use the entrypoint of the Docker image to execute the arguments. If the argument list is empty `CMD` from the
+    * Docker image is called.
+    *
+    * @param args A list of arguments passed.
+    */
+  case class DockerEntrypoint(args: List[String]) extends Command {
+    def build(): Mesos.CommandInfo.Builder = {
+      val builder = Mesos.CommandInfo
+        .newBuilder()
+        .setShell(false)
+
+      args.zipWithIndex.foreach { case (arg, index) => builder.setArguments(index, arg) }
+
+      builder
+    }
+  }
+
   /**
     * This task info builder is used by the [[LegacyLaunchRunTemplate]]. I launches a simple pod.
     *
@@ -19,11 +55,23 @@ object SimpleRunTemplateFactory {
     */
   case class SimpleTaskInfoBuilder(
       resourceRequirements: Seq[ResourceRequirement],
-      shellCommand: String,
+      command: Command,
       role: String,
       fetch: Seq[FetchUri] = Seq.empty,
       dockerImageName: Option[String] = None)
       extends TaskBuilder {
+
+    def this(
+        resourceRequirements: Seq[ResourceRequirement],
+        shellCommand: String,
+        role: String,
+        fetch: Seq[FetchUri] = Seq.empty,
+        dockerImageName: Option[String] = None) =
+      this(resourceRequirements, Shell(shellCommand), role, fetch, dockerImageName)
+
+    if (command.isInstanceOf[DockerEntrypoint]) {
+      assert(dockerImageName.isDefined, "The default entrypoint can only be used with a Docker image.")
+    }
 
     override def buildTask(
         taskInfoBuilder: Mesos.TaskInfo.Builder,
@@ -42,12 +90,8 @@ object SimpleRunTemplateFactory {
         }
         fetchBuilder.build()
       }
-      taskInfoBuilder.setCommand(
-        Mesos.CommandInfo
-          .newBuilder()
-          .setShell(true)
-          .setValue(shellCommand)
-          .addAllUris(uris.asJava))
+
+      taskInfoBuilder.setCommand(command.build().addAllUris(uris.asJava))
 
       dockerImageName.foreach { name =>
         taskInfoBuilder.setContainer(
