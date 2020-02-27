@@ -48,26 +48,18 @@ object SimpleRunTemplateFactory {
     * This task info builder is used by the [[LegacyLaunchRunTemplate]]. I launches a simple pod.
     *
     * @param resourceRequirements The resources required for the pod.
-    * @param shellCommand The command that is executed.
+    * @param command The command that is executed.
     * @param role The Mesos role used.
     * @param fetch The artifacts that are fetched by Mesos.
     * @param dockerImageName The optional Docker image the task will run in.
     */
-  case class SimpleTaskInfoBuilder(
-      resourceRequirements: Seq[ResourceRequirement],
+  class SimpleTaskInfoBuilder private (
+      val resourceRequirements: Seq[ResourceRequirement],
       command: Command,
       role: String,
-      fetch: Seq[FetchUri] = Seq.empty,
-      dockerImageName: Option[String] = None)
+      fetch: Seq[FetchUri],
+      dockerImageName: Option[String])
       extends TaskBuilder {
-
-    def this(
-        resourceRequirements: Seq[ResourceRequirement],
-        shellCommand: String,
-        role: String,
-        fetch: Seq[FetchUri] = Seq.empty,
-        dockerImageName: Option[String] = None) =
-      this(resourceRequirements, Shell(shellCommand), role, fetch, dockerImageName)
 
     if (command.isInstanceOf[DockerEntrypoint]) {
       assert(dockerImageName.isDefined, "The default entrypoint can only be used with a Docker image.")
@@ -110,6 +102,34 @@ object SimpleRunTemplateFactory {
     }
   }
 
+  object SimpleTaskInfoBuilder {
+
+    def apply(
+        resourceRequirements: Seq[ResourceRequirement],
+        command: Command,
+        role: String,
+        fetch: Seq[FetchUri],
+        dockerImageName: Option[String]): SimpleTaskInfoBuilder = {
+      new SimpleTaskInfoBuilder(resourceRequirements, command, role, fetch, dockerImageName)
+    }
+
+    def apply(
+        resourceRequirements: Seq[ResourceRequirement],
+        shellCommand: String,
+        role: String,
+        fetch: Seq[FetchUri] = Seq.empty,
+        dockerImageName: Option[String] = None): SimpleTaskInfoBuilder =
+      apply(resourceRequirements, Shell(shellCommand), role, fetch, dockerImageName)
+
+    def create(
+        resourceRequirements: java.util.List[ResourceRequirement],
+        shellCommand: String,
+        role: String,
+        fetch: java.util.List[FetchUri],
+        dockerImageName: Option[String]): SimpleTaskInfoBuilder =
+      apply(resourceRequirements.asScala, Shell(shellCommand), role, fetch.asScala, dockerImageName)
+  }
+
   /**
     * Creates a [[LegacyLaunchRunTemplate]] that is compatible to older USI versions.
     *
@@ -127,10 +147,5 @@ object SimpleRunTemplateFactory {
       dockerImageName: Option[String] = None): RunTemplate =
     new LegacyLaunchRunTemplate(
       role,
-      new SimpleTaskInfoBuilder(
-        resourceRequirements: Seq[ResourceRequirement],
-        shellCommand,
-        role,
-        fetch,
-        dockerImageName))
+      SimpleTaskInfoBuilder(resourceRequirements: Seq[ResourceRequirement], shellCommand, role, fetch, dockerImageName))
 }
