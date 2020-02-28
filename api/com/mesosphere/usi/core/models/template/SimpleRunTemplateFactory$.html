@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>usi 0.1.33 API  - com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory</title>
-          <meta name="description" content="usi 0.1.33 API - com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory" />
-          <meta name="keywords" content="usi 0.1.33 API com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory" />
+          <title>usi 0.1.34 API  - com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory</title>
+          <meta name="description" content="usi 0.1.34 API - com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory" />
+          <meta name="keywords" content="usi 0.1.34 API com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -28,7 +28,7 @@
         </head>
         <body>
       <div id="search">
-        <span id="doc-title">usi 0.1.33 API<span id="doc-version"></span></span>
+        <span id="doc-title">usi 0.1.34 API<span id="doc-version"></span></span>
         <span class="close-results"><span class="left">&lt;</span> Back</span>
         <div id="textfilter">
           <span class="input">
@@ -269,10 +269,44 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.SimpleTaskInfoBuilder" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="SimpleTaskInfoBuilderextendsTaskBuilderwithProductwithSerializable"></a><a id="SimpleTaskInfoBuilder:SimpleTaskInfoBuilder"></a>
+              <ol><li name="com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.Command" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="CommandextendsAnyRef"></a><a id="Command:Command"></a>
       <span class="permalink">
-      <a href="../../../../../../com/mesosphere/usi/core/models/template/SimpleRunTemplateFactory$.html#SimpleTaskInfoBuilderextendsTaskBuilderwithProductwithSerializable" title="Permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/template/SimpleRunTemplateFactory$.html#CommandextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="SimpleRunTemplateFactory$$Command.html"><span class="name">Command</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.DockerEntrypoint" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DockerEntrypointextendsSimpleRunTemplateFactory.Command"></a><a id="DockerEntrypoint:DockerEntrypoint"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/template/SimpleRunTemplateFactory$.html#DockerEntrypointextendsSimpleRunTemplateFactory.Command" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="Use the entrypoint of the Docker image to execute the arguments." href="SimpleRunTemplateFactory$$DockerEntrypoint.html"><span class="name">DockerEntrypoint</span></a><span class="result"> extends <a href="SimpleRunTemplateFactory$$Command.html" class="extype" name="com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.Command">Command</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Use the entrypoint of the Docker image to execute the arguments.</p><div class="fullcomment"><div class="comment cmt"><p>Use the entrypoint of the Docker image to execute the arguments. If the argument list is empty <code>CMD</code> from the
+Docker image is called.
+</p></div></div>
+    </li><li name="com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.Shell" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ShellextendsSimpleRunTemplateFactory.CommandwithProductwithSerializable"></a><a id="Shell:Shell"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/template/SimpleRunTemplateFactory$.html#ShellextendsSimpleRunTemplateFactory.CommandwithProductwithSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -281,11 +315,28 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="This task info builder is used by the LegacyLaunchRunTemplate." href="SimpleRunTemplateFactory$$SimpleTaskInfoBuilder.html"><span class="name">SimpleTaskInfoBuilder</span></a><span class="params">(<span name="resourceRequirements">resourceRequirements: <span class="extype" name="scala.Seq">Seq</span>[<a href="../resources/ResourceRequirement.html" class="extype" name="com.mesosphere.usi.core.models.resources.ResourceRequirement">ResourceRequirement</a>]</span>, <span name="shellCommand">shellCommand: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="role">role: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="fetch">fetch: <span class="extype" name="scala.Seq">Seq</span>[<a href="FetchUri.html" class="extype" name="com.mesosphere.usi.core.models.template.FetchUri">FetchUri</a>] = <span class="symbol">Seq.empty</span></span>, <span name="dockerImageName">dockerImageName: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>)</span><span class="result"> extends <a href="../TaskBuilder.html" class="extype" name="com.mesosphere.usi.core.models.TaskBuilder">TaskBuilder</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Use /bin/sh -c to execute passed command." href="SimpleRunTemplateFactory$$Shell.html"><span class="name">Shell</span></a><span class="params">(<span name="cmd">cmd: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <a href="SimpleRunTemplateFactory$$Command.html" class="extype" name="com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.Command">Command</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Use <code>/bin/sh -c</code> to execute passed command.</p><div class="fullcomment"><div class="comment cmt"><p>Use <code>/bin/sh -c</code> to execute passed command.
+</p></div><dl class="paramcmts block"><dt class="param">cmd</dt><dd class="cmt"><p>The shell command that is executed.</p></dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.SimpleTaskInfoBuilder" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SimpleTaskInfoBuilderextendsTaskBuilder"></a><a id="SimpleTaskInfoBuilder:SimpleTaskInfoBuilder"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/template/SimpleRunTemplateFactory$.html#SimpleTaskInfoBuilderextendsTaskBuilder" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="This task info builder is used by the LegacyLaunchRunTemplate." href="SimpleRunTemplateFactory$$SimpleTaskInfoBuilder.html"><span class="name">SimpleTaskInfoBuilder</span></a><span class="result"> extends <a href="../TaskBuilder.html" class="extype" name="com.mesosphere.usi.core.models.TaskBuilder">TaskBuilder</a></span>
       </span>
       
       <p class="shortcomment cmt">This task info builder is used by the <a href="LegacyLaunchRunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.LegacyLaunchRunTemplate">LegacyLaunchRunTemplate</a>.</p><div class="fullcomment"><div class="comment cmt"><p>This task info builder is used by the <a href="LegacyLaunchRunTemplate.html" class="extype" name="com.mesosphere.usi.core.models.template.LegacyLaunchRunTemplate">LegacyLaunchRunTemplate</a>. I launches a simple pod.
-</p></div><dl class="paramcmts block"><dt class="param">resourceRequirements</dt><dd class="cmt"><p>The resources required for the pod.</p></dd><dt class="param">shellCommand</dt><dd class="cmt"><p>The command that is executed.</p></dd><dt class="param">role</dt><dd class="cmt"><p>The Mesos role used.</p></dd><dt class="param">fetch</dt><dd class="cmt"><p>The artifacts that are fetched by Mesos.</p></dd><dt class="param">dockerImageName</dt><dd class="cmt"><p>The optional Docker image the task will run in.</p></dd></dl></div>
+</p></div></div>
     </li></ol>
             </div>
 
@@ -662,6 +713,38 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.DockerEntrypoint" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DockerEntrypoint"></a><a id="DockerEntrypoint:DockerEntrypoint"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/template/SimpleRunTemplateFactory$.html#DockerEntrypoint" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="SimpleRunTemplateFactory$$DockerEntrypoint$.html"><span class="name">DockerEntrypoint</span></a>
+      </span>
+      
+      
+    </li><li name="com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.SimpleTaskInfoBuilder" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SimpleTaskInfoBuilder"></a><a id="SimpleTaskInfoBuilder:SimpleTaskInfoBuilder"></a>
+      <span class="permalink">
+      <a href="../../../../../../com/mesosphere/usi/core/models/template/SimpleRunTemplateFactory$.html#SimpleTaskInfoBuilder" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="SimpleRunTemplateFactory$$SimpleTaskInfoBuilder$.html"><span class="name">SimpleTaskInfoBuilder</span></a>
+      </span>
+      
+      
     </li>
               </ol>
             </div>
