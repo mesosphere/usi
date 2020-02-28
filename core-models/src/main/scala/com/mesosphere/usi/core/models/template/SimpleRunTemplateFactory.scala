@@ -1,9 +1,12 @@
 package com.mesosphere.usi.core.models.template
 
+import java.util.Optional
+
 import com.mesosphere.usi.core.models.resources.ResourceRequirement
-import com.mesosphere.usi.core.models.{TaskName, TaskBuilder}
+import com.mesosphere.usi.core.models.{TaskBuilder, TaskName}
 import org.apache.mesos.v1.{Protos => Mesos}
 
+import scala.annotation.varargs
 import scala.collection.JavaConverters._
 
 object SimpleRunTemplateFactory {
@@ -50,10 +53,8 @@ object SimpleRunTemplateFactory {
     def apply(args: Seq[String]) = new DockerEntrypoint(args)
 
     /** Factory method for [[com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.DockerEntrypoint]]; Java Api. */
-    def create(args: java.util.List[String]) = new DockerEntrypoint(args.asScala)
-
-    /** Factory method for [[com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.DockerEntrypoint]]; Java Api. */
-    def create(arg: String) = new DockerEntrypoint(Seq(arg))
+    @varargs
+    def create(args: String*) = new DockerEntrypoint(args)
   }
 
   /**
@@ -133,13 +134,16 @@ object SimpleRunTemplateFactory {
         dockerImageName: Option[String] = None): SimpleTaskInfoBuilder =
       apply(resourceRequirements, Shell(shellCommand), role, fetch, dockerImageName)
 
+    /** Factory method for [[com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.SimpleTaskInfoBuilder]]; Java Api. */
     def create(
         resourceRequirements: java.util.List[ResourceRequirement],
         command: Command,
         role: String,
         fetch: java.util.List[FetchUri],
-        dockerImageName: Option[String]): SimpleTaskInfoBuilder =
-      apply(resourceRequirements.asScala, command, role, fetch.asScala, dockerImageName)
+        dockerImageName: Optional[String]): SimpleTaskInfoBuilder = {
+      val image = if (dockerImageName.isPresent) Some(dockerImageName.get()) else None
+      apply(resourceRequirements.asScala, command, role, fetch.asScala, image)
+    }
   }
 
   /**
