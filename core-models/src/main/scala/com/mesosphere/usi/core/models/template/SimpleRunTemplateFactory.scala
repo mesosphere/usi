@@ -142,7 +142,7 @@ object SimpleRunTemplateFactory {
         fetch: java.util.List[FetchUri],
         dockerImageName: Optional[String]): SimpleTaskInfoBuilder = {
       val image = if (dockerImageName.isPresent) Some(dockerImageName.get()) else None
-      apply(resourceRequirements.asScala, command, role, fetch.asScala, image)
+      apply(resourceRequirements.asScala.toSeq, command, role, fetch.asScala.toSeq, image)
     }
   }
 
