@@ -41,7 +41,7 @@ object SimpleRunTemplateFactory {
         .newBuilder()
         .setShell(false)
 
-      args.zipWithIndex.foreach { case (arg, index) => builder.setArguments(index, arg) }
+      if (args.nonEmpty) builder.addAllArguments(args.asJava)
 
       builder
     }
