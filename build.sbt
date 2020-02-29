@@ -8,6 +8,8 @@ val commonSettings = Seq(
     Dependencies.Test.akkaSlf4j % "test",
     Dependencies.Test.logbackClassic % "test"
   ),
+  // the PortAllocator logic is not cross-module aware, so running concurrent tests causes failures
+  concurrentRestrictions in Global += Tags.limit(Tags.Test, 1),
   scalaVersion := "2.13.1",
   crossScalaVersions := Seq("2.13.1", "2.12.7"),
 )
@@ -65,9 +67,10 @@ lazy val `mesos-client` = (project in file("./mesos-client/"))
       Dependencies.akkaHttpPlayJson,
       Dependencies.jwtPlayJson,
       Dependencies.scalaAsync % "compile",
-      Dependencies.alpakkaCodes
-    ))
+      Dependencies.alpakkaCodes,
+      Dependencies.Test.akkaStreamTestKit % "test"))
   .dependsOn(`core-models`)
+  .dependsOn(`test-utils` % "test->compile")
 
 lazy val `persistence-zookeeper` = (project in file("./persistence-zookeeper"))
   .settings(commonSettings: _*)
@@ -137,6 +140,7 @@ lazy val `examples-keep-alive-framework` = (project in file("./examples/keep-ali
 lazy val `examples-mesos-client-example` = (project in file("./examples/mesos-client-example"))
   .settings(commonSettings: _*)
   .dependsOn(`mesos-client`)
+  .dependsOn(`test-utils` % "test->compile")
 
 
 lazy val `examples-simple-hello-world` = (project in file("./examples/simple-hello-world"))
