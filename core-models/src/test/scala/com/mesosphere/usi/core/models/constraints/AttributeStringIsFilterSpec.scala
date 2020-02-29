@@ -1,9 +1,9 @@
 package com.mesosphere.usi.core.models.constraints
 
-import com.mesosphere.utils.UnitTest
 import org.apache.mesos.v1.Protos
+import org.scalatest.{Matchers, WordSpecLike}
 
-class AttributeStringIsFilterSpec extends UnitTest {
+class AttributeStringIsFilterSpec extends WordSpecLike with Matchers {
   private def newTextAttribute(name: String, value: String) = {
     Protos.Attribute
       .newBuilder()
