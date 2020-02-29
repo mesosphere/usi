@@ -8,7 +8,8 @@ val commonSettings = Seq(
     Dependencies.Test.akkaSlf4j % "test",
     Dependencies.Test.logbackClassic % "test"
   ),
-  scalaVersion := "2.13.1"
+  scalaVersion := "2.13.1",
+  crossScalaVersions := Seq("2.13.1", "2.12.7"),
 )
 
 lazy val `core-models` = (project in file("./core-models/"))
