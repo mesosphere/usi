@@ -10,7 +10,7 @@ import com.mesosphere.usi.storage.zookeeper.PersistenceStore._
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.zookeeper.KeeperException.{NoNodeException, NodeExistsException}
 
-import scala.collection.JavaConverters
+import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -169,10 +169,9 @@ class ZooKeeperPersistenceStore(metrics: Metrics, factory: AsyncCuratorBuilderFa
       .toScala
       .map { list =>
         Try(
-          JavaConverters
-            .asScalaBuffer(list)
-            .toSeq
-            .map(child => if (absolute) Paths.get(path, child).toString else child))
+          list.asScala.iterator
+            .map(child => if (absolute) Paths.get(path, child).toString else child)
+            .toList)
       }
       .recover {
         case e: NoNodeException => Failure(e) // re-throw exception in all other cases
@@ -228,7 +227,7 @@ class ZooKeeperPersistenceStore(metrics: Metrics, factory: AsyncCuratorBuilderFa
 
     factory
       .transaction()
-      .forOperations(JavaConverters.seqAsJavaList(transactionOps))
+      .forOperations(transactionOps.asJava)
       .toScala
       .map(_ => Done)
   }
