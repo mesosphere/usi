@@ -10,7 +10,7 @@ object Dependencies {
     val dropwizard = "4.0.5"
     val mesos = "1.9.0"
     val scalaLogging = "3.9.2"
-    val scalaTest = "3.1.1"
+    val scalaTest = "3.0.8"
   }
 
   val mesos = "org.apache.mesos" % "mesos" % Versions.mesos
@@ -61,7 +61,6 @@ object Dependencies {
     val junitJupiter = "org.junit.jupiter" % "junit-jupiter-api" % "5.3.1"
 
     val commonsIO = "commons-io" % "commons-io" % "2.6"
-    val scalaTestJunit = "org.scalatestplus" %% "scalatestplus-junit" % "1.0.0-M2"
     val akkaStreamTestKit = "com.typesafe.akka" %% "akka-stream-testkit" % Versions.akka
   }
 }

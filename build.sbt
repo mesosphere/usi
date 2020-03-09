@@ -44,7 +44,6 @@ lazy val `test-utils` = (project in file("./test-utils/"))
       Dependencies.akkaStream,
       Dependencies.scalaAsync % "compile",
       Dependencies.Test.junit,
-      Dependencies.Test.scalaTestJunit,
       Dependencies.akkaHttpPlayJson,
       Dependencies.Test.commonsIO,
       Dependencies.Test.junitJupiter,
