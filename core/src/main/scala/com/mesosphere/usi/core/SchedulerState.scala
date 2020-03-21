@@ -39,7 +39,7 @@ case class SchedulerState(
           case None =>
             newPodStatuses -= statusChange.id
         }
-      case agentRecordChange: AgentRecordUpdatedEvent => ???
+      case _: AgentRecordUpdatedEvent => ???
       case stateSnapshot: StateSnapshot =>
         // TODO (DCOS-47476) Implement cache invalidation and handle snapshot fully
         newPodRecords = stateSnapshot.podRecords

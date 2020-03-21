@@ -43,7 +43,7 @@ object ProtosHelper {
       .setUser(
         new SystemProperties()
           .get("user.name")
-          .getOrElse(throw new IllegalArgumentException("A local user is needed to launch Mesos tasks")))
+          .getOrElse(user))
       .setName(name)
       .setId(FrameworkID.newBuilder.setValue(frameworkId))
       .addRoles("test")

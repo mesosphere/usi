@@ -51,7 +51,7 @@ class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Op
       import TaskState._
       def activeTask(status: TaskStatus) = Seq(TASK_STAGING, TASK_STARTING, TASK_RUNNING).contains(status.getState)
       // We're only interested in the bad task statuses for our pod
-      val failedTasks = taskStatuses.filterNot { case (id, status) => activeTask(status) }
+      val failedTasks = taskStatuses.filterNot { case (_, status) => activeTask(status) }
       if (failedTasks.nonEmpty) {
         logger.info(s"Restarting Pod $id")
         val newId = KeepAlivePodSpecHelper.createNewIncarnationId(id)

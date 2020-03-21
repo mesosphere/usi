@@ -11,7 +11,12 @@ val commonSettings = Seq(
   // the PortAllocator logic is not cross-module aware, so running concurrent tests causes failures
   concurrentRestrictions in Global += Tags.limit(Tags.Test, 1),
   scalaVersion := "2.13.1",
-  crossScalaVersions := Seq("2.13.1", "2.12.7"),
+  crossScalaVersions := Seq("2.13.1", "2.12.11"),
+  addCompilerPlugin(scalafixSemanticdb),
+  scalacOptions ++= List(
+    "-Yrangepos",
+    "-Ywarn-unused"
+  )
 )
 
 lazy val `core-models` = (project in file("./core-models/"))

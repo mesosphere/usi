@@ -62,14 +62,12 @@ object SimpleRunTemplateFactory {
     *
     * @param resourceRequirements The resources required for the pod.
     * @param command The command that is executed.
-    * @param role The Mesos role used.
     * @param fetch The artifacts that are fetched by Mesos.
     * @param dockerImageName The optional Docker image the task will run in.
     */
   class SimpleTaskInfoBuilder private (
       val resourceRequirements: Seq[ResourceRequirement],
       command: Command,
-      role: String,
       fetch: Seq[FetchUri],
       dockerImageName: Option[String])
       extends TaskBuilder {
@@ -120,29 +118,26 @@ object SimpleRunTemplateFactory {
     def apply(
         resourceRequirements: Seq[ResourceRequirement],
         command: Command,
-        role: String,
         fetch: Seq[FetchUri],
         dockerImageName: Option[String]): SimpleTaskInfoBuilder = {
-      new SimpleTaskInfoBuilder(resourceRequirements, command, role, fetch, dockerImageName)
+      new SimpleTaskInfoBuilder(resourceRequirements, command, fetch, dockerImageName)
     }
 
     def apply(
         resourceRequirements: Seq[ResourceRequirement],
         shellCommand: String,
-        role: String,
         fetch: Seq[FetchUri] = Seq.empty,
         dockerImageName: Option[String] = None): SimpleTaskInfoBuilder =
-      apply(resourceRequirements, Shell(shellCommand), role, fetch, dockerImageName)
+      apply(resourceRequirements, Shell(shellCommand), fetch, dockerImageName)
 
     /** Factory method for [[com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.SimpleTaskInfoBuilder]]; Java Api. */
     def create(
         resourceRequirements: java.util.List[ResourceRequirement],
         command: Command,
-        role: String,
         fetch: java.util.List[FetchUri],
         dockerImageName: Optional[String]): SimpleTaskInfoBuilder = {
       val image = if (dockerImageName.isPresent) Some(dockerImageName.get()) else None
-      apply(resourceRequirements.asScala.toSeq, command, role, fetch.asScala.toSeq, image)
+      apply(resourceRequirements.asScala.toSeq, command, fetch.asScala.toSeq, image)
     }
   }
 
@@ -163,5 +158,5 @@ object SimpleRunTemplateFactory {
       dockerImageName: Option[String] = None): RunTemplate =
     new LegacyLaunchRunTemplate(
       role,
-      SimpleTaskInfoBuilder(resourceRequirements: Seq[ResourceRequirement], shellCommand, role, fetch, dockerImageName))
+      SimpleTaskInfoBuilder(resourceRequirements: Seq[ResourceRequirement], shellCommand, fetch, dockerImageName))
 }
