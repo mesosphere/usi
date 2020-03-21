@@ -1,0 +1,97 @@
+#!/bin/bash
+
+MESSAGE=""
+
+help() {
+  cat <<-EOF
+Usage: $0 [args] -- <command> <command-args...>
+
+Args:
+
+  --description : Human friendly description of the command being run
+
+Env vars:
+
+  GITHUB_USER
+  GITHUB_TOKEN
+  GITHUB_PULL_REQUEST - the PR id
+  GITHUB_REPO - the organization and repo name, IE mesosphere/usi
+
+EOF
+  exit 0
+}
+
+if [ -z "$GITHUB_PULL_REQUEST" ]; then
+  GITHUB_PULL_REQUEST="$TRAVIS_PULL_REQUEST"
+fi
+
+escape_html() {
+  sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g; s/'"'"'/\&#39;/g'
+}
+
+while ! [ -z "$1" ]; do
+  arg="$1"
+  shift
+  case "$arg" in
+    --help)
+      help
+      ;;
+    --description)
+      DESCRIPTION="$1"
+      shift
+      ;;
+    --)
+      break;
+      ;;
+    *)
+      echo "Unknown arg: $arg"
+      echo
+      help
+      ;;
+  esac
+done
+
+if [ "$GITHUB_PULL_REQUEST" = "false" ]; then
+  # not a pull request; just run the command
+  exec $@
+fi
+
+if [ -z "$DESCRIPTION" ]; then
+  DESCRIPTION="$@"
+fi
+
+for var in GITHUB_USER GITHUB_TOKEN GITHUB_PULL_REQUEST GITHUB_REPO; do
+  if [ -z "${!var}" ]; then
+    echo "$var is not set; not reporting result to GitHub" 1>&2 
+    exec $@
+  fi
+done
+
+TEMP="$(mktemp -d)"
+mkdir -p $TEMP
+
+# Actually execute the command
+$@ 2>&1 | tee "${TEMP}"/log
+
+STATUS=${PIPESTATUS[0]}
+
+if [ $STATUS -ne 0 ]; then
+  echo "Command ${@} failed"
+
+  cat <<-EOF > ${TEMP}/message.md
+Exit status ${STATUS} when running "${DESCRIPTION}"
+
+<details>
+<summary>Details</summary>
+<pre>
+$(tail -n 20 "${TEMP}/log" | escape_html)
+</pre>
+</details>
+EOF
+  jq '. as $text | {"body": $text}' --raw-input ${TEMP}/message.md --slurp > ${TEMP}/payload.json
+  curl --data @${TEMP}/payload.json -u $GITHUB_USER:$GITHUB_TOKEN -X POST https://api.github.com/repos/${GITHUB_REPO}/issues/${GITHUB_PULL_REQUEST}/comments
+  
+  exit $STATUS
+fi
+
+rm -rf "${TEMP}"
