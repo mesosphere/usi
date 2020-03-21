@@ -53,7 +53,7 @@ done
 
 if [ "$GITHUB_PULL_REQUEST" = "false" ]; then
   # not a pull request; just run the command
-  exec $@
+  exec "$@"
 fi
 
 if [ -z "$DESCRIPTION" ]; then
@@ -63,7 +63,7 @@ fi
 for var in GITHUB_USER GITHUB_TOKEN GITHUB_PULL_REQUEST GITHUB_REPO; do
   if [ -z "${!var}" ]; then
     echo "$var is not set; not reporting result to GitHub" 1>&2 
-    exec $@
+    exec "$@"
   fi
 done
 
@@ -71,7 +71,7 @@ TEMP="$(mktemp -d)"
 mkdir -p $TEMP
 
 # Actually execute the command
-$@ 2>&1 | tee "${TEMP}"/log
+"$@" 2>&1 | tee "${TEMP}"/log
 
 STATUS=${PIPESTATUS[0]}
 
