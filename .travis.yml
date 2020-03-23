@@ -20,7 +20,7 @@ cache:
 git:
   depth: false
 script:
-- ci/provision.sh 1.9.0
+- sudo ci/provision.sh 1.9.0
 - ci/reporting-pr-failure -- sbt +test:compile
 - ci/reporting-pr-failure -- sbt scalafmtCheck
 - ci/reporting-pr-failure --description "Unused imports / scalafix" -- sbt "scalafix --check"
