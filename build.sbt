@@ -1,3 +1,5 @@
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+
 val commonSettings = Seq(
   organization := "com.mesosphere.usi",
   version := {
@@ -16,7 +18,13 @@ val commonSettings = Seq(
   scalacOptions ++= List(
     "-Yrangepos",
     "-Ywarn-unused"
-  )
+  ),
+  publishTo := Some(s3resolver.value(
+    "Mesosphere Public Repo (S3)",
+    s3("downloads.mesosphere.io/maven")
+  )),
+  s3credentials := DefaultAWSCredentialsProviderChain.getInstance(),
+  s3region :=  com.amazonaws.services.s3.model.Region.US_Standard,
 )
 
 lazy val `core-models` = (project in file("./core-models/"))

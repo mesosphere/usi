@@ -19,7 +19,7 @@ ansiColor('xterm') {
       ]) {
       sshagent (credentials: ['0f7ec9c9-99b2-4797-9ed5-625572d5931d']) {
         checkout scm
-        sh './gradlew --parallel publish --info'
+        sh 'sbt +publish'
       }
     }}
   }
