@@ -5,8 +5,6 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install -y jq
 language: scala
-# this is necessary because otherwise travis runs gradlew assemble before out tasks
-# and if that is run, checkScalaFmtAll won't work
 install:
   - true
 before_cache:
@@ -21,17 +19,9 @@ cache:
     - $HOME/.sbt
 git:
   depth: false
-jobs:
-  include:
-    - stage: "compile"
-      name: "Compile code and tests"
-      script: ci/reporting-pr-failure -- sbt +test:compile
-    - stage: "scalafmt"
-      name: "Check Scalafmt"
-      script: ci/reporting-pr-failure -- sbt scalafmtCheck
-    - stage: "check unused (scalafix)"
-      name: "Check unused"
-      script: ci/reporting-pr-failure --description "Unused imports / scalafix" -- sbt "scalafix --check"
-    - state: "Run tests"
-      name: "Run tests"
-      script: ci/reporting-pr-failure --description "Running tests for all Scala versions" -- sbt +test
+script:
+- ci/provision.sh
+- ci/reporting-pr-failure -- sbt +test:compile
+- ci/reporting-pr-failure -- sbt scalafmtCheck
+- ci/reporting-pr-failure --description "Unused imports / scalafix" -- sbt "scalafix --check"
+- ci/reporting-pr-failure --description "Running tests for all Scala versions" -- sbt +test
