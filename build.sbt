@@ -27,8 +27,26 @@ val commonSettings = Seq(
   s3region :=  com.amazonaws.services.s3.model.Region.US_Standard,
 )
 
+lazy val `root` = (project in file("./"))
+  .settings(commonSettings)
+  .settings(publish / skip := true)
+  .aggregate(
+    `core-models`,
+    `metrics`,
+    `persistence`,
+    `test-utils`,
+    `mesos-client`,
+    `persistence-zookeeper`,
+    `metrics-dropwizard`,
+    `mesos-master-detector`,
+    `core`,
+    `examples-core-hello-world`,
+    `examples-keep-alive-framework`,
+    `examples-mesos-client-example`,
+    `examples-simple-hello-world`)
+
 lazy val `core-models` = (project in file("./core-models/"))
-  .settings(commonSettings : _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.mesos,
@@ -36,13 +54,13 @@ lazy val `core-models` = (project in file("./core-models/"))
       Dependencies.Test.scalaTest % "test")) // note, core-models cannot depends on test-utils because this creates a circular dependency.
 
 lazy val `metrics` = (project in file("./metrics"))
-  .settings(commonSettings : _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.akkaStream))
 
 lazy val `persistence` = (project in file("./persistence"))
-  .settings(commonSettings : _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.akkaActor
@@ -50,7 +68,7 @@ lazy val `persistence` = (project in file("./persistence"))
   .dependsOn(`core-models`)
 
 lazy val `test-utils` = (project in file("./test-utils/"))
-  .settings(commonSettings : _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.Test.scalaTest,
@@ -71,7 +89,7 @@ lazy val `test-utils` = (project in file("./test-utils/"))
   .dependsOn(`persistence`)
 
 lazy val `mesos-client` = (project in file("./mesos-client/"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.akkaStream,
@@ -85,7 +103,7 @@ lazy val `mesos-client` = (project in file("./mesos-client/"))
   .dependsOn(`test-utils` % "test->compile")
 
 lazy val `persistence-zookeeper` = (project in file("./persistence-zookeeper"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.akkaStream,
@@ -97,7 +115,7 @@ lazy val `persistence-zookeeper` = (project in file("./persistence-zookeeper"))
   .dependsOn(`test-utils` % "test->compile")
 
 lazy val `metrics-dropwizard` = (project in file("./metrics-dropwizard"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.akkaHttp,
@@ -112,7 +130,7 @@ lazy val `metrics-dropwizard` = (project in file("./metrics-dropwizard"))
   .dependsOn(`test-utils` % "test->compile")
 
 lazy val `mesos-master-detector` = (project in file("./mesos-master-detector"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.akkaHttpPlayJson,
@@ -122,7 +140,7 @@ lazy val `mesos-master-detector` = (project in file("./mesos-master-detector"))
   .dependsOn(`test-utils` % "test->compile")
 
 lazy val `core` = (project in file("./core"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.Test.akkaStreamTestKit % "test"))
@@ -133,7 +151,8 @@ lazy val `core` = (project in file("./core"))
   .dependsOn(`test-utils` % "test->compile")
 
 lazy val `examples-core-hello-world` = (project in file("./examples/core-hello-world"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
+  .settings(publish / skip := true)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.Test.akkaStreamTestKit % "test"))
@@ -141,7 +160,8 @@ lazy val `examples-core-hello-world` = (project in file("./examples/core-hello-w
   .dependsOn(`test-utils` % "compile->compile")
 
 lazy val `examples-keep-alive-framework` = (project in file("./examples/keep-alive-framework"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
+  .settings(publish / skip := true)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.scopt,
@@ -150,14 +170,14 @@ lazy val `examples-keep-alive-framework` = (project in file("./examples/keep-ali
   .dependsOn(`test-utils` % "compile->compile")
 
 lazy val `examples-mesos-client-example` = (project in file("./examples/mesos-client-example"))
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
+  .settings(publish / skip := true)
   .dependsOn(`mesos-client`)
   .dependsOn(`test-utils` % "test->compile")
 
 
 lazy val `examples-simple-hello-world` = (project in file("./examples/simple-hello-world"))
-  .settings(commonSettings: _*)
-  // .settings(
-  //   libraryDependencies ++= Seq())
+  .settings(commonSettings)
+  .settings(publish / skip := true)
   .dependsOn(`mesos-client`)
   .dependsOn(`test-utils` % "test->compile")
