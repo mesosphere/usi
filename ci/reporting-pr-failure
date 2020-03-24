@@ -1,10 +1,11 @@
 #!/bin/bash
 
-MESSAGE=""
-
 help() {
   cat <<-EOF
 Usage: $0 [args] -- <command> <command-args...>
+
+This script runs the provided command, and if it fails, reports it to the GitHub PR specified with env-vars, with the
+last 20 lines of the output from the process. This script will exit with the same exit status as the sub-process.
 
 Args:
 
@@ -14,12 +15,16 @@ Env vars:
 
   GITHUB_USER
   GITHUB_TOKEN
-  GITHUB_PULL_REQUEST - the PR id
+  GITHUB_PULL_REQUEST - the PR id; "false" if not a PR
   GITHUB_REPO - the organization and repo name, IE mesosphere/usi
 
+
+**note** if GITHUB_PULL_REQUEST is not set, it will default to the value TRAVIS_PULL_REQUEST
 EOF
   exit 0
 }
+
+MESSAGE=""
 
 if [ -z "$GITHUB_PULL_REQUEST" ]; then
   GITHUB_PULL_REQUEST="$TRAVIS_PULL_REQUEST"

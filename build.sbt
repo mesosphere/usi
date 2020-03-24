@@ -84,7 +84,7 @@ lazy val `test-utils` = (project in file("./test-utils/"))
       Dependencies.curatorAsync,
       Dependencies.curatorTest,
     ))
-  .dependsOn(`core-models` % "compile->compile")
+  .dependsOn(`core-models`)
   .dependsOn(`metrics`)
   .dependsOn(`persistence`)
 
