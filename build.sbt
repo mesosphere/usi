@@ -34,8 +34,9 @@ val commonSettings = Seq(
 )
 
 lazy val `root` = (project in file("./"))
-  .settings(commonSettings)
-  .settings(publish / skip := true)
+  .settings(
+    commonSettings,
+    publish / skip := true)
   .aggregate(
     `core-models`,
     `metrics`,
@@ -52,16 +53,16 @@ lazy val `root` = (project in file("./"))
     `examples-simple-hello-world`)
 
 lazy val `core-models` = (project in file("./core-models/"))
-  .settings(commonSettings)
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(
       Dependencies.mesos,
       Dependencies.scalaLogging,
       Dependencies.Test.scalaTest % "test")) // note, core-models cannot depends on test-utils because this creates a circular dependency.
 
 lazy val `metrics` = (project in file("./metrics"))
-  .settings(commonSettings)
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(
       Dependencies.akkaStream))
 
@@ -74,8 +75,8 @@ lazy val `persistence` = (project in file("./persistence"))
   .dependsOn(`core-models`)
 
 lazy val `test-utils` = (project in file("./test-utils/"))
-  .settings(commonSettings)
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(
       Dependencies.Test.scalaTest,
       Dependencies.akkaStream,
@@ -95,8 +96,8 @@ lazy val `test-utils` = (project in file("./test-utils/"))
   .dependsOn(`persistence`)
 
 lazy val `mesos-client` = (project in file("./mesos-client/"))
-  .settings(commonSettings)
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(
       Dependencies.akkaStream,
       Dependencies.akkaHttp,
@@ -109,8 +110,8 @@ lazy val `mesos-client` = (project in file("./mesos-client/"))
   .dependsOn(`test-utils` % "test->compile")
 
 lazy val `persistence-zookeeper` = (project in file("./persistence-zookeeper"))
-  .settings(commonSettings)
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(
       Dependencies.akkaStream,
       Dependencies.curatorFramework,
@@ -121,8 +122,8 @@ lazy val `persistence-zookeeper` = (project in file("./persistence-zookeeper"))
   .dependsOn(`test-utils` % "test->compile")
 
 lazy val `metrics-dropwizard` = (project in file("./metrics-dropwizard"))
-  .settings(commonSettings)
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(
       Dependencies.akkaHttp,
       Dependencies.scalaLogging,
@@ -136,8 +137,8 @@ lazy val `metrics-dropwizard` = (project in file("./metrics-dropwizard"))
   .dependsOn(`test-utils` % "test->compile")
 
 lazy val `mesos-master-detector` = (project in file("./mesos-master-detector"))
-  .settings(commonSettings)
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(
       Dependencies.akkaHttpPlayJson,
       Dependencies.scalaAsync % "compile",
@@ -146,8 +147,8 @@ lazy val `mesos-master-detector` = (project in file("./mesos-master-detector"))
   .dependsOn(`test-utils` % "test->compile")
 
 lazy val `core` = (project in file("./core"))
-  .settings(commonSettings)
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(
       Dependencies.Test.akkaStreamTestKit % "test"))
   .dependsOn(`core-models`)
@@ -157,18 +158,18 @@ lazy val `core` = (project in file("./core"))
   .dependsOn(`test-utils` % "test->compile")
 
 lazy val `examples-core-hello-world` = (project in file("./examples/core-hello-world"))
-  .settings(commonSettings)
-  .settings(publish / skip := true)
   .settings(
+    commonSettings,
+    publish / skip := true,
     libraryDependencies ++= Seq(
       Dependencies.Test.akkaStreamTestKit % "test"))
   .dependsOn(`core`)
   .dependsOn(`test-utils` % "compile->compile")
 
 lazy val `examples-keep-alive-framework` = (project in file("./examples/keep-alive-framework"))
-  .settings(commonSettings)
-  .settings(publish / skip := true)
   .settings(
+    commonSettings,
+    publish / skip := true,
     libraryDependencies ++= Seq(
       Dependencies.scopt,
       Dependencies.Test.akkaStreamTestKit % "test"))
@@ -176,14 +177,16 @@ lazy val `examples-keep-alive-framework` = (project in file("./examples/keep-ali
   .dependsOn(`test-utils` % "compile->compile")
 
 lazy val `examples-mesos-client-example` = (project in file("./examples/mesos-client-example"))
-  .settings(commonSettings)
-  .settings(publish / skip := true)
+  .settings(
+    commonSettings,
+    publish / skip := true)
   .dependsOn(`mesos-client`)
   .dependsOn(`test-utils` % "test->compile")
 
 
 lazy val `examples-simple-hello-world` = (project in file("./examples/simple-hello-world"))
-  .settings(commonSettings)
-  .settings(publish / skip := true)
+  .settings(
+    commonSettings,
+    publish / skip := true)
   .dependsOn(`mesos-client`)
   .dependsOn(`test-utils` % "test->compile")
