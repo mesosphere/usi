@@ -4,7 +4,8 @@ val commonSettings = Seq(
   organization := "com.mesosphere.usi",
   version := {
     import sys.process._
-      ("./version" !!).trim
+
+    ("./version" !!).trim
   },
   libraryDependencies := Seq(
     Dependencies.Test.akkaSlf4j % "test",
