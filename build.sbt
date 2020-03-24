@@ -19,10 +19,16 @@ val commonSettings = Seq(
     "-Yrangepos",
     "-Ywarn-unused"
   ),
-  publishTo := Some(s3resolver.value(
-    "Mesosphere Public Repo (S3)",
-    s3("downloads.mesosphere.io/maven")
-  )),
+  publishTo := {
+    if (version.value.endsWith("-SNAPSHOT"))
+      Some(s3resolver.value(
+        "Mesosphere Public Snapshot Repo (S3)",
+        s3("downloads.mesosphere.io/maven-snapshot")))
+    else
+      Some(s3resolver.value(
+        "Mesosphere Public Repo (S3)",
+        s3("downloads.mesosphere.io/maven")))
+  },
   s3credentials := DefaultAWSCredentialsProviderChain.getInstance(),
   s3region :=  com.amazonaws.services.s3.model.Region.US_Standard,
 )
