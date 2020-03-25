@@ -12,34 +12,6 @@ import scala.util.{Failure, Success}
 class FlowHelpersTest extends AkkaUnitTest {
   val inputElement = "one"
   val outputElement = 1
-  def fromSinkAndSourceWithSharedFate[A, B, M1, M2](sink: Sink[A, M1], source: Source[B, M2]): Flow[A, B, NotUsed] = {
-    val sinkKillSwitch = KillSwitches.shared(s"shared-fate-input-${UUID.randomUUID()}")
-    val sourceKillSwitch = KillSwitches.shared(s"shared-fate-output-${UUID.randomUUID()}")
-
-    val (sinkTerminalSignal, monitoredSink) = Flow[A]
-      .via(sinkKillSwitch.flow)
-      .watchTermination()(Keep.right)
-      .to(sink)
-      .preMaterialize()
-
-    val (sourceTerminated, monitoredSource) = source
-      .via(sourceKillSwitch.flow)
-      .watchTermination()(Keep.right)
-      .preMaterialize()
-
-    sinkTerminalSignal.onComplete {
-      case Success(_) =>
-        sourceKillSwitch.shutdown()
-      case Failure(ex) =>
-        sourceKillSwitch.abort(ex)
-    }
-
-    sourceTerminated.onComplete { _ =>
-      sinkKillSwitch.shutdown()
-    }
-
-    Flow.fromSinkAndSource(monitoredSink, monitoredSource)
-  }
 
   def newMockedFlow[M, O](
       inputSink: Sink[String, M],
@@ -53,7 +25,7 @@ class FlowHelpersTest extends AkkaUnitTest {
     val (o, preMaterializedOutput) =
       outputSource.preMaterialize()
 
-    val flow = fromSinkAndSourceWithSharedFate(preMaterializedInput, preMaterializedOutput)
+    val flow = Flow.fromSinkAndSourceCoupled(preMaterializedInput, preMaterializedOutput)
 
     (flow, m, o)
   }
