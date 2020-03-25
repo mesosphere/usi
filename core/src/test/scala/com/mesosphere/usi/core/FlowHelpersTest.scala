@@ -1,13 +1,8 @@
 package com.mesosphere.usi.core
 
-import java.util.UUID
-
-import akka.stream.KillSwitches
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.{Done, NotUsed}
 import com.mesosphere.utils.AkkaUnitTest
-
-import scala.util.{Failure, Success}
 
 class FlowHelpersTest extends AkkaUnitTest {
   val inputElement = "one"
