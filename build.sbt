@@ -59,7 +59,7 @@ lazy val `core-models` = (project in file("./core-models/"))
     libraryDependencies ++= Seq(
       Dependencies.mesos,
       Dependencies.scalaLogging,
-      Dependencies.Test.scalaTest % "test")) // note, core-models cannot depends on test-utils because this creates a circular dependency.
+      Dependencies.Test.scalaTest % "test")) // note, core-models cannot depend on test-utils because this creates a circular dependency.
 
 lazy val `metrics` = (project in file("./metrics"))
   .settings(
