@@ -147,7 +147,9 @@ object ResourceUtil extends ImplicitStrictLogging {
   /**
     * Deduct usedResources from resources by matching them by name and role.
     */
-  def consumeResources(resources: Seq[Mesos.Resource], usedResources: Seq[Mesos.Resource]): Seq[Mesos.Resource] = {
+  def consumeResources(
+      resources: Iterable[Mesos.Resource],
+      usedResources: Seq[Mesos.Resource]): Iterable[Mesos.Resource] = {
     val usedResourceMap: Map[ResourceMatchKey, Seq[Mesos.Resource]] =
       usedResources.groupBy(ResourceMatchKey(_))
 
@@ -183,13 +185,13 @@ object ResourceUtil extends ImplicitStrictLogging {
     * Deduct usedResources from resources in the offer.
     */
   def consumeResourcesFromOffer(offer: Mesos.Offer, usedResources: Seq[Mesos.Resource]): Mesos.Offer = {
-    val offerResources: Seq[Mesos.Resource] = offer.getResourcesList.asScala
+    val offerResources: Iterable[Mesos.Resource] = offer.getResourcesList.asScala
     val leftOverResources = ResourceUtil.consumeResources(offerResources, usedResources)
     offer.toBuilder.clearResources().addAllResources(leftOverResources.asJava).build()
   }
 
   def displayResource(resource: Mesos.Resource, maxRanges: Int): String = {
-    def rangesToString(ranges: Seq[Mesos.Value.Range]): String = {
+    def rangesToString(ranges: Iterable[Mesos.Value.Range]): String = {
       ranges.map { range =>
         s"${range.getBegin}->${range.getEnd}"
       }.mkString(",")

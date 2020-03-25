@@ -26,7 +26,7 @@ object KeepAlivePodSpecHelper {
   }
 
   def specsSnapshot(numberOfPods: Int): List[RunningPodSpec] =
-    (1 to numberOfPods).map(_ => generatePodSpec())(collection.breakOut)
+    (1 to numberOfPods).iterator.map(_ => generatePodSpec()).toList
 
   def createNewIncarnationId(podId: PodId): PodId = {
     val idAndIncarnation = """^(.+\..*)\.(\d+)$""".r

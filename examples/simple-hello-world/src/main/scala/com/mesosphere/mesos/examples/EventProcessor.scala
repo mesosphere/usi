@@ -39,7 +39,7 @@ class EventProcessor(mesosCalls: MesosCalls) extends StrictLogging {
     def decline(offerIds: Seq[OfferID]): Call =
       mesosCalls.newDecline(offerIds = offerIds, filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build))
 
-    val offersList = offers.getOffersList.asScala
+    val offersList = offers.getOffersList.asScala.toSeq
     val offerIds = offersList.map(_.getId)
 
     if (task.isScheduled) {

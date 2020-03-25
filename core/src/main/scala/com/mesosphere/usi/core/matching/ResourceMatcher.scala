@@ -12,7 +12,9 @@ object ResourceMatcher {
     * @param resources for matching. The Scheduler will only provide the resources matching the ResourceType for this [[ResourceRequirement.
     * @return Some match result if it matches, None if not.
     */
-  def matchAndConsume(requirement: ResourceRequirement, resources: Seq[Mesos.Resource]): Option[ResourceMatchResult] = {
+  def matchAndConsume(
+      requirement: ResourceRequirement,
+      resources: Iterable[Mesos.Resource]): Option[ResourceMatchResult] = {
     requirement match {
       case r: RangeRequirement =>
         RangeResourceMatcher.matchAndConsume(r, resources)

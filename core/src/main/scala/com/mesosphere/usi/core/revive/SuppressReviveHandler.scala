@@ -164,8 +164,8 @@ private[core] class SuppressReviveHandler(
   private def directivesForDiff(lastState: PodIdsWantingRoles, newState: PodIdsWantingRoles): List[RoleDirective] = {
     val directives = List.newBuilder[RoleDirective]
 
-    val newWanted = newState.iterator.collect { case (role, podIds) if podIds.nonEmpty => role }.to[Set]
-    val oldWanted = lastState.iterator.collect { case (role, podIds) if podIds.nonEmpty => role }.to[Set]
+    val newWanted = newState.iterator.collect { case (role, podIds) if podIds.nonEmpty => role }.toSet
+    val oldWanted = lastState.iterator.collect { case (role, podIds) if podIds.nonEmpty => role }.toSet
     val newlyWanted = newWanted -- oldWanted
     val newlyNotWanted = oldWanted -- newWanted
     val rolesChanged = lastState.keySet != newState.keySet
@@ -176,7 +176,7 @@ private[core] class SuppressReviveHandler(
 
     val rolesNeedingRevive = newState.iterator.collect {
       case (role, podIds) if (podIds -- lastState.getOrElse(role, Set.empty)).nonEmpty => role
-    }.to[Set]
+    }.toSet
 
     if (rolesNeedingRevive.nonEmpty)
       directives += IssueRevive(rolesNeedingRevive)

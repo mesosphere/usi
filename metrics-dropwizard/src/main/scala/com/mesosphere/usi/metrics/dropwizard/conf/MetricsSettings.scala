@@ -4,7 +4,7 @@ import com.typesafe.config.Config
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
-import net.ceedubs.ficus.Ficus.{finiteDurationReader, toFicusConfig}
+import scala.compat.java8.DurationConverters
 
 case class HistorgramSettings(
     reservoirHighestTrackableValue: Long = 3600000000000L,
@@ -27,7 +27,7 @@ object HistorgramSettings {
     c.getLong("reservoir-highest-trackable-value"),
     c.getInt("reservoir-significant-digits"),
     c.getBoolean("reservoir-reset-periodically"),
-    c.as[FiniteDuration]("reservoir-resetting-interval"),
+    DurationConverters.toScala(c.getDuration("reservoir-resetting-interval")),
     c.getInt("reservoir-resetting-chunks")
   )
 }
@@ -42,7 +42,7 @@ object StatsdReporterSettings {
   def fromSubConfig(c: Config) = apply(
     c.getString("host"),
     c.getInt("port"),
-    c.as[FiniteDuration]("transmission-interval")
+    DurationConverters.toScala(c.getDuration("transmission-interval"))
   )
 }
 
@@ -67,12 +67,12 @@ object DataDogReporterSettings {
       DataDogUdpReporterSettings(
         c.getString("host"),
         c.getInt("port"),
-        c.as[FiniteDuration]("transmission-interval")
+        DurationConverters.toScala(c.getDuration("transmission-interval"))
       )
     case "api" =>
       DataDogApiReporterSettings(
         c.getString("api-key"),
-        c.as[FiniteDuration]("transmission-interval")
+        DurationConverters.toScala(c.getDuration("transmission-interval"))
       )
     case p =>
       throw new IllegalArgumentException(

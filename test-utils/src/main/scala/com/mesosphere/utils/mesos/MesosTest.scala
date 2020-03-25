@@ -361,9 +361,9 @@ case class MesosCluster(
       "MESOS_SYSTEMD_ENABLE_SUPPORT" -> "false",
       "MESOS_SWITCH_USER" -> "false"
     ) ++
-      config.restrictedToRoles.map("MESOS_ROLES" -> _).to[Seq] ++
-      agentsConfig.isolation.map("MESOS_ISOLATION" -> _).to[Seq] ++
-      agentsConfig.imageProviders.map("MESOS_IMAGE_PROVIDERS" -> _).to[Seq]
+      config.restrictedToRoles.map("MESOS_ROLES" -> _).toSeq ++
+      agentsConfig.isolation.map("MESOS_ISOLATION" -> _).toSeq ++
+      agentsConfig.imageProviders.map("MESOS_IMAGE_PROVIDERS" -> _).toSeq
   }
 
   // Get a random port from a random agent from the port range that was given to the agent during initialisation

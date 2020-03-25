@@ -39,7 +39,7 @@ object RangeResourceMatcher {
 
   def matchAndConsume(
       rangeRequirment: RangeRequirement,
-      resources: Seq[Protos.Resource]): Option[ResourceMatchResult] = {
+      resources: Iterable[Protos.Resource]): Option[ResourceMatchResult] = {
     matchAndConsumeIter(rangeRequirment, Nil, resources.toList)
   }
 
@@ -74,21 +74,21 @@ object RangeResourceMatcher {
 
   /**
     * Tries to match and consume values from a given resource
-    * @param requestedValues values we want to consume
+    * @param rangeRequirement values we want to consume
     * @param resource mesos resource to match agains
     * @return final list of mesos resources created after consuming requested values, empty if match was not possible
     */
   private def tryConsumeValuesFromResource(
-      rangeRequirment: RangeRequirement,
+      rangeRequirement: RangeRequirement,
       resource: Protos.Resource): Seq[Protos.Resource] = {
-    val offeredRanges = parseResourceToRanges(rangeRequirment, resource)
-    if (offeredRanges.isEmpty || rangeRequirment.requestedValues.isEmpty) {
+    val offeredRanges = parseResourceToRanges(rangeRequirement, resource)
+    if (offeredRanges.isEmpty || rangeRequirement.requestedValues.isEmpty) {
       return Seq.empty
     }
 
     // non-dynamic values
-    val staticRequestedValues = rangeRequirment.requestedValues.collect { case ExactValue(v) => v }.toSet
-    val availableForDynamicAssignment: Iterator[Int] = rangeRequirment.valueSelectionPolicy match {
+    val staticRequestedValues = rangeRequirement.requestedValues.collect { case ExactValue(v) => v }.toSet
+    val availableForDynamicAssignment: Iterator[Int] = rangeRequirement.valueSelectionPolicy match {
       case RandomSelection(r) =>
         lazyRandomValuesFromRanges(offeredRanges, r)
           .filter(v => !staticRequestedValues(v))
@@ -98,7 +98,7 @@ object RangeResourceMatcher {
           .filterNot(staticRequestedValues)
     }
 
-    val matchResult = rangeRequirment.requestedValues.map {
+    val matchResult = rangeRequirement.requestedValues.map {
       case RandomValue if !availableForDynamicAssignment.hasNext =>
         // need dynamic value but no more available
         ValueNotAvailable
@@ -118,7 +118,7 @@ object RangeResourceMatcher {
       createMesosResource(
         resource,
         matchResult.collect { case ValueMatched(v) => v }.toSeq,
-        rangeRequirment.resourceType)
+        rangeRequirement.resourceType)
     }
   }
 
@@ -133,9 +133,9 @@ object RangeResourceMatcher {
       Seq.empty
     } else {
       val rangeInResource = resource.getRanges.getRangeList.asScala
-      rangeInResource.map { range =>
+      rangeInResource.iterator.map { range =>
         MesosRange(range.getBegin.toInt, range.getEnd.toInt)
-      }
+      }.toSeq
     }
   }
 

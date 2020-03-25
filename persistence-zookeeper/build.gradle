@@ -1,6 +1,0 @@
-dependencies {
-    compile project(':core-models')
-    compile project(':persistence')
-    compile project(':metrics')
-    testCompile project(':test-utils')
-}

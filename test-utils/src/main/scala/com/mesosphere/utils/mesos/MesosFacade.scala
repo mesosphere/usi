@@ -43,11 +43,11 @@ object MesosFacade {
   object ITAttributes {
     def empty: ITAttributes = new ITAttributes(Map.empty)
     def apply(vals: (String, Any)*): ITAttributes = {
-      val attributes: Map[String, ITResourceValue] = vals.map {
+      val attributes: Map[String, ITResourceValue] = vals.iterator.map {
         case (id, value: Double) => id -> ITResourceScalarValue(value)
         case (id, value: String) => id -> ITResourceStringValue(value)
         case (id, value: Any) => throw new IllegalArgumentException(s"Unexpected attribute id=$id value=$value")
-      }(collection.breakOut)
+      }.toMap
       ITAttributes(attributes)
     }
   }
@@ -68,12 +68,12 @@ object MesosFacade {
   object ITResources {
     def empty: ITResources = new ITResources(Map.empty)
     def apply(vals: (String, Any)*): ITResources = {
-      val resources: Map[String, ITResourceValue] = vals.map {
+      val resources: Map[String, ITResourceValue] = vals.iterator.map {
         case (id, value: Double) => id -> ITResourceScalarValue(value)
         case (id, value: String) => id -> ITResourceStringValue(value)
-        case (id, value) =>
+        case (_, value) =>
           throw new IllegalStateException(s"Unsupported ITResource type: ${value.getClass}; expected: Double | String")
-      }(collection.breakOut)
+      }.toMap
       ITResources(resources)
     }
   }
