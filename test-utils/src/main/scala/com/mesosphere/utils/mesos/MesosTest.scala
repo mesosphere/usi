@@ -44,7 +44,8 @@ case class MesosAgentConfig(
     seccompConfigDir: Option[String] = None,
     seccompProfileName: Option[String] = None,
     executorRegistrationTimeout: Duration = 1.minute,
-    fetcherStallTimeout: Duration = 1.minute) {
+    fetcherStallTimeout: Duration = 1.minute,
+    cgroupsEnableCfs: Boolean = false) {
 
   require(
     executorRegistrationTimeout >= fetcherStallTimeout,
@@ -180,7 +181,8 @@ case class MesosCluster(
       extraArgs = Seq(
         s"--attributes=$renderedAttributes",
         s"--executor_registration_timeout=${agentsConfig.executorRegistrationTimeout.toSeconds}secs",
-        s"--fetcher_stall_timeout=${agentsConfig.fetcherStallTimeout.toSeconds}secs"
+        s"--fetcher_stall_timeout=${agentsConfig.fetcherStallTimeout.toSeconds}secs",
+        if (agentsConfig.cgroupsEnableCfs) "--cgroups_enable_cfs" else "--no-cgroups_enable_cfs"
       ) ++ mesosFaultDomainAgentCmdOption.map(fd => s"--domain=$fd")
         ++ agentsConfig.seccompConfigDir.map(dir => s"--seccomp_config_dir=$dir")
         ++ agentsConfig.seccompProfileName.map(prf => s"--seccomp_profile_name=$prf")
