@@ -178,14 +178,9 @@ case class MesosCluster(
     // flakiness in tests.
     Agent(
       resources = new Resources(ports = PortAllocator.portsRange(), gpus = config.agentsGpus),
-      extraArgs = Seq(
-        s"--attributes=$renderedAttributes",
-        s"--executor_registration_timeout=${agentsConfig.executorRegistrationTimeout.toSeconds}secs",
-        s"--fetcher_stall_timeout=${agentsConfig.fetcherStallTimeout.toSeconds}secs",
-        if (agentsConfig.cgroupsEnableCfs) "--cgroups_enable_cfs" else "--no-cgroups_enable_cfs"
-      ) ++ mesosFaultDomainAgentCmdOption.map(fd => s"--domain=$fd")
-        ++ agentsConfig.seccompConfigDir.map(dir => s"--seccomp_config_dir=$dir")
-        ++ agentsConfig.seccompProfileName.map(prf => s"--seccomp_profile_name=$prf")
+      agentsConfig = agentsConfig,
+      renderedAttributes = renderedAttributes,
+      mesosFaultDomainAgentCmdOption = mesosFaultDomainAgentCmdOption
     )
   }
 
@@ -256,7 +251,6 @@ case class MesosCluster(
     * up after the execution which included collecting agent sandboxes.
     */
   trait Mesos extends AutoCloseable {
-    val extraArgs: Seq[String]
     val ip = IP.routableIPv4
     val port = PortAllocator.ephemeralPort()
     val workDir: File
@@ -401,18 +395,20 @@ case class MesosCluster(
     * Mesos agent closure that captures work directory, cgroups, resources etc.
     *
     * @param resources The resources assigned to the agent.
-    * @param extraArgs Extra dash arguments in addition to ip, hostname, post, resources, work_dir, and log level.
     * @param logVerbosityLevel The log level for GLOG_v.
     */
-  case class Agent(resources: Resources, extraArgs: Seq[String], logVerbosityLevel: Int = 2) extends Mesos with MesosTest.AgentLike {
+  case class Agent(resources: Resources, agentsConfig: MesosAgentConfig, renderedAttributes: String, mesosFaultDomainAgentCmdOption: Option[String], logVerbosityLevel: Int = 2) extends Mesos with MesosTest.AgentLike {
     /**
       * We can only specify the cgroups_root flag if running the integration tests under Linux; on Mac OS this flag is unrecognized.
       */
-    private val cgroupsRootArgs: Seq[String] =
+    private val cgroupsArgs: Seq[String] =
       if (MesosTest.isLinux)
-        Seq(s"--cgroups_root=mesos$port") // See MESOS-9960 for more info
+        Seq(
+          s"--cgroups_root=mesos$port", // See MESOS-9960 for more info
+          if (agentsConfig.cgroupsEnableCfs) "--cgroups_enable_cfs" else "--no-cgroups_enable_cfs")
       else
         Nil
+
     override val workDir = Files.createTempDirectory(s"$suiteName-mesos-agent-$port").toFile
     override val processBuilder = Process(
       command = Seq(
@@ -424,9 +420,14 @@ case class MesosCluster(
         s"--resources=${resources.resourceString()}",
         s"--master=$masterUrl",
         s"--work_dir=${workDir.getAbsolutePath}",
-        s"""--executor_environment_variables={"GLOG_v": "$logVerbosityLevel"}""") ++
-        cgroupsRootArgs ++
-        extraArgs,
+        s"""--executor_environment_variables={"GLOG_v": "$logVerbosityLevel"}""",
+        s"--attributes=$renderedAttributes",
+        s"--executor_registration_timeout=${agentsConfig.executorRegistrationTimeout.toSeconds}secs",
+        s"--fetcher_stall_timeout=${agentsConfig.fetcherStallTimeout.toSeconds}secs") ++
+        cgroupsArgs ++
+        mesosFaultDomainAgentCmdOption.map(fd => s"--domain=$fd") ++
+        agentsConfig.seccompConfigDir.map(dir => s"--seccomp_config_dir=$dir") ++
+        agentsConfig.seccompProfileName.map(prf => s"--seccomp_profile_name=$prf"),
       cwd = None, extraEnv = mesosEnv(workDir): _*)
 
     override val processName = "Agent"
