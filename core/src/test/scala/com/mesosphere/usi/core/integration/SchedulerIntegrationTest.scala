@@ -132,7 +132,14 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
 
     assertThrows {
       input.offer(commands.KillPod(PodId("unknown-pod"))).futureValue
+    }
+
+    assertThrows {
       output.pull().futureValue
+    }
+
+    assertThrows {
+      input.watchCompletion().futureValue
     }
   }
 }
