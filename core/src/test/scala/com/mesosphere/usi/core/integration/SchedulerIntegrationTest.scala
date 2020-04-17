@@ -110,4 +110,29 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
       }
     }
   }
+
+  "terminates the stream when Mesos master dies" in {
+    lazy val mesosClient: MesosClient = MesosClient(mesosClientSettings, frameworkInfo).runWith(Sink.head).futureValue
+    lazy val factory = SchedulerFactory(mesosClient, InMemoryPodRecordRepository(), schedulerSettings, DummyMetrics)
+    lazy val (_, schedulerFlow) = factory.newSchedulerFlow().futureValue
+    lazy val (input, output) = commandInputSource
+      .log("scheduler commands")
+      .via(schedulerFlow)
+      .log("scheduler events")
+      .toMat(Sink.queue())(Keep.both)
+      .withAttributes(Attributes
+        .logLevels(onElement = Logging.DebugLevel, onFinish = Logging.InfoLevel, onFailure = Logging.ErrorLevel))
+      .run
+
+    input.offer(commands.KillPod(PodId("unknown-pod"))).futureValue
+    // todo: output.pull()
+
+    // Mesos crashes
+    mesosCluster.masters.foreach(_.stop())
+
+    assertThrows {
+      input.offer(commands.KillPod(PodId("unknown-pod"))).futureValue
+      output.pull().futureValue
+    }
+  }
 }
