@@ -413,7 +413,7 @@ class MesosClientImpl(
           response.discardEntityBytes()
           throw new IllegalStateException(s"Failed to send $callType call to Mesos.")
         } else {
-          logger.info(s"Mesos $callType call response: $response")
+          logger.debug(s"Mesos $callType call response: $response")
           response.discardEntityBytes()
         }
     }
