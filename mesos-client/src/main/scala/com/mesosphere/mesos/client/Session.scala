@@ -7,11 +7,13 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.settings.ConnectionPoolSettings
-import akka.stream.Materializer
-import akka.stream.scaladsl.Flow
+import akka.stream.{Materializer, WatchedActorTerminatedException}
+import akka.stream.scaladsl.{Flow, FlowWithContext}
 import akka.util.Timeout
 import com.typesafe.scalalogging.StrictLogging
 
+import scala.concurrent.ExecutionContext
+import scala.reflect.ClassTag
 import scala.util.{Failure, Success}
 
 /**
@@ -25,7 +27,8 @@ import scala.util.{Failure, Success}
   * @param authorization A [[CredentialsProvider]] if the connection is secured.
   */
 case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None)(
-    implicit askTimout: Timeout) {
+    implicit askTimout: Timeout)
+    extends StrictLogging {
 
   /**
     * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
@@ -42,14 +45,41 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     )
   }
 
+  /**
+    * This is a port of [[Flow.ask()]] that supports a tuple to carry a context `C`.
+    */
+  def sessionActorFlow[C](parallelism: Int)(ref: ActorRef)(
+      implicit timeout: Timeout,
+      tag: ClassTag[HttpResponse],
+      ec: ExecutionContext): Flow[(Array[Byte], C), (HttpResponse, C), NotUsed] = {
+    Flow[(Array[Byte], C)]
+      .watch(ref)
+      .mapAsync(parallelism) {
+        case (el, ctx) =>
+          akka.pattern.ask(ref).?(el)(timeout).mapTo[HttpResponse](tag).map(o => (o, ctx))
+      }
+      .mapError {
+        // the purpose of this recovery is to change the name of the stage in that exception
+        // we do so in order to help users find which stage caused the failure -- "the ask stage"
+        case ex: WatchedActorTerminatedException =>
+          throw new WatchedActorTerminatedException("ask()", ex.ref)
+      }
+      .named("ask")
+  }
+
   /** @return A flow that makes Mesos calls and outputs HTTP responses. */
-  def post(implicit system: ActorSystem, mat: Materializer): Flow[Array[Byte], HttpResponse, NotUsed] =
+  def post[C](
+      implicit system: ActorSystem,
+      mat: Materializer): FlowWithContext[Array[Byte], C, HttpResponse, C, NotUsed] =
     authorization match {
       case Some(credentialsProvider) =>
+        import system.dispatcher
+        logger.info(s"Create authenticated session for stream $streamId.")
         val sessionActor = system.actorOf(SessionActor.props(credentialsProvider, createPostRequest))
-        Flow[Array[Byte]].ask[HttpResponse](1)(sessionActor)
+        FlowWithContext[Array[Byte], C].via(sessionActorFlow(1)(sessionActor))
       case None =>
-        Flow[Array[Byte]].map(createPostRequest(_, None)).via(connection)
+        logger.info(s"Create unauthenticated session for stream $streamId.")
+        FlowWithContext[Array[Byte], C].map(createPostRequest(_, None)).via(connection)
     }
 
   /**
@@ -59,15 +89,16 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     *
     * @return A connection flow for single requests.
     */
-  private def connection(implicit system: ActorSystem, mat: Materializer): Flow[HttpRequest, HttpResponse, NotUsed] = {
+  private def connection[C](
+      implicit system: ActorSystem,
+      mat: Materializer): Flow[(HttpRequest, C), (HttpResponse, C), NotUsed] = {
     // Constructs the connection pool settings with defaults and overrides the max connections and pipelining limit so
     // that only one request at a time is processed. See https://doc.akka.io/docs/akka-http/current/configuration.html
     // for details.
-    // *IMPORTANT*: DO NOT CHANGE maxConnections OR pipeliningLimit! Otherwise, USI won't guarantee request order to Mesos!
+    // *IMPORTANT*: DO NOT CHANGE maxConnections OR pipelining Limit! Otherwise, USI won't guarantee request order to Mesos!
     val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
 
-    Flow[HttpRequest]
-      .map(_ -> NotUsed)
+    Flow[(HttpRequest, C)]
       .via(if (Session.isSecured(url)) {
         Http()
           .newHostConnectionPoolHttps(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings)
@@ -75,8 +106,8 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
         Http().newHostConnectionPool(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings)
       })
       .map {
-        case (Success(response), NotUsed) => response
-        case (Failure(ex), NotUsed) => throw ex
+        case (Success(response), context) => response -> context
+        case (Failure(ex), _) => throw ex
       }
   }
 }
@@ -141,7 +172,7 @@ class SessionActor(
 
   def initializing: Receive = {
     case credentials: HttpCredentials =>
-      logger.info("Retrieved IAM authentication token")
+      logger.debug("Retrieved IAM authentication token")
       context.become(initialized(credentials))
       unstashAll()
     case Status.Failure(ex) =>
