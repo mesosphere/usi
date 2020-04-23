@@ -136,20 +136,15 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     logger.info("Kill Mesos masters.")
     mesosCluster.masters.foreach(_.stop())
 
-    Then("The next command should fail")
-    //assertThrows {
-      val offerResult = input.offer(commands.KillPod(PodId("unknown-pod-2"))).futureValue
-      logger.info(s"Offer KillPod returned $offerResult")
-    //}
+    Then("The stream terminates")
+    val completion = input.watchCompletion().failed.futureValue
+    completion.getMessage should be("I failed")
 
-    And("The stream terminates")
-    //assertThrows {
-      val pullResult = output.pull().futureValue
-      logger.info(s"Received USI event $pullResult")
-    //}
+    And("The next command should fail")
+    val offerResult = input.offer(commands.KillPod(PodId("unknown-pod-2"))).failed.futureValue
+    offerResult.getMessage should be("I failed")
 
-    assertThrows {
-      input.watchCompletion().futureValue
-    }
+    val pullResult = output.pull().failed.futureValue
+    logger.info(s"Received USI event $pullResult")
   }
 }

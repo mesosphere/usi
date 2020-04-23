@@ -1,6 +1,6 @@
 package com.mesosphere.usi.core
 
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
+import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler, StageLogging}
 import akka.stream.{Attributes, FanInShape2, Inlet, Outlet}
 import com.mesosphere.mesos.client.MesosCalls
 import com.mesosphere.usi.core.models.StateSnapshot
@@ -64,7 +64,7 @@ private[core] class SchedulerLogicGraph(
   // This is where the actual (possibly stateful) logic will live
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
 
-    new GraphStageLogic(shape) {
+    new GraphStageLogic(shape) with StageLogging {
       private[this] val handler: SchedulerLogicHandler =
         new SchedulerLogicHandler(mesosCallFactory, masterDomainInfo, initialState, metrics)
 
@@ -75,12 +75,32 @@ private[core] class SchedulerLogicGraph(
           pushOrQueueIntents(handler.handleMesosEvent(grab(mesosEventsInlet)))
           maybePull()
         }
+
+        override def onUpstreamFinish() = {
+          log.info("Mesos events finished")
+          super.onUpstreamFinish()
+        }
+
+        override def onUpstreamFailure(ex: Throwable): Unit = {
+          log.error("Mesos events failed", ex)
+          super.onUpstreamFailure(ex)
+        }
       })
 
       setHandler(schedulerCommandsInlet, new InHandler {
         override def onPush(): Unit = {
           pushOrQueueIntents(handler.handleCommand(grab(schedulerCommandsInlet)))
           maybePull()
+        }
+
+        override def onUpstreamFinish() = {
+          log.info("Scheduler commands finished")
+          super.onUpstreamFinish()
+        }
+
+        override def onUpstreamFailure(ex: Throwable): Unit = {
+          log.error("Scheduler commands failed", ex)
+          super.onUpstreamFailure(ex)
         }
       })
 
@@ -103,8 +123,10 @@ private[core] class SchedulerLogicGraph(
           if (pendingEffects.nonEmpty) {
             throw new IllegalStateException("We should always immediately push on pull if effects are queued")
           }
+          log.info(s"Push pending effects $effects")
           push(frameResultOutlet, effects)
         } else {
+          log.info(s"Queue pending effects $effects")
           pendingEffects.enqueue(effects)
         }
         maybePull()
