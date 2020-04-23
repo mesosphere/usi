@@ -61,7 +61,7 @@ class SchedulerFactory private (
   val frameworkInfo: FrameworkInfo = client.frameworkInfo
 
   override def newMesosFlow: Flow[MesosCall, MesosEvent, NotUsed] =
-    Flow.fromSinkAndSourceCoupled(logMesosCallException(client.mesosSink), client.mesosSource)
+    Flow.fromSinkAndSource(logMesosCallException(client.mesosSink), client.mesosSource)
 
   def newSchedulerFlow(): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] =
     Scheduler.asFlow(this)
