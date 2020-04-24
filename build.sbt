@@ -39,7 +39,7 @@ lazy val `root` = (project in file("./"))
   .settings(
     commonSettings,
     publish / skip := true)
-  .enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
+  .enablePlugins(ScalaUnidocPlugin, GhpagesPlugin, JekyllPlugin)
   .settings(
     // Documentation
     siteSourceDirectory := target.value / "docs",
