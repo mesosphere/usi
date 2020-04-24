@@ -38,6 +38,7 @@ lazy val `root` = (project in file("./"))
   .settings(
     commonSettings,
     publish / skip := true)
+  .enablePlugins(ScalaUnidocPlugin)
   .aggregate(
     `core-models`,
     `metrics`,

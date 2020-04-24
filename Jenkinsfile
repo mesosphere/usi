@@ -33,7 +33,7 @@ pipeline {
       }
 
       steps {
-     	sh 'sbt +publish' 
+        sh 'sbt +publish unidoc'
       }
     }
   }
