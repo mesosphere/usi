@@ -1,4 +1,5 @@
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+import com.typesafe.sbt.SbtGit.GitKeys._
 
 val commonSettings = Seq(
   organization := "com.mesosphere.usi",
@@ -38,7 +39,14 @@ lazy val `root` = (project in file("./"))
   .settings(
     commonSettings,
     publish / skip := true)
-  .enablePlugins(ScalaUnidocPlugin)
+  .enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
+  .settings(
+    // Documentation
+    siteSourceDirectory := target.value / "docs",
+    siteSubdirName in ScalaUnidoc := "api",
+    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
+    gitRemoteRepo := "git@github.com:mesosphere/usi.git"
+  )
   .aggregate(
     `core-models`,
     `metrics`,
