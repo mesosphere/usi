@@ -43,6 +43,10 @@ lazy val `root` = (project in file("./"))
   .settings(
     // Documentation
     sourceDirectory in (Compile, paradox) := baseDirectory.value / "docs",
+    Compile / paradoxMaterialTheme := {
+      ParadoxMaterialTheme()
+        .withRepository(uri("https://github.com/mesosphere/usi"))
+    },
     siteSubdirName in ScalaUnidoc := "api",
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
     gitRemoteRepo := "git@github.com:mesosphere/usi.git"
