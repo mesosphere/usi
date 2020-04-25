@@ -39,11 +39,10 @@ lazy val `root` = (project in file("./"))
   .settings(
     commonSettings,
     publish / skip := true)
-  .enablePlugins(ScalaUnidocPlugin, GhpagesPlugin, ParadoxSitePlugin)
+  .enablePlugins(ScalaUnidocPlugin, GhpagesPlugin, ParadoxSitePlugin, ParadoxMaterialThemePlugin)
   .settings(
     // Documentation
-    paradoxTheme := Some(builtinParadoxTheme("generic")),
-    paradox / sourceDirectory := baseDirectory.value / "docs",
+    //paradox / sourceDirectory := baseDirectory.value / "docs",
     siteSubdirName in ScalaUnidoc := "api",
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
     gitRemoteRepo := "git@github.com:mesosphere/usi.git"

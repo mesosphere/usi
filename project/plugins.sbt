@@ -5,3 +5,5 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.3")
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.4.0")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.12")
 addSbtPlugin("ohnosequences" % "sbt-s3-resolver" % "0.19.0")
+
+addSbtPlugin("io.github.jonas" % "sbt-paradox-material-theme" % "0.6.0")
