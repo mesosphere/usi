@@ -24,7 +24,10 @@ pipeline {
 
     stage("Publish Packages") {
       agent {
-        label "jdk8-scala"
+        docker {
+          image 'mesosphere/scala-sbt:marathon'
+          label 'large'
+        }
       }
 
       environment {
@@ -39,7 +42,10 @@ pipeline {
     }
     stage('Publish Documentation') {
       agent {
-        label "jdk8-scala"
+        docker {
+          image 'mesosphere/scala-sbt:marathon'
+          label 'large'
+        }
       }
         // TODO: enable later
 //      when {
