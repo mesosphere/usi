@@ -45,6 +45,7 @@ pipeline {
         docker {
           image 'mesosphere/scala-sbt:marathon'
           label 'large'
+          args '-u root'
         }
       }
         // TODO: enable later
