@@ -52,13 +52,12 @@ lazy val docs = (project in file("./docs"))
     gitRemoteRepo := "git@github.com:mesosphere/usi.git",
     ghpagesNoJekyll := true,
 
-    Compile / paradoxMaterialTheme := {
-      ParadoxMaterialTheme()
-        .withColor("deep-purple", "indigo")
-        .withRepository(uri("https://github.com/mesosphere/usi"))
+    ParadoxMaterialThemePlugin.paradoxMaterialThemeSettings(Paradox),
+    // TODO: These settings do not work yet
+    Compile / paradoxMaterialTheme ~= {
+      _.withColor("green", "indigo")
+       .withRepository(uri("https://github.com/mesosphere/usi"))
     },
-
-    SiteScaladocPlugin.scaladocSettings(Core, mappings in (Compile, packageDoc) in core, "api/core"),
   )
 
 val Core= config("core")
