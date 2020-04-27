@@ -47,7 +47,7 @@ pipeline {
       steps {
         // mesosphere-ci (mesosphere-ci on Github)
         sshagent(credentials: ['4ff09dce-407b-41d3-847a-9e6609dd91b8']) {
-          sh 'docs/makeSite'
+          sh 'sbt docs/ghpagesPushSite'
         }
       }
     }

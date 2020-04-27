@@ -50,7 +50,11 @@ lazy val docs = (project in file("./docs"))
 
     name := "USI - Unified Scheduler Interface",
     gitRemoteRepo := "git@github.com:mesosphere/usi.git",
+
+    SiteScaladocPlugin.scaladocSettings(Core, mappings in (Compile, packageDoc) in core, "api/core"),
   )
+
+val Core= config("core")
 
 lazy val `root` = (project in file("./"))
   .enablePlugins(ScalaUnidocPlugin)
