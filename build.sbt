@@ -54,6 +54,7 @@ lazy val docs = (project in file("./docs"))
 
     Compile / paradoxMaterialTheme := {
       ParadoxMaterialTheme()
+        .withColor("deep-purple", "indigo")
         .withRepository(uri("https://github.com/mesosphere/usi"))
     },
 
