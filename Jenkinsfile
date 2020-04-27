@@ -42,11 +42,7 @@ pipeline {
     }
     stage('Publish Documentation') {
       agent {
-        docker {
-          image 'hseeberger/scala-sbt:8u252_1.3.10_2.13.2'
-          label 'large'
-          args '-u root'
-        }
+        label 'JenkinsMarathonCI-Debian9-2020-01-14'
       }
         // TODO: enable later
 //      when {
@@ -54,11 +50,11 @@ pipeline {
 //      }
       steps {
         sshagent(credentials: ['mesosphereci-github']) {
-          sh 'git config --global user.name "MesosphereCI Robot"'
-          sh 'git config --global user.email "mesosphere-ci@users.noreply.github.com"'
-          sh 'git config core.sshCommand "ssh -v -o StrictHostKeyChecking=no"'
-          sh 'rm -r ~/.sbt/ghpages/ || true'
-          sh 'sbt docs/ghpagesPushSite'
+          sh 'sudo git config --global user.name "MesosphereCI Robot"'
+          sh 'sudo git config --global user.email "mesosphere-ci@users.noreply.github.com"'
+          sh 'sudo git config core.sshCommand "ssh -v -o StrictHostKeyChecking=no"'
+          sh 'sudo rm -r ~/.sbt/ghpages/ || true'
+          sh 'sudo sbt docs/ghpagesPushSite'
         }
       }
     }
