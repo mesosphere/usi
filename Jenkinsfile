@@ -43,7 +43,7 @@ pipeline {
     stage('Publish Documentation') {
       agent {
         docker {
-          image 'mesosphere/scala-sbt:marathon'
+          image 'hseeberger/scala-sbt:8u252_1.3.10_2.13.2'
           label 'large'
         }
       }
