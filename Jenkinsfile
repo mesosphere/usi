@@ -34,6 +34,7 @@ pipeline {
 
       steps {
         sh 'sbt +publish unidoc'
+        sh 'docs/makeSite'
       }
     }
   }
