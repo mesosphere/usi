@@ -46,9 +46,10 @@ pipeline {
 //        branch 'master'
 //      }
       steps {
-        // mesosphere-ci (mesosphere-ci on Github)
+        // mesosphere-ci (mesosphere-ci on Github) mesosphereci-github
         sshagent(credentials: ['4ff09dce-407b-41d3-847a-9e6609dd91b8']) {
           sh 'git branch'
+          sh 'rm -r ~/.sbt/ghpages/'
           sh 'sbt docs/ghpagesPushSite'
         }
       }

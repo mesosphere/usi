@@ -52,6 +52,11 @@ lazy val docs = (project in file("./docs"))
     gitRemoteRepo := "git@github.com:mesosphere/usi.git",
     ghpagesNoJekyll := true,
 
+    Compile / paradoxMaterialTheme := {
+      ParadoxMaterialTheme()
+        .withRepository(uri("https://github.com/mesosphere/usi"))
+    },
+
     SiteScaladocPlugin.scaladocSettings(Core, mappings in (Compile, packageDoc) in core, "api/core"),
   )
 

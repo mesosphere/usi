@@ -1,6 +1,8 @@
 @@@ index
 
 * [Code Culture](code-culture.md)
+* API Documentation
+  * [Core](api/core)
 
 @@@
 
