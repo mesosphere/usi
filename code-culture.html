@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="description" content="Hello Project">
+<meta name="generator" content="Paradox, paradox-material-theme=0.6.0, mkdocs-material=3.0.3">
+
+<meta name="lang:clipboard.copy" content="Copy to clipboard">
+<meta name="lang:clipboard.copied" content="Copied to clipboard">
+<meta name="lang:search.language" content="">
+<meta name="lang:search.pipeline.stopwords" content="true">
+<meta name="lang:search.pipeline.trimmer" content="true">
+<meta name="lang:search.result.none" content="No matching documents">
+<meta name="lang:search.result.one" content="1 matching document">
+<meta name="lang:search.result.other" content="# matching documents">
+<meta name="lang:search.tokenizer" content="[\s\-]+">
+
+
+<meta name="description" content="Hello Project">
+<link rel="shortcut icon" href="assets/images/favicon.png">
+<title>Code Culture · Unified Scheduler Interface</title>
+<link rel="stylesheet" href="assets/stylesheets/application.451f80e5.css">
+<link rel="stylesheet" href="lib/material__tabs/dist/mdc.tabs.min.css">
+<link rel="stylesheet" href="lib/prettify/prettify.css">
+<script src="assets/javascripts/modernizr.1aa3b519.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+<style>
+body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}
+code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
+</style>
+<link rel="stylesheet" href="assets/fonts/font-awesome.css">
+<link rel="stylesheet" href="assets/fonts/material-icons.css">
+<link rel="stylesheet" href="assets/stylesheets/paradox-material-theme.css">
+</head>
+<body
+>
+<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+<input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+<label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+<header class="md-header" data-md-component="header">
+<nav class="md-header-nav md-grid">
+<div class="md-flex">
+<div class="md-flex__cell md-flex__cell--shrink">
+<a href="index.html" title="Unified Scheduler Interface" class="md-header-nav__button md-logo">
+<i class="md-icon">local_library</i>
+</a>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+</div>
+<div class="md-flex__cell md-flex__cell--stretch">
+<div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+<span class="md-header-nav__topic">
+Unified Scheduler Interface
+</span>
+<span class="md-header-nav__topic">
+Code Culture
+</span>
+</div>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+<label class="md-icon md-search__icon" for="__search"></label>
+<button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">&#xE5CD;</button>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix>
+<div class="md-search-result" data-md-component="result">
+<div class="md-search-result__meta">
+Type to start searching
+</div>
+<ol class="md-search-result__list"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</nav>
+</header>
+
+<div class="md-container">
+<main class="md-main">
+<div class="md-main__inner md-grid" data-md-component="container">
+<div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--primary" data-md-level="0" style="visibility: hidden">
+<label class="md-nav__title md-nav__title--site" for="drawer">
+<a href="index.html" title="Unified Scheduler Interface" class="md-nav__button md-logo">
+<span class="md-nav__button md-logo">
+<i class="md-icon">local_library</i>
+</a>
+<a href="index.html" title="Unified Scheduler Interface">
+Unified Scheduler Interface
+</a>
+</label>
+<ul>
+  <li><a href="code-culture.html" class="active page">Code Culture</a></li>
+</ul>
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="code-culture.html#code-culture" class="header">Code Culture</a>
+  <ul>
+    <li><a href="code-culture.html#overview" class="header">Overview</a></li>
+    <li><a href="code-culture.html#code-is-legible-on-github" class="header">Code is Legible on GitHub</a></li>
+    <li><a href="code-culture.html#immutability-over-mutability" class="header">Immutability Over Mutability</a></li>
+    <li><a href="code-culture.html#no-smelly-code" class="header">No Smelly Code</a></li>
+    <li><a href="code-culture.html#fail-loud-and-proud" class="header">Fail Loud and Proud</a></li>
+    <li><a href="code-culture.html#let-it-crash" class="header">Let it Crash</a></li>
+    <li><a href="code-culture.html#dont-panic" class="header">Don&rsquo;t Panic</a></li>
+    <li><a href="code-culture.html#structured-logging" class="header">Structured logging</a></li>
+    <li><a href="code-culture.html#testing" class="header">Testing</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</nav>
+<ul style="display: none">
+<li class="md-nav__item md-version" id="project.version">
+<label class="md-nav__link" for="__version">
+<i class="md-icon" title="Version">label_outline</i> 0.1.0*
+</label>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="code-culture.html#code-culture" class="header">Code Culture</a>
+  <ul>
+    <li><a href="code-culture.html#overview" class="header">Overview</a></li>
+    <li><a href="code-culture.html#code-is-legible-on-github" class="header">Code is Legible on GitHub</a></li>
+    <li><a href="code-culture.html#immutability-over-mutability" class="header">Immutability Over Mutability</a></li>
+    <li><a href="code-culture.html#no-smelly-code" class="header">No Smelly Code</a></li>
+    <li><a href="code-culture.html#fail-loud-and-proud" class="header">Fail Loud and Proud</a></li>
+    <li><a href="code-culture.html#let-it-crash" class="header">Let it Crash</a></li>
+    <li><a href="code-culture.html#dont-panic" class="header">Don&rsquo;t Panic</a></li>
+    <li><a href="code-culture.html#structured-logging" class="header">Structured logging</a></li>
+    <li><a href="code-culture.html#testing" class="header">Testing</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</div>
+</div>
+</div>
+<div class="md-content">
+<article class="md-content__inner md-typeset">
+<div class="md-content__searchable">
+<h1><a href="#code-culture" name="code-culture" class="anchor"><span class="anchor-link"></span></a>Code Culture</h1>
+<h2><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h2>
+<p>The code culture is a set of defaults ascribed to by the Orchestration developer team. Since writing software is an optimization problem, we guide our design decisions with defaults, not rules. Deviations from our defaults require justification.</p>
+<p>Our defaults are:</p>
+<ul>
+  <li>Code is legible on GitHub</li>
+  <li>Immutability over mutability</li>
+  <li>No smelly code</li>
+  <li>Fail loud and proud</li>
+  <li>Let it crash</li>
+  <li>Don&rsquo;t panic</li>
+  <li>Structured logging</li>
+</ul>
+<h2><a href="#code-is-legible-on-github" name="code-is-legible-on-github" class="anchor"><span class="anchor-link"></span></a>Code is Legible on GitHub</h2>
+<p>This default speaks to the desire to write code that can be understood without needing an IDE. USI is written in Scala, so our defaults are specific as such.</p>
+<h3><a href="#on-implicits" name="on-implicits" class="anchor"><span class="anchor-link"></span></a>On Implicits</h3>
+<p>Implicits are an important feature in Scala and are critical for the implementation of type-classes and DSLs.</p>
+<p>Prefer:</p>
+<ul>
+  <li>Explicit conversion over implicit</li>
+  <li>Explicit passing over implicit</li>
+</ul>
+<p>For our case, if implicits don&rsquo;t help improve the design of code, we don&rsquo;t use them. We avoid implicit conversions. We also avoid multi-priority implicits. When type classes help improve the design of code, we use implicits for type classes (IE serialization logic).</p>
+<p>We prefer implicits to be used for contextual values such as execution contexts or the actor system. However, we prefer to be conservative, and pass the value explicitly for things like validators, authenticators, and normalizers.</p>
+<h3><a href="#on-type-inference" name="on-type-inference" class="anchor"><span class="anchor-link"></span></a>On Type Inference</h3>
+<p>If you are writing some function chain that has multiple levels of inferred function parameter types, we prefer to specify the parameter types.</p>
+<p>Prefer:</p>
+<pre class="prettyprint"><code class="language-scala">groups.map { group: Group =&gt;
+  group.apps
+    .groupBy(_.container.image)
+    .map { case (image: String, apps: Seq[App]) =&gt;
+      image -&gt; apps.length
+    }
+  }
+</code></pre>
+<p>Over:</p>
+<pre class="prettyprint"><code class="language-scala">groups.map { group =&gt;
+  group.apps.groupBy(_.container.image).map { case(k, v) =&gt;
+    k -&gt; v.length
+  }
+}
+</code></pre>
+<h3><a href="#on-playing-code-golf" name="on-playing-code-golf" class="anchor"><span class="anchor-link"></span></a>On Playing Code Golf</h3>
+<p>Code golf is a game in which you implement some program in as few characters as possible.</p>
+<p>We prefer not to play this game when working on USI. Instead, we focus on removing noise (boilerplate), while preserving valuable signal pertaining to the problem at hand.</p>
+<h3><a href="#on-imports" name="on-imports" class="anchor"><span class="anchor-link"></span></a>On Imports</h3>
+<p>We prefer, almost always, that imports go at the top of the file. Additionally, prefer explicit imports over wildcard imports.</p>
+<p>Prefer:</p>
+<pre class="prettyprint"><code class="language-scala">import org.company.{
+  Stringifier,
+  Demuxer
+}
+</code></pre>
+<p>Over:</p>
+<pre class="prettyprint"><code class="language-scala">import org.company._
+</code></pre>
+<h2><a href="#immutability-over-mutability" name="immutability-over-mutability" class="anchor"><span class="anchor-link"></span></a>Immutability Over Mutability</h2>
+<p>Functional programming is what follows when you don&rsquo;t mutate state. We prefer it, except in performance critical parts of our code.</p>
+<p>We have a strong preference to encapsulate mutable state. References to data crossing the boundary of some module should be immutable.</p>
+<h2><a href="#no-smelly-code" name="no-smelly-code" class="anchor"><span class="anchor-link"></span></a>No Smelly Code</h2>
+<p>We pay attention to <a href="https://en.wikipedia.org/wiki/Code_smell">code smells</a> and strive to write well encapsulated code.</p>
+<ul>
+  <li>A method should not receive more data than it needs to do its job.</li>
+  <li>Changing some behavior should not result in &ldquo;shotgun surgery&rdquo;</li>
+</ul>
+<h3><a href="#on-todos" name="on-todos" class="anchor"><span class="anchor-link"></span></a>On TODOs</h3>
+<p>TODOs are as liberally used as they are ignored. TODOs should be only used for one of two reasons:</p>
+<ol>
+  <li>Things you plan to do before merging</li>
+  <li>Things that are definitely planned in the near future (with a high-priority JIRA)</li>
+</ol>
+<p>Instead of a TODO, prefer:</p>
+<ul>
+  <li>Code that fails (e.g. throw a not-implemented exception)</li>
+  <li>A comment describing the pitfalls of the implementation (e.g. this code does not perform very well, or, this code is prone to bugs from possible rounding errors)</li>
+</ul>
+<h2><a href="#fail-loud-and-proud" name="fail-loud-and-proud" class="anchor"><span class="anchor-link"></span></a>Fail Loud and Proud</h2>
+<p>It is better to do nothing, than to do the wrong thing.</p>
+<p>One of my favorite non-examples of this is found in PHP 5:</p>
+<pre class="prettyprint"><code class="language-bash">$ echo &#39;&lt;? print(strftime(&quot;%Y-%m-%d&quot;,strtotime(&quot;lol&quot;))) ?&gt;&#39; | php
+1970-01-01
+</code></pre>
+<p>Another non-example is found in Marathon&rsquo;s history. At one point in time, the storage layer would swallow the exception and return <code>None</code> if it could not deserialize some entity successfully, and this led to data loss.</p>
+<p>We are strict in what we accept, and in what we emit. If input is not what we expect, don&rsquo;t be fancy.</p>
+<p>Fail loudly. Fail proudly.</p>
+<h2><a href="#let-it-crash" name="let-it-crash" class="anchor"><span class="anchor-link"></span></a>Let it Crash</h2>
+<p>We prefer to focus on state recovery, and not graceful tear down. We&rsquo;d prefer to just crash and restart, rather than implement many complex error recovery handlers.</p>
+<h2><a href="#dont-panic" name="dont-panic" class="anchor"><span class="anchor-link"></span></a>Don&rsquo;t Panic</h2>
+<p>We prefer to that Exceptions are thrown only when something goes unexpectedly wrong outside of domain of the library.</p>
+<p>For example:</p>
+<ul>
+  <li>A validation function should return validation errors, not throw them.</li>
+  <li>A storage module will throw an exception if a connection is unavailable.</li>
+</ul>
+<h2><a href="#structured-logging" name="structured-logging" class="anchor"><span class="anchor-link"></span></a>Structured logging</h2>
+<p>Debugging distributed system is hard. To make this at least a bit easier we favor log messages including logging context (using structured logging). Core USI is providing all necessary tooling for framework developer to log in structured way.</p>
+<p>For introduction to structured logging read <a href="https://stackify.com/what-is-structured-logging-and-why-developers-need-it/">this article</a>.</p>
+<p>All relevant ids should be part of the logging message e.g.:</p>
+<ul>
+  <li>pod ID (&ldquo;podId&rdquo;)</li>
+  <li>mesos task ID (&ldquo;taskId&rdquo;)</li>
+  <li>mesos offer ID (&ldquo;offerId&rdquo;)</li>
+</ul>
+<p>It&rsquo;s important to keep the naming of keys consistent so that one can use them for log pre-selection.</p>
+<p>Even though structured logging is strongly recommended to every framework developer, including context into the final log message is always optional. We should aim for keeping our messages meaningful even without the context provided (it&rsquo;s ok to duplicate e.g. podId both in messaage and context).</p>
+<p>Example of good framework log messages (a little bit simplified) can look like example below:</p>
+<pre class="prettyprint"><code class="language-json">{
+  &quot;time&quot;: &quot;1.1.1970&quot;,
+  &quot;level&quot;: &quot;INFO&quot;,
+  &quot;podId&quot;: &quot;my-pod&quot;,
+  &quot;taskId&quot;: &quot;mesos-task-my-pod-1&quot;,
+  &quot;message&quot;: &quot;Task $taskId of Pod $podId was killed&quot;
+}
+</code></pre>
+<h2><a href="#testing" name="testing" class="anchor"><span class="anchor-link"></span></a>Testing</h2>
+<p>Tests are executable documentation and should be <strong>written, read and maintained</strong> as such. A test tells its reader a short story about how some part of the system should behave given a certain input. Hundreds of excellent books and articles are dedicated to writing proper tests, so we&rsquo;ll try to avoid repeating them here, however:</p>
+<ul>
+  <li>Choose the lightest testing mechanism that suits the need; if something can be tested well at a unit level, then test there first. IE: An integration test might check that a validation error is properly returned via the API, but a unit test should check the 20 different ways a validation fails.</li>
+  <li>Avoid mocks/stubbing. Mocks are often a code smell that happens when effects are coupled with business logic, and the tests often look too much like the implementation. If we separate our effects then we don&rsquo;t need mocks. Preference for fake implementations of interfaces (IE MockMesos flow) over &ldquo;method X should be invoked once with param Y and return Z&rdquo;.</li>
+</ul>
+<h3><a href="#on-libraries-and-styles" name="on-libraries-and-styles" class="anchor"><span class="anchor-link"></span></a>On Libraries and Styles</h3>
+<p>We heavily utilize <a href="http://www.scalatest.org/">ScalaTest</a> as our primary test library. All tests should implement the UnitTest class in test-utils, which uses <a href="http://www.scalatest.org/at_a_glance/WordSpec">WordSpec</a>.</p>
+<pre class="prettyprint"><code class="language-scala">  // The number of nested levels is dependent on your test case.
+  // For most tests one or two are levels are enough.
+  // Describe a scope for a subject, in this case: &quot;An empty Set&quot;
+  &quot;An empty Set&quot; should { // All tests within these curly braces are about &quot;A Set&quot;
+
+        &quot;have size 0&quot; in {    // Here, &#39;it&#39; refers to &quot;A Set (when empty)&quot;. The full name
+          Set.empty.size shouldBe 0 // of this test is: &quot;A Set (when empty) should have size 0
+      }
+      ...
+</code></pre>
+<p>combined with <a href="http://www.scalatest.org/getting_started_with_feature_spec">Given, When, And Then</a> and scala <a href="http://www.scalatest.org/user_guide/using_matchers">matchers</a>:</p>
+<pre class="prettyprint"><code class="language-scala">  &quot;A mutable Set&quot; should
+
+    &quot;allow an element to be added&quot; in {
+      Given(&quot;an empty mutable Set&quot;)
+      val set = mutable.Set.empty[String]
+
+      When(&quot;an element is added&quot;)
+      set += &quot;clarity&quot;
+
+      Then(&quot;the Set should have size 1&quot;)
+      set.size shouldBe 1
+
+      And(&quot;the Set should contain the added element&quot;)
+      set should contain theSameElementsAs Set(&quot;clarity&quot;)
+    }
+  }
+</code></pre>
+<p>which give us an opportunity to write a test as a short story documenting part of the system behaviour.</p>
+<h3><a href="#on-testing-granularity" name="on-testing-granularity" class="anchor"><span class="anchor-link"></span></a>On Testing Granularity</h3>
+<p>In USI we define following granularity levels:</p>
+<ul>
+  <li><strong>Unit tests</strong>: the lowest test level possible. Unit test are cheap, can be run fast and give the developer an immediate feedback on when something is obviously broken</li>
+  <li><strong>Integration tests</strong>: an integration test starts a minimal Mesos cluster consisting of Mesos master, Mesos agent, in-memory Zookeeper server and a framework. These are more expensive tests that typically require more resources and time to run. Tests that require back and forth communication with Mesos are best placed here because we don&rsquo;t want to mock Mesos responses.</li>
+  <li><strong>System integraiton test</strong>: here we start a full-blown DC/OS cluster testing all aspects of framework interacting with the DC/OS ecosystem. These are the most expensive tests (in terms of time and money) that would typically reqire a DC/OS cluster running on e.g. AWS utilizing multiple EC2 nodes, volumes, ELB etc. A system integration test would typically cover some coarse-grained USI feature or a feature that relies on other DC/OS components like the secret store.</li>
+</ul>
+<p><strong>As a rule of thumb, a broken behavior should fail at the lowest possible level</strong>. Most features will be covered on more than one level but the coverage is different. Let&rsquo;s consider support for <a href="http://mesos.apache.org/documentation/latest/fetcher/">Mesos fetcher</a> as an example. In preparation to run a task, the Mesos fetcher downloads resources into the task&rsquo;s sandbox directory. So how do the tests look like?</p>
+<ul>
+  <li><strong>Unit test</strong>: makes sure that given a <code>PodSpec</code> with a defined fetch URI it is converted to a Mesos protobuf message, where correspoding <a href="https://github.com/apache/mesos/blob/master/include/mesos/mesos.proto#L658">URI</a> fields are initialized properly</li>
+  <li><strong>Integration test</strong>: makes sure that when a task from a <code>PodSpec</code> is started, the fetched artifact is actually part of its sandbox</li>
+  <li><strong>System integration test</strong>: this is a tricky one; do we need full DC/OS cluster to test this? How is this different from the integration test from the fetchers perspective? The simple answer is that it&rsquo;s not, and an integration test might be sufficient enough.</li>
+</ul>
+<p>However consider the following aspects (which are all taken from prior experience building Mesos frameworks):</p>
+<ul>
+  <li>While an integration test usually starts some stable Mesos version on which USI officially depends, DC/OS frequently integrates the latest Mesos changes into its master branch. Testing a framework against the latest DC/OS master might expose a bug sooner rather than later.</li>
+  <li>An integration test runs against a local Mesos cluster where communication is typically fast and reliable. A system integration test runs against a cluster somewhere in the cloud, and has a different communications profile. In the past, we&rsquo;ve seen bugs that would only manifest themselves in the latter case, but not in the former. Admittedly, it seems unlikely that such a bug is triggered in the Mesos fetcher; however, we&rsquo;ve seen unlikely things happen before.</li>
+  <li>Even a simple request to the framework running on a DC/OS cluster touches many components on its way (e.g. ELB, Admin Router, Monitoring service which themselves rely on other components, such as Admin Router relying on CockroachDB), so there is always potential for things to go wrong.</li>
+</ul>
+<p>It makes sense to have a system integration test for every user-facing coarse-grained API feature, including the example above.</p>
+</div>
+<div class="print-only">
+<span class="md-source-file md-version">
+0.1.0*
+</span>
+</div>
+</article>
+</div>
+</div>
+</main>
+<footer class="md-footer">
+<div class="md-footer-nav">
+<nav class="md-footer-nav__inner md-grid">
+<a href="index.html" title="Unified Scheduler Interface" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<div class="md-flex__cell md-flex__cell--shrink">
+<i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+</div>
+<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+<span class="md-flex__ellipsis">
+<span class="md-footer-nav__direction">
+Previous
+</span>
+Unified Scheduler Interface
+</span>
+</div>
+</a>
+</nav>
+</div>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-footer-copyright">
+Powered by
+<a href="https://github.com/lightbend/paradox">Paradox</a>
+and
+<a href="https://jonas.github.io/paradox-material-theme/">Paradox Material Theme</a>
+
+</div>
+</div>
+</div>
+</footer>
+
+</div>
+<script src="assets/javascripts/application.583bbe55.js"></script>
+<script src="assets/javascripts/paradox-material-theme.js"></script>
+<script>app.initialize({version:"0.17",url:{base:"."}})</script>
+<script type="text/javascript" src="lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+window.prettyPrint && prettyPrint();
+});
+</script>
+</body>
+</html>
