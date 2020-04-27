@@ -1,6 +1,8 @@
 @@@ index
 
-* [Code Culture](code-culture.md)
+* [Getting Started](getting-started.md)
+* [Contributing](contributing/index.md)
+* [Examples](examples/index.md)
 
 @@@
 

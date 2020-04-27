@@ -49,7 +49,7 @@ lazy val docs = (project in file("./docs"))
     publish / skip := true,
 
     name := "USI - Unified Scheduler Interface",
-    gitRemoteRepo := "git@github.com:mesosphere/usi.git",
+    gitRemoteRepo := "https://github.com/mesosphere/usi",
     ghpagesNoJekyll := true,
 
     ParadoxMaterialThemePlugin.paradoxMaterialThemeSettings(Paradox),
