@@ -22,6 +22,7 @@ import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.scalatest.Inside
 
 import scala.concurrent.duration._
+import scala.util.Try
 
 class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with Inside {
   override def materializerSettings = super.materializerSettings.withDebugLogging(true)
@@ -137,18 +138,11 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     mesosCluster.masters.foreach(_.stop())
 
     Then("The stream terminates")
-    val completion = input.watchCompletion().futureValue
-    logger.info(s"Watch completion returned $completion")
-    //completion.getMessage should be("I failed")
+    input.watchCompletion().futureValue
 
-    And("The next command should fail")
-    val offerResult = input.offer(commands.KillPod(PodId("unknown-pod-2"))).failed.futureValue
-    //offerResult.getMessage should be("foot")
-//    inside(offerResult) {
-//      case QueueOfferResult.Failure(cause) => cause.getMessage should be("foo")
-//    }
-
-    val pullResult = output.pull().failed.futureValue
-    logger.info(s"Received USI event $pullResult")
+    eventually {
+      val pullResult = Try(output.pull().futureValue)
+      pullResult.isFailure should be(true)
+    }
   }
 }
