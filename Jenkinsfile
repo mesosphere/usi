@@ -48,7 +48,8 @@ pipeline {
       steps {
         // mesosphere-ci (mesosphere-ci on Github) mesosphereci-github
         sshagent(credentials: ['4ff09dce-407b-41d3-847a-9e6609dd91b8']) {
-          sh 'git branch'
+          sh 'git config --global user.name "MesosphereCI Robot"'
+          sh 'git config --global user.email "mesosphere-ci@users.noreply.github.com"'
           sh 'rm -r ~/.sbt/ghpages/ || true'
           sh 'sbt docs/ghpagesPushSite'
         }
