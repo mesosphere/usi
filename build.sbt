@@ -36,28 +36,27 @@ val commonSettings = Seq(
 )
 
 lazy val docs = (project in file("./docs"))
-  .enablePlugins(GhpagesPlugin, ParadoxSitePlugin, ParadoxMaterialThemePlugin)
+  .enablePlugins(GhpagesPlugin, ParadoxSitePlugin, ParadoxMaterialThemePlugin, ScalaUnidocPlugin)
   .settings(
+    version := {
+      import sys.process._
+
+      ("./version" !!).trim
+    },
+
     s3credentials := DefaultAWSCredentialsProviderChain.getInstance(),
     s3region :=  com.amazonaws.services.s3.model.Region.US_Standard,
     publish / skip := true,
+
     name := "USI - Unified Scheduler Interface",
-    gitRemoteRepo := "git@github.com:mesosphere/usi.git"
+    gitRemoteRepo := "git@github.com:mesosphere/usi.git",
   )
 
 lazy val `root` = (project in file("./"))
+  .enablePlugins(ScalaUnidocPlugin)
   .settings(
     commonSettings,
     publish / skip := true)
-  .settings(
-    // Documentation
-//    Compile / paradoxMaterialTheme := {
-//      ParadoxMaterialTheme()
-//        .withRepository(uri("https://github.com/mesosphere/usi"))
-//    },
-//    siteSubdirName in ScalaUnidoc := "api",
-//    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
-  )
   .aggregate(
     `core-models`,
     `metrics`,
