@@ -22,7 +22,7 @@ pipeline {
       }
     }
 
-    stage("Publish") {
+    stage("Publish Packages") {
       agent {
         label "jdk8-scala"
       }
@@ -34,7 +34,21 @@ pipeline {
 
       steps {
         sh 'sbt +publish unidoc'
-        sh 'docs/makeSite'
+      }
+    }
+    stage('Publish Documentation') {
+      agent {
+        label "jdk8-scala"
+      }
+        // TODO: enable later
+//      when {
+//        branch 'master'
+//      }
+      steps {
+        // mesosphere-ci (mesosphere-ci on Github)
+        sshagent(credentials: ['4ff09dce-407b-41d3-847a-9e6609dd91b8']) {
+          sh 'docs/makeSite'
+        }
       }
     }
   }

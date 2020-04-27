@@ -1,5 +1,5 @@
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-//import com.typesafe.sbt.SbtGit.GitKeys._
+import com.typesafe.sbt.SbtGit.GitKeys._
 
 val commonSettings = Seq(
   organization := "com.mesosphere.usi",
@@ -36,12 +36,13 @@ val commonSettings = Seq(
 )
 
 lazy val docs = (project in file("./docs"))
-  .enablePlugins(ParadoxSitePlugin, ParadoxMaterialThemePlugin)
+  .enablePlugins(GhpagesPlugin, ParadoxSitePlugin, ParadoxMaterialThemePlugin)
   .settings(
     s3credentials := DefaultAWSCredentialsProviderChain.getInstance(),
     s3region :=  com.amazonaws.services.s3.model.Region.US_Standard,
     publish / skip := true,
     name := "USI - Unified Scheduler Interface",
+    gitRemoteRepo := "git@github.com:mesosphere/usi.git"
   )
 
 lazy val `root` = (project in file("./"))
@@ -50,14 +51,12 @@ lazy val `root` = (project in file("./"))
     publish / skip := true)
   .settings(
     // Documentation
-//    sourceDirectory in (Compile, paradox) := baseDirectory.value / "docs",
 //    Compile / paradoxMaterialTheme := {
 //      ParadoxMaterialTheme()
 //        .withRepository(uri("https://github.com/mesosphere/usi"))
 //    },
 //    siteSubdirName in ScalaUnidoc := "api",
 //    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
-//    gitRemoteRepo := "git@github.com:mesosphere/usi.git"
   )
   .aggregate(
     `core-models`,
