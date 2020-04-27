@@ -49,14 +49,14 @@ lazy val docs = (project in file("./docs"))
     publish / skip := true,
 
     name := "USI - Unified Scheduler Interface",
-    gitRemoteRepo := "https://github.com/mesosphere/usi",
+    gitRemoteRepo := "git@github.com:mesosphere/usi",
     ghpagesNoJekyll := true,
 
     ParadoxMaterialThemePlugin.paradoxMaterialThemeSettings(Paradox),
     // TODO: These settings do not work yet
     Compile / paradoxMaterialTheme ~= {
       _.withColor("green", "indigo")
-       .withRepository(uri("git@github.com:mesosphere/usi"))
+       .withRepository(uri("https://github.com/mesosphere/usi"))
     },
   )
 
