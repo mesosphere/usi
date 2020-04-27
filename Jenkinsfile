@@ -33,7 +33,8 @@ pipeline {
       }
 
       steps {
-        sh 'sbt +publish'
+        sh 'echo skip'
+    //    sh 'sbt +publish'
       }
     }
     stage('Publish Documentation') {
@@ -47,6 +48,7 @@ pipeline {
       steps {
         // mesosphere-ci (mesosphere-ci on Github)
         sshagent(credentials: ['4ff09dce-407b-41d3-847a-9e6609dd91b8']) {
+          sh 'git branch'
           sh 'sbt docs/ghpagesPushSite'
         }
       }

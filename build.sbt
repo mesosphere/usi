@@ -50,6 +50,7 @@ lazy val docs = (project in file("./docs"))
 
     name := "USI - Unified Scheduler Interface",
     gitRemoteRepo := "git@github.com:mesosphere/usi.git",
+    ghpagesNoJekyll := true,
 
     SiteScaladocPlugin.scaladocSettings(Core, mappings in (Compile, packageDoc) in core, "api/core"),
   )
