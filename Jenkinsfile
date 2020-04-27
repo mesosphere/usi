@@ -50,7 +50,7 @@ pipeline {
 //      }
       steps {
         sshagent(credentials: ['mesosphereci-github']) {
-          sh 'ssh -vT git@github.com'
+          sh 'ssh -vT git@github.com || true'
           sh 'git config --global user.name "MesosphereCI Robot"'
           sh 'git config --global user.email "mesosphere-ci@users.noreply.github.com"'
           sh 'git config core.sshCommand "ssh -v -o StrictHostKeyChecking=no"'
