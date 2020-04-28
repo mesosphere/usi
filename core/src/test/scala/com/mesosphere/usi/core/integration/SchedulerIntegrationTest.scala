@@ -2,7 +2,7 @@ package com.mesosphere.usi.core.integration
 
 import akka.event.Logging
 import akka.stream.scaladsl.{Keep, Sink}
-import akka.stream.{ActorMaterializer, Attributes, QueueOfferResult}
+import akka.stream.{ActorMaterializer, Attributes}
 import com.mesosphere.mesos.client.MesosClient
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.SchedulerFactory
