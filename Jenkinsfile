@@ -50,11 +50,14 @@ pipeline {
 //      }
       steps {
         sshagent(credentials: ['mesosphereci-github']) {
+	  // /home/admin/.cache was populated with sudo
           sh 'sudo chown -R admin /home/admin/.cache'
-          //sh 'git config --global user.name "MesosphereCI Robot"'
-          //sh 'git config --global user.email "mesosphere-ci@users.noreply.github.com"'
-          //sh 'git config core.sshCommand "ssh -v -o StrictHostKeyChecking=no"'
+	  
+	  // Clear cache.
           sh 'rm -r ~/.sbt/ghpages/ || true'
+
+          sh 'git config --global user.name "MesosphereCI Robot"'
+          sh 'git config --global user.email "mesosphere-ci@users.noreply.github.com"'
           sh 'sbt docs/ghpagesPushSite'
         }
       }
