@@ -38,11 +38,12 @@ pipeline {
     }
 
     stage('Publish Documentation') {
+      when {
+        beforeAgent true
+        branch 'master'
+      }
       agent {
         label 'JenkinsMarathonCI-Debian9-2020-01-14'
-      }
-      when {
-        branch 'master'
       }
       steps {
         sshagent(credentials: ['mesosphereci-github']) {
