@@ -22,6 +22,7 @@ import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.scalatest.Inside
 
 import scala.concurrent.duration._
+import scala.util.Try
 
 class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with Inside {
   override def materializerSettings = super.materializerSettings.withDebugLogging(true)
@@ -108,6 +109,40 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
             .taskStatuses(TaskId(podId.value))
             .getState shouldBe Protos.TaskState.TASK_RUNNING
       }
+    }
+  }
+
+  "terminates the stream when Mesos master dies" in {
+    Given("A Mesos client")
+    lazy val mesosClient: MesosClient = MesosClient(mesosClientSettings, frameworkInfo).runWith(Sink.head).futureValue
+    lazy val factory = SchedulerFactory(mesosClient, InMemoryPodRecordRepository(), schedulerSettings, DummyMetrics)
+    lazy val (_, schedulerFlow) = factory.newSchedulerFlow().futureValue
+    lazy val (input, output) = commandInputSource
+      .log("scheduler commands")
+      .via(schedulerFlow)
+      .log("scheduler events")
+      .toMat(Sink.queue())(Keep.both)
+      .withAttributes(Attributes
+        .logLevels(onElement = Logging.DebugLevel, onFinish = Logging.InfoLevel, onFailure = Logging.ErrorLevel))
+      .run
+
+    And("a first successful command.")
+    input.offer(commands.KillPod(PodId("unknown-pod-1"))).futureValue
+    inside(output.pull().futureValue.value) {
+      case PodSpecUpdatedEvent(PodId(idString), _) =>
+        idString should be("unknown-pod-1")
+    }
+
+    When("Mesos masters crash.")
+    logger.info("Kill Mesos masters.")
+    mesosCluster.masters.foreach(_.stop())
+
+    Then("The stream terminates")
+    input.watchCompletion().futureValue
+
+    eventually {
+      val pullResult = Try(output.pull().futureValue)
+      pullResult.isFailure should be(true)
     }
   }
 }
