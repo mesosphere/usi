@@ -24,10 +24,7 @@ pipeline {
 
     stage("Publish Packages") {
       agent {
-        docker {
-          image 'mesosphere/scala-sbt:marathon'
-          label 'large'
-        }
+        label 'jdk8-scala'
       }
 
       environment {
@@ -39,6 +36,7 @@ pipeline {
         sh 'sbt +publish'
       }
     }
+
     stage('Publish Documentation') {
       agent {
         label 'JenkinsMarathonCI-Debian9-2020-01-14'
