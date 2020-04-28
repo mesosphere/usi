@@ -51,6 +51,7 @@ pipeline {
       steps {
         sshagent(credentials: ['mesosphereci-github']) {
           sh 'whoami'
+          sh 'ls -lah /home/admin/.cache/coursier/v1'
           sh 'ssh -vT git@github.com || true'
           sh 'git config --global user.name "MesosphereCI Robot"'
           sh 'git config --global user.email "mesosphere-ci@users.noreply.github.com"'
