@@ -36,18 +36,16 @@ pipeline {
       }
 
       steps {
-        sh 'echo skip'
-    //    sh 'sbt +publish'
+        sh 'sbt +publish'
       }
     }
     stage('Publish Documentation') {
       agent {
         label 'JenkinsMarathonCI-Debian9-2020-01-14'
       }
-        // TODO: enable later
-//      when {
-//        branch 'master'
-//      }
+      when {
+        branch 'master'
+      }
       steps {
         sshagent(credentials: ['mesosphereci-github']) {
 	  // /home/admin/.cache was populated with sudo
@@ -56,8 +54,10 @@ pipeline {
 	  // Clear cache.
           sh 'rm -r ~/.sbt/ghpages/ || true'
 
+          // Set git config to CI bot.
           sh 'git config --global user.name "MesosphereCI Robot"'
           sh 'git config --global user.email "mesosphere-ci@users.noreply.github.com"'
+
           sh 'sbt docs/ghpagesPushSite'
         }
       }

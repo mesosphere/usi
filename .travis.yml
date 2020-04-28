@@ -25,3 +25,4 @@ script:
 - ci/reporting-pr-failure -- sbt "scalafmtCheck" "test:scalafmtCheck"
 - ci/reporting-pr-failure --description "Unused imports / scalafix" -- sbt "scalafix --check" "test:scalafix --check"
 - ci/reporting-pr-failure --description "Running tests for all Scala versions" -- sbt "+test"
+- ci/reporting-pr-failure --description "Building documentation" -- sbt "docs/makeSite" "unidoc"

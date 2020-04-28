@@ -36,7 +36,7 @@ val commonSettings = Seq(
 )
 
 lazy val docs = (project in file("./docs"))
-  .enablePlugins(GhpagesPlugin, ParadoxSitePlugin, ParadoxMaterialThemePlugin, ScalaUnidocPlugin)
+  .enablePlugins(GhpagesPlugin, ParadoxSitePlugin, ParadoxMaterialThemePlugin)
   .settings(
     version := {
       import sys.process._
