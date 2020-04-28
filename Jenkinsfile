@@ -51,9 +51,9 @@ pipeline {
       steps {
         sshagent(credentials: ['mesosphereci-github']) {
           sh 'sudo chown -R admin /home/admin/.cache'
-          sh 'git config --global user.name "MesosphereCI Robot"'
-          sh 'git config --global user.email "mesosphere-ci@users.noreply.github.com"'
-          sh 'git config core.sshCommand "ssh -v -o StrictHostKeyChecking=no"'
+          //sh 'git config --global user.name "MesosphereCI Robot"'
+          //sh 'git config --global user.email "mesosphere-ci@users.noreply.github.com"'
+          //sh 'git config core.sshCommand "ssh -v -o StrictHostKeyChecking=no"'
           sh 'rm -r ~/.sbt/ghpages/ || true'
           sh 'sbt docs/ghpagesPushSite'
         }
