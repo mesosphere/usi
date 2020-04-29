@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="description" content="USI - Unified Scheduler Interface">
+<meta name="generator" content="Paradox, paradox-material-theme=0.6.0, mkdocs-material=3.0.3">
+
+<meta name="lang:clipboard.copy" content="Copy to clipboard">
+<meta name="lang:clipboard.copied" content="Copied to clipboard">
+<meta name="lang:search.language" content="">
+<meta name="lang:search.pipeline.stopwords" content="true">
+<meta name="lang:search.pipeline.trimmer" content="true">
+<meta name="lang:search.result.none" content="No matching documents">
+<meta name="lang:search.result.one" content="1 matching document">
+<meta name="lang:search.result.other" content="# matching documents">
+<meta name="lang:search.tokenizer" content="[\s\-]+">
+
+
+<meta name="description" content="USI - Unified Scheduler Interface">
+<link rel="shortcut icon" href="../assets/images/favicon.png">
+<title>Design · Unified Scheduler Interface</title>
+<link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
+<link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
+<link rel="stylesheet" href="../lib/prettify/prettify.css">
+<script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+<style>
+body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}
+code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
+</style>
+<link rel="stylesheet" href="../assets/fonts/font-awesome.css">
+<link rel="stylesheet" href="../assets/fonts/material-icons.css">
+<link rel="stylesheet" href="../assets/stylesheets/paradox-material-theme.css">
+</head>
+<body
+>
+<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+<input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+<label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+<header class="md-header" data-md-component="header">
+<nav class="md-header-nav md-grid">
+<div class="md-flex">
+<div class="md-flex__cell md-flex__cell--shrink">
+<a href="../index.html" title="Unified Scheduler Interface" class="md-header-nav__button md-logo">
+<i class="md-icon">local_library</i>
+</a>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+</div>
+<div class="md-flex__cell md-flex__cell--stretch">
+<div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+<span class="md-header-nav__topic">
+Unified Scheduler Interface
+</span>
+<span class="md-header-nav__topic">
+Design
+</span>
+</div>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+<label class="md-icon md-search__icon" for="__search"></label>
+<button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">&#xE5CD;</button>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix>
+<div class="md-search-result" data-md-component="result">
+<div class="md-search-result__meta">
+Type to start searching
+</div>
+<ol class="md-search-result__list"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</nav>
+</header>
+
+<div class="md-container">
+<main class="md-main">
+<div class="md-main__inner md-grid" data-md-component="container">
+<div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--primary" data-md-level="0" style="visibility: hidden">
+<label class="md-nav__title md-nav__title--site" for="drawer">
+<a href="../index.html" title="Unified Scheduler Interface" class="md-nav__button md-logo">
+<span class="md-nav__button md-logo">
+<i class="md-icon">local_library</i>
+</a>
+<a href="../index.html" title="Unified Scheduler Interface">
+Unified Scheduler Interface
+</a>
+</label>
+<ul>
+  <li><a href="../getting-started.html" class="page">Getting Started</a></li>
+  <li><a href="../contributing/index.html" class="page">Contributors Guide</a>
+  <ul>
+    <li><a href="../contributing/code-culture.html" class="page">Code Culture</a></li>
+  </ul></li>
+  <li><a href="../design/index.html" class="active page">Design</a></li>
+  <li><a href="../examples/index.html" class="page">Examples</a>
+  <ul>
+    <li><a href="../examples/keep-alive-framework.html" class="page">Keep-Alive Example Framework</a></li>
+  </ul></li>
+</ul>
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../design/index.html#design" class="header">Design</a>
+  <ul>
+    <li><a href="../design/index.html#intent-of-this-document" class="header">Intent of this document</a></li>
+    <li><a href="../design/index.html#terminology-" class="header">Terminology:</a></li>
+    <li><a href="../design/index.html#overview" class="header">Overview</a></li>
+    <li><a href="../design/index.html#schema" class="header">Schema</a></li>
+    <li><a href="../design/index.html#responsibilities-of-usi" class="header">Responsibilities of USI</a></li>
+    <li><a href="../design/index.html#example-interaction-diagram" class="header">Example Interaction Diagram</a></li>
+    <li><a href="../design/index.html#questions" class="header">Questions</a></li>
+    <li><a href="../design/index.html#relevant-resources" class="header">Relevant Resources</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</nav>
+<ul style="display: none">
+<li class="md-nav__item md-version" id="project.version">
+<label class="md-nav__link" for="__version">
+<i class="md-icon" title="Version">label_outline</i> 0.1.42
+</label>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../design/index.html#design" class="header">Design</a>
+  <ul>
+    <li><a href="../design/index.html#intent-of-this-document" class="header">Intent of this document</a></li>
+    <li><a href="../design/index.html#terminology-" class="header">Terminology:</a></li>
+    <li><a href="../design/index.html#overview" class="header">Overview</a></li>
+    <li><a href="../design/index.html#schema" class="header">Schema</a></li>
+    <li><a href="../design/index.html#responsibilities-of-usi" class="header">Responsibilities of USI</a></li>
+    <li><a href="../design/index.html#example-interaction-diagram" class="header">Example Interaction Diagram</a></li>
+    <li><a href="../design/index.html#questions" class="header">Questions</a></li>
+    <li><a href="../design/index.html#relevant-resources" class="header">Relevant Resources</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</div>
+</div>
+</div>
+<div class="md-content">
+<article class="md-content__inner md-typeset">
+<div class="md-content__searchable">
+<h1><a href="#design" name="design" class="anchor"><span class="anchor-link"></span></a>Design</h1>
+<h1><a href="#intent-of-this-document" name="intent-of-this-document" class="anchor"><span class="anchor-link"></span></a>Intent of this document</h1>
+<p>This document is intended for developers of the Unified Scheduler Interface (USI) and implementation frameworks that will use it.</p>
+<h1><a href="#terminology-" name="terminology-" class="anchor"><span class="anchor-link"></span></a>Terminology:</h1>
+<ul>
+  <li><strong>Unified Scheduler Interface (USI)</strong>: The scheduler component described in this document; an abstraction layer that receives specifications for pods to launch, and handles low level details with Mesos.</li>
+  <li><strong>Implementation Framework</strong>: Term used to refer to a framework that uses the USI. Contains orchestration logic and persistence logic pertinent to its logic domain.</li>
+  <li><strong>Scheduler command</strong>: Sent by the implementation framework to perform actions; launch pods, kill pods, etc.</li>
+  <li><strong>Pod</strong>: A collection of one or more tasks. In the USI (and this document), we deal only with pods. Things formerly known as &ldquo;apps&rdquo; or &ldquo;tasks&rdquo; are pods with 1 task, with slightly more supported launch options (Docker, etc.).</li>
+  <li><strong>Implementation Framework State</strong>: The state of a Framework as best modeled for the Framework&rsquo;s needs; for example, service specifications, deployment plans, etc.</li>
+  <li><strong>Orchestrator</strong>: The orchestrator functionality of a Framework as suited for the Framework&rsquo;s goals, dealing with the conditional evolution of framework state.</li>
+  <li><strong>RunSpec</strong>: Framework managed data structure used to communicate a launch recipe to the USI. Covers resource requirements, networking specification, and a factory to generate a Mesos CommandInfo in order to run one or more tasks.</li>
+  <li><strong>ReserveSpec</strong>: A data structure used to communicate with the USI that some reservation to be made, resized, or destroyed. This data structure is provided by the framework.</li>
+</ul>
+<h1><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h1>
+<p>In this document we present a design for the USI, in order to support the creation of Frameworks with the following general design goals:</p>
+<ul>
+  <li>Deterministic, even in the event of a crash.</li>
+  <li>High scale; can handle workloads with high volume of tasks and deployments.</li>
+  <li>Modular; frameworks can use only what it needs.</li>
+  <li>Stays responsive under large spikes of load.</li>
+  <li>Understandable by mortals (IE framework authors)</li>
+  <li>Help unify integration efforts with Mesos across the variety of Frameworks in the DC/OS ecosystem.</li>
+  <li>Provide a deterministic interface for launching pods.</li>
+</ul>
+<p>In an effort to achieve these goals, the following concepts will be employed, generally, in the design of USI:</p>
+<ul>
+  <li>Fast, lock-less serial processing over concurrency.</li>
+  <li><a href="https://martinfowler.com/eaaDev/EventSourcing.html">Event sourcing</a> for the replication of state.</li>
+  <li>External-affecting decisions are made in response to the evolution of persisted state, and not in direct response to commands themselves.</li>
+  <li>State transitions and actions are decided upon by pure functions (scheduler has side-effects, decision to make a revive call made by a pure function which receives the current state; will make same decision every time.)</li>
+</ul>
+<p>At a high-level, there are three major groups of components involved in a framework using USI, and will roughly look like the following:</p>
+<p><img src="./high-level-design.svg" /></p>
+<h1><a href="#schema" name="schema" class="anchor"><span class="anchor-link"></span></a>Schema</h1>
+<p>As a rough general overview, schema in USI is expected to look something like this:</p>
+<p><img src="./data-model.svg" /></p>
+<h1><a href="#responsibilities-of-usi" name="responsibilities-of-usi" class="anchor"><span class="anchor-link"></span></a>Responsibilities of USI</h1>
+<p>The USI handle as much of the Mesos-specific pod management logic, and reservation logic, without performing any orchestration functions. As an overview, the USI will perform the following jobs:</p>
+<ul>
+  <li>For a given launch command and pod id, launch that pod at-most once.
+    <ul>
+      <li>This includes offer matching, constraint evaluation, revive behavior, etc.</li>
+    </ul>
+  </li>
+  <li>Provide a mechanism to kill pods, including periodic kill retry</li>
+  <li>Expose the state of those pods in replicable fashion.</li>
+  <li>Reconciles pod statuses with Mesos</li>
+  <li>Cache (persist) and expose non-recoverable facts about pods and reservation state so that those facts are known by future recovering framework processes</li>
+  <li>Manage reservations</li>
+  <li>Expose agent state changes, such as &ldquo;agent has begun a maintenance window and should drain&rdquo;.</li>
+  <li>Expose inverse-offer changes</li>
+</ul>
+<p>The USI will <em>not</em> perform these jobs:</p>
+<ul>
+  <li>Automatically restarting pods</li>
+  <li>Orchestration logic, such as rolling deployment logic</li>
+  <li>Automatically killing unrecognized pods</li>
+</ul>
+<h2><a href="#offer-match-statistics" name="offer-match-statistics" class="anchor"><span class="anchor-link"></span></a>Offer Match Statistics</h2>
+<p>In order to minimize the complexity in the scheduler, the USI will expose a stream of offer match events that can be aggregated by some other component as best serves the needs of the framework. A generic and standard way to do that is left for another design document.</p>
+<h2><a href="#storage-of-unrecoverable-facts-from-mesos" name="storage-of-unrecoverable-facts-from-mesos" class="anchor"><span class="anchor-link"></span></a>Storage of Unrecoverable Facts from Mesos</h2>
+<p>There are several pieces of state that cannot be reliably recovered from Mesos under certain unreachable scenarios, or under all scenarios. In order to support deterministic behavior in the framework in the event of a crash / recovery, the USI will store these facts so that the same decisions can be made.</p>
+<h3><a href="#the-fact-that-we-sent-a-task-launch" name="the-fact-that-we-sent-a-task-launch" class="anchor"><span class="anchor-link"></span></a>The fact that we sent a task launch</h3>
+<p>The USI has launch-at-most-once guarantees. In order to guarantee this in the event of a crash, we have to store the fact that we were about to launch some task on an agent before we actually do so, since, presumably, we could failover and not see the task we launched if the agent in question were unreachable. This needs confirmation, but our understanding is that the Mesos master only stores agent info, and not task info. It should be clarified that we don&rsquo;t need to store the full offer, or the full response; just the time and the agentId should suffice.</p>
+<p>The time at which we sent the task launch request is also unrecoverable, and needed as an input for rate-limited launch scenarios.</p>
+<h3><a href="#certain-taskstatus-attributes" name="certain-taskstatus-attributes" class="anchor"><span class="anchor-link"></span></a>Certain TaskStatus attributes</h3>
+<p>Mesos does not retain the first time a task was unreachable, or the first time a Mesos health check was reported unhealthy.</p>
+<h3><a href="#agent-info" name="agent-info" class="anchor"><span class="anchor-link"></span></a>Agent info</h3>
+<p>Lamentably, the agent info can be forgotten by Mesos when it is unreachable for more than <code>agent_ping_timeout * max_agent_ping_timeouts</code>. Agent info is needed as an input for certain types of offer-matching constraints, such as the Marathon <code>MAX_PER</code> constraint or <code>UNIQUE</code> constraint.</p>
+<p>If the Agent info is forgotten, the pods may still come back later (source: I tested this myself).</p>
+<h3><a href="#certain-facts-about-reservations" name="certain-facts-about-reservations" class="anchor"><span class="anchor-link"></span></a>Certain facts about reservations</h3>
+<p>We&rsquo;ll store certain things about reservations, such as &ldquo;reservation last seen&rdquo;.</p>
+<h2><a href="#unrecognized-reservations-and-unrecognized-pods" name="unrecognized-reservations-and-unrecognized-pods" class="anchor"><span class="anchor-link"></span></a>Unrecognized reservations and unrecognized pods</h2>
+<p>A unrecognized pod and unrecognized reservation is defined as a pod or reservation belonging to the implementation framework for which there is no persistent record (PodRecord or ReservationRecord) of it being launched.</p>
+<p>In the case of a unrecognized pod being discovered, the USI will expose a PodStatus for the unrecognized pod to the implementation framework.</p>
+<p>Similarly, unrecognized pods pertaining to the framework may surface. Rather than automatically kill these pods, the scheduler component will expose their status as best as it can, so that the framework can best decide what to do with them (PodStatus without a PodRecord).</p>
+<p>Unfortunately, Mesos does not expose task grouping information, but instead reports individual task statuses. As such, unrecognized tasks will be reported as PodStatuses with a task count of 1, each.not expose this information in TaskGroup.</p>
+<h2><a href="#constraints-application" name="constraints-application" class="anchor"><span class="anchor-link"></span></a>Constraints Application</h2>
+<p>The scheduler component itself will provide an unopinionated, pluggable approach to the application of constraints. The USI will provide a library of predefined constraints available for use that the framework may optionally choose to use. Implementation frameworks will provide constraints to the USI via the RunSpec. The language for exposing these constraints to the end-user is left to the implementation framework.</p>
+<h2><a href="#storage-and-message-ordering-guarantees" name="storage-and-message-ordering-guarantees" class="anchor"><span class="anchor-link"></span></a>Storage and Message Ordering Guarantees</h2>
+<p>In order to support deterministic behavior in implementation frameworks, Message ordering will be preserved. Were it not so, we could do things such as send Mesos task statuses out of order.</p>
+<p>Some messages require data to be persisted before we can act on them. All messages, whether they affect the persisted state or not, will be threaded through the scheduler persistence layer.</p>
+<p>This does not imply that we store offers.</p>
+<h2><a href="#decoupling-scheduler-input-from-implementation-framework-state" name="decoupling-scheduler-input-from-implementation-framework-state" class="anchor"><span class="anchor-link"></span></a>Decoupling Scheduler Input from Implementation Framework State</h2>
+<p>An implementation framework launches pods and creates reservations by specifying RunSpecs and ReserveSpecs. However, depending on the implementation framework, different aspects of this runSpec come from the user. For example, a user may specify memory requirements, but not specify the launch command or container image (this being managed by the implementation framework deploying a deta service of some kind).</p>
+<p>Therefore, by design USI does not persist the runSpec. It only persists the record of launching pods or reservations.</p>
+<h1><a href="#example-interaction-diagram" name="example-interaction-diagram" class="anchor"><span class="anchor-link"></span></a>Example Interaction Diagram</h1>
+<p>Implementation frameworks will be responsible for storing and maintaining what needs to be launched, and for handling orchestration logic; the scheduler solely handles the launching of pods (with at-least-once guarantees), and providing guarantees about which aspects of these pod states the implementation framework can get back. This has the following benefits:</p>
+<ul>
+  <li><strong>Flexible framework schema</strong>: Implementation frameworks can store the information about tasks to launch and schedules as it suits the framework; it is not necessary for the USI to support every different orchestration concern under the sun</li>
+  <li><strong>Incremental adoption path</strong>: Scheduler component can be integrated in to any existing framework that can emit the appropriate launch commands with runSpecs; statuses emitted by scheduler can be mapped back to entities that the implementation framework understands.</li>
+  <li><strong>Generally solve the problem of deterministic orchestration</strong>: Implementation frameworks can rely on podRecords to ensure that an instance of some service isn&rsquo;t doubly launched in the event of failover.</li>
+</ul>
+<p>The following interaction diagram should help illustrate roughly how the scheduler component will interact with other layers.</p>
+<p><img src="./scheduler-interaction.svg" /></p>
+<h1><a href="#questions" name="questions" class="anchor"><span class="anchor-link"></span></a>Questions</h1>
+<h3><a href="#how-does-the-scheduler-notify-the-orchestrator-that-an-agent-is-going-away-" name="how-does-the-scheduler-notify-the-orchestrator-that-an-agent-is-going-away-" class="anchor"><span class="anchor-link"></span></a>How does the scheduler notify the orchestrator that an agent is going away?</h3>
+<p>AgentInfo will be exposed via the podStatus. If the agent&rsquo;s information is detected to be updated, an PodStatus update will be emitted for all pods pertaining to the agent with the new agent information. The orchestrator can react to this new state and begin transitioning pods off the agent in a controlled fashion.</p>
+<h3><a href="#what-about-pod-relaunch-rate-limiting-" name="what-about-pod-relaunch-rate-limiting-" class="anchor"><span class="anchor-link"></span></a>What about pod relaunch rate-limiting?</h3>
+<p>This is an area that needs further consideration and design. To keep the scheduler component simple and concerns separated, ideally the scheduler knows nothing about backoff delay, and another component rate-limits launch commands in-transit according to the backoff mechanism.</p>
+<p>We may also consider if configurable per-service rate limiters are even necessary, and potentially just throttle by pod ids globally.</p>
+<h3><a href="#what-about-logging-" name="what-about-logging-" class="anchor"><span class="anchor-link"></span></a>What about logging?</h3>
+<p>It&rsquo;s anticipated that logging will be handled through the generic slf4j interface. Implementation frameworks will be responsible to provide implementations of their choosing.</p>
+<h3><a href="#what-about-metrics-tracing-" name="what-about-metrics-tracing-" class="anchor"><span class="anchor-link"></span></a>What about metrics / tracing?</h3>
+<p>This is an area that needs design, but can be done at a later date and does not affect the overall architecture of the USI.</p>
+<h3><a href="#benchmarking" name="benchmarking" class="anchor"><span class="anchor-link"></span></a>Benchmarking</h3>
+<p>The USI will have a simple framework test harness used to benchmark its performance, independently, to avoid performance regressions.</p>
+<h3><a href="#how-will-java-consume-this-" name="how-will-java-consume-this-" class="anchor"><span class="anchor-link"></span></a>How will Java consume this?</h3>
+<p>The inputs and outputs will be exposed as reactive stream <a href="https://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Publisher.html">Publishers</a> and <a href="https://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Subscriber.html">Subscribers</a>. Reactive streams has been merged in to the standard library as of Java 9 and is available as a polyfill dependency for Java 8.</p>
+<p>A Java interface will be provided for generating related data structures, interacting with constraints, reading <code>PodStatus</code> / <code>ReservationStatus</code>, etc.</p>
+<h3><a href="#how-will-we-react-to-spikes-in-offers-received" name="how-will-we-react-to-spikes-in-offers-received" class="anchor"><span class="anchor-link"></span></a>How will we react to spikes in offers received</h3>
+<p>The USI will queue a configurable number of offers. If this queue is exceeded, offers without reservations pertaining to the framework will be &ldquo;quick declined&rdquo;, without evaluation.</p>
+<h3><a href="#how-will-reservations-be-labeled-associated-with-the-framework-" name="how-will-reservations-be-labeled-associated-with-the-framework-" class="anchor"><span class="anchor-link"></span></a>How will reservations be labeled / associated with the Framework?</h3>
+<p>Reservations for single role frameworks will be handled with labels. If needed, we will provide an pluggable strategy for detecting reservations belonging to us, and specifying them.</p>
+<p>For multi-role reservations, we can explore using a framework-specific role (the framework ID?). This could in theory enable more efficient revives when trying to re-launch resident pods.</p>
+<h3><a href="#how-will-offer-revive-be-handled-" name="how-will-offer-revive-be-handled-" class="anchor"><span class="anchor-link"></span></a>How will offer revive be handled?</h3>
+<p>Offer revive will be automatically managed by the USI, as needed. However, there could be different revive policies needed (more aggressive, less aggressive, due to the framework?). Some investigation and further design is warranted here.</p>
+<h3><a href="#how-do-you-restart-a-pod-" name="how-do-you-restart-a-pod-" class="anchor"><span class="anchor-link"></span></a>How do you restart a pod?</h3>
+<p>A pod is restarted by sending a Kill command for some pod id. Then, once USI reports said pod as terminal, send a command to expunge the podRecord, and send a command to launch a new pod.</p>
+<h3><a href="#what-constraints-are-there-on-pod-task-ids-" name="what-constraints-are-there-on-pod-task-ids-" class="anchor"><span class="anchor-link"></span></a>What constraints are there on Pod / task IDs?</h3>
+<p>The USI, out of necessity, allows any valid task ID as a pod / task ID. Were it not so, frameworks could not move to the USI without killing all existing pods and reservations (since said IDs are immutable).</p>
+<p>An option we can explore is providing modeled IDs to the USI, with one of the variants of the modeled ID being &ldquo;freeform&rdquo; (no associated metadata implied). Benefits of this approach could allow the USI to:</p>
+<h3><a href="#how-does-the-usi-report-schema-violation-errors-to-the-framework" name="how-does-the-usi-report-schema-violation-errors-to-the-framework" class="anchor"><span class="anchor-link"></span></a>How does the USI report schema violation errors to the framework</h3>
+<p>The Framework is responsible for sanitizing user input. Any failures to provide the USI valid input will be considered a bug.</p>
+<p>If it does happen, one mechanism for reporting errors could be to output an erroneous podStatuses with the validation errors. This is an area open for further design.</p>
+<h3><a href="#how-does-a-framework-resize-reservations-" name="how-does-a-framework-resize-reservations-" class="anchor"><span class="anchor-link"></span></a>How does a Framework resize reservations?</h3>
+<p>Reservations will be resized by specifying a new reservation spec for the same reservation ID. The status for the reservation will be exposed via the ReservationStatus on the other end, &ldquo;resizing&rdquo;, &ldquo;resize failed&rdquo;, etc.</p>
+<h3><a href="#which-version-of-the-mesos-client-will-the-usi-use-" name="which-version-of-the-mesos-client-will-the-usi-use-" class="anchor"><span class="anchor-link"></span></a>Which version of the Mesos client will the USI use?</h3>
+<p>The USI will use the Mesos v1 client</p>
+<h3><a href="#is-leader-election-a-concern-of-the-unified-scheduler-" name="is-leader-election-a-concern-of-the-unified-scheduler-" class="anchor"><span class="anchor-link"></span></a>Is leader election a concern of the unified scheduler?</h3>
+<p>No.</p>
+<h3><a href="#what-if-the-framework-wants-to-use-a-different-data-store-other-than-zookeeper-" name="what-if-the-framework-wants-to-use-a-different-data-store-other-than-zookeeper-" class="anchor"><span class="anchor-link"></span></a>What if the framework wants to use a different data store, other than Zookeeper?</h3>
+<p>Initially, the USI will be opinionated towards storing its state in Zookeeper. Theoretically, any persistence mechanism that can preserve the order of writes would work as well. A pluggable storage module could be introduced at a future point.</p>
+<h3><a href="#why-not-just-auto-kill-something-for-which-a-podrecord-no-longer-exists-" name="why-not-just-auto-kill-something-for-which-a-podrecord-no-longer-exists-" class="anchor"><span class="anchor-link"></span></a>Why not just auto-kill something for which a podRecord no longer exists?</h3>
+<p>This is the behavior that Marathon has historically had, and has led to upsetting problems when the persistent state comes invalid or out-of-date (for example, a backup is restored because an upgrade failed). Preferably, how to handle unrecognized pods and reservations is up to the implementation framework.</p>
+<h1><a href="#relevant-resources" name="relevant-resources" class="anchor"><span class="anchor-link"></span></a>Relevant Resources</h1>
+<ul>
+  <li><a href="http://www.cqrs.nu/faq">CQRS Faq</a></li>
+  <li><a href="https://docs.google.com/presentation/d/11DFGBhWcEj3s7h1UT-adUbPQlea2K-PgYimySfQgb8k/edit?ouid=116111700009119528924&usp=slides_home&ths=true">Scheduler Loop Design Slides</a></li>
+  <li><a href="https://martinfowler.com/articles/lmax.html">Martin Fowler: The LMAX Architecture</a></li>
+  <li><a href="https://qconlondon.com/london-2012/qconlondon.com/dl/qcon-london-2012/slides/MartinThompson_and_MichaelBarker_LockFreeAlgorithmsForUltimatePerformance.pdf">Lock Fee Algorithms for Ultimate Performance Slides</a></li>
+  <li><a href="https://www.reactivemanifesto.org">Reactive Manifesto</a></li>
+</ul>
+</div>
+<div>
+<a href="https://github.com/mesosphere/usi/tree/v0.1.42/docs/src/paradox/design/index.md" title="Edit this page" class="md-source-file md-edit">
+Edit this page
+</a>
+</div>
+<div class="print-only">
+<span class="md-source-file md-version">
+0.1.42
+</span>
+</div>
+</article>
+</div>
+</div>
+</main>
+<footer class="md-footer">
+<div class="md-footer-nav">
+<nav class="md-footer-nav__inner md-grid">
+<a href="../contributing/code-culture.html" title="Code Culture" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<div class="md-flex__cell md-flex__cell--shrink">
+<i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+</div>
+<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+<span class="md-flex__ellipsis">
+<span class="md-footer-nav__direction">
+Previous
+</span>
+Code Culture
+</span>
+</div>
+</a>
+<a href="../examples/index.html" title="Examples" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+<span class="md-flex__ellipsis">
+<span class="md-footer-nav__direction">
+Next
+</span>
+Examples
+</span>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+</div>
+</a>
+</nav>
+</div>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-footer-copyright">
+Powered by
+<a href="https://github.com/lightbend/paradox">Paradox</a>
+and
+<a href="https://jonas.github.io/paradox-material-theme/">Paradox Material Theme</a>
+
+</div>
+</div>
+</div>
+</footer>
+
+</div>
+<script src="../assets/javascripts/application.583bbe55.js"></script>
+<script src="../assets/javascripts/paradox-material-theme.js"></script>
+<script>app.initialize({version:"0.17",url:{base:"../."}})</script>
+<script type="text/javascript" src="../lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+window.prettyPrint && prettyPrint();
+});
+</script>
+</body>
+</html>

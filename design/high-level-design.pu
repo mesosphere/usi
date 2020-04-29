@@ -1,0 +1,63 @@
+@startuml
+scale 600 width
+
+legend
+|= Legend|
+|<#LightGrey> Framework provided |
+|<#LightYellow> UnifiedScheduler library |
+|<#White> Mesos |
+endlegend
+
+cloud Framework {
+  component FrameworkState #LightGrey [
+    <b>FrameworkState</b>
+
+    • Framework is responsible for knowing which
+      services it launches
+    • Framework submits commands to the scheduler
+      to launch and kill pods
+  ]
+
+  package UnifiedScheduler {
+    component Scheduler [
+      <b>Scheduler</b>
+      • Receives scheduler commands, such as LaunchPod and KillPod
+      • Handles offer matching
+      • Handles task reconciliation
+      • Persists records of reservations and launched pods
+      • Emits PodStatus and ReservationStatus
+    ]
+
+    component SchedulerStorage [
+      <b>SchedulerStorage</b>
+      • Stores data that cannot be reliably
+        recovered from Mesos (PodRecord, etc)
+      • Pipelined
+    ]
+
+    Scheduler --> SchedulerStorage
+  }
+
+  component Orchestrator #LightGrey [
+    <b>Orchestrator</b>
+    • Framework provided layer to manage
+      deployment concerns
+    • Respond to task statuses and take
+      appropriate actions, such as restarting.
+  ]
+}
+
+cloud Mesos {
+  component MesosMaster #White
+  component Agent #White
+  MesosMaster --> Agent
+  MesosMaster <-- Agent
+}
+
+MesosMaster --> Scheduler
+SchedulerStorage --> MesosMaster
+SchedulerStorage --> Orchestrator
+FrameworkState --> Scheduler
+
+ 
+@enduml
