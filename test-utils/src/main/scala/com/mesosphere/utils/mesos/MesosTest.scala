@@ -258,6 +258,8 @@ case class MesosCluster(
     val processName: String
     private var process: Option[Process] = None
 
+    private var prefix: Option[String] = None
+
     if (autoStart) {
       start()
     }
@@ -272,13 +274,30 @@ case class MesosCluster(
       */
     def start(prefix: Option[String] = None): Unit = if (process.isEmpty) {
       assert(!isAlive(), s"Mesos process ${processName} already started")
-      val name = prefix.getOrElse(suiteName)
+
+      // Capture prefix if required. [[MesosClusterExtension]] is using this feature.
+      if (prefix.nonEmpty) this.prefix = prefix
+
+      val name = this.prefix.getOrElse(suiteName)
       process = Some(processBuilder.run(ProcessOutputToLogStream(s"$name-Mesos$processName-$port")))
     }
 
     def stop(): Unit = {
       process.foreach(_.destroy())
       process = None
+    }
+
+    def restart(): Unit = {
+      if (isAlive()) {
+        process.foreach { p =>
+          p.destroy()
+          // Wait for process to exit
+          p.exitValue()
+        }
+        process = None
+      }
+
+      start()
     }
 
     override def close(): Unit = {
