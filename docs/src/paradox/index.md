@@ -1,8 +1,16 @@
+@@@ index
+
+* [Getting Started](getting-started.md)
+* [Contributing](contributing/index.md)
+* [Design](design/index.md)
+* [Examples](examples/index.md)
+
+@@@
+
 # Unified Scheduler Interface
 
 This repository is currently a work-in-progress.
 
-[Scaladoc](api/index.html)
 
 
 How to run:

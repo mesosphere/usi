@@ -1,4 +1,5 @@
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+import com.typesafe.sbt.SbtGit.GitKeys._
 
 val commonSettings = Seq(
   organization := "com.mesosphere.usi",
@@ -34,7 +35,35 @@ val commonSettings = Seq(
   s3region :=  com.amazonaws.services.s3.model.Region.US_Standard,
 )
 
+lazy val docs = (project in file("./docs"))
+  .enablePlugins(GhpagesPlugin, ParadoxSitePlugin, ParadoxMaterialThemePlugin)
+  .settings(
+    version := {
+      import sys.process._
+
+      ("./version" !!).trim
+    },
+
+    s3credentials := DefaultAWSCredentialsProviderChain.getInstance(),
+    s3region :=  com.amazonaws.services.s3.model.Region.US_Standard,
+    publish / skip := true,
+
+    name := "USI - Unified Scheduler Interface",
+    gitRemoteRepo := "git@github.com:mesosphere/usi",
+    ghpagesNoJekyll := true,
+
+    ParadoxMaterialThemePlugin.paradoxMaterialThemeSettings(Paradox),
+    // TODO: These settings do not work yet
+    Compile / paradoxMaterialTheme ~= {
+      _.withColor("green", "indigo")
+       .withRepository(uri("https://github.com/mesosphere/usi"))
+    },
+  )
+
+val Core= config("core")
+
 lazy val `root` = (project in file("./"))
+  .enablePlugins(ScalaUnidocPlugin)
   .settings(
     commonSettings,
     publish / skip := true)

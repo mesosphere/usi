@@ -1,10 +1,10 @@
-Contributors Guide
-==================
-[__Quick Start__](README.md#quick-start) |
-[__FAQ__](docs/pages/faq.md) |
-[__Javadocs__](http://mesosphere.github.io/dcos-commons/reference/api/) |
-[__Contributing__](CONTRIBUTING.md) |
-[__Slack__](http://chat.dcos.io)
+# Contributors Guide
+
+@@@ index
+
+* [Code Culture](code-culture.md)
+
+@@@ 
 
 Make contributions with GitHub [pull requests](https://github.com/mesosphere/usi/pulls).
 
@@ -34,6 +34,6 @@ Most communication is done primarily over Slack. Join us via http://chat.dcos.io
 To build a healthy, respectful community, we follow [Github’s community guidelines](https://help.github.com/articles/github-community-guidelines/#building-a-strong-community).
 
 ### Licensing
-Mesosphere USI is licensed under the [Apache License, Version 2.0](LICENSE). Any code you submit must be under that license.
+Mesosphere USI is licensed under the [Apache License, Version 2.0](../../../../LICENSE). Any code you submit must be under that license.
 
 For significant changes, we may ask you to sign a [Contributor License Agreement](http://en.wikipedia.org/wiki/Contributor_License_Agreement).
