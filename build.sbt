@@ -25,11 +25,11 @@ val commonSettings = Seq(
     if (version.value.endsWith("-SNAPSHOT"))
       Some(s3resolver.value(
         "Mesosphere Public Snapshot Repo (S3)",
-        s3("downloads.mesosphere.io/maven-snapshot")))
+        s3("downloads.mesosphere.io/maven-snapshot")).withMavenPatterns)
     else
       Some(s3resolver.value(
         "Mesosphere Public Repo (S3)",
-        s3("downloads.mesosphere.io/maven")))
+        s3("downloads.mesosphere.io/maven")).withMavenPatterns)
   },
   s3credentials := DefaultAWSCredentialsProviderChain.getInstance(),
   s3region :=  com.amazonaws.services.s3.model.Region.US_Standard,
