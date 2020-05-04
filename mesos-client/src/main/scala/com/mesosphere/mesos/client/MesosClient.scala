@@ -164,7 +164,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       frameworkInfo: FrameworkInfo,
       uri: Uri,
       authorization: Option[CredentialsProvider],
-      followRedirect: Boolean = true)(implicit as: ActorSystem): Source[HttpResponse, NotUsed] = {
+      redirectsLeft: Int)(implicit as: ActorSystem): Source[HttpResponse, NotUsed] = {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
     def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest =
@@ -190,20 +190,18 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     requestSource
       .via(info(s"Connecting to the new leader: $uri"))
       .via(httpConnection)
-      .map { response: HttpResponse =>
+      .flatMapConcat { response: HttpResponse =>
         if (response.status.isRedirection()) {
-          val redirectUri = response.header[headers.Location].get.uri.resolvedAgainst(uri)
-          logger.warn(s"Redirect Mesos client from $uri to $redirectUri")
-          // Update the context with the new leader's host and port and throw an exception that is handled in the
-          // next `recoverWith` stage.
-          response.discardEntityBytes()
-          throw MesosRedirectException(redirectUri)
-        } else response
+          if (redirectsLeft > 0) {
+            val redirectUri = response.header[headers.Location].get.uri.resolvedAgainst(uri)
+            logger.warn(s"Redirect Mesos client from $uri to $redirectUri")
+            response.discardEntityBytes()
+            connectionSource(frameworkInfo, redirectUri, authorization, redirectsLeft - 1)
+          } else {
+            throw new IOException("Failed to connect to Mesos: Too many redirects.")
+          }
+        } else Source.single(response)
       }
-      .recoverWithRetries(3, { // TODO: count redirects
-        case MesosRedirectException(redirect) =>
-          connectionSource(frameworkInfo, redirect, authorization, followRedirect)
-      })
       .via(info("HttpResponse: "))
   }
 
@@ -235,7 +233,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
           port = if (baseUrl.getPort == -1) baseUrl.getDefaultPort else baseUrl.getPort)
         logger.info(s"Connecting to Mesos master $baseUri")
         val requestUri = baseUri.withPath(Path("/api/v1/scheduler"))
-        connectionSource(frameworkInfo, requestUri, authorization, followRedirect = true).map { response =>
+        connectionSource(frameworkInfo, requestUri, authorization, maxRedirects).map { response =>
           response.status match {
             case StatusCodes.OK =>
               logger.info(s"Connected successfully to $baseUrl");

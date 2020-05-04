@@ -4,6 +4,7 @@ import java.util.UUID
 
 import akka.Done
 import akka.actor.ActorSystem
+import akka.http.scaladsl.model.Uri
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import com.mesosphere.mesos.conf.MesosClientSettings
@@ -24,7 +25,7 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
     f.client.frameworkId.getValue shouldNot be(empty)
 
     And("connection context should be initialized")
-    f.client.session.baseUri.toString() shouldBe f.mesosHost.toString
+    f.client.session.baseUri shouldBe f.baseUri
     f.client.session.streamId.length should be > 1
     f.client.frameworkId.getValue.length should be > 1
   }
@@ -53,13 +54,13 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
     val settings = MesosClientSettings.load().withMasters(nonLeader)
 
     When(s"we connect to $nonLeader")
-    val f = new Fixture(settings = settings)
+    withFixture(None, Some(settings)) { f =>
+      Then("a new framework should register")
+      f.client.frameworkId.getValue shouldNot be(empty)
 
-    Then("a new framework should register")
-    // TODO: withFixture
-
-    And("a heartbeat should arrive")
-    f.pullUntil(_.getType == Event.Type.HEARTBEAT) shouldNot be(empty)
+      And("a heartbeat should arrive")
+      f.pullUntil(_.getType == Event.Type.HEARTBEAT) shouldNot be(empty)
+    }
   }
 
   "Mesos client should successfully receive offers" in withFixture() { f =>
@@ -97,8 +98,9 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
     }
   }
 
-  def withFixture(frameworkId: Option[FrameworkID.Builder] = None)(fn: Fixture => Unit): Unit = {
-    val f = new Fixture(frameworkId)
+  def withFixture(frameworkId: Option[FrameworkID.Builder] = None, settings: Option[MesosClientSettings] = None)(
+      fn: Fixture => Unit): Unit = {
+    val f = new Fixture(frameworkId, settings)
     try fn(f)
     finally {
       f.client.killSwitch.shutdown()
@@ -107,7 +109,7 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
 
   class Fixture(
       existingFrameworkId: Option[FrameworkID.Builder] = None,
-      val settings: MesosClientSettings = MesosClientSettings.load().withMasters(mesosFacade.url)) {
+      maybeSettings: Option[MesosClientSettings] = None) {
     implicit val system: ActorSystem = ActorSystem()
     implicit val materializer: ActorMaterializer = ActorMaterializer()
 
@@ -121,8 +123,9 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
       .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
       .build()
 
-    lazy val mesosHost = mesosFacade.url.getHost
-    lazy val mesosPort = mesosFacade.url.getPort
+    lazy val baseUri = Uri.from(scheme = "http", host = mesosFacade.url.getHost, port = mesosFacade.url.getPort)
+
+    val settings: MesosClientSettings = maybeSettings.getOrElse(MesosClientSettings.load().withMasters(mesosFacade.url))
 
     val client = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
 
