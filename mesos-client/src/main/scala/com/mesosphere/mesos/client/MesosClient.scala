@@ -249,6 +249,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
         }.recoverWithRetries(
           1, {
             case ex =>
+              // TODO: This retry only works on the initial connection. It does *not* work the the connection dies.
               logger.warn(s"Failed to connect to Mesos $baseUri", ex)
               mesosHttpConnection(frameworkInfo, rest, maxRedirects, authorization)
           }
