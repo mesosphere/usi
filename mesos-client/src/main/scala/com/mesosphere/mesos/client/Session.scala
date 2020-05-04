@@ -4,6 +4,7 @@ import java.net.URL
 import akka.NotUsed
 import akka.actor.{Actor, ActorRef, ActorSystem, Props, Stash, Status}
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.settings.ConnectionPoolSettings
@@ -22,11 +23,11 @@ import scala.util.{Failure, Success}
   * It behaves similar to Python Request's [[https://2.python-requests.org/en/master/user/advanced/#session-objects Session object]].
   * Thus it provides methods to construct and connect to Mesos.
   *
-  * @param url The Mesos master URL.
+  * @param baseUri The Mesos master URL.
   * @param streamId The Mesos stream ID. See the [[http://mesos.apache.org/documentation/latest/scheduler-http-api/#calls docs]] for details.
   * @param authorization A [[CredentialsProvider]] if the connection is secured.
   */
-case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None)(
+case class Session(baseUri: Uri, streamId: String, authorization: Option[CredentialsProvider] = None)(
     implicit askTimout: Timeout)
     extends StrictLogging {
 
@@ -39,7 +40,7 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
   def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest = {
     HttpRequest(
       HttpMethods.POST,
-      uri = Uri(s"$url/api/v1/scheduler"),
+      uri = baseUri.withPath(Path("/api/v1/scheduler")),
       entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
       headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
     )
@@ -99,11 +100,18 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
     val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
 
     Flow[(HttpRequest, C)]
-      .via(if (Session.isSecured(url)) {
+      .via(if (Session.isSecured(baseUri)) {
         Http()
-          .newHostConnectionPoolHttps(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings)
+          .newHostConnectionPoolHttps(
+            host = baseUri.authority.host.address(),
+            port = baseUri.effectivePort,
+            settings = poolSettings)
       } else {
-        Http().newHostConnectionPool(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings)
+        Http()
+          .newHostConnectionPool(
+            host = baseUri.authority.host.address(),
+            port = baseUri.effectivePort,
+            settings = poolSettings)
       })
       .map {
         case (Success(response), context) => response -> context
@@ -120,7 +128,7 @@ object Session {
       case "https" => true
       case "http" => false
       case other =>
-        throw new IllegalArgumentException(s"$other is not a supported protocol. Only HTTPS and HTTP are supported.")
+        throw new IllegalArgumentException(s"'$other' is not a supported protocol. Only HTTPS and HTTP are supported.")
     }
   }
 }

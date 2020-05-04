@@ -188,6 +188,12 @@ case class MesosCluster(
     start()
   }
 
+  /**
+    * Starts a Mesos cluster.
+    *
+    * @param prefix An optional prefix for the master and angent logs.
+    * @return The leader URL.
+    */
   def start(prefix: Option[String] = None): URL = {
     masters.foreach(_.start(prefix))
     agents.foreach(_.start(prefix))
@@ -195,6 +201,23 @@ case class MesosCluster(
     waitForAgents(masterUrl)
     logger.info(s"Started Mesos cluster with master on $masterUrl")
     masterUrl
+  }
+
+  /**
+    * Kills the Mesos master to force a different master to become leader.
+    *
+    * @return The URL of the new leader.
+    */
+  def failover(): URL = {
+    require(config.numMasters > 1, s"The number of masters ${config.numMasters} is not bigger than 1.")
+
+    val leaderPort = new URL(masterUrl).getPort
+    val oldLeader = masters
+      .find(_.port == leaderPort)
+      .getOrElse(
+        throw new IllegalStateException(s"Could not find leader $masterUrl in ${masters.map(_.port).mkString(", ")}."))
+    oldLeader.restart()
+    waitForLeader()
   }
 
   def waitForLeader(): URL = {
@@ -253,6 +276,8 @@ case class MesosCluster(
   trait Mesos extends AutoCloseable {
     val ip = IP.routableIPv4
     val port = PortAllocator.ephemeralPort()
+    def host(): URL = new URL("http", ip, port, "")
+
     val workDir: File
     val processBuilder: ProcessBuilder
     val processName: String

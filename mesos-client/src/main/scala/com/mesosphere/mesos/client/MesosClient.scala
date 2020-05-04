@@ -6,6 +6,7 @@ import java.net.URL
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.MediaType.Compressible
+import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.stream.alpakka.recordio.scaladsl.RecordIOFraming
@@ -192,7 +193,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       .map { response: HttpResponse =>
         if (response.status.isRedirection()) {
           val redirectUri = response.header[headers.Location].get.uri.resolvedAgainst(uri)
-          logger.warn(s"Redirect Mesos client to $redirectUri")
+          logger.warn(s"Redirect Mesos client from $uri to $redirectUri")
           // Update the context with the new leader's host and port and throw an exception that is handled in the
           // next `recoverWith` stage.
           response.discardEntityBytes()
@@ -227,8 +228,13 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     urls match {
       case Nil => throw new IOException(s"Failed to connect to Mesos: List of master urls exhausted.")
       case baseUrl :: rest =>
-        logger.info(s"Connecting to Mesos master $baseUrl")
-        val requestUri = Uri(s"${baseUrl.getPath}/api/v1/scheduler")
+        // Convert the Java URL to an Akka Uri.
+        val baseUri = Uri.from(
+          scheme = baseUrl.getProtocol,
+          host = baseUrl.getHost,
+          port = if (baseUrl.getPort == -1) baseUrl.getDefaultPort else baseUrl.getPort)
+        logger.info(s"Connecting to Mesos master $baseUri")
+        val requestUri = baseUri.withPath(Path("/api/v1/scheduler"))
         connectionSource(frameworkInfo, requestUri, authorization, followRedirect = true).map { response =>
           response.status match {
             case StatusCodes.OK =>
@@ -237,7 +243,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
                 .find(h => h.is(MesosStreamIdHeaderName.toLowerCase))
                 .getOrElse(throw new IllegalStateException(s"Missing MesosStreamId header in ${response.headers}"))
 
-              (response, Session(baseUrl, streamId.value(), authorization))
+              (response, Session(baseUri, streamId.value(), authorization))
             case _ =>
               response.discardEntityBytes()
               throw new IllegalArgumentException(s"Mesos server error: ${response.status}")
@@ -365,7 +371,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     httpConnection.flatMapConcat {
       case (httpResponse, session) =>
         val sharedKillSwitch =
-          KillSwitches.shared(s"MesosClient-${session.url}")
+          KillSwitches.shared(s"MesosClient-${session.baseUri}")
         httpResponse.entity.withoutSizeLimit.dataBytes
           .via(eventReader)
           .via(sharedKillSwitch.flow)

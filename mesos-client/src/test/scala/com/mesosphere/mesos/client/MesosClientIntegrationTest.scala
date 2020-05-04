@@ -8,7 +8,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.utils.AkkaUnitTest
-import com.mesosphere.utils.mesos.MesosClusterTest
+import com.mesosphere.utils.mesos.{MesosClusterTest, MesosConfig}
 import org.apache.mesos.v1.Protos.{Filters, FrameworkID, FrameworkInfo}
 import org.apache.mesos.v1.scheduler.Protos.Event
 
@@ -17,17 +17,19 @@ import scala.concurrent.Future
 
 class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
 
-  "Mesos client should successfully subscribe to mesos without framework Id" in withFixture() { f =>
+  override lazy val mesosConfig = MesosConfig(numMasters = 3)
+
+  "Mesos client should successfully subscribe to Mesos without framework Id" in withFixture() { f =>
     Then("a framework successfully subscribes without a framework Id")
     f.client.frameworkId.getValue shouldNot be(empty)
 
     And("connection context should be initialized")
-    f.client.session.url.getHost shouldBe f.mesosHost
+    f.client.session.baseUri.toString() shouldBe f.mesosHost.toString
     f.client.session.streamId.length should be > 1
     f.client.frameworkId.getValue.length should be > 1
   }
 
-  "Mesos client should successfully subscribe to mesos with framework Id" in {
+  "Mesos client should successfully subscribe to Mesos with framework Id" in {
     val frameworkID = FrameworkID.newBuilder.setValue(UUID.randomUUID().toString)
 
     When("a framework subscribes with a framework Id")
@@ -43,6 +45,21 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
 
     Then("a heartbeat event should arrive")
     heartbeat shouldNot be(empty)
+  }
+
+  "Mesos client should follow redirect" in {
+    Given("client settings with non-leader URL")
+    val nonLeader = mesosCluster.masters.find(_.port != mesosFacade.url.getPort).value.host()
+    val settings = MesosClientSettings.load().withMasters(nonLeader)
+
+    When(s"we connect to $nonLeader")
+    val f = new Fixture(settings = settings)
+
+    Then("a new framework should register")
+    // TODO: withFixture
+
+    And("a heartbeat should arrive")
+    f.pullUntil(_.getType == Event.Type.HEARTBEAT) shouldNot be(empty)
   }
 
   "Mesos client should successfully receive offers" in withFixture() { f =>
@@ -88,7 +105,9 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
     }
   }
 
-  class Fixture(existingFrameworkId: Option[FrameworkID.Builder] = None) {
+  class Fixture(
+      existingFrameworkId: Option[FrameworkID.Builder] = None,
+      val settings: MesosClientSettings = MesosClientSettings.load().withMasters(mesosFacade.url)) {
     implicit val system: ActorSystem = ActorSystem()
     implicit val materializer: ActorMaterializer = ActorMaterializer()
 
@@ -98,14 +117,12 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
       .setName("Mesos Client Integration Tests")
       .setId(existingFrameworkId.getOrElse(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString)))
       .addRoles("test")
-      .setFailoverTimeout(0.0f)
+      .setFailoverTimeout(30.0f)
       .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
       .build()
 
     lazy val mesosHost = mesosFacade.url.getHost
     lazy val mesosPort = mesosFacade.url.getPort
-
-    val settings = MesosClientSettings.load().withMasters(Seq(mesosFacade.url))
 
     val client = MesosClient(settings, frameworkInfo).runWith(Sink.head).futureValue
 
@@ -131,4 +148,5 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
           pullUntil(predicate)
       }
   }
+
 }
