@@ -211,7 +211,7 @@ case class MesosCluster(
   def failover(): URL = {
     require(config.numMasters > 1, s"The number of masters ${config.numMasters} is not bigger than 1.")
 
-    val leaderPort = new URL(masterUrl).getPort
+    val leaderPort = waitForLeader().getPort
     val oldLeader = masters
       .find(_.port == leaderPort)
       .getOrElse(

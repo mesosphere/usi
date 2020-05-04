@@ -236,7 +236,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
         connectionSource(frameworkInfo, requestUri, authorization, maxRedirects).map { response =>
           response.status match {
             case StatusCodes.OK =>
-              logger.info(s"Connected successfully to $baseUrl");
+              logger.info(s"Connected successfully to $baseUri");
               val streamId = response.headers
                 .find(h => h.is(MesosStreamIdHeaderName.toLowerCase))
                 .getOrElse(throw new IllegalStateException(s"Missing MesosStreamId header in ${response.headers}"))
@@ -249,7 +249,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
         }.recoverWithRetries(
           1, {
             case ex =>
-              logger.warn(s"Failed to connect to Mesos $baseUrl", ex)
+              logger.warn(s"Failed to connect to Mesos $baseUri", ex)
               mesosHttpConnection(frameworkInfo, rest, maxRedirects, authorization)
           }
         )
