@@ -115,17 +115,14 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
 object Session {
 
   /** @return whether the url defines a secured connection. */
-  def isSecured(url: URL): Boolean = {
-    url.getProtocol match {
+  def isSecured(uri: Uri): Boolean = {
+    uri.scheme match {
       case "https" => true
       case "http" => false
       case other =>
         throw new IllegalArgumentException(s"$other is not a supported protocol. Only HTTPS and HTTP are supported.")
     }
   }
-
-  /** @return The defined port or default port for given protocol. */
-  def effectivePort(url: URL): Int = if (url.getPort == -1) url.getDefaultPort else url.getPort
 }
 
 object SessionActor {
