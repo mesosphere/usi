@@ -224,7 +224,7 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
               val protocol = url.getProtocol
               // TODO: what happens when we redirect from http to https?
               val redirect = response.header[headers.Location].get.value()
-              val redirectUrl = s"$protocol$redirect"
+              val redirectUrl = s"$protocol:$redirect"
               logger.warn(s"New Mesos leader available at $redirectUrl")
               val leader = new URL(redirectUrl)
               // Update the context with the new leader's host and port and throw an exception that is handled in the
