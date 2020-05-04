@@ -1,5 +1,4 @@
 package com.mesosphere.mesos.client
-import java.net.URL
 
 import akka.NotUsed
 import akka.actor.{Actor, ActorRef, ActorSystem, Props, Stash, Status}

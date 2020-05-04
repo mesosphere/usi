@@ -38,7 +38,7 @@ class SimpleHelloWorldFramework(settings: MesosClientSettings) extends StrictLog
 
   logger.info(s"""Successfully subscribed to Mesos:
                  | Framework Id: ${client.frameworkId.getValue}
-                 | Mesos host: ${client.session.url}
+                 | Mesos host: ${client.session.baseUri}
        """.stripMargin)
 
   /**
