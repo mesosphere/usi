@@ -70,52 +70,11 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
   /** @return A flow that makes Mesos calls and outputs HTTP responses. */
   def post[C](
       implicit system: ActorSystem,
-      mat: Materializer): FlowWithContext[Array[Byte], C, HttpResponse, C, NotUsed] =
-    authorization match {
-      case Some(credentialsProvider) =>
-        import system.dispatcher
-        logger.info(s"Create authenticated session for stream $streamId.")
-        val sessionActor = system.actorOf(SessionActor.props(credentialsProvider, createPostRequest))
-        FlowWithContext[Array[Byte], C].via(sessionActorFlow(1)(sessionActor))
-      case None =>
-        logger.info(s"Create unauthenticated session for stream $streamId.")
-        FlowWithContext[Array[Byte], C].map(createPostRequest(_, None)).via(connection)
-    }
-
-  /**
-    * A connection flow factory that will create a flow that only processes one request at a time.
-    *
-    * It will reconnect if the server closes the connection after a successful request.
-    *
-    * @return A connection flow for single requests.
-    */
-  private def connection[C](
-      implicit system: ActorSystem,
-      mat: Materializer): Flow[(HttpRequest, C), (HttpResponse, C), NotUsed] = {
-    // Constructs the connection pool settings with defaults and overrides the max connections and pipelining limit so
-    // that only one request at a time is processed. See https://doc.akka.io/docs/akka-http/current/configuration.html
-    // for details.
-    // *IMPORTANT*: DO NOT CHANGE maxConnections OR pipelining Limit! Otherwise, USI won't guarantee request order to Mesos!
-    val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
-
-    Flow[(HttpRequest, C)]
-      .via(if (Session.isSecured(baseUri)) {
-        Http()
-          .newHostConnectionPoolHttps(
-            host = baseUri.authority.host.address(),
-            port = baseUri.effectivePort,
-            settings = poolSettings)
-      } else {
-        Http()
-          .newHostConnectionPool(
-            host = baseUri.authority.host.address(),
-            port = baseUri.effectivePort,
-            settings = poolSettings)
-      })
-      .map {
-        case (Success(response), context) => response -> context
-        case (Failure(ex), _) => throw ex
-      }
+      mat: Materializer): FlowWithContext[Array[Byte], C, HttpResponse, C, NotUsed] = {
+    import system.dispatcher
+    logger.info(s"Create authenticated session for stream $streamId.")
+    val sessionActor = system.actorOf(SessionActor.props(authorization, createPostRequest))
+    FlowWithContext[Array[Byte], C].via(sessionActorFlow(1)(sessionActor))
   }
 }
 
@@ -134,9 +93,9 @@ object Session {
 
 object SessionActor {
   def props(
-      credentialsProvider: CredentialsProvider,
+      authorization: Option[CredentialsProvider],
       requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest): Props = {
-    Props(new SessionActor(credentialsProvider, requestFactory))
+    Props(new SessionActor(authorization, requestFactory))
   }
 
   /**
@@ -152,12 +111,13 @@ object SessionActor {
 /**
   * An actor makes requests to Mesos using credentials from a [[CredentialsProvider]].
   *
-  * @param credentialsProvider The provider used to fetch the credentials, ie a session token.
+  * @param authorization The provider used to fetch the credentials, ie a session token, or None for unauthenticated
+  *                       calls
   * @param requestFactory The factory method that creates a [[HttpRequest]] from a serialized Mesos call. It should
   *                       capture the [[Session.streamId]] and [[Session.url]].
   */
 class SessionActor(
-    credentialsProvider: CredentialsProvider,
+    authorization: Option[CredentialsProvider],
     requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest)
     extends Actor
     with Stash
@@ -169,7 +129,10 @@ class SessionActor(
 
   override def preStart(): Unit = {
     super.preStart()
-    credentialsProvider.nextToken().pipeTo(self)
+    authorization match {
+      case Some(credentialsProvider) => credentialsProvider.nextToken().pipeTo(self)
+      case None => context.become(initialized(None))
+    }
   }
 
   override def receive: Receive = initializing
@@ -177,7 +140,7 @@ class SessionActor(
   def initializing: Receive = {
     case credentials: HttpCredentials =>
       logger.debug("Retrieved IAM authentication token")
-      context.become(initialized(credentials))
+      context.become(initialized(Some(credentials)))
       unstashAll()
     case Status.Failure(ex) =>
       logger.error("Fetching the next IAM authentication token failed", ex)
@@ -185,9 +148,9 @@ class SessionActor(
     case _ => stash()
   }
 
-  def initialized(credentials: HttpCredentials): Receive = {
+  def initialized(maybeCredentials: Option[HttpCredentials]): Receive = {
     case call: Array[Byte] =>
-      val request = requestFactory(call, Some(credentials))
+      val request = requestFactory(call, maybeCredentials)
       val originalSender = sender()
       logger.debug("Processing next Mesos call.")
       // The TLS handshake for each connection might be an overhead. We could potentially reuse a connection.
@@ -202,13 +165,18 @@ class SessionActor(
             // Fail stream.
             originalSender ! Status.Failure(ex)
         }
+    // TODO: there is a bug. The session requests do not follow redirects
     case SessionActor.Response(originalCall, originalSender, response) =>
       logger.debug(s"Call replied with ${response.status}")
       if (response.status == StatusCodes.Unauthorized) {
         logger.info("Refreshing IAM authentication token")
 
         context.become(initializing)
-        credentialsProvider.nextToken().pipeTo(self)
+        authorization match {
+          case Some(credentialsProvider) => credentialsProvider.nextToken().pipeTo(self)
+          case None =>
+            throw new IllegalStateException("Received HTTP 401 Unauthorized but no credential provider was supplied.")
+        }
 
         // Queue current call again.
         self.tell(originalCall, originalSender)

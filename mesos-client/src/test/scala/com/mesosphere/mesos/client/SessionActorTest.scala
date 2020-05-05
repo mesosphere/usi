@@ -20,7 +20,7 @@ class SessionActorTest extends AkkaUnitTest {
 
       Given("A SessionActor and an HTTP response")
       val sessionActor =
-        system.actorOf(SessionActor.props(BasicAuthenticationProvider("user", "password"), f.requestFactory))
+        system.actorOf(SessionActor.props(Some(BasicAuthenticationProvider("user", "password")), f.requestFactory))
       val originalSender = TestProbe()
       val httpResponse = HttpResponse(entity = HttpEntity("hello"))
 
@@ -37,7 +37,7 @@ class SessionActorTest extends AkkaUnitTest {
       Given("A simple Mesos API stub and a SessionActor instance")
       val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
-        system.actorOf(SessionActor.props(credentialsProvider, mesos.createRequest))
+        system.actorOf(SessionActor.props(Some(credentialsProvider), mesos.createRequest))
 
       When("we make a call through the session actor")
       val response = (sessionActor ? Array.empty[Byte]).futureValue.asInstanceOf[HttpResponse]
@@ -60,7 +60,7 @@ class SessionActorTest extends AkkaUnitTest {
       Given("A SessionActor instance")
       val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
-        system.actorOf(SessionActor.props(credentialsProvider, mesos.createRequest))
+        system.actorOf(SessionActor.props(Some(credentialsProvider), mesos.createRequest))
 
       When("we make a call through the session actor")
       val response = (sessionActor ? Array.empty[Byte]).futureValue.asInstanceOf[HttpResponse]
