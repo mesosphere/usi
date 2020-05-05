@@ -6,7 +6,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.stream.{Materializer, WatchedActorTerminatedException}
 import akka.stream.scaladsl.{Flow, FlowWithContext}
 import akka.util.Timeout
