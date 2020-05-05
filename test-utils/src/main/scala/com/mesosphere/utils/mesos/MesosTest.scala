@@ -220,7 +220,7 @@ case class MesosCluster(
     eventually(timeout(waitForMesosTimeout), interval(1.seconds)) {
       val possibleNewLeader = waitForLeader();
       assert(leaderPort != possibleNewLeader.getPort, "Leader did not change.")
-      logger.info(s"Changed leader from $oldLeader to ${possibleNewLeader.getPort}.")
+      logger.info(s"Changed leader from $leaderPort to ${possibleNewLeader.getPort}.")
       possibleNewLeader
     }
   }
