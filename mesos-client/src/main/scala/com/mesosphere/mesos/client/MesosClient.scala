@@ -197,6 +197,10 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
             val redirectUri = locationHeader.uri.resolvedAgainst(uri)
             logger.warn(s"Redirect Mesos client from $uri to $redirectUri given header '$locationHeader'")
             response.discardEntityBytes()
+
+            if (redirectUri == uri) {
+              throw new IOException(s"Failed to connect to Mesos: Circular redirection for $uri.")
+            }
             connectionSource(frameworkInfo, redirectUri, authorization, redirectsLeft - 1)
           } else {
             throw new IOException("Failed to connect to Mesos: Too many redirects.")
