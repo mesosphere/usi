@@ -1,5 +1,4 @@
 package com.mesosphere.mesos.client
-import java.net.URL
 
 import akka.http.scaladsl.model.Uri
 import akka.stream.KillSwitches

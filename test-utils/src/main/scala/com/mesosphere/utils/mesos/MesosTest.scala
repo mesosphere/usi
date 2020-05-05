@@ -215,9 +215,13 @@ case class MesosCluster(
     val oldLeader = masters
       .find(_.port == leaderPort)
       .getOrElse(
-        throw new IllegalStateException(s"Could not find leader $masterUrl in ${masters.map(_.port).mkString(", ")}."))
+        throw new IllegalStateException(s"Could not find leader $leaderPort in ${masters.map(_.port).mkString(", ")}."))
     oldLeader.restart()
-    waitForLeader()
+    eventually(timeout(waitForMesosTimeout), interval(1.seconds)) {
+      val possibleNewLeader = waitForLeader();
+      assert(leaderPort != possibleNewLeader.getPort, "Leader did not change.")
+      possibleNewLeader
+    }
   }
 
   def waitForLeader(): URL = {

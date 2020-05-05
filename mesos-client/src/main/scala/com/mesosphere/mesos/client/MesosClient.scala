@@ -188,13 +188,14 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     }
 
     requestSource
-      .via(info(s"Connecting to the new leader: $uri"))
+      .via(info(s"Connecting to the new leader: $uri "))
       .via(httpConnection)
       .flatMapConcat { response: HttpResponse =>
         if (response.status.isRedirection()) {
           if (redirectsLeft > 0) {
-            val redirectUri = response.header[headers.Location].get.uri.resolvedAgainst(uri)
-            logger.warn(s"Redirect Mesos client from $uri to $redirectUri")
+            val locationHeader = response.header[headers.Location].get
+            val redirectUri = locationHeader.uri.resolvedAgainst(uri)
+            logger.warn(s"Redirect Mesos client from $uri to $redirectUri given header '$locationHeader'")
             response.discardEntityBytes()
             connectionSource(frameworkInfo, redirectUri, authorization, redirectsLeft - 1)
           } else {
