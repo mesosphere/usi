@@ -31,24 +31,9 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
     extends StrictLogging {
 
   /**
-    * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
-    * @param bytes The bytes of the serialized Mesos call.
-    * @param maybeCredentials The session token if required.
-    * @return The [[HttpRequest]] with proper headers and body.
-    */
-  def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest = {
-    HttpRequest(
-      HttpMethods.POST,
-      uri = baseUri.withPath(Path("/api/v1/scheduler")),
-      entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
-      headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
-    )
-  }
-
-  /**
     * This is a port of [[Flow.ask()]] that supports a tuple to carry a context `C`.
     */
-  def sessionActorFlow[C](parallelism: Int)(ref: ActorRef)(
+  private def sessionActorFlow[C](parallelism: Int)(ref: ActorRef)(
       implicit timeout: Timeout,
       tag: ClassTag[HttpResponse],
       ec: ExecutionContext): Flow[(Array[Byte], C), (HttpResponse, C), NotUsed] = {
@@ -73,7 +58,8 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
       mat: Materializer): FlowWithContext[Array[Byte], C, HttpResponse, C, NotUsed] = {
     import system.dispatcher
     logger.info(s"Create authenticated session for stream $streamId.")
-    val sessionActor = system.actorOf(SessionActor.props(authorization, createPostRequest))
+    val sessionActor =
+      system.actorOf(SessionActor.props(authorization, streamId, baseUri.withPath(Path("/api/v1/scheduler"))))
     FlowWithContext[Array[Byte], C].via(sessionActorFlow(1)(sessionActor))
   }
 }
@@ -92,10 +78,8 @@ object Session {
 }
 
 object SessionActor {
-  def props(
-      authorization: Option[CredentialsProvider],
-      requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest): Props = {
-    Props(new SessionActor(authorization, requestFactory))
+  def props(authorization: Option[CredentialsProvider], streamId: String, schedulerEndpoint: Uri): Props = {
+    Props(new SessionActor(authorization, streamId, schedulerEndpoint))
   }
 
   /**
@@ -113,12 +97,10 @@ object SessionActor {
   *
   * @param authorization The provider used to fetch the credentials, ie a session token, or None for unauthenticated
   *                       calls
-  * @param requestFactory The factory method that creates a [[HttpRequest]] from a serialized Mesos call. It should
-  *                       capture the [[Session.streamId]] and [[Session.url]].
+  * @param streamId The Mesos stream ID. See the [[http://mesos.apache.org/documentation/latest/scheduler-http-api/#calls docs]] for details.
+  * @param schedulerEndpoint The Mesos master URL /api/v1/scheduler.
   */
-class SessionActor(
-    authorization: Option[CredentialsProvider],
-    requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest)
+class SessionActor(authorization: Option[CredentialsProvider], streamId: String, schedulerEndpoint: Uri)
     extends Actor
     with Stash
     with StrictLogging {
@@ -131,16 +113,19 @@ class SessionActor(
     super.preStart()
     authorization match {
       case Some(credentialsProvider) => credentialsProvider.nextToken().pipeTo(self)
-      case None => context.become(initialized(None))
+      case None => context.become(initialized(schedulerEndpoint, None))
     }
   }
 
   override def receive: Receive = initializing
 
+  /**
+    * Initial behavior that fetched the initial auth token.
+    */
   def initializing: Receive = {
     case credentials: HttpCredentials =>
       logger.debug("Retrieved IAM authentication token")
-      context.become(initialized(Some(credentials)))
+      context.become(initialized(schedulerEndpoint, Some(credentials)))
       unstashAll()
     case Status.Failure(ex) =>
       logger.error("Fetching the next IAM authentication token failed", ex)
@@ -148,11 +133,18 @@ class SessionActor(
     case _ => stash()
   }
 
-  def initialized(maybeCredentials: Option[HttpCredentials]): Receive = {
+  /**
+    * Default behaviour when the session has an auth token.
+    *
+    * @param requestUri The endpoint for the requests. Should be <Mesos leader>/api/v1/scheduler.
+    * @param maybeCredentials The auth token if the requests need to be authenticated.
+    * @return
+    */
+  def initialized(requestUri: Uri, maybeCredentials: Option[HttpCredentials]): Receive = {
     case call: Array[Byte] =>
-      val request = requestFactory(call, maybeCredentials)
+      val request = createPostRequest(call, requestUri, maybeCredentials)
       val originalSender = sender()
-      logger.debug("Processing next Mesos call.")
+      logger.debug(s"Processing next Mesos call: $request")
       // The TLS handshake for each connection might be an overhead. We could potentially reuse a connection.
       Http()(context.system)
         .singleRequest(request)
@@ -180,9 +172,38 @@ class SessionActor(
 
         // Queue current call again.
         self.tell(originalCall, originalSender)
+      } else if (response.status.isRedirection()) {
+        logger.debug(s"Received redirect $response")
+
+        // Reset scheduler endpoint.
+        val locationHeader = response.header[headers.Location].get
+        val redirectUri = locationHeader.uri.resolvedAgainst(requestUri)
+        context.become(initialized(redirectUri, maybeCredentials))
+
+        // Queue current call again.
+        self.tell(originalCall, originalSender)
       } else {
         logger.debug("Responding to original sender")
         originalSender ! response
       }
+  }
+
+  /**
+    * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
+    * @param bytes The bytes of the serialized Mesos call.
+    * @param endpoint The endpoint for the request.
+    * @param maybeCredentials The session token if required.
+    * @return The [[HttpRequest]] with proper headers and body.
+    */
+  private def createPostRequest(
+      bytes: Array[Byte],
+      endpoint: Uri,
+      maybeCredentials: Option[HttpCredentials]): HttpRequest = {
+    HttpRequest(
+      HttpMethods.POST,
+      uri = endpoint,
+      entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
+      headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
+    )
   }
 }
