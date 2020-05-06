@@ -31,6 +31,7 @@ val commonSettings = Seq(
         "Mesosphere Public Repo (S3)",
         s3("downloads.mesosphere.io/maven")).withMavenPatterns)
   },
+  publishMavenStyle := true,
   s3credentials := DefaultAWSCredentialsProviderChain.getInstance(),
   s3region :=  com.amazonaws.services.s3.model.Region.US_Standard,
 )
