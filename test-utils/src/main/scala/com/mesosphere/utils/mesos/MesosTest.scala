@@ -188,6 +188,12 @@ case class MesosCluster(
     start()
   }
 
+  /**
+    * Starts a Mesos cluster.
+    *
+    * @param prefix An optional prefix for the master and angent logs.
+    * @return The leader URL.
+    */
   def start(prefix: Option[String] = None): URL = {
     masters.foreach(_.start(prefix))
     agents.foreach(_.start(prefix))
@@ -195,6 +201,28 @@ case class MesosCluster(
     waitForAgents(masterUrl)
     logger.info(s"Started Mesos cluster with master on $masterUrl")
     masterUrl
+  }
+
+  /**
+    * Kills the Mesos master to force a different master to become leader.
+    *
+    * @return The URL of the new leader.
+    */
+  def failover(): URL = {
+    require(config.numMasters > 1, s"The number of masters ${config.numMasters} is not bigger than 1.")
+
+    val leaderPort = waitForLeader().getPort
+    val oldLeader = masters
+      .find(_.port == leaderPort)
+      .getOrElse(
+        throw new IllegalStateException(s"Could not find leader $leaderPort in ${masters.map(_.port).mkString(", ")}."))
+    oldLeader.restart()
+    eventually(timeout(waitForMesosTimeout), interval(1.seconds)) {
+      val possibleNewLeader = waitForLeader();
+      assert(leaderPort != possibleNewLeader.getPort, "Leader did not change.")
+      logger.info(s"Changed leader from $leaderPort to ${possibleNewLeader.getPort}.")
+      possibleNewLeader
+    }
   }
 
   def waitForLeader(): URL = {
@@ -253,10 +281,14 @@ case class MesosCluster(
   trait Mesos extends AutoCloseable {
     val ip = IP.routableIPv4
     val port = PortAllocator.ephemeralPort()
+    def host(): URL = new URL("http", ip, port, "")
+
     val workDir: File
     val processBuilder: ProcessBuilder
     val processName: String
     private var process: Option[Process] = None
+
+    private var prefix: Option[String] = None
 
     if (autoStart) {
       start()
@@ -272,13 +304,30 @@ case class MesosCluster(
       */
     def start(prefix: Option[String] = None): Unit = if (process.isEmpty) {
       assert(!isAlive(), s"Mesos process ${processName} already started")
-      val name = prefix.getOrElse(suiteName)
+
+      // Capture prefix if required. [[MesosClusterExtension]] is using this feature.
+      if (prefix.nonEmpty) this.prefix = prefix
+
+      val name = this.prefix.getOrElse(suiteName)
       process = Some(processBuilder.run(ProcessOutputToLogStream(s"$name-Mesos$processName-$port")))
     }
 
     def stop(): Unit = {
       process.foreach(_.destroy())
       process = None
+    }
+
+    def restart(): Unit = {
+      if (isAlive()) {
+        process.foreach { p =>
+          p.destroy()
+          // Wait for process to exit
+          p.exitValue()
+        }
+        process = None
+      }
+
+      start()
     }
 
     override def close(): Unit = {

@@ -2,6 +2,7 @@ package com.mesosphere.mesos.client
 
 import akka.pattern.ask
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{BasicHttpCredentials, HttpCredentials}
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -16,11 +17,11 @@ class SessionActorTest extends AkkaUnitTest {
 
   "The Session Actor" should {
     "replied with a response to the original sender" in {
-      val f = new Fixture
-
       Given("A SessionActor and an HTTP response")
       val sessionActor =
-        system.actorOf(SessionActor.props(BasicAuthenticationProvider("user", "password"), f.requestFactory))
+        system.actorOf(
+          SessionActor
+            .props(Some(BasicAuthenticationProvider("user", "password")), "some-strean-id", Uri("http://example.com")))
       val originalSender = TestProbe()
       val httpResponse = HttpResponse(entity = HttpEntity("hello"))
 
@@ -37,7 +38,7 @@ class SessionActorTest extends AkkaUnitTest {
       Given("A simple Mesos API stub and a SessionActor instance")
       val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
-        system.actorOf(SessionActor.props(credentialsProvider, mesos.createRequest))
+        system.actorOf(SessionActor.props(Some(credentialsProvider), "some-stream-id", mesos.uri))
 
       When("we make a call through the session actor")
       val response = (sessionActor ? Array.empty[Byte]).futureValue.asInstanceOf[HttpResponse]
@@ -60,7 +61,7 @@ class SessionActorTest extends AkkaUnitTest {
       Given("A SessionActor instance")
       val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
-        system.actorOf(SessionActor.props(credentialsProvider, mesos.createRequest))
+        system.actorOf(SessionActor.props(Some(credentialsProvider), "some-stream-id", mesos.uri))
 
       When("we make a call through the session actor")
       val response = (sessionActor ? Array.empty[Byte]).futureValue.asInstanceOf[HttpResponse]
@@ -74,11 +75,23 @@ class SessionActorTest extends AkkaUnitTest {
       And("the session token was fetched twice")
       credentialsProvider.calls should be(2)
     }
-  }
 
-  class Fixture() {
+    "follow a redirect" in withMesosStub(StatusCodes.OK) { mesos =>
+      implicit val timeout = Timeout(2.seconds)
 
-    def requestFactory(body: Array[Byte], credentials: Option[HttpCredentials]): HttpRequest = ???
+      Given("A SessionActor instance")
+      val sessionActor =
+        system.actorOf(SessionActor.props(None, "some-stream-id", mesos.uri.withPath(Path("/redirected"))))
+
+      When("we make a call through the session actor")
+      val response = (sessionActor ? Array.empty[Byte]).futureValue.asInstanceOf[HttpResponse]
+
+      Then("we receive an HTTP 200")
+      response.status should be(StatusCodes.OK)
+
+      And("/mesos was called once: the redirected call")
+      Unmarshal(response.entity).to[String].futureValue.toInt should be(1)
+    }
   }
 
   /**
@@ -124,23 +137,25 @@ class SessionActorTest extends AkkaUnitTest {
     @volatile var calls: Int = 0
 
     val route =
-      path("mesos") {
-        post {
-          calls += 1
-          responseCodes match {
-            case head :: tail =>
-              responseCodes = tail
-              complete(head -> calls.toString)
-            case Nil =>
-              complete(StatusCodes.NotImplemented -> "Provided response codes exhausted.")
+      post {
+        concat(
+          path("mesos") {
+            calls += 1
+            responseCodes match {
+              case head :: tail =>
+                responseCodes = tail
+                complete(head -> calls.toString)
+              case Nil =>
+                complete(StatusCodes.NotImplemented -> "Provided response codes exhausted.")
+            }
+          },
+          path("redirected") {
+            redirect("/mesos", StatusCodes.TemporaryRedirect)
           }
-        }
+        )
       }
 
     val binding = Http().bindAndHandle(route, "localhost", 0).futureValue
     val uri = Uri(s"http://localhost:${binding.localAddress.getPort}/mesos")
-
-    def createRequest(body: Array[Byte], credentials: Option[HttpCredentials]): HttpRequest =
-      HttpRequest(HttpMethods.POST, uri = uri)
   }
 }

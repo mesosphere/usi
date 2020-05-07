@@ -1,12 +1,11 @@
 package com.mesosphere.mesos.client
-import java.net.URL
 
 import akka.NotUsed
 import akka.actor.{Actor, ActorRef, ActorSystem, Props, Stash, Status}
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.stream.{Materializer, WatchedActorTerminatedException}
 import akka.stream.scaladsl.{Flow, FlowWithContext}
 import akka.util.Timeout
@@ -22,33 +21,18 @@ import scala.util.{Failure, Success}
   * It behaves similar to Python Request's [[https://2.python-requests.org/en/master/user/advanced/#session-objects Session object]].
   * Thus it provides methods to construct and connect to Mesos.
   *
-  * @param url The Mesos master URL.
+  * @param baseUri The Mesos master URL.
   * @param streamId The Mesos stream ID. See the [[http://mesos.apache.org/documentation/latest/scheduler-http-api/#calls docs]] for details.
   * @param authorization A [[CredentialsProvider]] if the connection is secured.
   */
-case class Session(url: URL, streamId: String, authorization: Option[CredentialsProvider] = None)(
+case class Session(baseUri: Uri, streamId: String, authorization: Option[CredentialsProvider] = None)(
     implicit askTimout: Timeout)
     extends StrictLogging {
 
   /**
-    * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
-    * @param bytes The bytes of the serialized Mesos call.
-    * @param maybeCredentials The session token if required.
-    * @return The [[HttpRequest]] with proper headers and body.
-    */
-  def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest = {
-    HttpRequest(
-      HttpMethods.POST,
-      uri = Uri(s"$url/api/v1/scheduler"),
-      entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
-      headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
-    )
-  }
-
-  /**
     * This is a port of [[Flow.ask()]] that supports a tuple to carry a context `C`.
     */
-  def sessionActorFlow[C](parallelism: Int)(ref: ActorRef)(
+  private def sessionActorFlow[C](parallelism: Int)(ref: ActorRef)(
       implicit timeout: Timeout,
       tag: ClassTag[HttpResponse],
       ec: ExecutionContext): Flow[(Array[Byte], C), (HttpResponse, C), NotUsed] = {
@@ -70,69 +54,31 @@ case class Session(url: URL, streamId: String, authorization: Option[Credentials
   /** @return A flow that makes Mesos calls and outputs HTTP responses. */
   def post[C](
       implicit system: ActorSystem,
-      mat: Materializer): FlowWithContext[Array[Byte], C, HttpResponse, C, NotUsed] =
-    authorization match {
-      case Some(credentialsProvider) =>
-        import system.dispatcher
-        logger.info(s"Create authenticated session for stream $streamId.")
-        val sessionActor = system.actorOf(SessionActor.props(credentialsProvider, createPostRequest))
-        FlowWithContext[Array[Byte], C].via(sessionActorFlow(1)(sessionActor))
-      case None =>
-        logger.info(s"Create unauthenticated session for stream $streamId.")
-        FlowWithContext[Array[Byte], C].map(createPostRequest(_, None)).via(connection)
-    }
-
-  /**
-    * A connection flow factory that will create a flow that only processes one request at a time.
-    *
-    * It will reconnect if the server closes the connection after a successful request.
-    *
-    * @return A connection flow for single requests.
-    */
-  private def connection[C](
-      implicit system: ActorSystem,
-      mat: Materializer): Flow[(HttpRequest, C), (HttpResponse, C), NotUsed] = {
-    // Constructs the connection pool settings with defaults and overrides the max connections and pipelining limit so
-    // that only one request at a time is processed. See https://doc.akka.io/docs/akka-http/current/configuration.html
-    // for details.
-    // *IMPORTANT*: DO NOT CHANGE maxConnections OR pipelining Limit! Otherwise, USI won't guarantee request order to Mesos!
-    val poolSettings = ConnectionPoolSettings("").withMaxConnections(1).withPipeliningLimit(1)
-
-    Flow[(HttpRequest, C)]
-      .via(if (Session.isSecured(url)) {
-        Http()
-          .newHostConnectionPoolHttps(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings)
-      } else {
-        Http().newHostConnectionPool(host = url.getHost, port = Session.effectivePort(url), settings = poolSettings)
-      })
-      .map {
-        case (Success(response), context) => response -> context
-        case (Failure(ex), _) => throw ex
-      }
+      mat: Materializer): FlowWithContext[Array[Byte], C, HttpResponse, C, NotUsed] = {
+    import system.dispatcher
+    logger.info(s"Create authenticated session for stream $streamId.")
+    val sessionActor =
+      system.actorOf(SessionActor.props(authorization, streamId, baseUri.withPath(Path("/api/v1/scheduler"))))
+    FlowWithContext[Array[Byte], C].via(sessionActorFlow(1)(sessionActor))
   }
 }
 
 object Session {
 
   /** @return whether the url defines a secured connection. */
-  def isSecured(url: URL): Boolean = {
-    url.getProtocol match {
+  def isSecured(uri: Uri): Boolean = {
+    uri.scheme match {
       case "https" => true
       case "http" => false
       case other =>
-        throw new IllegalArgumentException(s"$other is not a supported protocol. Only HTTPS and HTTP are supported.")
+        throw new IllegalArgumentException(s"'$other' is not a supported protocol. Only HTTPS and HTTP are supported.")
     }
   }
-
-  /** @return The defined port or default port for given protocol. */
-  def effectivePort(url: URL): Int = if (url.getPort == -1) url.getDefaultPort else url.getPort
 }
 
 object SessionActor {
-  def props(
-      credentialsProvider: CredentialsProvider,
-      requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest): Props = {
-    Props(new SessionActor(credentialsProvider, requestFactory))
+  def props(authorization: Option[CredentialsProvider], streamId: String, schedulerEndpoint: Uri): Props = {
+    Props(new SessionActor(authorization, streamId, schedulerEndpoint))
   }
 
   /**
@@ -148,13 +94,12 @@ object SessionActor {
 /**
   * An actor makes requests to Mesos using credentials from a [[CredentialsProvider]].
   *
-  * @param credentialsProvider The provider used to fetch the credentials, ie a session token.
-  * @param requestFactory The factory method that creates a [[HttpRequest]] from a serialized Mesos call. It should
-  *                       capture the [[Session.streamId]] and [[Session.url]].
+  * @param authorization The provider used to fetch the credentials, ie a session token, or None for unauthenticated
+  *                       calls
+  * @param streamId The Mesos stream ID. See the [[http://mesos.apache.org/documentation/latest/scheduler-http-api/#calls docs]] for details.
+  * @param schedulerEndpoint The Mesos master URL /api/v1/scheduler.
   */
-class SessionActor(
-    credentialsProvider: CredentialsProvider,
-    requestFactory: (Array[Byte], Option[HttpCredentials]) => HttpRequest)
+class SessionActor(authorization: Option[CredentialsProvider], streamId: String, schedulerEndpoint: Uri)
     extends Actor
     with Stash
     with StrictLogging {
@@ -165,15 +110,21 @@ class SessionActor(
 
   override def preStart(): Unit = {
     super.preStart()
-    credentialsProvider.nextToken().pipeTo(self)
+    authorization match {
+      case Some(credentialsProvider) => credentialsProvider.nextToken().pipeTo(self)
+      case None => context.become(initialized(schedulerEndpoint, None))
+    }
   }
 
   override def receive: Receive = initializing
 
+  /**
+    * Initial behavior that fetched the initial auth token.
+    */
   def initializing: Receive = {
     case credentials: HttpCredentials =>
       logger.debug("Retrieved IAM authentication token")
-      context.become(initialized(credentials))
+      context.become(initialized(schedulerEndpoint, Some(credentials)))
       unstashAll()
     case Status.Failure(ex) =>
       logger.error("Fetching the next IAM authentication token failed", ex)
@@ -181,11 +132,18 @@ class SessionActor(
     case _ => stash()
   }
 
-  def initialized(credentials: HttpCredentials): Receive = {
+  /**
+    * Default behaviour when the session has an auth token.
+    *
+    * @param requestUri The endpoint for the requests. Should be <Mesos leader>/api/v1/scheduler.
+    * @param maybeCredentials The auth token if the requests need to be authenticated.
+    * @return
+    */
+  def initialized(requestUri: Uri, maybeCredentials: Option[HttpCredentials]): Receive = {
     case call: Array[Byte] =>
-      val request = requestFactory(call, Some(credentials))
+      val request = createPostRequest(call, requestUri, maybeCredentials)
       val originalSender = sender()
-      logger.debug("Processing next Mesos call.")
+      logger.debug(s"Processing next Mesos call: $request")
       // The TLS handshake for each connection might be an overhead. We could potentially reuse a connection.
       Http()(context.system)
         .singleRequest(request)
@@ -198,13 +156,28 @@ class SessionActor(
             // Fail stream.
             originalSender ! Status.Failure(ex)
         }
+    // TODO: there is a bug. The session requests do not follow redirects
     case SessionActor.Response(originalCall, originalSender, response) =>
       logger.debug(s"Call replied with ${response.status}")
       if (response.status == StatusCodes.Unauthorized) {
         logger.info("Refreshing IAM authentication token")
 
         context.become(initializing)
-        credentialsProvider.nextToken().pipeTo(self)
+        authorization match {
+          case Some(credentialsProvider) => credentialsProvider.nextToken().pipeTo(self)
+          case None =>
+            throw new IllegalStateException("Received HTTP 401 Unauthorized but no credential provider was supplied.")
+        }
+
+        // Queue current call again.
+        self.tell(originalCall, originalSender)
+      } else if (response.status.isRedirection()) {
+        logger.debug(s"Received redirect $response")
+
+        // Reset scheduler endpoint.
+        val locationHeader = response.header[headers.Location].get
+        val redirectUri = locationHeader.uri.resolvedAgainst(requestUri)
+        context.become(initialized(redirectUri, maybeCredentials))
 
         // Queue current call again.
         self.tell(originalCall, originalSender)
@@ -212,5 +185,24 @@ class SessionActor(
         logger.debug("Responding to original sender")
         originalSender ! response
       }
+  }
+
+  /**
+    * Construct a new [[HttpRequest]] for a serialized Mesos call and a set of authorization, ie session token.
+    * @param bytes The bytes of the serialized Mesos call.
+    * @param endpoint The endpoint for the request.
+    * @param maybeCredentials The session token if required.
+    * @return The [[HttpRequest]] with proper headers and body.
+    */
+  private def createPostRequest(
+      bytes: Array[Byte],
+      endpoint: Uri,
+      maybeCredentials: Option[HttpCredentials]): HttpRequest = {
+    HttpRequest(
+      HttpMethods.POST,
+      uri = endpoint,
+      entity = HttpEntity(MesosClient.ProtobufMediaType, bytes),
+      headers = MesosClient.MesosStreamIdHeader(streamId) :: maybeCredentials.map(Authorization(_)).toList
+    )
   }
 }

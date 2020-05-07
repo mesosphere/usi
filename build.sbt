@@ -1,4 +1,4 @@
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+//import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.typesafe.sbt.SbtGit.GitKeys._
 
 val commonSettings = Seq(
@@ -23,16 +23,11 @@ val commonSettings = Seq(
   ),
   publishTo := {
     if (version.value.endsWith("-SNAPSHOT"))
-      Some(s3resolver.value(
-        "Mesosphere Public Snapshot Repo (S3)",
-        s3("downloads.mesosphere.io/maven-snapshot")))
+      Some("Mesosphere Public Snapshot Repo (S3)" at "s3://downloads.mesosphere.io/maven-snapshots")
     else
-      Some(s3resolver.value(
-        "Mesosphere Public Repo (S3)",
-        s3("downloads.mesosphere.io/maven")))
+      Some("Mesosphere Public Snapshot Repo (S3)" at "s3://downloads.mesosphere.io/maven")
   },
-  s3credentials := DefaultAWSCredentialsProviderChain.getInstance(),
-  s3region :=  com.amazonaws.services.s3.model.Region.US_Standard,
+  publishMavenStyle := true
 )
 
 lazy val docs = (project in file("./docs"))
@@ -44,8 +39,6 @@ lazy val docs = (project in file("./docs"))
       ("./version" !!).trim
     },
 
-    s3credentials := DefaultAWSCredentialsProviderChain.getInstance(),
-    s3region :=  com.amazonaws.services.s3.model.Region.US_Standard,
     publish / skip := true,
 
     name := "USI - Unified Scheduler Interface",
