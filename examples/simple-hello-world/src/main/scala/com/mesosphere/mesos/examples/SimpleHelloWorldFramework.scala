@@ -3,7 +3,7 @@ package com.mesosphere.mesos.examples
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
-import com.mesosphere.mesos.client.{MesosClient, StrictLoggingFlow}
+import com.mesosphere.mesos.client.{MesosCalls, MesosClient, StrictLoggingFlow}
 import com.mesosphere.mesos.conf.MesosClientSettings
 
 import scala.concurrent.Await
@@ -44,7 +44,7 @@ class SimpleHelloWorldFramework(settings: MesosClientSettings) extends StrictLog
   /**
     * Main event processor for all Mesos [[org.apache.mesos.v1.scheduler.Protos.Event]]s.
     */
-  val eventProcessor = new EventProcessor(client.calls)
+  val eventProcessor = new EventProcessor(new MesosCalls())
 
   /**
     * This is the main framework loop:

@@ -6,7 +6,7 @@ import org.apache.mesos.v1.Protos.{AgentID, ExecutorID, Filters, FrameworkID, Ki
 import org.apache.mesos.v1.scheduler.Protos.Call
 import org.apache.mesos.v1.scheduler.Protos.Call.{Accept, Decline, Reconcile, Revive, UpdateFramework}
 
-class MesosCalls(frameworkId: FrameworkID) {
+class MesosCalls() {
 
   /**
     * ***************************************************************************
@@ -28,7 +28,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.TEARDOWN)
-      .setFrameworkId(frameworkId)
       .build()
   }
 
@@ -46,7 +45,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.ACCEPT)
-      .setFrameworkId(frameworkId)
       .setAccept(accepts)
       .build()
   }
@@ -56,7 +54,6 @@ class MesosCalls(frameworkId: FrameworkID) {
       .newBuilder()
       .setType(Call.Type.UPDATE_FRAMEWORK)
       .setUpdateFramework(updateFramework)
-      .setFrameworkId(frameworkId)
       .build()
   }
 
@@ -76,7 +73,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.DECLINE)
-      .setFrameworkId(frameworkId)
       .setDecline(declineBuilder.build())
       .build()
   }
@@ -95,7 +91,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.REVIVE)
-      .setFrameworkId(frameworkId)
       .setRevive(reviveBuilder.build())
       .build()
   }
@@ -115,7 +110,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.SUPPRESS)
-      .setFrameworkId(frameworkId)
       .setSuppress(suppressBuilder)
       .build()
   }
@@ -143,7 +137,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.KILL)
-      .setFrameworkId(frameworkId)
       .setKill(killBuilder)
       .build()
   }
@@ -160,7 +153,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.SHUTDOWN)
-      .setFrameworkId(frameworkId)
       .setShutdown(
         Call.Shutdown
           .newBuilder()
@@ -184,7 +176,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.ACKNOWLEDGE)
-      .setFrameworkId(frameworkId)
       .setAcknowledge(
         Call.Acknowledge
           .newBuilder()
@@ -211,7 +202,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.RECONCILE)
-      .setFrameworkId(frameworkId)
       .setReconcile(reconcileBuilder)
       .build()
   }
@@ -228,7 +218,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.MESSAGE)
-      .setFrameworkId(frameworkId)
       .setMessage(
         Call.Message
           .newBuilder()
@@ -254,7 +243,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.REQUEST)
-      .setFrameworkId(frameworkId)
       .setRequest(requestBuilder)
       .build()
   }
@@ -275,7 +263,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.ACCEPT_INVERSE_OFFERS)
-      .setFrameworkId(frameworkId)
       .setAcceptInverseOffers(acceptInverseBuilder)
       .build()
   }
@@ -297,7 +284,6 @@ class MesosCalls(frameworkId: FrameworkID) {
     Call
       .newBuilder()
       .setType(Call.Type.DECLINE_INVERSE_OFFERS)
-      .setFrameworkId(frameworkId)
       .setDeclineInverseOffers(declineInverseBuilder)
       .build()
   }

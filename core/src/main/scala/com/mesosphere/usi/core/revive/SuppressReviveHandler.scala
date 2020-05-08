@@ -19,18 +19,16 @@ import scala.concurrent.duration.FiniteDuration
   *
   * This component handles the suppress-and-revive logic in USI. It does so by subscribing to the PodSpec state,
   * tracking which pods want offers for which roles, and then issuing the appropriate UpdateFramework (to either
-  * suppress and add new roles) or Revive mesos (when a role was previously suppressed) calls. Further, it debounces the
+  * suppress and add new roles) or Revive Mesos (when a role was previously suppressed) calls. Further, it debounces the
   * suppress and revive calls in order to reduce the load on Mesos when launching many new pods at one time.
   *
   * @param initialFrameworkInfo The initial framework info used to subscribe to Mesos, used as the basis for the UpdateFramework message.
-  * @param frameworkId The frameworkId assigned to the framework, since initialFrameworkInfo may not have it (new frameworks)
   * @param metrics Reference to metric reporter
   * @param mesosCallFactory Used to generate the suppress/revive calls to Mesos
   * @param debounceReviveInterval Specifies the time to wait before sending next revive/update. All revive/update effects are aggregrated.
   */
 private[core] class SuppressReviveHandler(
     initialFrameworkInfo: Mesos.FrameworkInfo,
-    frameworkId: Mesos.FrameworkID,
     metrics: Metrics,
     mesosCallFactory: MesosCalls,
     debounceReviveInterval: FiniteDuration)
@@ -107,7 +105,6 @@ private[core] class SuppressReviveHandler(
     val b = initialFrameworkInfo.toBuilder
     b.clearRoles()
     b.addAllRoles(roles.asJava)
-    b.setId(frameworkId)
     b.build
   }
 

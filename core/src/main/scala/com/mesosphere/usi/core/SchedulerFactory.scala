@@ -1,9 +1,11 @@
 package com.mesosphere.usi.core
 
+import akka.actor.ActorSystem
 import akka.{Done, NotUsed}
-import akka.stream.{FanInShape2, Graph}
-import akka.stream.scaladsl.{Flow, Sink}
-import com.mesosphere.mesos.client.MesosClient
+import akka.stream.{FanInShape2, Graph, Materializer}
+import akka.stream.scaladsl.{Flow, RestartFlow, Sink}
+import com.mesosphere.mesos.client.{CredentialsProvider, MesosCalls, MesosClient}
+import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.{PodSpecUpdatedEvent, StateEvent, StateSnapshot}
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
@@ -17,6 +19,7 @@ import org.apache.mesos.v1.scheduler.Protos
 import org.apache.mesos.v1.scheduler.Protos.{Call => MesosCall, Event => MesosEvent}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
 
 private[usi] trait SchedulerLogicFactory {
   private[usi] def newSchedulerLogicGraph(
@@ -48,20 +51,26 @@ private[usi] trait MesosFlowFactory {
   * @param metrics Metrics
   */
 class SchedulerFactory private (
-    client: MesosClient,
+    clientSettings: MesosClientSettings,
+    frameworkInfo: FrameworkInfo,
+    authorization: Option[CredentialsProvider],
     podRecordRepository: PodRecordRepository,
     schedulerSettings: SchedulerSettings,
-    metrics: Metrics)(implicit ec: ExecutionContext)
+    metrics: Metrics)(implicit ec: ExecutionContext, system: ActorSystem, materializer: Materializer)
     extends SchedulerLogicFactory
     with PersistenceFlowFactory
     with SuppressReviveFactory
     with MesosFlowFactory
     with StrictLogging {
 
-  val frameworkInfo: FrameworkInfo = client.frameworkInfo
-
   override def newMesosFlow: Flow[MesosCall, MesosEvent, NotUsed] =
-    Flow.fromSinkAndSourceCoupled(logMesosCallException(client.mesosSink), client.mesosSource)
+    RestartFlow.withBackoff(5.seconds, 30.seconds, 0.2, 10) { () =>
+      // TODO: Inject client factory
+      val flow = MesosClient(clientSettings, frameworkInfo, authorization).map { client =>
+        Flow.fromSinkAndSourceCoupled(logMesosCallException(client.mesosSink), client.mesosSource)
+      }.runWith(Sink.head)
+      Flow.futureFlow(flow)
+    }
 
   def newSchedulerFlow(): Future[(StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed])] =
     Scheduler.asFlow(this)
@@ -78,15 +87,14 @@ class SchedulerFactory private (
   }
 
   override def newSchedulerLogicGraph(snapshot: StateSnapshot): SchedulerLogicGraph = {
-    new SchedulerLogicGraph(client.calls, client.masterInfo.getDomain, snapshot, metrics)
+    new SchedulerLogicGraph(new MesosCalls(), client.masterInfo.getDomain, snapshot, metrics)
   }
 
   override def newSuppressReviveFlow: Flow[PodSpecUpdatedEvent, Protos.Call, NotUsed] = {
     new SuppressReviveHandler(
-      client.frameworkInfo,
-      client.frameworkId,
+      frameworkInfo,
       metrics,
-      client.calls,
+      new MesosCalls(),
       debounceReviveInterval = DurationConverters.toScala(schedulerSettings.debounceReviveInterval)
     ).flow
   }
@@ -104,16 +112,26 @@ class SchedulerFactory private (
 object SchedulerFactory {
 
   def apply(
-      client: MesosClient,
+      clientSettings: MesosClientSettings,
+      frameworkInfo: FrameworkInfo,
+      authorization: Option[CredentialsProvider],
       podRecordRepository: PodRecordRepository,
       schedulerSettings: SchedulerSettings,
-      metrics: Metrics)(implicit ec: ExecutionContext) =
-    new SchedulerFactory(client, podRecordRepository, schedulerSettings, metrics)
+      metrics: Metrics)(implicit ec: ExecutionContext, system: ActorSystem, materializer: Materializer) =
+    new SchedulerFactory(clientSettings, frameworkInfo, authorization, podRecordRepository, schedulerSettings, metrics)
 
   def create(
-      client: MesosClient,
+      clientSettings: MesosClientSettings,
+      frameworkInfo: FrameworkInfo,
+      authorization: Option[CredentialsProvider],
       podRecordRepository: PodRecordRepository,
       schedulerSettings: SchedulerSettings,
       metrics: Metrics,
-      ec: ExecutionContext) = new SchedulerFactory(client, podRecordRepository, schedulerSettings, metrics)(ec)
+      ec: ExecutionContext,
+      system: ActorSystem,
+      materializer: Materializer) =
+    new SchedulerFactory(clientSettings, frameworkInfo, authorization, podRecordRepository, schedulerSettings, metrics)(
+      ec,
+      system,
+      materializer)
 }

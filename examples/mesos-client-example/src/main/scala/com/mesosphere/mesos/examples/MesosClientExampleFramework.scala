@@ -6,7 +6,13 @@ import java.util.UUID
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.Sink
-import com.mesosphere.mesos.client.{CredentialsProvider, DcosServiceAccountProvider, MesosClient, StrictLoggingFlow}
+import com.mesosphere.mesos.client.{
+  CredentialsProvider,
+  DcosServiceAccountProvider,
+  MesosCalls,
+  MesosClient,
+  StrictLoggingFlow
+}
 import com.mesosphere.mesos.conf.MesosClientSettings
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.mesos.v1.Protos
@@ -47,6 +53,7 @@ class MesosClientExampleFramework(settings: MesosClientSettings, authorization: 
     .build()
 
   val client = Await.result(MesosClient(settings, frameworkInfo, authorization).runWith(Sink.head), 10.seconds)
+  val calls = new MesosCalls()
 
   client.mesosSource
     .mapConcat[Protos.OfferID] { event =>
@@ -62,7 +69,7 @@ class MesosClientExampleFramework(settings: MesosClientSettings, authorization: 
     }
     .via(info(s"Declining offer with id = ")) // Decline all offers
     .map { oId =>
-      client.calls.newDecline(
+      calls.newDecline(
         offerIds = Seq(oId),
         filters = Some(Filters.newBuilder().setRefuseSeconds(5.0).build())
       )

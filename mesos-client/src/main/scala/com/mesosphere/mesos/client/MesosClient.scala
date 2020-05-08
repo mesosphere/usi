@@ -42,13 +42,6 @@ trait MesosClient {
   def session: Session
 
   /**
-    * Set of helper factory methods that can be used for constructing various calls that the framework will make, to be
-    * send to Mesos via the `mesosSink`. These calls will have the Frameworks FrameworkID and will automatically include
-    * them in the instantiated call. **Note** none of the methods in this factory object have side effects.
-    */
-  def calls: MesosCalls
-
-  /**
     * Calling `shutdown()` or `abort()` on this will close both the original connection to Mesos and all event publisher
     * connections created by materializing mesosSink.
     *
@@ -70,9 +63,6 @@ trait MesosClient {
   /**
     * Akka Sink that is used to publish events to the current connected Mesos Master.
     *
-    * The calls published to this sink should be constructed using MesosClient.callFactory. This ensures that the
-    * appropriate Framework ID field are populated.
-    *
     * This sink can be materialized multiple times, with each stream creating a single new HTTP connection to
     * Mesos. Message-order delivery to Mesos is preserved at a stream.
     *
@@ -91,13 +81,13 @@ trait MesosClient {
     * v
     * +------------+
     * | Request    |
-    * | Builder    | (2)  <-- reads mesosStreamId and from connection context
+    * | Builder    | (2)  <-- reads Mesos StreamId and from connection context and adds the Framework ID.
     * +------------+
     * |
     * v
     * +------------+
     * | Http       |
-    * | Connection | (3)  <-- reads mesos url from connection context
+    * | Connection | (3)  <-- reads Mesos URL from connection context
     * +------------+
     * |
     * v
@@ -413,8 +403,6 @@ class MesosClientImpl(
 
   val frameworkId = subscribed.getFrameworkId
 
-  val calls = new MesosCalls(frameworkId)
-
   val masterInfo = subscribed.getMasterInfo
 
   val minimalVersion = SemanticVersion(1, 9, 0)
@@ -439,6 +427,7 @@ class MesosClientImpl(
     }
 
   private val callSerializer: Flow[Call, (Array[Byte], Call.Type), NotUsed] = Flow[Call]
+    .map(call => call.toBuilder.setFrameworkId(frameworkId).build())
     .map(call => call.toByteArray -> call.getType)
 
   override val mesosSink: Sink[Call, Future[Done]] =
