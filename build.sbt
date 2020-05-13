@@ -51,6 +51,10 @@ lazy val docs = (project in file("./docs"))
       _.withColor("green", "indigo")
        .withRepository(uri("https://github.com/mesosphere/usi"))
     },
+    paradoxProperties ++= Map(
+      "github.base_url" -> s"https://github.com/mesosphere/usi",
+      "scaladoc.com.mesosphere.usi.base_url" -> s"https://mesosphere.github.io/usi/api/latest",
+    )
   )
 
 val Core= config("core")
