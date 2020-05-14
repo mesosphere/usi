@@ -53,7 +53,7 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
 
   /**
     * Construct a claim to authenticate and retrieve a session token. The timeout is for this token ''not'' the session
-    * token that we are requesting. That means if ou login request takes more than [[DcosServiceAccountProvider.SERVICE_LOGIN_TOKEN_LIFETIME]]
+    * token that we are requesting. That means if our login request takes more than [[DcosServiceAccountProvider.SERVICE_LOGIN_TOKEN_LIFETIME]]
     * seconds the authentication will fail.
     *
     * @return a claim for the user that expires in [[DcosServiceAccountProvider.SERVICE_LOGIN_TOKEN_LIFETIME]] seconds.
@@ -82,10 +82,18 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
   override def nextToken(): Future[HttpCredentials] = async {
     logger.info(s"Fetching next authentication token from $root")
     val response = await(Http().singleRequest(loginRequest))
-    logger.info(s"Mesos response ${response.status}")
-    val AuthenticationToken(acsToken) = await(Unmarshal(response.entity).to[AuthenticationToken])
-    GenericHttpCredentials("", Map("token" -> acsToken))
+    logger.info(s"Next token response ${response.status}")
+    if (response.status.isSuccess()) {
+      val AuthenticationToken(acsToken) = await(Unmarshal(response.entity).to[AuthenticationToken])
+      GenericHttpCredentials("", Map("token" -> acsToken))
+    } else {
+      val body = await(Unmarshal(response.entity).to[String])
+      throw AuthenticationException(s"Could not login as $uid got ${response.status}: $body")
+    }
   }
+
+  final case class AuthenticationException(private val message: String = "", private val cause: Throwable = None.orNull)
+      extends Exception(message, cause)
 }
 
 object DcosServiceAccountProvider {
