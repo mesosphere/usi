@@ -6,6 +6,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
+import akka.pattern.AskTimeoutException
 import akka.stream.{Materializer, WatchedActorTerminatedException}
 import akka.stream.scaladsl.{Flow, FlowWithContext}
 import akka.util.Timeout
@@ -29,6 +30,9 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
     implicit askTimout: Timeout)
     extends StrictLogging {
 
+  final case class SessionRequestException(private val message: String, private val cause: AskTimeoutException)
+      extends Exception(message, cause)
+
   /**
     * This is a port of [[Flow.ask()]] that supports a tuple to carry a context `C`.
     */
@@ -40,7 +44,15 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
       .watch(ref)
       .mapAsync(parallelism) {
         case (el, ctx) =>
-          akka.pattern.ask(ref).?(el)(timeout).mapTo[HttpResponse](tag).map(o => (o, ctx))
+          akka.pattern
+            .ask(ref)
+            .?(el)(timeout)
+            .transform {
+              case Failure(ex: AskTimeoutException) => Failure(SessionRequestException("Mesos request timed out.", ex))
+              case other => other
+            }
+            .mapTo[HttpResponse](tag)
+            .map(o => (o, ctx))
       }
       .mapError {
         // the purpose of this recovery is to change the name of the stage in that exception
