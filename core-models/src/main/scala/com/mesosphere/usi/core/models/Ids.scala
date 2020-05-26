@@ -1,10 +1,19 @@
 package com.mesosphere.usi.core.models
 
+import scala.util.matching.Regex
+
 /**
   * Unique identifier of a pod
+  *
   * @param value
   */
-case class PodId(value: String)
+case class PodId(value: String) {
+
+  val validNameRegex = "^[a-zA-Z0-9\\-\\.]+$"
+
+  require(value.matches(validNameRegex), s"Pod id $value must only contain alphanum, . or -.")
+  require(value.nonEmpty, s"Pod id must not be empty")
+}
 
 /**
   * Name for a pod's task. The TaskName and PodId are combined via PodTaskIdStrategy to generate a TaskId.

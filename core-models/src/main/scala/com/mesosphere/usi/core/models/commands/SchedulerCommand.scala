@@ -38,7 +38,10 @@ class LaunchPod private (
     val runSpec: RunTemplate,
     val domainFilter: DomainFilter,
     val agentFilter: Iterable[AgentFilter])
-    extends SchedulerCommand
+    extends SchedulerCommand {
+
+  override def toString: String = s"LaunchPod id=${podId.value}"
+}
 
 object LaunchPod {
 

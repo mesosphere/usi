@@ -8,7 +8,7 @@ import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.SchedulerFactory
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.commandInputSource
-import com.mesosphere.usi.core.models.commands.LaunchPod
+import com.mesosphere.usi.core.models.commands.{KillPod, LaunchPod}
 import com.mesosphere.usi.core.models.resources.{RangeRequirement, ScalarRequirement}
 import com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory
 import com.mesosphere.usi.core.models.{commands, _}
@@ -19,12 +19,14 @@ import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import org.apache.mesos.v1.Protos
 import org.apache.mesos.v1.Protos.FrameworkInfo
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.Inside
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.concurrent.duration._
 import scala.util.Try
 
-class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with Inside {
+class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with Inside with ScalaCheckPropertyChecks {
   override def materializerSettings = super.materializerSettings.withDebugLogging(true)
   override implicit lazy val mat = ActorMaterializer()
 
@@ -143,6 +145,52 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     eventually {
       val pullResult = Try(output.pull().futureValue)
       pullResult.isFailure should be(true)
+    }
+  }
+
+  "launch pod round trip" in {
+
+    val podLaunches = for {
+      //podId <- Arbitrary.arbitrary[String].suchThat(s => s.nonEmpty && s.matches("^[a-zA-Z0-9\\-\\.]+$"))
+      podId <- Arbitrary.arbitrary[Int]
+      cpu <- Gen.choose(0.1, 1.1)
+      mem <- Gen.choose(2, 256)
+    } yield
+      LaunchPod(
+        PodId(s"random-pod-$podId"),
+        SimpleRunTemplateFactory(
+          resourceRequirements = List(ScalarRequirement.cpus(cpu), ScalarRequirement.memory(mem)),
+          shellCommand = "sleep 3600",
+          "test")
+      )
+
+    forAll(podLaunches) { cmd =>
+      input.offer(cmd)
+
+      eventually {
+        inside(output.pull().futureValue) {
+          case other =>
+            logger.info(s"Ignoring update $other")
+          case Some(podStatusChange: PodStatusUpdatedEvent) =>
+            podStatusChange.id shouldBe cmd.podId
+            podStatusChange.newStatus.get
+              .taskStatuses(TaskId(cmd.podId.value))
+              .getState shouldBe Protos.TaskState.TASK_RUNNING
+        }
+      }
+
+      input.offer(KillPod(cmd.podId))
+
+      eventually {
+        inside(output.pull().futureValue) {
+          case other =>
+            logger.info(s"Ignoring update $other")
+          case Some(podStatusChange: PodStatusUpdatedEvent) =>
+            podStatusChange.newStatus.get
+              .taskStatuses(TaskId(cmd.podId.value))
+              .getState shouldBe Protos.TaskState.TASK_KILLED
+        }
+      }
     }
   }
 }

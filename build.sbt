@@ -177,7 +177,8 @@ lazy val `core` = (project in file("./core"))
   .settings(
     commonSettings,
     libraryDependencies ++= Seq(
-      Dependencies.Test.akkaStreamTestKit % "test"))
+      Dependencies.Test.akkaStreamTestKit % "test",
+      Dependencies.Test.scalaCheck % "test"))
   .dependsOn(`core-models`)
   .dependsOn(`persistence`)
   .dependsOn(`mesos-client`)
