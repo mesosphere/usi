@@ -1,6 +1,5 @@
 package com.mesosphere.usi.core.models
 
-import scala.util.matching.Regex
 
 /**
   * Unique identifier of a pod
