@@ -106,6 +106,10 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
     mesosClient.killSwitch.shutdown()
     output.futureValue
 
+    /**
+      * Updated the expected state. It is called in the beginning of forAll.
+      * @param cmd The next command.
+      */
     def updateExpectedState(cmd: SchedulerCommand): Unit = cmd match {
       case launchPod: LaunchPod => expectedState.addOne((launchPod.podId, Protos.TaskState.TASK_RUNNING))
       case killPod: KillPod =>
@@ -114,6 +118,10 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
       case expungePod: ExpungePod => expectedState.remove(expungePod.podId)
     }
 
+    /**
+      * Process [[StateEvent]]s from USI to replicated the internal USI state.
+      * @param update The update from USI. We only case for [[PodSpecUpdatedEvent]] and [[PodStatusUpdatedEvent]].
+      */
     def updateObservedState(update: StateEvent): Unit = update match {
       case PodSpecUpdatedEvent(podId, None) =>
         logger.debug(s"Removing pod. podId=${podId.value}")
