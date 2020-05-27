@@ -40,7 +40,7 @@ class LaunchPod private (
     val agentFilter: Iterable[AgentFilter])
     extends SchedulerCommand {
 
-  override def toString: String = s"LaunchPod id=${podId.value}"
+  override def toString: String = s"LaunchPod podId=${podId.value}"
 }
 
 object LaunchPod {
@@ -96,17 +96,24 @@ object LaunchPod {
   * If no task status is known for the specified podId, then the kill is a no-op.
   * @param podId
   */
-case class KillPod(podId: PodId) extends SchedulerCommand
+case class KillPod(podId: PodId) extends SchedulerCommand {
+
+  override def toString: String = s"KillPod podId=${podId.value}"
+}
 
 /**
-  * Delete the pod record and any pending [[PodSpec]] ([[RunningPodSpec]] or [[TerminalPodSpec]]) for a given pod. Does
+  * Delete the pod record and any pending [[com.mesosphere.usi.core.models.PodSpec]] ([[com.mesosphere.usi.core.models.RunningPodSpec]] or [[com.mesosphere.usi.core.models.TerminalPodSpec]]) for a given pod. Does
   * not cause the actual tasks in the pod to be killed.
   *
-  * The associated [[PodStatus]], if it exists, will remain until the [[PodStatus]] is either terminal or unreachable.
+  * The associated [[com.mesosphere.usi.core.models.PodStatus]], if it exists, will remain until the
+  * [[com.mesosphere.usi.core.models.PodStatus]] is either terminal or unreachable.
   *
   * @param podId
   */
-case class ExpungePod(podId: PodId) extends SchedulerCommand
+case class ExpungePod(podId: PodId) extends SchedulerCommand {
+
+  override def toString: String = s"ExpungePod podId=${podId.value}"
+}
 
 /**
   * Not implemented yet; command will be used to make new reservations.

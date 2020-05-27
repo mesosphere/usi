@@ -62,8 +62,14 @@ case class ScalarRequirement(resourceType: ResourceType, amount: Double) extends
 }
 
 object ScalarRequirement {
-  def cpus(amount: Double): ScalarRequirement = ScalarRequirement(ResourceType.CPUS, amount)
-  def memory(amount: Double): ScalarRequirement = ScalarRequirement(ResourceType.MEM, amount)
+  def cpus(amount: Double): ScalarRequirement = {
+    require(amount > 0.0, s"CPU must be larger than 0.0 but was $amount")
+    ScalarRequirement(ResourceType.CPUS, amount)
+  }
+  def memory(amount: Double): ScalarRequirement = {
+    require(amount > 0, s"Memory must be larger than 0 but was $amount")
+    ScalarRequirement(ResourceType.MEM, amount)
+  }
   def disk(amount: Double): ScalarRequirement = ScalarRequirement(ResourceType.DISK, amount)
   def gpus(amount: Double): ScalarRequirement = ScalarRequirement(ResourceType.GPUS, amount)
 }

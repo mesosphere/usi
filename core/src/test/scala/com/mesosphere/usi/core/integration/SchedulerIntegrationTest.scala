@@ -8,7 +8,7 @@ import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.SchedulerFactory
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.commandInputSource
-import com.mesosphere.usi.core.models.commands.{KillPod, LaunchPod}
+import com.mesosphere.usi.core.models.commands.{ExpungePod, KillPod, LaunchPod, SchedulerCommand}
 import com.mesosphere.usi.core.models.resources.{RangeRequirement, ScalarRequirement}
 import com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory
 import com.mesosphere.usi.core.models.{commands, _}
@@ -18,7 +18,6 @@ import com.mesosphere.utils.mesos.MesosClusterTest
 import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import org.apache.mesos.v1.Protos
-import org.apache.mesos.v1.Protos.FrameworkInfo
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.Inside
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -36,7 +35,8 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     .setUser("test")
     .setName("SimpleHelloWorldExample")
     .addRoles("test")
-    .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
+    .addCapabilities(
+      Protos.FrameworkInfo.Capability.newBuilder().setType(Protos.FrameworkInfo.Capability.Type.MULTI_ROLE))
     .build()
 
   lazy val mesosClient: MesosClient = MesosClient(mesosClientSettings, frameworkInfo).runWith(Sink.head).futureValue
@@ -54,10 +54,6 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     .withAttributes(Attributes
       .logLevels(onElement = Logging.DebugLevel, onFinish = Logging.InfoLevel, onFailure = Logging.ErrorLevel))
     .run
-
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-  }
 
   "launches a pod with Mesos and reports the status" in {
     val podId = PodId("scheduler-integration-test-pod")

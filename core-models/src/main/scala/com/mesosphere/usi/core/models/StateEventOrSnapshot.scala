@@ -46,7 +46,7 @@ object StateSnapshot {
   * If [[PodSpec]] is [[TerminalPodSpec]], then USI is killing a pod and has not yet received a terminal status for the
   * pod.
   * @param id
-  * @param newState
+  * @param newState the possible new state. None indicates a removal.
   */
 case class PodSpecUpdatedEvent(id: PodId, newState: Option[PodSpec]) extends StateEvent with PodStateEvent
 
