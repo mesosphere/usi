@@ -39,7 +39,7 @@ trait RepositoryBehavior extends AkkaUnitTestLike { this: UnitTest =>
 
     "update a record" in {
       val f = Fixture()
-      val podId = PodId("second_pod")
+      val podId = PodId("second-pod")
       val record = f.record.copy(podId = podId)
 
       Given("a record already exists")
@@ -130,7 +130,7 @@ trait RepositoryBehavior extends AkkaUnitTestLike { this: UnitTest =>
     TestSource.probe[In].via(flow).toMat(TestSink.probe[Out])(Keep.both).run()
 
   case class Fixture() {
-    val podId = PodId(s"pod_${podCount.getAndIncrement()}")
+    val podId = PodId(s"pod-${podCount.getAndIncrement()}")
     val agentId = AgentId("my_agent")
     val record = PodRecord(podId, Instant.now(), agentId)
   }

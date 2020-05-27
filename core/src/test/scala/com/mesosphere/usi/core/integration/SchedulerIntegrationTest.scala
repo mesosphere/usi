@@ -19,12 +19,11 @@ import com.mesosphere.utils.metrics.DummyMetrics
 import com.mesosphere.utils.persistence.InMemoryPodRecordRepository
 import org.apache.mesos.v1.Protos
 import org.scalatest.Inside
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.concurrent.duration._
 import scala.util.Try
 
-class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with Inside with ScalaCheckPropertyChecks {
+class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with Inside {
   override def materializerSettings = super.materializerSettings.withDebugLogging(true)
   override implicit lazy val mat = ActorMaterializer()
 
