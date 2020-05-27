@@ -102,8 +102,9 @@ case class KillPod(podId: PodId) extends SchedulerCommand {
 }
 
 /**
-  * Delete the pod record and any pending [[com.mesosphere.usi.core.models.PodSpec]] ([[com.mesosphere.usi.core.models.RunningPodSpec]] or [[com.mesosphere.usi.core.models.TerminalPodSpec]]) for a given pod. Does
-  * not cause the actual tasks in the pod to be killed.
+  * Delete the pod record and any pending [[com.mesosphere.usi.core.models.PodSpec]]
+  * ([[com.mesosphere.usi.core.models.RunningPodSpec]] or [[com.mesosphere.usi.core.models.TerminalPodSpec]])
+  * for a given pod. Does not cause the actual tasks in the pod to be killed.
   *
   * The associated [[com.mesosphere.usi.core.models.PodStatus]], if it exists, will remain until the
   * [[com.mesosphere.usi.core.models.PodStatus]] is either terminal or unreachable.

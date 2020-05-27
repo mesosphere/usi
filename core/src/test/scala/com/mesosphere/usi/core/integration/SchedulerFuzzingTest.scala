@@ -63,6 +63,7 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
             "test")
         )
 
+    // Gen.delay will evaluate expectedState each time.
     def genPodKills = Gen.delay {
       if (expectedState.nonEmpty) Gen.oneOf(expectedState.keys).map(KillPod)
       else Arbitrary.arbitrary[Int].map(id => KillPod(PodId(s"unknown-pod-$id")))
