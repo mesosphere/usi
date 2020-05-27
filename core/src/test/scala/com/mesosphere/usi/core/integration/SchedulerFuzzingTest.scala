@@ -44,8 +44,35 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
     // Expected pod states
     val expectedState = mutable.Map[PodId, Protos.TaskState]()
 
+    /**
+      * Updated the expected state. It is called in the beginning of forAll.
+      * @param cmd The next command.
+      */
+    def updateExpectedState(cmd: SchedulerCommand): Unit = cmd match {
+      case launchPod: LaunchPod => expectedState.update(launchPod.podId, Protos.TaskState.TASK_RUNNING)
+      case killPod: KillPod =>
+        // Killed pods are automatically expunged once they become terminal.
+        expectedState.remove(killPod.podId)
+      case expungePod: ExpungePod => expectedState.remove(expungePod.podId)
+    }
+
     // Observed pod states as reported by USI
     var observedState = concurrent.TrieMap.empty[PodId, Protos.TaskState]
+
+    /**
+      * Process [[StateEvent]]s from USI to replicated the internal USI state.
+      * @param update The update from USI. We only case for [[PodSpecUpdatedEvent]] and [[PodStatusUpdatedEvent]].
+      */
+    def updateObservedState(update: StateEvent): Unit = update match {
+      case PodSpecUpdatedEvent(podId, None) =>
+        logger.debug(s"Removing pod. podId=${podId.value}")
+        observedState.remove(podId)
+      case PodStatusUpdatedEvent(podId, Some(PodStatus(_, taskStatuses))) =>
+        val state = taskStatuses(TaskId(podId.value)).getState
+        logger.debug(s"Adding pod status. podId=${podId.value} state=$state")
+        observedState.update(podId, state)
+      case other => logger.debug(s"Ignoring USI state event. event=$other")
+    }
 
     // Commands
     def genPodLaunches =
@@ -69,7 +96,12 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
       else Arbitrary.arbitrary[Int].map(id => KillPod(PodId(s"unknown-pod-$id")))
     }
 
-    def genCommands = Gen.oneOf(genPodLaunches, genPodKills)
+    def genExpungePod = Gen.delay {
+      if (expectedState.nonEmpty) Gen.oneOf(expectedState.keys).map(ExpungePod)
+      else Arbitrary.arbitrary[Int].map(id => ExpungePod(PodId(s"unknown-pod-$id")))
+    }
+
+    def genCommands = Gen.frequency((50, genPodLaunches), (20, genPodKills), (5, genExpungePod))
 
     // Setup USI
     lazy val mesosClient: MesosClient = MesosClient(mesosClientSettings, frameworkInfo).runWith(Sink.head).futureValue
@@ -103,35 +135,21 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
       }
     }
 
+    // Assert the Mesos state
+    val actualMesosState = mesosFacade
+      .state()
+      .value
+      .frameworks
+      .head
+      .tasks
+      .map { task =>
+        PodId(task.id) -> Protos.TaskState.valueOf(task.state.value)
+      }
+      .toMap
+    actualMesosState should contain theSameElementsAs (expectedState)
+
     // Stop
     mesosClient.killSwitch.shutdown()
     output.futureValue
-
-    /**
-      * Updated the expected state. It is called in the beginning of forAll.
-      * @param cmd The next command.
-      */
-    def updateExpectedState(cmd: SchedulerCommand): Unit = cmd match {
-      case launchPod: LaunchPod => expectedState.update(launchPod.podId, Protos.TaskState.TASK_RUNNING)
-      case killPod: KillPod =>
-        // Killed pods are automatically expunged once they become terminal.
-        expectedState.remove(killPod.podId)
-      case expungePod: ExpungePod => expectedState.remove(expungePod.podId)
-    }
-
-    /**
-      * Process [[StateEvent]]s from USI to replicated the internal USI state.
-      * @param update The update from USI. We only case for [[PodSpecUpdatedEvent]] and [[PodStatusUpdatedEvent]].
-      */
-    def updateObservedState(update: StateEvent): Unit = update match {
-      case PodSpecUpdatedEvent(podId, None) =>
-        logger.debug(s"Removing pod. podId=${podId.value}")
-        observedState.remove(podId)
-      case PodStatusUpdatedEvent(podId, Some(PodStatus(_, taskStatuses))) =>
-        val state = taskStatuses(TaskId(podId.value)).getState
-        logger.debug(s"Adding pod status. podId=${podId.value} state=$state")
-        observedState.update(podId, state)
-      case other => logger.debug(s"Ignoring USI state event. event=$other")
-    }
   }
 }
