@@ -112,7 +112,7 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
       * @param cmd The next command.
       */
     def updateExpectedState(cmd: SchedulerCommand): Unit = cmd match {
-      case launchPod: LaunchPod => expectedState.addOne((launchPod.podId, Protos.TaskState.TASK_RUNNING))
+      case launchPod: LaunchPod => expectedState.update(launchPod.podId, Protos.TaskState.TASK_RUNNING)
       case killPod: KillPod =>
         // Killed pods are automatically expunged once they become terminal.
         expectedState.remove(killPod.podId)
