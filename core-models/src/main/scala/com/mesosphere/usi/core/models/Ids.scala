@@ -1,6 +1,5 @@
 package com.mesosphere.usi.core.models
 
-
 /**
   * Unique identifier of a pod
   *
