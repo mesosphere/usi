@@ -184,7 +184,7 @@ class SessionActor(
     * @return A behavior that can process Mesos calls.
     */
   def initialized(requestUri: Uri, maybeCredentials: Option[HttpCredentials]): Behavior[Message] = {
-    Behaviors.receiveMessage {
+    Behaviors.receiveMessagePartial {
       case call: Call =>
         val request = createPostRequest(call.body, requestUri, maybeCredentials)
         logger.debug(s"Processing next Mesos call: $request")
@@ -212,10 +212,9 @@ class SessionActor(
               throw new IllegalStateException("Received HTTP 401 Unauthorized but no credential provider was supplied.")
           }
 
-          // Queue current call again.
-          context.self ! originalCall
+          // Queue current call again. It will be unstashed/sent once the actor becomes initialized again.
+          buffer.stash(originalCall)
 
-          // TODO: is this here a race condition?
           initializing
         } else if (response.status.isRedirection()) {
           logger.debug(s"Received redirect $response")
@@ -225,10 +224,11 @@ class SessionActor(
           val redirectUri = locationHeader.uri.resolvedAgainst(requestUri)
 
           // Queue current call again.
-          context.self ! originalCall
+          buffer.stash(originalCall)
 
-          // TODO: is this a race with tell before?
-          initialized(redirectUri, maybeCredentials)
+          // Change redirect URI and unstash/sent the call again.
+          buffer.unstash(initialized(redirectUri, maybeCredentials), 1, identity)
+
         } else {
           logger.debug("Responding to original sender")
           originalCall.responsePromise.success(response)
