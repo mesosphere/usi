@@ -53,7 +53,9 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
     import system.dispatcher
     logger.info(s"Create authenticated session for stream $streamId.")
     val sessionActor =
-      system.spawn(SessionActor(authorization, streamId, baseUri.withPath(Path("/api/v1/scheduler"))), "SessionActor")
+      system.spawn(
+        SessionActor(authorization, streamId, baseUri.withPath(Path("/api/v1/scheduler"))),
+        s"SessionActor-$streamId")
 
     FlowWithContext[Array[Byte], C].via(sessionActorFlow(1)(sessionActor))
   }
