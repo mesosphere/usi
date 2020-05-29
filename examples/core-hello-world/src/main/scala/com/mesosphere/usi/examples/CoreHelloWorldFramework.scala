@@ -102,6 +102,7 @@ object CoreHelloWorldFramework extends StrictLogging {
       .build()
   }
 
+  // #launch-command
   def generateLaunchCommand: LaunchPod = {
     // Lets construct the initial specs snapshot which will contain our hello-world PodSpec. For that we generate
     // - a unique PodId
@@ -115,6 +116,7 @@ object CoreHelloWorldFramework extends StrictLogging {
     )
     commands.LaunchPod(podId, runSpec = runSpec)
   }
+  // #launch-command
 
   def init(
       clientSettings: MesosClientSettings,
@@ -124,11 +126,13 @@ object CoreHelloWorldFramework extends StrictLogging {
       implicit ec: ExecutionContext,
       system: ActorSystem,
       materializer: Materializer): (MesosClient, StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed]) = {
+    // #connect
     val client: MesosClient = Await.result(MesosClient(clientSettings, frameworkInfo).runWith(Sink.head), 10.seconds)
     val factory = SchedulerFactory(client, podRecordRepository, SchedulerSettings.load(), DummyMetrics)
     val (snapshot, schedulerFlow) =
       Await.result(factory.newSchedulerFlow(), 10.seconds)
     (client, snapshot, schedulerFlow)
+    // #connect
   }
 
   def run(
@@ -144,11 +148,14 @@ object CoreHelloWorldFramework extends StrictLogging {
     // Note: this is hardly realistic since an orchestrator will need to react to StateEvents by sending SpecUpdates
     // to the scheduler. We're making our lives easier by ignoring this part for now - all we care about is to start
     // a "hello-world" task once.
+    // #command-source
     val completed: Future[Done] = Source.maybe
       .prepend(Source.single(generateLaunchCommand))
       // Here our initial snapshot is going to the scheduler flow
       .via(schedulerFlow)
+      // #command-source
       .map {
+        // #event-handling
         // Main state event handler. We log happy events and exit if something goes wrong
         case PodStatusUpdatedEvent(id, Some(PodStatus(_, taskStatuses))) =>
           import TaskState._
@@ -165,6 +172,7 @@ object CoreHelloWorldFramework extends StrictLogging {
       }
       .toMat(Sink.ignore)(Keep.right)
       .run()
+    // #event-handling
 
     CoreHelloWorldFramework(client.frameworkId, client.killSwitch, completed)
   }
