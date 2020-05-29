@@ -8,7 +8,7 @@ import com.mesosphere.mesos.conf.MesosClientSettings
 import com.mesosphere.usi.core.SchedulerFactory
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.helpers.SchedulerStreamTestHelpers.commandInputSource
-import com.mesosphere.usi.core.models.{PodId, PodSpecUpdatedEvent, PodStatus, PodStatusUpdatedEvent, StateEvent, TaskId}
+import com.mesosphere.usi.core.models.{PodId, PodStatus, PodStatusUpdatedEvent, StateEvent, TaskId}
 import com.mesosphere.usi.core.models.commands.{ExpungePod, KillPod, LaunchPod, SchedulerCommand}
 import com.mesosphere.usi.core.models.resources.ScalarRequirement
 import com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory
@@ -50,21 +50,22 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
       */
     def updateExpectedState(cmd: SchedulerCommand): Unit = cmd match {
       case launchPod: LaunchPod => expectedState.update(launchPod.podId, Protos.TaskState.TASK_RUNNING)
-      case killPod: KillPod =>
-        // Killed pods are automatically expunged once they become terminal.
-        expectedState.remove(killPod.podId)
+      case killPod: KillPod if killPod.podId.value.startsWith("random") =>
+        expectedState.update(killPod.podId, Protos.TaskState.TASK_KILLED)
       case expungePod: ExpungePod => expectedState.remove(expungePod.podId)
+      case other =>
+        logger.debug(s"Ignoring USI command. command=$other")
     }
 
     // Observed pod states as reported by USI
     var observedState = concurrent.TrieMap.empty[PodId, Protos.TaskState]
 
     /**
-      * Process [[StateEvent]]s from USI to replicated the internal USI state.
-      * @param update The update from USI. We only case for [[PodSpecUpdatedEvent]] and [[PodStatusUpdatedEvent]].
+      * Process [[StateEvent]]s from USI to replicated the internal USI pod record state.
+      * @param update The update from USI. We only case for [[PodStatusUpdatedEvent]].
       */
     def updateObservedState(update: StateEvent): Unit = update match {
-      case PodSpecUpdatedEvent(podId, None) =>
+      case PodStatusUpdatedEvent(podId, None) =>
         logger.debug(s"Removing pod. podId=${podId.value}")
         observedState.remove(podId)
       case PodStatusUpdatedEvent(podId, Some(PodStatus(_, taskStatuses))) =>
@@ -96,12 +97,9 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
       else Arbitrary.arbitrary[Int].map(id => KillPod(PodId(s"unknown-pod-$id")))
     }
 
-    def genExpungePod = Gen.delay {
-      if (expectedState.nonEmpty) Gen.oneOf(expectedState.keys).map(ExpungePod)
-      else Arbitrary.arbitrary[Int].map(id => ExpungePod(PodId(s"unknown-pod-$id")))
-    }
+    
 
-    def genCommands = Gen.frequency((50, genPodLaunches), (20, genPodKills), (5, genExpungePod))
+    def genCommands = Gen.frequency((50, genPodLaunches), (20, genPodKills)) //, (5, genExpungePod))
 
     // Setup USI
     lazy val mesosClient: MesosClient = MesosClient(mesosClientSettings, frameworkInfo).runWith(Sink.head).futureValue
@@ -136,6 +134,9 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
     }
 
     // Assert the Mesos state
+    val expectedRunning = expectedState.filter {
+      case (_, state) => state == Protos.TaskState.TASK_RUNNING
+    }
     val actualMesosState = mesosFacade
       .state()
       .value
@@ -146,7 +147,7 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
         PodId(task.id) -> Protos.TaskState.valueOf(task.state.value)
       }
       .toMap
-    actualMesosState should contain theSameElementsAs (expectedState)
+    actualMesosState should contain theSameElementsAs expectedRunning
 
     // Stop
     mesosClient.killSwitch.shutdown()
