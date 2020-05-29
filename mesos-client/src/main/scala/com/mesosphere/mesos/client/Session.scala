@@ -1,8 +1,8 @@
 package com.mesosphere.mesos.client
 
 import akka.NotUsed
-import akka.actor.{ActorRef, ActorSystem, Props, Stash, Status}
-import akka.actor.typed.{Behavior, DispatcherSelector}
+import akka.actor.ActorSystem
+import akka.actor.typed.{ActorRef, Behavior, DispatcherSelector}
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, StashBuffer}
 import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl.Http
@@ -32,10 +32,10 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
   /**
     * This is a port of [[Flow.ask()]] that supports a tuple to carry a context `C`.
     */
-  private def sessionActorFlow[C](parallelism: Int)(ref: ActorRef)(
+  private def sessionActorFlow[C](parallelism: Int)(ref: ActorRef[SessionActor.Message])(
       implicit ec: ExecutionContext): Flow[(Array[Byte], C), (HttpResponse, C), NotUsed] = {
     Flow[(Array[Byte], C)]
-      .watch(ref)
+      .watch(ref.toClassic)
       .mapAsync(parallelism) {
         case (el, ctx) => SessionActor.call(ref, el).map(o => (o, ctx))
       }
@@ -52,9 +52,9 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
   def post[C](implicit system: ActorSystem): FlowWithContext[Array[Byte], C, HttpResponse, C, NotUsed] = {
     import system.dispatcher
     logger.info(s"Create authenticated session for stream $streamId.")
-    // TODO: How are we creating the session actor in a classic system?
     val sessionActor =
-      system.actorOf(SessionActor.props(authorization, streamId, baseUri.withPath(Path("/api/v1/scheduler"))))
+      system.spawn(SessionActor(authorization, streamId, baseUri.withPath(Path("/api/v1/scheduler"))), "SessionActor")
+
     FlowWithContext[Array[Byte], C].via(sessionActorFlow(1)(sessionActor))
   }
 }
@@ -106,7 +106,7 @@ object SessionActor {
     * @param body The body of the call.
     * @return A future [[HttpResponse]] of the call.
     */
-  private[client] def call(ref: ActorRef, body: Array[Byte]): Future[HttpResponse] = {
+  private[client] def call(ref: ActorRef[SessionActor.Message], body: Array[Byte]): Future[HttpResponse] = {
     val promise = Promise[HttpResponse]()
     ref ! SessionActor.Call(body, promise)
     promise.future
