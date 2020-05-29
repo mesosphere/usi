@@ -126,6 +126,7 @@ lazy val `mesos-client` = (project in file("./mesos-client/"))
   .settings(
     commonSettings,
     libraryDependencies ++= Seq(
+      Dependencies.akkaActorTyped,
       Dependencies.akkaStream,
       Dependencies.akkaHttp,
       Dependencies.akkaHttpPlayJson,

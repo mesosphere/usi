@@ -2,7 +2,7 @@ import sbt.{ExclusionRule, _}
 
 object Dependencies {
   object Versions {
-    val akka = "2.6.3"
+    val akka = "2.6.5"
     val akkaHttp = "10.1.11"
     val alpakka = "1.1.2"
     val curatorTestVersion = "2.13.0"
@@ -22,6 +22,7 @@ object Dependencies {
   // Akka and akka-http
   val akkaHttp = "com.typesafe.akka" %% "akka-http" % Versions.akkaHttp
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % Versions.akka
+  val akkaActorTyped = "com.typesafe.akka" %% "akka-actor-typed" % Versions.akka
   val akkaStream = "com.typesafe.akka" %% "akka-stream" % Versions.akka
 
   // Apache Curator. See this [compatibility documentation](http://curator.apache.org/zk-compatibility.html)
@@ -37,12 +38,11 @@ object Dependencies {
   val akkaHttpPlayJson = "de.heikoseeberger" %% "akka-http-play-json" % "1.31.0"
   val alpakkaCodes = "com.lightbend.akka" %% "akka-stream-alpakka-simple-codecs" % Versions.alpakka
 
-
-  val rollingMetrics = "com.github.vladimir-bukhtoyarov" % "rolling-metrics" %  "2.0.4"
+  val rollingMetrics = "com.github.vladimir-bukhtoyarov" % "rolling-metrics" % "2.0.4"
   val scalaJava8Compat = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0"
   val dropwizardMetricsCore = "io.dropwizard.metrics" % "metrics-core" % Versions.dropwizard
   val dropwizardMetricsJvm = "io.dropwizard.metrics" % "metrics-jvm" % Versions.dropwizard
-  val hdrHistogram = "org.hdrhistogram" % "HdrHistogram" %  "2.1.11"
+  val hdrHistogram = "org.hdrhistogram" % "HdrHistogram" % "2.1.11"
   val scopt = "com.github.scopt" %% "scopt" % "4.0.0-RC2"
 
   object Test {
@@ -53,7 +53,6 @@ object Dependencies {
     // Logging
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "1.2.3"
     val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % Versions.akka
-
 
     // Provides import org.junit.runner.RunWith. We probably want to move to a different test platform for Scalatest or
     // use the Scalatest Runner.
