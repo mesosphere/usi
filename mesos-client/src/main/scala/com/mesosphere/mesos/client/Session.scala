@@ -6,13 +6,13 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
-import akka.pattern.AskTimeoutException
 import akka.stream.{Materializer, WatchedActorTerminatedException}
 import akka.stream.scaladsl.{Flow, FlowWithContext}
 import akka.util.Timeout
+import com.mesosphere.mesos.client.SessionActor.Call
 import com.typesafe.scalalogging.StrictLogging
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Promise}
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success}
 
@@ -30,9 +30,6 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
     implicit askTimout: Timeout)
     extends StrictLogging {
 
-  final case class SessionRequestException(private val message: String, private val cause: AskTimeoutException)
-      extends Exception(message, cause)
-
   /**
     * This is a port of [[Flow.ask()]] that supports a tuple to carry a context `C`.
     */
@@ -44,15 +41,9 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
       .watch(ref)
       .mapAsync(parallelism) {
         case (el, ctx) =>
-          akka.pattern
-            .ask(ref)
-            .?(el)(timeout)
-            .transform {
-              case Failure(ex: AskTimeoutException) => Failure(SessionRequestException("Mesos request timed out.", ex))
-              case other => other
-            }
-            .mapTo[HttpResponse](tag)
-            .map(o => (o, ctx))
+          val promise = Promise[HttpResponse]()
+          ref ! SessionActor.Call(el, promise)
+          promise.future.map(o => (o, ctx))
       }
       .mapError {
         // the purpose of this recovery is to change the name of the stage in that exception
@@ -94,13 +85,20 @@ object SessionActor {
   }
 
   /**
-    * A simple class that captures the original sender of a call and the serialized call.
+    * Captures the serialized call and promise of the call
     *
-    * @param originalCall The serialized Mesos call.
-    * @param originalSender The sender from the stream.
+    * @param body The serialized Mesos call
+    * @param responsePromise The promise that is fulfilled with the response of the call
+    */
+  private[client] case class Call(body: Array[Byte], responsePromise: Promise[HttpResponse])
+
+  /**
+    * Captures the response, the promise of a call and the serialized call.
+    *
+    * @param originalCall The original call that resulted in the response.
     * @param response The response for the call.
     */
-  private[client] case class Response(originalCall: Array[Byte], originalSender: ActorRef, response: HttpResponse)
+  private[client] case class Response(originalCall: Call, response: HttpResponse)
 }
 
 /**
@@ -152,9 +150,8 @@ class SessionActor(authorization: Option[CredentialsProvider], streamId: String,
     * @return
     */
   def initialized(requestUri: Uri, maybeCredentials: Option[HttpCredentials]): Receive = {
-    case call: Array[Byte] =>
-      val request = createPostRequest(call, requestUri, maybeCredentials)
-      val originalSender = sender()
+    case call: Call =>
+      val request = createPostRequest(call.body, requestUri, maybeCredentials)
       logger.debug(s"Processing next Mesos call: $request")
       // The TLS handshake for each connection might be an overhead. We could potentially reuse a connection.
       Http()(context.system)
@@ -162,14 +159,13 @@ class SessionActor(authorization: Option[CredentialsProvider], streamId: String,
         .onComplete {
           case Success(response) =>
             logger.debug(s"Mesos call HTTP response: ${response.status}")
-            self ! SessionActor.Response(call, originalSender, response)
-          case Failure(ex) =>
+            self ! SessionActor.Response(call, response)
+          case f @ Failure(ex) =>
             logger.error("Mesos call HTTP request failed", ex)
             // Fail stream.
-            originalSender ! Status.Failure(ex)
+            call.responsePromise.complete(f)
         }
-    // TODO: there is a bug. The session requests do not follow redirects
-    case SessionActor.Response(originalCall, originalSender, response) =>
+    case SessionActor.Response(originalCall, response) =>
       logger.debug(s"Call replied with ${response.status}")
       if (response.status == StatusCodes.Unauthorized) {
         logger.info("Refreshing IAM authentication token")
@@ -182,7 +178,7 @@ class SessionActor(authorization: Option[CredentialsProvider], streamId: String,
         }
 
         // Queue current call again.
-        self.tell(originalCall, originalSender)
+        self ! originalCall
       } else if (response.status.isRedirection()) {
         logger.debug(s"Received redirect $response")
 
@@ -192,10 +188,10 @@ class SessionActor(authorization: Option[CredentialsProvider], streamId: String,
         context.become(initialized(redirectUri, maybeCredentials))
 
         // Queue current call again.
-        self.tell(originalCall, originalSender)
+        self ! originalCall
       } else {
         logger.debug("Responding to original sender")
-        originalSender ! response
+        originalCall.responsePromise.success(response)
       }
   }
 
