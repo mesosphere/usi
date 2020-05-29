@@ -49,13 +49,20 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
       * @param cmd The next command.
       */
     def updateExpectedState(cmd: SchedulerCommand): Unit = cmd match {
-      case launchPod: LaunchPod => expectedState.update(launchPod.podId, Protos.TaskState.TASK_RUNNING)
+      case launchPod: LaunchPod if wasNotKilled(launchPod.podId) =>
+        // Pods can only become launching if they haven't run before.
+        expectedState.update(launchPod.podId, Protos.TaskState.TASK_RUNNING)
       case killPod: KillPod if killPod.podId.value.startsWith("random") =>
         expectedState.update(killPod.podId, Protos.TaskState.TASK_KILLED)
       case expungePod: ExpungePod => expectedState.remove(expungePod.podId)
+      case ExpungePod(podId) =>
+        expectedState.remove(podId)
       case other =>
         logger.debug(s"Ignoring USI command. command=$other")
     }
+
+    /** @return whether a pod exists in a killed state. */
+    def wasNotKilled(id: PodId): Boolean = expectedState.get(id).exists(_ != Protos.TaskState.TASK_KILLED)
 
     // Observed pod states as reported by USI
     var observedState = concurrent.TrieMap.empty[PodId, Protos.TaskState]
@@ -97,9 +104,12 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
       else Arbitrary.arbitrary[Int].map(id => KillPod(PodId(s"unknown-pod-$id")))
     }
 
-    
+    def genExpungePod = Gen.delay {
+      if (expectedState.nonEmpty) Gen.oneOf(expectedState.keys).map(ExpungePod)
+      else Arbitrary.arbitrary[Int].map(id => ExpungePod(PodId(s"unknown-pod-$id")))
+    }
 
-    def genCommands = Gen.frequency((50, genPodLaunches), (20, genPodKills)) //, (5, genExpungePod))
+    def genCommands = Gen.frequency((50, genPodLaunches), (20, genPodKills), (5, genExpungePod))
 
     // Setup USI
     lazy val mesosClient: MesosClient = MesosClient(mesosClientSettings, frameworkInfo).runWith(Sink.head).futureValue
