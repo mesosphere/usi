@@ -3,6 +3,7 @@ package com.mesosphere.usi.core
 import akka.stream.scaladsl.{BidiFlow, Broadcast, Flow, GraphDSL, Merge, Sink, Source}
 import akka.stream.{BidiShape, FanOutShape2, Graph, Materializer}
 import akka.{Done, NotUsed}
+import com.mesosphere.usi.async.ExecutionContexts
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.models.{PodRecordUpdatedEvent, PodSpecUpdatedEvent, StateEvent, StateSnapshot}
 import com.mesosphere.usi.repository.PodRecordRepository
@@ -69,7 +70,7 @@ object Scheduler extends StrictLogging {
       case (snapshot, schedulerFlow) =>
         val (source, sink) = FlowHelpers.asSourceAndSink(schedulerFlow)(mat)
         (snapshot, source, sink)
-    }(CallerThreadExecutionContext.context)
+    }(ExecutionContexts.callerThread)
   }
 
   /**
@@ -88,7 +89,7 @@ object Scheduler extends StrictLogging {
       .map { snapshot =>
         val graph = schedulerGraph(snapshot, factory)
         snapshot -> graph.join(factory.newMesosFlow)
-      }(CallerThreadExecutionContext.context)
+      }(ExecutionContexts.callerThread)
   }
 
   private[usi] def schedulerGraph(
@@ -164,10 +165,10 @@ object Scheduler extends StrictLogging {
     val ops: List[() => Future[Option[SchedulerEvents]]] = events.stateEvents.collect {
       case PodRecordUpdatedEvent(_, Some(podRecord)) =>
         () =>
-          podRecordRepository.store(podRecord).map(_ => None)(CallerThreadExecutionContext.context)
+          podRecordRepository.store(podRecord).map(_ => None)(ExecutionContexts.callerThread)
       case PodRecordUpdatedEvent(podId, None) =>
         () =>
-          podRecordRepository.delete(podId).map(_ => None)(CallerThreadExecutionContext.context)
+          podRecordRepository.delete(podId).map(_ => None)(ExecutionContexts.callerThread)
     }
     ops :+ (() => Future.successful(Some(events)))
   }

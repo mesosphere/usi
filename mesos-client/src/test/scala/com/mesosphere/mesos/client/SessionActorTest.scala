@@ -1,5 +1,6 @@
 package com.mesosphere.mesos.client
 
+import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model._
@@ -15,9 +16,12 @@ class SessionActorTest extends AkkaUnitTest {
     "replied with a response to the original sender" in {
       Given("A SessionActor and an HTTP response")
       val sessionActor =
-        system.actorOf(
-          SessionActor
-            .props(Some(BasicAuthenticationProvider("user", "password")), "some-strean-id", Uri("http://example.com")))
+        system.spawn(
+          SessionActor(
+            Some(BasicAuthenticationProvider("user", "password")),
+            "some-strean-id",
+            Uri("http://example.com")),
+          "SessionActor-reply")
       val responsePromise = Promise[HttpResponse]()
       val httpResponse = HttpResponse(entity = HttpEntity("hello"))
 
@@ -32,7 +36,7 @@ class SessionActorTest extends AkkaUnitTest {
       Given("A simple Mesos API stub and a SessionActor instance")
       val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
-        system.actorOf(SessionActor.props(Some(credentialsProvider), "some-stream-id", mesos.uri))
+        system.spawn(SessionActor(Some(credentialsProvider), "some-stream-id", mesos.uri), "SessionActor-simple-call")
 
       When("we make a call through the session actor")
       val responsePromise = Promise[HttpResponse]()
@@ -55,7 +59,7 @@ class SessionActorTest extends AkkaUnitTest {
       Given("A SessionActor instance")
       val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
-        system.actorOf(SessionActor.props(Some(credentialsProvider), "some-stream-id", mesos.uri))
+        system.spawn(SessionActor(Some(credentialsProvider), "some-stream-id", mesos.uri), "SessionActor-refresh")
 
       When("we make a call through the session actor")
       val responsePromise = Promise[HttpResponse]()
@@ -75,7 +79,9 @@ class SessionActorTest extends AkkaUnitTest {
     "follow a redirect" in withMesosStub(StatusCodes.OK) { mesos =>
       Given("A SessionActor instance")
       val sessionActor =
-        system.actorOf(SessionActor.props(None, "some-stream-id", mesos.uri.withPath(Path("/redirected"))))
+        system.spawn(
+          SessionActor(None, "some-stream-id", mesos.uri.withPath(Path("/redirected"))),
+          "SessionActor-redirect")
 
       When("we make a call through the session actor")
       val responsePromise = Promise[HttpResponse]()
