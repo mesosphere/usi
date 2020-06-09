@@ -1,17 +1,13 @@
 package com.mesosphere.mesos.client
 
-import akka.pattern.ask
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{BasicHttpCredentials, HttpCredentials}
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.testkit.TestProbe
-import akka.util.Timeout
 import com.mesosphere.utils.AkkaUnitTest
 
-import scala.concurrent.Future
-import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
 
 class SessionActorTest extends AkkaUnitTest {
 
@@ -22,26 +18,26 @@ class SessionActorTest extends AkkaUnitTest {
         system.actorOf(
           SessionActor
             .props(Some(BasicAuthenticationProvider("user", "password")), "some-strean-id", Uri("http://example.com")))
-      val originalSender = TestProbe()
+      val responsePromise = Promise[HttpResponse]()
       val httpResponse = HttpResponse(entity = HttpEntity("hello"))
 
       When("the actor receives a response for the request")
-      sessionActor ! SessionActor.Response(Array.emptyByteArray, originalSender.ref, httpResponse)
+      sessionActor ! SessionActor.Response(SessionActor.Call(Array.emptyByteArray, responsePromise), httpResponse)
 
       Then("it sends the response to the original sender")
-      originalSender.expectMsg(httpResponse)
+      responsePromise.future.futureValue shouldBe httpResponse
     }
 
     "make a simple call to Mesos" in withMesosStub(StatusCodes.OK) { mesos =>
-      implicit val timeout = Timeout(2.seconds)
-
       Given("A simple Mesos API stub and a SessionActor instance")
       val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
         system.actorOf(SessionActor.props(Some(credentialsProvider), "some-stream-id", mesos.uri))
 
       When("we make a call through the session actor")
-      val response = (sessionActor ? Array.empty[Byte]).futureValue.asInstanceOf[HttpResponse]
+      val responsePromise = Promise[HttpResponse]()
+      sessionActor ! SessionActor.Call(Array.empty[Byte], responsePromise)
+      val response = responsePromise.future.futureValue
 
       Then("we receive an HTTP 200")
       response.status should be(StatusCodes.OK)
@@ -56,15 +52,15 @@ class SessionActorTest extends AkkaUnitTest {
     "refresh the session token when the first call response is an HTTP 401" in withMesosStub(
       StatusCodes.Unauthorized,
       StatusCodes.OK) { mesos =>
-      implicit val timeout = Timeout(2.seconds)
-
       Given("A SessionActor instance")
       val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
         system.actorOf(SessionActor.props(Some(credentialsProvider), "some-stream-id", mesos.uri))
 
       When("we make a call through the session actor")
-      val response = (sessionActor ? Array.empty[Byte]).futureValue.asInstanceOf[HttpResponse]
+      val responsePromise = Promise[HttpResponse]()
+      sessionActor ! SessionActor.Call(Array.empty[Byte], responsePromise)
+      val response = responsePromise.future.futureValue
 
       Then("we receive an HTTP 200")
       response.status should be(StatusCodes.OK)
@@ -77,14 +73,14 @@ class SessionActorTest extends AkkaUnitTest {
     }
 
     "follow a redirect" in withMesosStub(StatusCodes.OK) { mesos =>
-      implicit val timeout = Timeout(2.seconds)
-
       Given("A SessionActor instance")
       val sessionActor =
         system.actorOf(SessionActor.props(None, "some-stream-id", mesos.uri.withPath(Path("/redirected"))))
 
       When("we make a call through the session actor")
-      val response = (sessionActor ? Array.empty[Byte]).futureValue.asInstanceOf[HttpResponse]
+      val responsePromise = Promise[HttpResponse]()
+      sessionActor ! SessionActor.Call(Array.empty[Byte], responsePromise)
+      val response = responsePromise.future.futureValue
 
       Then("we receive an HTTP 200")
       response.status should be(StatusCodes.OK)
