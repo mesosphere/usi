@@ -6,14 +6,12 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
-import akka.stream.{Materializer, WatchedActorTerminatedException}
+import akka.stream.WatchedActorTerminatedException
 import akka.stream.scaladsl.{Flow, FlowWithContext}
-import akka.util.Timeout
 import com.mesosphere.mesos.client.SessionActor.Call
 import com.typesafe.scalalogging.StrictLogging
 
-import scala.concurrent.{ExecutionContext, Promise}
-import scala.reflect.ClassTag
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success}
 
 /**
@@ -26,24 +24,18 @@ import scala.util.{Failure, Success}
   * @param streamId The Mesos stream ID. See the [[http://mesos.apache.org/documentation/latest/scheduler-http-api/#calls docs]] for details.
   * @param authorization A [[CredentialsProvider]] if the connection is secured.
   */
-case class Session(baseUri: Uri, streamId: String, authorization: Option[CredentialsProvider] = None)(
-    implicit askTimout: Timeout)
+case class Session(baseUri: Uri, streamId: String, authorization: Option[CredentialsProvider] = None)
     extends StrictLogging {
 
   /**
     * This is a port of [[Flow.ask()]] that supports a tuple to carry a context `C`.
     */
   private def sessionActorFlow[C](parallelism: Int)(ref: ActorRef)(
-      implicit timeout: Timeout,
-      tag: ClassTag[HttpResponse],
-      ec: ExecutionContext): Flow[(Array[Byte], C), (HttpResponse, C), NotUsed] = {
+      implicit ec: ExecutionContext): Flow[(Array[Byte], C), (HttpResponse, C), NotUsed] = {
     Flow[(Array[Byte], C)]
       .watch(ref)
       .mapAsync(parallelism) {
-        case (el, ctx) =>
-          val promise = Promise[HttpResponse]()
-          ref ! SessionActor.Call(el, promise)
-          promise.future.map(o => (o, ctx))
+        case (el, ctx) => SessionActor.call(ref, el).map(o => (o, ctx))
       }
       .mapError {
         // the purpose of this recovery is to change the name of the stage in that exception
@@ -55,9 +47,7 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
   }
 
   /** @return A flow that makes Mesos calls and outputs HTTP responses. */
-  def post[C](
-      implicit system: ActorSystem,
-      mat: Materializer): FlowWithContext[Array[Byte], C, HttpResponse, C, NotUsed] = {
+  def post[C](implicit system: ActorSystem): FlowWithContext[Array[Byte], C, HttpResponse, C, NotUsed] = {
     import system.dispatcher
     logger.info(s"Create authenticated session for stream $streamId.")
     val sessionActor =
@@ -82,6 +72,19 @@ object Session {
 object SessionActor {
   def props(authorization: Option[CredentialsProvider], streamId: String, schedulerEndpoint: Uri): Props = {
     Props(new SessionActor(authorization, streamId, schedulerEndpoint))
+  }
+
+  /**
+    * Calls the session actor with the body of the request.
+    *
+    * @param ref A reference to the [[SessionActor]].
+    * @param body The body of the call.
+    * @return A future [[HttpResponse]] of the call.
+    */
+  private[client] def call(ref: ActorRef, body: Array[Byte]): Future[HttpResponse] = {
+    val promise = Promise[HttpResponse]()
+    ref ! SessionActor.Call(body, promise)
+    promise.future
   }
 
   /**

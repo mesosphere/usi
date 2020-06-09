@@ -31,8 +31,6 @@ class SessionActorTest extends AkkaUnitTest {
     }
 
     "make a simple call to Mesos" in withMesosStub(StatusCodes.OK) { mesos =>
-      implicit val timeout = Timeout(2.seconds)
-
       Given("A simple Mesos API stub and a SessionActor instance")
       val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
@@ -56,8 +54,6 @@ class SessionActorTest extends AkkaUnitTest {
     "refresh the session token when the first call response is an HTTP 401" in withMesosStub(
       StatusCodes.Unauthorized,
       StatusCodes.OK) { mesos =>
-      implicit val timeout = Timeout(2.seconds)
-
       Given("A SessionActor instance")
       val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
@@ -79,8 +75,6 @@ class SessionActorTest extends AkkaUnitTest {
     }
 
     "follow a redirect" in withMesosStub(StatusCodes.OK) { mesos =>
-      implicit val timeout = Timeout(2.seconds)
-
       Given("A SessionActor instance")
       val sessionActor =
         system.actorOf(SessionActor.props(None, "some-stream-id", mesos.uri.withPath(Path("/redirected"))))
