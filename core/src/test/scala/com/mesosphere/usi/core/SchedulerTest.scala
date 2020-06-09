@@ -55,7 +55,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
         r
       case None =>
         None
-      case Some(o) =>
+      case Some(_) =>
         pullUntil(sink)(predicate)
     }
   }
@@ -165,7 +165,7 @@ class SchedulerTest extends AkkaUnitTest with Inside {
   "suppress and revive calls are generated in response to podspecs" in {
     val watchingMockMesosFlow = Flow[MesosCall].alsoToMat(Sink.queue())(Keep.right).via(loggingMockMesosFlow)
     val schedulerWithWatchingMesos = mockedUnconnectedFlow.joinMat(watchingMockMesosFlow)(Keep.right)
-    val ((input, mesosCallsOutput), stateEventsOutput) = commandInputSource
+    val ((input, mesosCallsOutput), _) = commandInputSource
       .viaMat(schedulerWithWatchingMesos)(Keep.both)
       .toMat(Sink.queue())(Keep.both)
       .run

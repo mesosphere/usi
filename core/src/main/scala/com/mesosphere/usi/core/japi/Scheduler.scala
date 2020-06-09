@@ -4,9 +4,10 @@ import java.util.concurrent.CompletableFuture
 
 import akka.stream.{Materializer, javadsl}
 import akka.{Done, NotUsed}
+import com.mesosphere.usi.async.ExecutionContexts
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
 import com.mesosphere.usi.core.models.{StateEvent, StateSnapshot}
-import com.mesosphere.usi.core.{CallerThreadExecutionContext, SchedulerFactory, Scheduler => ScalaScheduler}
+import com.mesosphere.usi.core.{SchedulerFactory, Scheduler => ScalaScheduler}
 
 import scala.compat.java8.FutureConverters._
 
@@ -29,7 +30,7 @@ object Scheduler {
   def asFlow(factory: SchedulerFactory): CompletableFuture[FlowResult] = {
     ScalaScheduler
       .asFlow(factory)
-      .map { case (snapshot, flow) => new FlowResult(snapshot, flow.asJava) }(CallerThreadExecutionContext.context)
+      .map { case (snapshot, flow) => new FlowResult(snapshot, flow.asJava) }(ExecutionContexts.callerThread)
       .toJava
       .toCompletableFuture
   }
@@ -47,7 +48,7 @@ object Scheduler {
       .map {
         case (snap, source, sink) =>
           new SourceAndSinkResult(snap, source.asJava, sink.mapMaterializedValue(_.toJava.toCompletableFuture).asJava)
-      }(CallerThreadExecutionContext.context)
+      }(ExecutionContexts.callerThread)
       .toJava
       .toCompletableFuture
   }

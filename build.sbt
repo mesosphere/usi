@@ -79,6 +79,13 @@ lazy val `root` = (project in file("./"))
     `examples-mesos-client-example`,
     `examples-simple-hello-world`)
 
+lazy val `commons` = (project in file("./commons"))
+  .settings(
+    commonSettings,
+    libraryDependencies ++= Seq(
+      Dependencies.scalaLogging,
+      Dependencies.Test.scalaTest % "test"))
+
 lazy val `core-models` = (project in file("./core-models/"))
   .settings(
     commonSettings,
@@ -134,6 +141,7 @@ lazy val `mesos-client` = (project in file("./mesos-client/"))
       Dependencies.scalaAsync % "compile",
       Dependencies.alpakkaCodes,
       Dependencies.Test.akkaStreamTestKit % "test"))
+  .dependsOn(`commons`)
   .dependsOn(`core-models`)
   .dependsOn(`test-utils` % "test->compile")
 
@@ -162,6 +170,7 @@ lazy val `metrics-dropwizard` = (project in file("./metrics-dropwizard"))
       Dependencies.hdrHistogram,
     ))
   .dependsOn(`metrics`)
+  .dependsOn(`commons`)
   .dependsOn(`test-utils` % "test->compile")
 
 lazy val `mesos-master-detector` = (project in file("./mesos-master-detector"))

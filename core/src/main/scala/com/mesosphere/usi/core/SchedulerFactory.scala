@@ -4,6 +4,7 @@ import akka.{Done, NotUsed}
 import akka.stream.{FanInShape2, Graph}
 import akka.stream.scaladsl.{Flow, Sink}
 import com.mesosphere.mesos.client.MesosClient
+import com.mesosphere.usi.async.ExecutionContexts
 import com.mesosphere.usi.core.conf.SchedulerSettings
 import com.mesosphere.usi.core.models.{PodSpecUpdatedEvent, StateEvent, StateSnapshot}
 import com.mesosphere.usi.core.models.commands.SchedulerCommand
@@ -95,7 +96,7 @@ class SchedulerFactory private (
     s.mapMaterializedValue { f =>
       f.failed.foreach { ex =>
         logger.error("Mesos client hanging up due to error in stream", ex)
-      }(CallerThreadExecutionContext.context)
+      }(ExecutionContexts.callerThread)
       NotUsed
     }
   }

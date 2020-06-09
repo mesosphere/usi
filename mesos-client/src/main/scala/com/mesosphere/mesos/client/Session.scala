@@ -11,6 +11,7 @@ import akka.http.scaladsl.model.headers.{Authorization, HttpCredentials}
 import akka.http.scaladsl.model._
 import akka.stream.WatchedActorTerminatedException
 import akka.stream.scaladsl.{Flow, FlowWithContext}
+import com.mesosphere.usi.async.ExecutionContexts
 import com.typesafe.scalalogging.StrictLogging
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
@@ -198,7 +199,7 @@ class SessionActor(
               logger.error("Mesos call HTTP request failed", ex)
               // Fail stream.
               call.responsePromise.complete(f)
-          }(ExecutionContext.parasitic)
+          }(ExecutionContexts.callerThread)
         Behaviors.same
       case SessionActor.Response(originalCall, response) =>
         logger.debug(s"Call replied with ${response.status}")
