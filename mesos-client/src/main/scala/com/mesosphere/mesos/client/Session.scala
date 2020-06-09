@@ -149,9 +149,6 @@ class SessionActor(
 
   import SessionActor._
 
-  // TODO:Should we still use this dispatcher?
-  implicit val dispatcher = context.system.dispatchers.lookup(DispatcherSelector.default())
-
   def start(): Behavior[Message] = {
     authorization match {
       case Some(credentialsProvider) =>
@@ -201,7 +198,7 @@ class SessionActor(
               logger.error("Mesos call HTTP request failed", ex)
               // Fail stream.
               call.responsePromise.complete(f)
-          }
+          }(ExecutionContext.parasitic)
         Behaviors.same
       case SessionActor.Response(originalCall, response) =>
         logger.debug(s"Call replied with ${response.status}")
