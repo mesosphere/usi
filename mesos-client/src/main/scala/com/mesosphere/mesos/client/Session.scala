@@ -2,7 +2,7 @@ package com.mesosphere.mesos.client
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.actor.typed.{ActorRef, Behavior, DispatcherSelector}
+import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, StashBuffer}
 import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl.Http
