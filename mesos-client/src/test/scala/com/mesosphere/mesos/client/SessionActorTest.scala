@@ -5,11 +5,9 @@ import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{BasicHttpCredentials, HttpCredentials}
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.util.Timeout
 import com.mesosphere.utils.AkkaUnitTest
 
 import scala.concurrent.{Future, Promise}
-import scala.concurrent.duration._
 
 class SessionActorTest extends AkkaUnitTest {
 
