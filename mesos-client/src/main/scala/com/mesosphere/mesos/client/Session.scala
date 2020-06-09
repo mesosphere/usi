@@ -211,8 +211,8 @@ class SessionActor(
               throw new IllegalStateException("Received HTTP 401 Unauthorized but no credential provider was supplied.")
           }
 
-          // Queue current call again. It will be unstashed/sent once the actor becomes initialized again.
-          buffer.stash(originalCall)
+          // Queue current call again.
+          context.self ! originalCall
 
           initializing
         } else if (response.status.isRedirection()) {
@@ -223,10 +223,10 @@ class SessionActor(
           val redirectUri = locationHeader.uri.resolvedAgainst(requestUri)
 
           // Queue current call again.
-          buffer.stash(originalCall)
+          context.self ! originalCall
 
-          // Change redirect URI and unstash/sent the call again.
-          buffer.unstash(initialized(redirectUri, maybeCredentials), 1, identity)
+          // Change redirect URI
+          initialized(redirectUri, maybeCredentials)
 
         } else {
           logger.debug("Responding to original sender")
