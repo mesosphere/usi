@@ -52,7 +52,7 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
       case launchPod: LaunchPod if wasNotKilled(launchPod.podId) =>
         // Pods can only become launching if they haven't run before.
         expectedState.update(launchPod.podId, Protos.TaskState.TASK_RUNNING)
-      case killPod: KillPod if killPod.podId.value.startsWith("random") =>
+      case killPod: KillPod if isKnownPod(killPod.podId) =>
         expectedState.update(killPod.podId, Protos.TaskState.TASK_KILLED)
       case expungePod: ExpungePod => expectedState.remove(expungePod.podId)
       case ExpungePod(podId) =>
@@ -63,6 +63,9 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
 
     /** @return whether a pod exists in a killed state. */
     def wasNotKilled(id: PodId): Boolean = expectedState.get(id).exists(_ != Protos.TaskState.TASK_KILLED)
+
+    /** @return whether the pod is known or unknown */
+    def isKnownPod(id: PodId): Boolean = id.value.startsWith("random")
 
     // Observed pod states as reported by USI
     var observedState = concurrent.TrieMap.empty[PodId, Protos.TaskState]
@@ -86,12 +89,12 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
     def genPodLaunches =
       for {
         //podId <- Arbitrary.arbitrary[String].suchThat(s => s.nonEmpty && s.matches("^[a-zA-Z0-9\\-\\.]+$"))
-        podId <- Arbitrary.arbitrary[Int]
+        podId <- Arbitrary.arbitrary[Int].map(i => PodId(s"random-pod-$i")).suchThat(id => !expectedState.contains(id))
         cpu <- Gen.choose(0.1, 1.1)
         mem <- Gen.choose(2, 256)
       } yield
         LaunchPod(
-          PodId(s"random-pod-$podId"),
+          podId,
           SimpleRunTemplateFactory(
             resourceRequirements = List(ScalarRequirement.cpus(cpu), ScalarRequirement.memory(mem)),
             shellCommand = "sleep 3600",
