@@ -88,8 +88,9 @@ class SchedulerFuzzingTest extends AkkaUnitTest with MesosClusterTest with Insid
     // Commands
     def genPodLaunches =
       for {
-        //podId <- Arbitrary.arbitrary[String].suchThat(s => s.nonEmpty && s.matches("^[a-zA-Z0-9\\-\\.]+$"))
-        podId <- Arbitrary.arbitrary[Int].map(i => PodId(s"random-pod-$i")).suchThat(id => !expectedState.contains(id))
+        podId <- Arbitrary
+          .arbitrary[Int]
+          .map(i => PodId(s"random-pod-$i")) //.suchThat(id => !expectedState.contains(id))
         cpu <- Gen.choose(0.1, 1.1)
         mem <- Gen.choose(2, 256)
       } yield
