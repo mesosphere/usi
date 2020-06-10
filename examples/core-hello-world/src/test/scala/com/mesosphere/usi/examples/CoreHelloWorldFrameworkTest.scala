@@ -45,7 +45,8 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     val (mesosClient, _, scheduler) = CoreHelloWorldFramework.init(
       MesosClientSettings.load().withMasters(Seq(mesosFacade.url)),
       customPersistenceStore,
-      frameworkInfo)
+      frameworkInfo
+    )
 
     And("an initial pod spec is launched")
     val launchCommand = CoreHelloWorldFramework.generateLaunchCommand
@@ -72,7 +73,8 @@ class CoreHelloWorldFrameworkTest extends AkkaUnitTest with MesosClusterTest wit
     val (newClient, _, newScheduler) = CoreHelloWorldFramework.init(
       MesosClientSettings.load().withMasters(Seq(mesosFacade.url)),
       customPersistenceStore,
-      frameworkInfo)
+      frameworkInfo
+    )
     val (newPub, newSub) = testScheduler(newScheduler)
     newPub.sendNext(launchCommand)
 

@@ -24,25 +24,30 @@ import org.scalatest.Inside
 class SchedulerLogicHandlerTest extends UnitTest with Inside {
   val testRoleRunSpec = SimpleRunTemplateFactory(Seq.empty, "", "test")
 
-  def declineCallsIn(calls: Seq[Call]): Seq[Call.Decline] = calls.collect {
-    case call if call.hasDecline => call.getDecline
-  }
+  def declineCallsIn(calls: Seq[Call]): Seq[Call.Decline] =
+    calls.collect {
+      case call if call.hasDecline => call.getDecline
+    }
 
-  def acceptCallsIn(calls: Seq[Call]): Seq[Call.Accept] = calls.collect {
-    case call if call.hasAccept => call.getAccept
-  }
+  def acceptCallsIn(calls: Seq[Call]): Seq[Call.Accept] =
+    calls.collect {
+      case call if call.hasAccept => call.getAccept
+    }
 
-  def podRecordUpdatesIn(events: Seq[StateEventOrSnapshot]): Seq[PodRecordUpdatedEvent] = events.collect {
-    case podRecordUpdated: PodRecordUpdatedEvent => podRecordUpdated
-  }
+  def podRecordUpdatesIn(events: Seq[StateEventOrSnapshot]): Seq[PodRecordUpdatedEvent] =
+    events.collect {
+      case podRecordUpdated: PodRecordUpdatedEvent => podRecordUpdated
+    }
 
-  def podStatusUpdatesIn(events: Seq[StateEventOrSnapshot]): Seq[PodStatusUpdatedEvent] = events.collect {
-    case podStatusUpdated: PodStatusUpdatedEvent => podStatusUpdated
-  }
+  def podStatusUpdatesIn(events: Seq[StateEventOrSnapshot]): Seq[PodStatusUpdatedEvent] =
+    events.collect {
+      case podStatusUpdated: PodStatusUpdatedEvent => podStatusUpdated
+    }
 
-  def podSpecUpdatesIn(events: Seq[StateEventOrSnapshot]): Seq[PodSpecUpdatedEvent] = events.collect {
-    case podSpecUpdated: PodSpecUpdatedEvent => podSpecUpdated
-  }
+  def podSpecUpdatesIn(events: Seq[StateEventOrSnapshot]): Seq[PodSpecUpdatedEvent] =
+    events.collect {
+      case podSpecUpdated: PodSpecUpdatedEvent => podSpecUpdated
+    }
 
   "launching pods" should {
     import ProtoBuilders._
@@ -56,7 +61,8 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
       SimpleRunTemplateFactory(
         resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
         shellCommand = "sleep 3600",
-        "test")
+        "test"
+      )
     )
 
     "ignore launch commands for podIds that already have a podRecord" in {
@@ -65,7 +71,8 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
         new MesosCalls(MesosMock.mockFrameworkId),
         MesosMock.masterDomainInfo,
         StateSnapshot.empty,
-        DummyMetrics)
+        DummyMetrics
+      )
       handler.handleCommand(launchPod)
 
       inside(handler.handleMesosEvent(newOfferEvent(offer))) {
@@ -91,7 +98,8 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
         new MesosCalls(MesosMock.mockFrameworkId),
         MesosMock.masterDomainInfo,
         StateSnapshot.empty,
-        DummyMetrics)
+        DummyMetrics
+      )
       handler.handleCommand(launchPod)
 
       inside(handler.handleMesosEvent(newOfferEvent(offer))) {
@@ -127,7 +135,8 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
         new MesosCalls(MesosMock.mockFrameworkId),
         MesosMock.masterDomainInfo,
         StateSnapshot.empty,
-        DummyMetrics)
+        DummyMetrics
+      )
 
       When("a task status update is received")
       val result = handler.handleMesosEvent(newTaskUpdateEvent(runningTaskStatus))
@@ -155,7 +164,8 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
         new MesosCalls(MesosMock.mockFrameworkId),
         MesosMock.masterDomainInfo,
         StateSnapshot.empty,
-        DummyMetrics)
+        DummyMetrics
+      )
 
       When("a unrecognized task status update is received")
       val resultForRunningTaskStatus = handler.handleMesosEvent(newTaskUpdateEvent(runningTaskStatus))
@@ -191,7 +201,8 @@ class SchedulerLogicHandlerTest extends UnitTest with Inside {
         new MesosCalls(MesosMock.mockFrameworkId),
         MesosMock.masterDomainInfo,
         StateSnapshot.empty,
-        DummyMetrics)
+        DummyMetrics
+      )
       handler.handleMesosEvent(newTaskUpdateEvent(runningTaskStatus))
 
       And("the task status turns back to terminal")

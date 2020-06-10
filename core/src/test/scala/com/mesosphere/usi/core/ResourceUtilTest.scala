@@ -31,7 +31,8 @@ class ResourceUtilTest extends UnitTest {
       amount: T,
       reservations: Iterable[Protos.Resource.ReservationInfo] = Nil,
       disk: Option[DiskInfo] = None,
-      role: String = "mock-role"): Protos.Resource = {
+      role: String = "mock-role"
+  ): Protos.Resource = {
     ProtoBuilders.newResource(
       resourceType.name,
       Protos.Value.Type.SCALAR,
@@ -56,14 +57,17 @@ class ResourceUtilTest extends UnitTest {
         Seq(
           newScalarResource(ResourceType.CPUS, 3),
           ports(2 to 20),
-          set(ResourceType.UNKNOWN("labels"), Set("a", "b"))),
+          set(ResourceType.UNKNOWN("labels"), Set("a", "b"))
+        ),
         Seq(newScalarResource(ResourceType.CPUS, 2), ports(2 to 12), set(ResourceType.UNKNOWN("labels"), Set("a")))
       )
       assert(
         leftOvers == Seq(
           newScalarResource(ResourceType.CPUS, 1),
           ports(13 to 20),
-          set(ResourceType.UNKNOWN("labels"), Set("b"))))
+          set(ResourceType.UNKNOWN("labels"), Set("b"))
+        )
+      )
     }
 
     "combine used resource and match on all available resource" in {
@@ -78,7 +82,8 @@ class ResourceUtilTest extends UnitTest {
       val leftOvers = ResourceUtil.consumeResources(
         Seq(
           newScalarResource(ResourceType.CPUS, 2),
-          newScalarResource(ResourceType.CPUS, 2, reservations = Seq(reservedForRole("marathon")))),
+          newScalarResource(ResourceType.CPUS, 2, reservations = Seq(reservedForRole("marathon")))
+        ),
         Seq(
           newScalarResource(ResourceType.CPUS, 0.5),
           newScalarResource(ResourceType.CPUS, 1, reservations = Seq(reservedForRole("marathon"))),
@@ -88,14 +93,17 @@ class ResourceUtilTest extends UnitTest {
       assert(
         leftOvers == Seq(
           newScalarResource(ResourceType.CPUS, 1.5),
-          newScalarResource(ResourceType.CPUS, 0.5, reservations = Seq(reservedForRole("marathon")))))
+          newScalarResource(ResourceType.CPUS, 0.5, reservations = Seq(reservedForRole("marathon")))
+        )
+      )
     }
 
     "consider reservation state when consuming resources" in {
       val reservationInfo = ProtoBuilders.newResourceReservationInfo(
         ReservationInfo.Type.STATIC,
         role = "marathon",
-        principal = "principal")
+        principal = "principal"
+      )
 
       val disk = DiskInfo.newBuilder().setPersistence(Persistence.newBuilder().setId("persistenceId")).build()
       val resourceWithReservation = newScalarResource(ResourceType.DISK, 1024, Seq(reservationInfo), Some(disk))
@@ -151,7 +159,8 @@ class ResourceUtilTest extends UnitTest {
     "fully consume mount disks" in {
       ResourceUtil.consumeScalarResource(
         newScalarResource(ResourceType.DISK, 1024.0, disk = Some(mountDisk(Some("/mnt/disk1")))),
-        32.0) shouldBe (None)
+        32.0
+      ) shouldBe (None)
     }
 
     "consider reservation labels" in {
@@ -230,22 +239,26 @@ class ResourceUtilTest extends UnitTest {
     portsTest(
       consumedResource = Seq(10 to 10),
       baseResource = Seq(5 to 15),
-      expectedResult = Some(Seq(5 to 9, 11 to 15)))
+      expectedResult = Some(Seq(5 to 9, 11 to 15))
+    )
     portsTest(
       consumedResource = Seq(10 to 11),
       baseResource = Seq(5 to 15),
-      expectedResult = Some(Seq(5 to 9, 12 to 15)))
+      expectedResult = Some(Seq(5 to 9, 12 to 15))
+    )
     portsTest(
       consumedResource = Seq(10 to 11),
       baseResource = Seq(5 to 15, 30 to 31),
-      expectedResult = Some(Seq(5 to 9, 12 to 15, 30 to 31)))
+      expectedResult = Some(Seq(5 to 9, 12 to 15, 30 to 31))
+    )
 
     portsTest(consumedResource = Seq(), baseResource = Seq(5 to 15), expectedResult = Some(Seq(5 to 15)))
 
     portsTest(
       consumedResource = Seq(31084 to 31084),
       baseResource = Seq(31000 to 31096, 31098 to 32000),
-      expectedResult = Some(Seq(31000 to 31083, 31085 to 31096, 31098 to 32000)))
+      expectedResult = Some(Seq(31000 to 31083, 31085 to 31096, 31098 to 32000))
+    )
 
     // overlapping smaller
     portsTest(consumedResource = Seq(2 to 5), baseResource = Seq(5 to 15), expectedResult = Some(Seq(6 to 15)))
@@ -266,14 +279,16 @@ class ResourceUtilTest extends UnitTest {
     setResourceTest(
       consumedResource = Set("a", "b"),
       baseResource = Set("a", "b", "c"),
-      expectedResult = Some(Set("c")))
+      expectedResult = Some(Set("c"))
+    )
     setResourceTest(consumedResource = Set("a", "b", "c"), baseResource = Set("a", "b", "c"), expectedResult = None)
   }
 
   private[this] def setResourceTest(
       consumedResource: Set[String],
       baseResource: Set[String],
-      expectedResult: Option[Set[String]]): Unit = {
+      expectedResult: Option[Set[String]]
+  ): Unit = {
 
     s"consuming sets resource $consumedResource from $baseResource results in $expectedResult" in {
       val r1 = set(ResourceType.UNKNOWN("labels"), consumedResource)
@@ -289,13 +304,15 @@ class ResourceUtilTest extends UnitTest {
       resourceType.name,
       Protos.Value.Type.SET,
       ProtoBuilders.newResourceAllocationInfo("some-role"),
-      set = labels.asProtoSet)
+      set = labels.asProtoSet
+    )
   }
 
   private[this] def portsTest(
       consumedResource: Seq[Range.Inclusive],
       baseResource: Seq[Range.Inclusive],
-      expectedResult: Option[Seq[Range.Inclusive]]): Unit = {
+      expectedResult: Option[Seq[Range.Inclusive]]
+  ): Unit = {
 
     s"consuming ports resource $consumedResource from $baseResource results in $expectedResult" in {
       val r1 = ports(consumedResource: _*)

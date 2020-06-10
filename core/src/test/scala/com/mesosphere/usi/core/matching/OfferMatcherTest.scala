@@ -17,7 +17,8 @@ class OfferMatcherTest extends UnitTest {
     SimpleRunTemplateFactory(
       resourceRequirements = List(ScalarRequirement(ResourceType.CPUS, cpus), ScalarRequirement(ResourceType.MEM, mem)),
       shellCommand = "sleep 3600",
-      "test")
+      "test"
+    )
   }
   val offerMatcher = new OfferMatcher(MesosMock.masterDomainInfo)
 
@@ -27,7 +28,8 @@ class OfferMatcherTest extends UnitTest {
         testPodId,
         testRunTemplate(cpus = 1, mem = 256),
         HomeRegionFilter,
-        List(AttributeStringIsFilter("rack", "a"), AttributeStringIsFilter("class", "vm")))
+        List(AttributeStringIsFilter("rack", "a"), AttributeStringIsFilter("class", "vm"))
+      )
 
       val result = offerMatcher.matchOffer(offer, List(nonMatchingPodSpec))
       result shouldBe Map.empty
@@ -38,7 +40,8 @@ class OfferMatcherTest extends UnitTest {
         testPodId,
         testRunTemplate(cpus = 1, mem = 256),
         HomeRegionFilter,
-        List(AttributeStringIsFilter("rack", "a"), AttributeStringIsFilter("class", "baremetal")))
+        List(AttributeStringIsFilter("rack", "a"), AttributeStringIsFilter("class", "baremetal"))
+      )
 
       val result = offerMatcher.matchOffer(offer, List(nonMatchingPodSpec))
       result.nonEmpty shouldBe true

@@ -49,8 +49,10 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
     .via(schedulerFlow)
     .log("scheduler events")
     .toMat(Sink.queue())(Keep.both)
-    .withAttributes(Attributes
-      .logLevels(onElement = Logging.DebugLevel, onFinish = Logging.InfoLevel, onFailure = Logging.ErrorLevel))
+    .withAttributes(
+      Attributes
+        .logLevels(onElement = Logging.DebugLevel, onFinish = Logging.InfoLevel, onFailure = Logging.ErrorLevel)
+    )
     .run
 
   override def beforeAll(): Unit = {
@@ -66,8 +68,10 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
         SimpleRunTemplateFactory(
           resourceRequirements = List(ScalarRequirement.cpus(1), ScalarRequirement.memory(256)),
           shellCommand = "sleep 3600",
-          "test")
-      ))
+          "test"
+        )
+      )
+    )
 
     inside(output.pull().futureValue) {
       case Some(specUpdated: PodSpecUpdatedEvent) =>
@@ -100,7 +104,8 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
           shellCommand = "sleep 3600",
           "test"
         )
-      ))
+      )
+    )
 
     eventually {
       inside(output.pull().futureValue) {
@@ -122,8 +127,10 @@ class SchedulerIntegrationTest extends AkkaUnitTest with MesosClusterTest with I
       .via(schedulerFlow)
       .log("scheduler events")
       .toMat(Sink.queue())(Keep.both)
-      .withAttributes(Attributes
-        .logLevels(onElement = Logging.DebugLevel, onFinish = Logging.InfoLevel, onFailure = Logging.ErrorLevel))
+      .withAttributes(
+        Attributes
+          .logLevels(onElement = Logging.DebugLevel, onFinish = Logging.InfoLevel, onFailure = Logging.ErrorLevel)
+      )
       .run
 
     And("a first successful command.")

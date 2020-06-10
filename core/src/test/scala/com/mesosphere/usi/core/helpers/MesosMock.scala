@@ -25,10 +25,13 @@ object MesosMock {
         List(
           MesosEvent
             .newBuilder()
-            .setOffers(MesosEvent.Offers
-              .newBuilder()
-              .addOffers(createMockOffer()))
-            .build())
+            .setOffers(
+              MesosEvent.Offers
+                .newBuilder()
+                .addOffers(createMockOffer())
+            )
+            .build()
+        )
       } else if (call.hasAccept) {
         val events = for {
           operation <- call.getAccept.getOperationsList.iterator.asScala
@@ -38,7 +41,8 @@ object MesosMock {
             taskId = taskInfo.getTaskId,
             state = Mesos.TaskState.TASK_RUNNING,
             agentId = mockAgentId.asProto,
-            uuid = ByteString.copyFromUtf8("uuid"))
+            uuid = ByteString.copyFromUtf8("uuid")
+          )
           MesosEvent.newBuilder
             .setUpdate(
               MesosEvent.Update

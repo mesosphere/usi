@@ -10,7 +10,8 @@ class FlowHelpersTest extends AkkaUnitTest {
 
   def newMockedFlow[M, O](
       inputSink: Sink[String, M],
-      outputSource: Source[Int, O]): (Flow[String, Int, NotUsed], M, O) = {
+      outputSource: Source[Int, O]
+  ): (Flow[String, Int, NotUsed], M, O) = {
 
     val (m, preMaterializedInput) =
       Flow[String]

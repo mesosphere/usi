@@ -28,7 +28,8 @@ class MesosEventsLogicTest extends UnitTest with Inside {
     SimpleRunTemplateFactory(
       resourceRequirements = resourceRequirements.result(),
       shellCommand = "sleep 3600",
-      role = "test")
+      role = "test"
+    )
   }
 
   val testPodId = PodId("mock-podId")
@@ -52,7 +53,8 @@ class MesosEventsLogicTest extends UnitTest with Inside {
       val insufficientOffer = MesosMock.createMockOffer(cpus = 1)
       val (_, schedulerEventsBuilder) = mesosEventLogic.matchOffer(
         insufficientOffer,
-        Seq(RunningPodSpec(testPodId, testRunTemplate(cpus = Integer.MAX_VALUE), HomeRegionFilter)))
+        Seq(RunningPodSpec(testPodId, testRunTemplate(cpus = Integer.MAX_VALUE), HomeRegionFilter))
+      )
       schedulerEventsBuilder.result.mesosCalls.size shouldBe 1
       val declines = schedulerEventsBuilder.result.mesosCalls.head.getDecline.getOfferIdsList
       declines.size() shouldBe 1
@@ -84,7 +86,7 @@ class MesosEventsLogicTest extends UnitTest with Inside {
           podWith1Cpu256Mem.copy(id = PodId("podid-2")),
           podWith1Cpu256Mem.copy(id = PodId("podid-3")),
           podWith1Cpu256Mem.copy(id = PodId("podid-4")),
-          podWith1Cpu256Mem.copy(id = PodId("podid-5")),
+          podWith1Cpu256Mem.copy(id = PodId("podid-5"))
         )
       )
       schedulerEventsBuilder.result.mesosCalls.size shouldBe 1
@@ -124,7 +126,9 @@ class MesosEventsLogicTest extends UnitTest with Inside {
           podWith1Cpu256Mem.id,
           Map(
             TaskId(podWith1Cpu256Mem.id.value) -> taskUpdate.getUpdate.getStatus
-          )))
+          )
+        )
+      )
 
       val events = mesosEventLogic.processEvent(
         SchedulerState(Map.empty, podStatus, Map.empty)
@@ -152,7 +156,9 @@ class MesosEventsLogicTest extends UnitTest with Inside {
           podWith1Cpu256Mem.id,
           Map(
             TaskId(podWith1Cpu256Mem.id.value) -> taskUpdateWithoutUuid.getUpdate.getStatus
-          )))
+          )
+        )
+      )
 
       val events = mesosEventLogic.processEvent(
         SchedulerState(Map.empty, podStatus, Map.empty)
@@ -167,11 +173,12 @@ class MesosEventsLogicTest extends UnitTest with Inside {
       state: Mesos.TaskState = Mesos.TaskState.TASK_RUNNING,
       agentId: Mesos.AgentID = newAgentId("some-agent-id"),
       uuid: ByteString = ByteString.copyFromUtf8("uuid")
-  ): Mesos.TaskStatus = newTaskStatus(
-    taskId = taskId,
-    state = state,
-    agentId = agentId,
-    uuid = uuid
-  )
+  ): Mesos.TaskStatus =
+    newTaskStatus(
+      taskId = taskId,
+      state = state,
+      agentId = agentId,
+      uuid = uuid
+    )
 
 }

@@ -19,7 +19,9 @@ class ScalarResourceMatcherTest extends UnitTest with Inside {
             ResourceType.CPUS.name,
             Mesos.Value.Type.SCALAR,
             ProtoBuilders.newResourceAllocationInfo("some-role"),
-            scalar = 10.asProtoScalar))
+            scalar = 10.asProtoScalar
+          )
+        )
       inside(ScalarResourceMatcher.matchAndConsume(requirement, resources)) {
         case Some(ResourceMatchResult(List(matchedResult), List(unmatched))) =>
           matchedResult.getScalar.getValue shouldBe 2.0

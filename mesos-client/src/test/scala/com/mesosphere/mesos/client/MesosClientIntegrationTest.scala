@@ -99,7 +99,8 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
   }
 
   def withFixture(frameworkId: Option[FrameworkID.Builder] = None, settings: Option[MesosClientSettings] = None)(
-      fn: Fixture => Unit): Unit = {
+      fn: Fixture => Unit
+  ): Unit = {
     val f = new Fixture(frameworkId, settings)
     try fn(f)
     finally {
@@ -109,7 +110,8 @@ class MesosClientIntegrationTest extends AkkaUnitTest with MesosClusterTest {
 
   class Fixture(
       existingFrameworkId: Option[FrameworkID.Builder] = None,
-      maybeSettings: Option[MesosClientSettings] = None) {
+      maybeSettings: Option[MesosClientSettings] = None
+  ) {
     implicit val system: ActorSystem = ActorSystem()
     implicit val materializer: ActorMaterializer = ActorMaterializer()
 
