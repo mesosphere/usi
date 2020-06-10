@@ -46,7 +46,8 @@ class DropwizardMetrics(metricsSettings: MetricsSettings, registry: MetricRegist
   override def closureGauge[N](
       name: String,
       fn: () => N,
-      unit: UnitOfMeasurement = UnitOfMeasurement.None): ClosureGauge = {
+      unit: UnitOfMeasurement = UnitOfMeasurement.None
+  ): ClosureGauge = {
     class DropwizardClosureGauge(val name: String) extends ClosureGauge {
       registry.gauge(name, () => () => fn())
     }
@@ -91,14 +92,16 @@ class DropwizardMetrics(metricsSettings: MetricsSettings, registry: MetricRegist
         .withLowestDiscernibleValue(1)
         .withHighestTrackableValue(
           histogramReservoirHighestTrackableValue,
-          OverflowResolver.REDUCE_TO_HIGHEST_TRACKABLE)
+          OverflowResolver.REDUCE_TO_HIGHEST_TRACKABLE
+        )
       if (histogramReservoirResetPeriodically) {
         if (histogramReservoirResettingChunks == 0)
           reservoirBuilder.resetReservoirPeriodically(histogramReservoirResettingInterval)
         else
           reservoirBuilder.resetReservoirPeriodicallyByChunks(
             histogramReservoirResettingInterval,
-            histogramReservoirResettingChunks)
+            histogramReservoirResettingChunks
+          )
       }
       val reservoir = reservoirBuilder.buildReservoir()
       new metrics.Timer(reservoir)
@@ -122,7 +125,8 @@ object DropwizardMetrics {
       case validNameRegex() =>
       case _ =>
         throw new IllegalArgumentException(
-          s"$constructedName is not a valid metric name. It must only include alpha numeric characters, '.' and '-'.")
+          s"$constructedName is not a valid metric name. It must only include alpha numeric characters, '.' and '-'."
+        )
     }
     constructedName
   }

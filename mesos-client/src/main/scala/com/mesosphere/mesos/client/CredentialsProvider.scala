@@ -41,11 +41,11 @@ trait CredentialsProvider {
   * @see See [[https://docs.mesosphere.com/1.11/security/ent/iam-api/#obtaining-an-authentication-token]] for details on
   *      the protocol.
   */
-case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL)(
-    implicit system: ActorSystem,
+case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL)(implicit
+    system: ActorSystem,
     materializer: ActorMaterializer,
-    context: ExecutionContext)
-    extends CredentialsProvider
+    context: ExecutionContext
+) extends CredentialsProvider
     with PlayJsonSupport
     with StrictLogging {
 
@@ -79,18 +79,19 @@ case class DcosServiceAccountProvider(uid: String, privateKey: String, root: URL
     )
   }
 
-  override def nextToken(): Future[HttpCredentials] = async {
-    logger.info(s"Fetching next authentication token from $root")
-    val response = await(Http().singleRequest(loginRequest))
-    logger.info(s"Next token response ${response.status}")
-    if (response.status.isSuccess()) {
-      val AuthenticationToken(acsToken) = await(Unmarshal(response.entity).to[AuthenticationToken])
-      GenericHttpCredentials("", Map("token" -> acsToken))
-    } else {
-      val body = await(Unmarshal(response.entity).to[String])
-      throw AuthenticationException(s"Could not login as $uid got ${response.status}: $body")
+  override def nextToken(): Future[HttpCredentials] =
+    async {
+      logger.info(s"Fetching next authentication token from $root")
+      val response = await(Http().singleRequest(loginRequest))
+      logger.info(s"Next token response ${response.status}")
+      if (response.status.isSuccess()) {
+        val AuthenticationToken(acsToken) = await(Unmarshal(response.entity).to[AuthenticationToken])
+        GenericHttpCredentials("", Map("token" -> acsToken))
+      } else {
+        val body = await(Unmarshal(response.entity).to[String])
+        throw AuthenticationException(s"Could not login as $uid got ${response.status}: $body")
+      }
     }
-  }
 
   final case class AuthenticationException(private val message: String = "", private val cause: Throwable = None.orNull)
       extends Exception(message, cause)

@@ -15,8 +15,8 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends ImplicitStrictLog
   @tailrec private def maybeMatchResourceRequirements(
       remainingResources: Map[ResourceType, Iterable[Mesos.Resource]],
       matchedResources: List[OfferMatcher.ResourceMatch],
-      resourceRequirements: List[KeyedResourceRequirement])
-    : Option[(List[OfferMatcher.ResourceMatch], Map[ResourceType, Iterable[Mesos.Resource]])] = {
+      resourceRequirements: List[KeyedResourceRequirement]
+  ): Option[(List[OfferMatcher.ResourceMatch], Map[ResourceType, Iterable[Mesos.Resource]])] = {
 
     resourceRequirements match {
       case Nil =>
@@ -40,7 +40,8 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends ImplicitStrictLog
       originalOffer: Mesos.Offer,
       remainingResources: Map[ResourceType, Iterable[Mesos.Resource]],
       result: Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]],
-      pendingLaunchPodSpecs: List[RunningPodSpec]): Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = {
+      pendingLaunchPodSpecs: List[RunningPodSpec]
+  ): Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = {
 
     def matchesAgentFilters(podId: PodId, agentFilters: Iterable[AgentFilter]): Boolean = {
       agentFilters.find { filter =>
@@ -48,7 +49,8 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends ImplicitStrictLog
       } match {
         case Some(nonMatchingfilter) =>
           logger.debug(
-            s"Declining offer ${originalOffer.getId.getValue} for pod $podId; first non-matching agent filter: ${nonMatchingfilter.description}")
+            s"Declining offer ${originalOffer.getId.getValue} for pod $podId; first non-matching agent filter: ${nonMatchingfilter.description}"
+          )
           false
         case None =>
           true
@@ -59,7 +61,8 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends ImplicitStrictLog
       val result = domainFilter(masterDomainInfo, originalOffer.getDomain)
       if (!result)
         logger.debug(
-          s"Declining offer ${originalOffer.getId.getValue} for pod $podId; domain filter did not match: ${domainFilter.description}.")(
+          s"Declining offer ${originalOffer.getId.getValue} for pod $podId; domain filter did not match: ${domainFilter.description}."
+        )(
           LoggingArgs("podId" -> podId)
         )
       result
@@ -87,7 +90,8 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends ImplicitStrictLog
               originalOffer,
               newRemainingResources,
               result.updated(podSpec, matchedResources),
-              rest)
+              rest
+            )
           case None =>
             matchPodSpecsTaskRecords(originalOffer, remainingResources, result, rest)
         }
@@ -96,7 +100,8 @@ class OfferMatcher(masterDomainInfo: Mesos.DomainInfo) extends ImplicitStrictLog
 
   def matchOffer(
       offer: Mesos.Offer,
-      podSpecs: Iterable[RunningPodSpec]): Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = {
+      podSpecs: Iterable[RunningPodSpec]
+  ): Map[RunningPodSpec, List[OfferMatcher.ResourceMatch]] = {
     val groupedResources = offer.getResourcesList.asScala.groupBy(r => ResourceType.fromName(r.getName))
     matchPodSpecsTaskRecords(offer, groupedResources, Map.empty, podSpecs.toList)
   }

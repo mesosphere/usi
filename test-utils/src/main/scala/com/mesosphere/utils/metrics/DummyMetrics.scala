@@ -41,10 +41,12 @@ object DummyMetrics extends Metrics {
   override def closureGauge[N](
       name: String,
       currentValue: () => N,
-      unit: DropwizardUnitOfMeasurement = DropwizardUnitOfMeasurement.None): ClosureGauge = new DummyClosureGauge
+      unit: DropwizardUnitOfMeasurement = DropwizardUnitOfMeasurement.None
+  ): ClosureGauge = new DummyClosureGauge
   override def settableGauge(
       name: String,
-      unit: DropwizardUnitOfMeasurement = DropwizardUnitOfMeasurement.None): SettableGauge =
+      unit: DropwizardUnitOfMeasurement = DropwizardUnitOfMeasurement.None
+  ): SettableGauge =
     new DummyGauge
 
   override def meter(name: String): Meter = new DummyMeter

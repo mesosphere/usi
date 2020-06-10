@@ -45,10 +45,13 @@ class TimedStage[T](timer: TimerAdapter, clock: Clock) extends GraphStage[FlowSh
         }
       )
 
-      setHandler(out, new OutHandler {
-        @scala.throws[Exception](classOf[Exception])
-        override def onPull(): Unit = pull(in)
-      })
+      setHandler(
+        out,
+        new OutHandler {
+          @scala.throws[Exception](classOf[Exception])
+          override def onPull(): Unit = pull(in)
+        }
+      )
     }
     logic
   }
@@ -60,13 +63,14 @@ case class HistogramTimer(timer: TimerAdapter) extends Timer {
 
   override def apply[T](f: => Future[T]): Future[T] = {
     val start = System.nanoTime()
-    val future = try {
-      f
-    } catch {
-      case NonFatal(e) =>
-        timer.update(System.nanoTime() - start)
-        throw e
-    }
+    val future =
+      try {
+        f
+      } catch {
+        case NonFatal(e) =>
+          timer.update(System.nanoTime() - start)
+          throw e
+      }
     future.onComplete(_ => timer.update(System.nanoTime() - start))(ExecutionContexts.callerThread)
     future
   }

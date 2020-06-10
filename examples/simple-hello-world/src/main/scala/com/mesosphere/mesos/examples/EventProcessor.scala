@@ -93,7 +93,8 @@ class EventProcessor(mesosCalls: MesosCalls) extends StrictLogging {
 
       case st =>
         throw new IllegalStateException(
-          s"Received a terminal task status $st for task ${taskID.getValue}. Terminating now...")
+          s"Received a terminal task status $st for task ${taskID.getValue}. Terminating now..."
+        )
     }
   }
 }

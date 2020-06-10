@@ -47,7 +47,8 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
       registry.getCounters,
       registry.getHistograms,
       registry.getMeters,
-      registry.getTimers)
+      registry.getTimers
+    )
   }
 
   private def report(
@@ -56,7 +57,8 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
       counters: util.SortedMap[String, Counter],
       histograms: util.SortedMap[String, Histogram],
       meters: util.SortedMap[String, Meter],
-      timers: util.SortedMap[String, Timer]): Unit = {
+      timers: util.SortedMap[String, Timer]
+  ): Unit = {
 
     gauges.asScala.foreach {
       case (name, value) => reportGauge(socket, sanitizeName(name), value)
@@ -108,7 +110,8 @@ class DataDogUDPReporter(settings: DataDogUdpReporterSettings, registry: MetricR
       "99percentile",
       "999percentile",
       "max",
-      "stddev")
+      "stddev"
+    )
   private def reportSnapshot(socket: ActorRef, name: String, snapshot: Snapshot, scaleMetrics: Boolean): Unit = {
     val values = Seq(
       snapshot.getMin.toDouble,

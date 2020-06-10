@@ -21,7 +21,8 @@ case class FrameResultBuilder(
     state: SchedulerState,
     appliedStateEvents: List[StateEvent],
     mesosCalls: List[MesosCall],
-    dirtyPodIds: Set[PodId]) {
+    dirtyPodIds: Set[PodId]
+) {
   private def applyAndAccumulate(schedulerEvents: SchedulerEvents): FrameResultBuilder = {
     if (schedulerEvents == SchedulerEvents.empty)
       this

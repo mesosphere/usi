@@ -12,25 +12,25 @@ import scala.reflect.ClassTag
 
 object AkkaHttpResponse {
 
-  def request(request: HttpRequest)(
-      implicit
+  def request(request: HttpRequest)(implicit
       actorSystem: ActorSystem,
       materializer: Materializer,
       ec: ExecutionContext,
-      timeout: FiniteDuration): Future[RestResult[HttpResponse]] = {
+      timeout: FiniteDuration
+  ): Future[RestResult[HttpResponse]] = {
     Http(actorSystem).singleRequest(request).flatMap { response =>
       response.entity.toStrict(timeout).map(_.data.decodeString("utf-8")).map(RestResult(response, _))
     }
   }
 
-  def requestFor[T](httpRequest: HttpRequest)(
-      implicit
+  def requestFor[T](httpRequest: HttpRequest)(implicit
       actorSystem: ActorSystem,
       materializer: Materializer,
       ec: ExecutionContext,
       timeout: FiniteDuration,
       reads: Reads[T],
-      classTag: ClassTag[T]): Future[RestResult[T]] = {
+      classTag: ClassTag[T]
+  ): Future[RestResult[T]] = {
     request(httpRequest).map(read[T])
   }
 

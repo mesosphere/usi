@@ -164,7 +164,8 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       frameworkInfo: FrameworkInfo,
       uri: Uri,
       authorization: Option[CredentialsProvider],
-      redirectsLeft: Int)(implicit as: ActorSystem): Source[HttpResponse, NotUsed] = {
+      redirectsLeft: Int
+  )(implicit as: ActorSystem): Source[HttpResponse, NotUsed] = {
     val body = newSubscribeCall(frameworkInfo).toByteArray
 
     def createPostRequest(bytes: Array[Byte], maybeCredentials: Option[HttpCredentials]): HttpRequest =
@@ -213,10 +214,8 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
   private def mesosHttpConnection(
       frameworkInfo: FrameworkInfo,
       conf: MesosClientSettings,
-      authorization: Option[CredentialsProvider])(
-      implicit mat: Materializer,
-      as: ActorSystem,
-      askTimeout: Timeout): Source[(HttpResponse, Session), NotUsed] = {
+      authorization: Option[CredentialsProvider]
+  )(implicit mat: Materializer, as: ActorSystem, askTimeout: Timeout): Source[(HttpResponse, Session), NotUsed] = {
     mesosHttpConnection(frameworkInfo, conf.masters.toList, conf.maxRedirects, authorization)
   }
 
@@ -224,10 +223,8 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
       frameworkInfo: FrameworkInfo,
       urls: List[URL],
       maxRedirects: Int,
-      authorization: Option[CredentialsProvider])(
-      implicit mat: Materializer,
-      as: ActorSystem,
-      askTimeout: Timeout): Source[(HttpResponse, Session), NotUsed] =
+      authorization: Option[CredentialsProvider]
+  )(implicit mat: Materializer, as: ActorSystem, askTimeout: Timeout): Source[(HttpResponse, Session), NotUsed] =
     urls match {
       case Nil => throw new IOException(s"Failed to connect to Mesos: List of master urls exhausted.")
       case baseUrl :: rest =>
@@ -235,7 +232,8 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
         val baseUri = Uri.from(
           scheme = baseUrl.getProtocol,
           host = baseUrl.getHost,
-          port = if (baseUrl.getPort == -1) baseUrl.getDefaultPort else baseUrl.getPort)
+          port = if (baseUrl.getPort == -1) baseUrl.getDefaultPort else baseUrl.getPort
+        )
         logger.info(s"Connecting to Mesos master $baseUri")
         val requestUri = baseUri.withPath(Path("/api/v1/scheduler"))
         connectionSource(frameworkInfo, requestUri, authorization, maxRedirects).map { response =>
@@ -252,7 +250,8 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
               throw new IllegalArgumentException(s"Mesos server error: ${response.status}")
           }
         }.recoverWithRetries(
-          1, {
+          1,
+          {
             case ex if rest.nonEmpty =>
               // TODO: This retry only works on the initial connection. It does *not* work the the connection dies.
               logger.warn(s"Failed to connect to Mesos $baseUri", ex)
@@ -352,10 +351,11 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
     *    available via the materializable-once source, `.mesosSource`, which DOES NOT include the earlier-consumed
     *    SUBSCRIBED event.
     */
-  def apply(conf: MesosClientSettings, frameworkInfo: FrameworkInfo, authorization: Option[CredentialsProvider] = None)(
-      implicit
-      system: ActorSystem,
-      materializer: Materializer): Source[MesosClient, NotUsed] = {
+  def apply(
+      conf: MesosClientSettings,
+      frameworkInfo: FrameworkInfo,
+      authorization: Option[CredentialsProvider] = None
+  )(implicit system: ActorSystem, materializer: Materializer): Source[MesosClient, NotUsed] = {
 
     if (authorization.nonEmpty) {
       require(frameworkInfo.hasPrincipal, "The framework info must have a principal set if authorization is used.")
@@ -388,7 +388,8 @@ object MesosClient extends StrictLogging with StrictLoggingFlow {
                 sharedKillSwitch,
                 subscribed,
                 session,
-                events.log("mesosSource events"))
+                events.log("mesosSource events")
+              )
             case (other, _) =>
               throw new RuntimeException(s"Expected subscribed event, got $other")
           }
@@ -407,7 +408,8 @@ class MesosClientImpl(
     /**
       * Events from Mesos scheduler, sans initial Subscribed event.
       */
-    val mesosSource: Source[Event, NotUsed])(implicit as: ActorSystem, m: Materializer)
+    val mesosSource: Source[Event, NotUsed]
+)(implicit as: ActorSystem, m: Materializer)
     extends MesosClient
     with StrictLoggingFlow {
 
@@ -421,7 +423,8 @@ class MesosClientImpl(
   val version = SemanticVersion(masterInfo.getVersion).get
   require(
     version >= minimalVersion,
-    s"Mesos master version $version is not compatible with required version $minimalVersion.")
+    s"Mesos master version $version is not compatible with required version $minimalVersion."
+  )
 
   override def killSwitch: KillSwitch = sharedKillSwitch
 

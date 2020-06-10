@@ -37,8 +37,8 @@ class LaunchPod private (
     val podId: PodId,
     val runSpec: RunTemplate,
     val domainFilter: DomainFilter,
-    val agentFilter: Iterable[AgentFilter])
-    extends SchedulerCommand
+    val agentFilter: Iterable[AgentFilter]
+) extends SchedulerCommand
 
 object LaunchPod {
 
@@ -55,7 +55,8 @@ object LaunchPod {
       podId: PodId,
       runSpec: RunTemplate,
       domainFilter: DomainFilter,
-      agentFilter: Iterable[AgentFilter]): LaunchPod =
+      agentFilter: Iterable[AgentFilter]
+  ): LaunchPod =
     new LaunchPod(podId, runSpec, domainFilter, agentFilter)
 
   /**
@@ -71,7 +72,8 @@ object LaunchPod {
       podId: PodId,
       runSpec: RunTemplate,
       domainFilter: DomainFilter,
-      agentFilter: java.lang.Iterable[AgentFilter]): LaunchPod =
+      agentFilter: java.lang.Iterable[AgentFilter]
+  ): LaunchPod =
     apply(podId, runSpec, domainFilter, agentFilter.asScala)
 
   /**

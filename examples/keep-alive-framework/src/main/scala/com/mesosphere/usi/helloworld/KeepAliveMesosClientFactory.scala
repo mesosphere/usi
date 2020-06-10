@@ -16,7 +16,8 @@ import scala.concurrent.Await
 class KeepAliveMesosClientFactory(
     settings: MesosClientSettings,
     authorization: Option[CredentialsProvider],
-    role: String)(implicit system: ActorSystem, mat: ActorMaterializer) {
+    role: String
+)(implicit system: ActorSystem, mat: ActorMaterializer) {
 
   val frameworkInfo = FrameworkInfo
     .newBuilder()

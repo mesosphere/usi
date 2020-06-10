@@ -108,7 +108,8 @@ class SimpleHelloWorldFramework(settings: MesosClientSettings) extends StrictLog
           cmd = """echo "Hello, world" && sleep 3600""",
           cpus = 0.1,
           mem = 32.0
-        ))
+        )
+      )
 
       event =>
         val (newTask, calls) = eventProcessor.process(task, event)

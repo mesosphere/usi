@@ -64,8 +64,9 @@ object Scheduler extends StrictLogging {
     *
     * @return Snapshot of the current state, as well as Source which produces [[StateEvent]]s and Sink which accepts [[SchedulerCommand]]s.
     */
-  def asSourceAndSink(factory: Factory)(implicit mat: Materializer)
-    : Future[(StateSnapshot, Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]])] = {
+  def asSourceAndSink(factory: Factory)(implicit
+      mat: Materializer
+  ): Future[(StateSnapshot, Source[StateEvent, NotUsed], Sink[SchedulerCommand, Future[Done]])] = {
     asFlow(factory).map {
       case (snapshot, schedulerFlow) =>
         val (source, sink) = FlowHelpers.asSourceAndSink(schedulerFlow)(mat)
@@ -82,7 +83,8 @@ object Scheduler extends StrictLogging {
     if (!isMultiRoleFramework(factory.frameworkInfo)) {
       throw new IllegalArgumentException(
         "USI scheduler provides support for MULTI_ROLE frameworks only. " +
-          "Please provide a MesosClient with FrameworkInfo that has capability MULTI_ROLE")
+          "Please provide a MesosClient with FrameworkInfo that has capability MULTI_ROLE"
+      )
     }
     factory
       .loadSnapshot()
@@ -94,7 +96,8 @@ object Scheduler extends StrictLogging {
 
   private[usi] def schedulerGraph(
       snapshot: StateSnapshot,
-      factory: Factory): BidiFlow[SchedulerCommand, MesosCall, MesosEvent, StateEvent, NotUsed] = {
+      factory: Factory
+  ): BidiFlow[SchedulerCommand, MesosCall, MesosEvent, StateEvent, NotUsed] = {
     val schedulerLogicGraph = factory.newSchedulerLogicGraph(snapshot)
     val suppressReviveFlow = factory.newSuppressReviveFlow
     BidiFlow.fromGraph {
@@ -119,7 +122,8 @@ object Scheduler extends StrictLogging {
               Flow[SchedulerEvents]
                 .mapConcat(_.stateEvents)
                 .collect { case psu: PodSpecUpdatedEvent => psu }
-                .named("collectPodSpecEvents"))
+                .named("collectPodSpecEvents")
+            )
             val persistenceStorageFlow = builder.add(factory.newPersistenceFlow.named("persistenceFlow"))
 
             schedulerLogic.out ~> schedulerEventsBroadcast
@@ -140,7 +144,8 @@ object Scheduler extends StrictLogging {
 
       val b = builder.add(Broadcast[SchedulerEvents](2, eagerCancel = true).named("routeSchedulerEvents"))
       val getStateEvents = builder.add(
-        Flow[SchedulerEvents].mapConcat(_.stateEvents).named("stateEvents").log("routeEvents - state events"))
+        Flow[SchedulerEvents].mapConcat(_.stateEvents).named("stateEvents").log("routeEvents - state events")
+      )
       val getMesosCalls =
         builder.add(Flow[SchedulerEvents].mapConcat(_.mesosCalls).named("mesosCalls").log("routeEvents - mesos calls"))
       b ~> getStateEvents
@@ -152,7 +157,8 @@ object Scheduler extends StrictLogging {
 
   private[core] def newPersistenceFlow(
       podRecordRepository: PodRecordRepository,
-      persistencePipelineLimit: Int): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
+      persistencePipelineLimit: Int
+  ): Flow[SchedulerEvents, SchedulerEvents, NotUsed] = {
     Flow[SchedulerEvents]
       .mapConcat(persistEvents(_, podRecordRepository))
       .mapAsync(persistencePipelineLimit)(call => call())
@@ -161,14 +167,13 @@ object Scheduler extends StrictLogging {
 
   private def persistEvents(
       events: SchedulerEvents,
-      podRecordRepository: PodRecordRepository): List[() => Future[Option[SchedulerEvents]]] = {
+      podRecordRepository: PodRecordRepository
+  ): List[() => Future[Option[SchedulerEvents]]] = {
     val ops: List[() => Future[Option[SchedulerEvents]]] = events.stateEvents.collect {
       case PodRecordUpdatedEvent(_, Some(podRecord)) =>
-        () =>
-          podRecordRepository.store(podRecord).map(_ => None)(ExecutionContexts.callerThread)
+        () => podRecordRepository.store(podRecord).map(_ => None)(ExecutionContexts.callerThread)
       case PodRecordUpdatedEvent(podId, None) =>
-        () =>
-          podRecordRepository.delete(podId).map(_ => None)(ExecutionContexts.callerThread)
+        () => podRecordRepository.delete(podId).map(_ => None)(ExecutionContexts.callerThread)
     }
     ops :+ (() => Future.successful(Some(events)))
   }

@@ -17,7 +17,8 @@ object PrometheusReporter {
       counters: util.SortedMap[String, Counter],
       histograms: util.SortedMap[String, Histogram],
       meters: util.SortedMap[String, Meter],
-      timers: util.SortedMap[String, Timer]): String = {
+      timers: util.SortedMap[String, Timer]
+  ): String = {
 
     val buffer = new StringBuilder
 

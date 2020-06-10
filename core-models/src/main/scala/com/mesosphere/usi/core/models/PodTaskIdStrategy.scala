@@ -25,7 +25,8 @@ object PodTaskIdStrategy {
       else {
         if (podId.value.contains(".")) {
           logger.error(
-            s"podId ${podId.value} contains a '.', which is the delimiter character; this results in an unparseable taskId.")
+            s"podId ${podId.value} contains a '.', which is the delimiter character; this results in an unparseable taskId."
+          )
         }
         TaskId(podId.value + "." + taskName.value)
       }

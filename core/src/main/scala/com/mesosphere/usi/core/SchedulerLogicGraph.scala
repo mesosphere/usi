@@ -48,8 +48,8 @@ private[core] class SchedulerLogicGraph(
     mesosCallFactory: MesosCalls,
     masterDomainInfo: DomainInfo,
     initialState: StateSnapshot,
-    metrics: Metrics)
-    extends GraphStage[FanInShape2[SchedulerCommand, MesosEvent, SchedulerEvents]] {
+    metrics: Metrics
+) extends GraphStage[FanInShape2[SchedulerCommand, MesosEvent, SchedulerEvents]] {
   import SchedulerLogicGraph.BUFFER_SIZE
 
   override def initialAttributes: Attributes = super.initialAttributes.and(Attributes.name("SchedulerLogicGraph"))
@@ -70,28 +70,37 @@ private[core] class SchedulerLogicGraph(
 
       val pendingEffects: mutable.Queue[SchedulerEvents] = mutable.Queue.empty
 
-      setHandler(mesosEventsInlet, new InHandler {
-        override def onPush(): Unit = {
-          pushOrQueueIntents(handler.handleMesosEvent(grab(mesosEventsInlet)))
-          maybePull()
-        }
-      })
-
-      setHandler(schedulerCommandsInlet, new InHandler {
-        override def onPush(): Unit = {
-          pushOrQueueIntents(handler.handleCommand(grab(schedulerCommandsInlet)))
-          maybePull()
-        }
-      })
-
-      setHandler(frameResultOutlet, new OutHandler {
-        override def onPull(): Unit = {
-          if (pendingEffects.nonEmpty) {
-            push(frameResultOutlet, pendingEffects.dequeue())
+      setHandler(
+        mesosEventsInlet,
+        new InHandler {
+          override def onPush(): Unit = {
+            pushOrQueueIntents(handler.handleMesosEvent(grab(mesosEventsInlet)))
             maybePull()
           }
         }
-      })
+      )
+
+      setHandler(
+        schedulerCommandsInlet,
+        new InHandler {
+          override def onPush(): Unit = {
+            pushOrQueueIntents(handler.handleCommand(grab(schedulerCommandsInlet)))
+            maybePull()
+          }
+        }
+      )
+
+      setHandler(
+        frameResultOutlet,
+        new OutHandler {
+          override def onPull(): Unit = {
+            if (pendingEffects.nonEmpty) {
+              push(frameResultOutlet, pendingEffects.dequeue())
+              maybePull()
+            }
+          }
+        }
+      )
 
       override def preStart(): Unit = {
         // start the graph off

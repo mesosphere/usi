@@ -14,7 +14,8 @@ object ResourceMatcher {
     */
   def matchAndConsume(
       requirement: ResourceRequirement,
-      resources: Iterable[Mesos.Resource]): Option[ResourceMatchResult] = {
+      resources: Iterable[Mesos.Resource]
+  ): Option[ResourceMatchResult] = {
     requirement match {
       case r: RangeRequirement =>
         RangeResourceMatcher.matchAndConsume(r, resources)

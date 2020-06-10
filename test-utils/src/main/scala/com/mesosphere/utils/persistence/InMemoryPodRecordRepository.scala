@@ -15,17 +15,19 @@ import scala.concurrent.Future
 case class InMemoryPodRecordRepository() extends PodRecordRepository with StrictLogging {
   val data = mutable.Map.empty[PodId, PodRecord]
 
-  override def store(record: PodRecord): Future[Done] = synchronized {
-    logger.info(s"Create record ${record.podId}")
-    data += record.podId -> record
-    Future.successful(Done)
-  }
+  override def store(record: PodRecord): Future[Done] =
+    synchronized {
+      logger.info(s"Create record ${record.podId}")
+      data += record.podId -> record
+      Future.successful(Done)
+    }
 
-  override def delete(podId: PodId): Future[Done] = synchronized {
-    logger.info(s"Delete record $podId")
-    data -= podId
-    Future.successful(Done)
-  }
+  override def delete(podId: PodId): Future[Done] =
+    synchronized {
+      logger.info(s"Delete record $podId")
+      data -= podId
+      Future.successful(Done)
+    }
 
   override def readAll(): Future[Map[PodId, PodRecord]] = {
     Future.successful(data.toMap)

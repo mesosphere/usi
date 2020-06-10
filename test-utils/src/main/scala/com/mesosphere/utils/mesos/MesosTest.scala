@@ -45,7 +45,8 @@ case class MesosAgentConfig(
     seccompProfileName: Option[String] = None,
     executorRegistrationTimeout: Duration = 1.minute,
     fetcherStallTimeout: Duration = 1.minute,
-    cgroupsEnableCfs: Boolean = false) {
+    cgroupsEnableCfs: Boolean = false
+) {
 
   require(
     executorRegistrationTimeout >= fetcherStallTimeout,
@@ -54,7 +55,8 @@ case class MesosAgentConfig(
 
   require(
     validSeccompConfig,
-    "To enable seccomp, agentSeccompConfigDir should be defined and isolation \"linux/seccomp\" used")
+    "To enable seccomp, agentSeccompConfigDir should be defined and isolation \"linux/seccomp\" used"
+  )
 
   def validSeccompConfig: Boolean =
     seccompConfigDir.isEmpty || (seccompConfigDir.isDefined && isolation.get.contains("linux/seccomp"))
@@ -77,7 +79,8 @@ case class MesosConfig(
     mastersFaultDomains: Seq[Option[FaultDomain]] = Seq.empty,
     agentsFaultDomains: Seq[Option[FaultDomain]] = Seq.empty,
     agentsGpus: Option[Int] = None, // TODO: move agent related config into MesosAgentConfig
-    restrictedToRoles: Option[String] = Some("public,foo,test")) {
+    restrictedToRoles: Option[String] = Some("public,foo,test")
+) {
 
   require(validQuorumSize, "Mesos quorum size should be 0 or smaller than number of agents")
   require(validFaultDomainConfig, "Fault domains should be configure for all agents or not at all")
@@ -103,7 +106,8 @@ case class MesosCluster(
     autoStart: Boolean = false,
     config: MesosConfig = MesosConfig(),
     agentsConfig: MesosAgentConfig = MesosAgentConfig(),
-    waitForMesosTimeout: FiniteDuration = 5.minutes)(implicit system: ActorSystem, mat: Materializer)
+    waitForMesosTimeout: FiniteDuration = 5.minutes
+)(implicit system: ActorSystem, mat: Materializer)
     extends AutoCloseable
     with Eventually
     with StrictLogging {
@@ -129,11 +133,14 @@ case class MesosCluster(
       Some(faultDomainJson)
     } else None
 
-    Master(extraArgs = Seq(
-      "--agent_ping_timeout=1secs",
-      "--max_agent_ping_timeouts=4",
-      s"--quorum=${config.quorumSize}") ++ faultDomainJson
-      .map(fd => s"--domain=$fd"))
+    Master(extraArgs =
+      Seq(
+        "--agent_ping_timeout=1secs",
+        "--max_agent_ping_timeouts=4",
+        s"--quorum=${config.quorumSize}"
+      ) ++ faultDomainJson
+        .map(fd => s"--domain=$fd")
+    )
   }
 
   private var initialCachedAgentDetails: Map[AgentLike, ITAgentDetails] = Map.empty
@@ -160,7 +167,8 @@ case class MesosCluster(
 
         val nodeAttributes = Map(
           "fault_domain_region" -> Some(faultDomain.region.value),
-          "fault_domain_zone" -> Some(faultDomain.zone.value))
+          "fault_domain_zone" -> Some(faultDomain.zone.value)
+        )
         (nodeAttributes, Some(mesosFaultDomainCmdOption))
       } else Map.empty -> None
 
@@ -215,7 +223,8 @@ case class MesosCluster(
     val oldLeader = masters
       .find(_.port == leaderPort)
       .getOrElse(
-        throw new IllegalStateException(s"Could not find leader $leaderPort in ${masters.map(_.port).mkString(", ")}."))
+        throw new IllegalStateException(s"Could not find leader $leaderPort in ${masters.map(_.port).mkString(", ")}.")
+      )
     oldLeader.restart()
     eventually(timeout(waitForMesosTimeout), interval(1.seconds)) {
       val possibleNewLeader = waitForLeader();
@@ -302,15 +311,16 @@ case class MesosCluster(
       * Starts a Mesos master or agent.
       * @param prefix May be defined to override the log prefix. It defaults to [[suiteName]].
       */
-    def start(prefix: Option[String] = None): Unit = if (process.isEmpty) {
-      assert(!isAlive(), s"Mesos process ${processName} already started")
+    def start(prefix: Option[String] = None): Unit =
+      if (process.isEmpty) {
+        assert(!isAlive(), s"Mesos process ${processName} already started")
 
-      // Capture prefix if required. [[MesosClusterExtension]] is using this feature.
-      if (prefix.nonEmpty) this.prefix = prefix
+        // Capture prefix if required. [[MesosClusterExtension]] is using this feature.
+        if (prefix.nonEmpty) this.prefix = prefix
 
-      val name = this.prefix.getOrElse(suiteName)
-      process = Some(processBuilder.run(ProcessOutputToLogStream(s"$name-Mesos$processName-$port")))
-    }
+        val name = this.prefix.getOrElse(suiteName)
+        process = Some(processBuilder.run(ProcessOutputToLogStream(s"$name-Mesos$processName-$port")))
+      }
 
     def stop(): Unit = {
       process.foreach(_.destroy())
@@ -521,7 +531,7 @@ trait MesosClusterTest
     autoStart = false,
     config = mesosConfig,
     agentsConfig = agentConfig,
-    waitForMesosTimeout = mesosLeaderTimeout,
+    waitForMesosTimeout = mesosLeaderTimeout
   )
   lazy val mesosFacade = {
     assert(

@@ -7,12 +7,14 @@ import com.typesafe.config.{Config, ConfigFactory}
 class SchedulerSettings private (
     val persistencePipelineLimit: Int,
     val persistenceLoadTimeout: Duration,
-    val debounceReviveInterval: Duration) {
+    val debounceReviveInterval: Duration
+) {
 
   private def copy(
       persistencePipelineLimit: Int = this.persistencePipelineLimit,
       persistenceLoadTimeout: Duration = this.persistenceLoadTimeout,
-      debounceReviveInterval: Duration = this.debounceReviveInterval): SchedulerSettings =
+      debounceReviveInterval: Duration = this.debounceReviveInterval
+  ): SchedulerSettings =
     new SchedulerSettings(persistencePipelineLimit, persistenceLoadTimeout, debounceReviveInterval)
 
   def withPersistencePipelineLimit(limit: Int): SchedulerSettings = copy(persistencePipelineLimit = limit)

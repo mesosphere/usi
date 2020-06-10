@@ -38,9 +38,9 @@ import scala.util.{Failure, Try}
   * @param parallelism parallelism level for CRUD operations
   * @param ec execution context
   */
-class ZooKeeperPersistenceStore(metrics: Metrics, factory: AsyncCuratorBuilderFactory, parallelism: Int = 10)(
-    implicit ec: ExecutionContext)
-    extends PersistenceStore
+class ZooKeeperPersistenceStore(metrics: Metrics, factory: AsyncCuratorBuilderFactory, parallelism: Int = 10)(implicit
+    ec: ExecutionContext
+) extends PersistenceStore
     with StrictLogging {
 
   private[this] val createMetric = metrics.counter("debug.zookeeper.operations.create")
@@ -171,7 +171,8 @@ class ZooKeeperPersistenceStore(metrics: Metrics, factory: AsyncCuratorBuilderFa
         Try(
           list.asScala.iterator
             .map(child => if (absolute) Paths.get(path, child).toString else child)
-            .toList)
+            .toList
+        )
       }
       .recover {
         case e: NoNodeException => Failure(e) // re-throw exception in all other cases

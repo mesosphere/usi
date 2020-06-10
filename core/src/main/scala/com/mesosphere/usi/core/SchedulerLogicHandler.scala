@@ -70,8 +70,8 @@ private[core] class SchedulerLogicHandler(
     mesosCallFactory: MesosCalls,
     masterDomainInfo: DomainInfo,
     initialState: StateSnapshot,
-    metrics: Metrics)
-    extends StrictLogging {
+    metrics: Metrics
+) extends StrictLogging {
 
   private val schedulerLogic = new SpecLogic(mesosCallFactory)
   private val mesosEventsLogic = new MesosEventsLogic(mesosCallFactory, masterDomainInfo, metrics)

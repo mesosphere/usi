@@ -27,7 +27,8 @@ case class AsyncCuratorBuilderSettings(
     createMode: CreateMode = CreateMode.PERSISTENT,
     acl: Seq[ACL] = Seq.empty,
     nodeVersion: Int = -1,
-    compressedData: Boolean = true)
+    compressedData: Boolean = true
+)
 
 /**
   * A simple Factory that give an instance of the [[CuratorFramework]] provides
@@ -55,7 +56,8 @@ class AsyncCuratorBuilderFactory(curator: CuratorFramework, defaults: AsyncCurat
   def create(
       mode: CreateMode = defaults.createMode,
       acl: Seq[ACL] = defaults.acl,
-      options: Set[CreateOption] = defaults.createOptions): AsyncCreateBuilder = {
+      options: Set[CreateOption] = defaults.createOptions
+  ): AsyncCreateBuilder = {
 
     assert(isStarted(), "Curator connection to ZK has been closed/not started yet")
 
@@ -88,7 +90,8 @@ class AsyncCuratorBuilderFactory(curator: CuratorFramework, defaults: AsyncCurat
     */
   def setData(
       compressed: Boolean = defaults.compressedData,
-      version: Int = defaults.nodeVersion): AsyncSetDataBuilder = {
+      version: Int = defaults.nodeVersion
+  ): AsyncSetDataBuilder = {
     assert(isStarted(), "Curator connection to ZK has been closed/not started yet")
 
     val builder = async.setData()
@@ -197,7 +200,8 @@ class AsyncCuratorBuilderFactory(curator: CuratorFramework, defaults: AsyncCurat
   def transactionOpCreate(
       mode: CreateMode = defaults.createMode,
       acl: Seq[ACL] = defaults.acl,
-      compressed: Boolean = defaults.compressedData): AsyncTransactionCreateBuilder = {
+      compressed: Boolean = defaults.compressedData
+  ): AsyncTransactionCreateBuilder = {
     assert(isStarted(), "Curator connection to ZK has been closed/not started yet")
 
     val op = async.transactionOp().create()
@@ -216,7 +220,8 @@ class AsyncCuratorBuilderFactory(curator: CuratorFramework, defaults: AsyncCurat
     */
   def transactionOpSetData(
       version: Int = defaults.nodeVersion,
-      compressed: Boolean = defaults.compressedData): AsyncTransactionSetDataBuilder = {
+      compressed: Boolean = defaults.compressedData
+  ): AsyncTransactionSetDataBuilder = {
     assert(isStarted(), "Curator connection to ZK has been closed/not started yet")
 
     val op = async.transactionOp().setData()
@@ -257,7 +262,8 @@ class AsyncCuratorBuilderFactory(curator: CuratorFramework, defaults: AsyncCurat
 object AsyncCuratorBuilderFactory {
   def apply(
       curator: CuratorFramework,
-      defaults: AsyncCuratorBuilderSettings = new AsyncCuratorBuilderSettings()): AsyncCuratorBuilderFactory = {
+      defaults: AsyncCuratorBuilderSettings = new AsyncCuratorBuilderSettings()
+  ): AsyncCuratorBuilderFactory = {
     assert(
       defaults.createOptions.contains(CreateOption.compress) == defaults.compressedData,
       "Data compression should be enabled/disabled in createOptions and dataCompressed flag"

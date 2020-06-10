@@ -25,7 +25,8 @@ private[usi] object ProtoBuilders {
       name: String,
       user: String,
       id: Option[Mesos.FrameworkID],
-      roles: Iterable[String]): Mesos.FrameworkInfo = {
+      roles: Iterable[String]
+  ): Mesos.FrameworkInfo = {
     val b = Mesos.FrameworkInfo
       .newBuilder()
       .setName(name)
@@ -45,7 +46,8 @@ private[usi] object ProtoBuilders {
         Mesos.DomainInfo.FaultDomain
           .newBuilder()
           .setRegion(Mesos.DomainInfo.FaultDomain.RegionInfo.newBuilder().setName(region))
-          .setZone(Mesos.DomainInfo.FaultDomain.ZoneInfo.newBuilder().setName(zone)))
+          .setZone(Mesos.DomainInfo.FaultDomain.ZoneInfo.newBuilder().setName(zone))
+      )
       .build()
   }
 
@@ -60,7 +62,8 @@ private[usi] object ProtoBuilders {
       attributes: Iterable[Mesos.Attribute] = Nil,
       resources: Iterable[Mesos.Resource] = Nil,
       unavailability: Mesos.Unavailability = null,
-      url: Mesos.URL = null): Mesos.Offer = {
+      url: Mesos.URL = null
+  ): Mesos.Offer = {
 
     val b = Mesos.Offer
       .newBuilder()
@@ -85,7 +88,8 @@ private[usi] object ProtoBuilders {
       reservationType: Mesos.Resource.ReservationInfo.Type,
       role: String,
       principal: String,
-      labels: Mesos.Labels = null): Mesos.Resource.ReservationInfo = {
+      labels: Mesos.Labels = null
+  ): Mesos.Resource.ReservationInfo = {
     val b = Mesos.Resource.ReservationInfo
       .newBuilder()
       .setPrincipal(principal)
@@ -114,7 +118,8 @@ private[usi] object ProtoBuilders {
       revocable: Mesos.Resource.RevocableInfo = null,
       scalar: Mesos.Value.Scalar = null,
       set: Mesos.Value.Set = null,
-      shared: Mesos.Resource.SharedInfo = null): Mesos.Resource = {
+      shared: Mesos.Resource.SharedInfo = null
+  ): Mesos.Resource = {
 
     val b = Mesos.Resource
       .newBuilder()
@@ -154,7 +159,8 @@ private[usi] object ProtoBuilders {
       reason: Mesos.TaskStatus.Reason = null,
       source: Mesos.TaskStatus.Source = null,
       timestamp: Double = 0,
-      unreachableTime: Mesos.TimeInfo = null): Mesos.TaskStatus = {
+      unreachableTime: Mesos.TimeInfo = null
+  ): Mesos.TaskStatus = {
 
     val b = Mesos.TaskStatus
       .newBuilder()
@@ -193,7 +199,8 @@ private[usi] object ProtoBuilders {
       launchGroup: Mesos.Offer.Operation.LaunchGroup = null,
       reserve: Mesos.Offer.Operation.Reserve = null,
       shrinkVolume: Mesos.Offer.Operation.ShrinkVolume = null,
-      unreserve: Mesos.Offer.Operation.Unreserve = null): Mesos.Offer.Operation = {
+      unreserve: Mesos.Offer.Operation.Unreserve = null
+  ): Mesos.Offer.Operation = {
 
     val b = Mesos.Offer.Operation
       .newBuilder()
@@ -233,7 +240,8 @@ private[usi] object ProtoBuilders {
       killPolicy: Mesos.KillPolicy = null,
       labels: Mesos.Labels = null,
       maxCompletionTime: Mesos.DurationInfo = null,
-      resources: Iterable[Mesos.Resource] = Nil): Mesos.TaskInfo = {
+      resources: Iterable[Mesos.Resource] = Nil
+  ): Mesos.TaskInfo = {
 
     val b = Mesos.TaskInfo
       .newBuilder()
