@@ -59,7 +59,7 @@ lazy val docs = (project in file("./docs"))
 
 val Core= config("core")
 
-lazy val `root` = (project in file("./"))
+lazy val `usi-root` = (project in file("./"))
   .enablePlugins(ScalaUnidocPlugin)
   .settings(
     commonSettings,
