@@ -65,6 +65,7 @@ lazy val `root` = (project in file("./"))
     commonSettings,
     publish / skip := true)
   .aggregate(
+    `commons`,
     `core-models`,
     `metrics`,
     `persistence`,
