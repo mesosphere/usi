@@ -2,6 +2,7 @@ package com.mesosphere.utils.http
 
 import akka.http.scaladsl.model.HttpResponse
 import com.typesafe.scalalogging.StrictLogging
+import org.scalatest.matchers.{BeMatcher, MatchResult}
 import play.api.libs.json.{JsValue, Json}
 
 import scala.reflect.ClassTag
@@ -48,4 +49,30 @@ object RestResult {
   def apply(response: HttpResponse, entityString: String): RestResult[HttpResponse] = {
     new RestResult[HttpResponse](() => response, response, entityString)
   }
+}
+
+/**
+  * Custom matcher for HTTP responses that print response body.
+  * @param status The expected status code.
+  */
+class RestResultMatcher(status: Int) extends BeMatcher[RestResult[_]] {
+  def apply(left: RestResult[_]) =
+    MatchResult(
+      left.code == status,
+      s"Response code was not $status but ${left.code} with body '${left.entityString}'",
+      s"Response code was $status with body '${left.entityString}'"
+    )
+}
+
+trait ResultResultMatchers {
+  val OK = new RestResultMatcher(200)
+  val Created = new RestResultMatcher(201)
+  val Accepted = new RestResultMatcher(202)
+  val NoContent = new RestResultMatcher(204)
+  val Redirect = new RestResultMatcher(302)
+  val NotFound = new RestResultMatcher(404)
+  val Conflict = new RestResultMatcher(409)
+  val UnprocessableEntity = new RestResultMatcher(422)
+  val ServerError = new RestResultMatcher(500)
+  val BadGateway = new RestResultMatcher(502)
 }
