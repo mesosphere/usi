@@ -64,7 +64,7 @@ class RestResultMatcher(status: Int) extends BeMatcher[RestResult[_]] {
     )
 }
 
-trait ResultResultMatchers {
+trait RestResultMatchers {
   val OK = new RestResultMatcher(200)
   val Created = new RestResultMatcher(201)
   val Accepted = new RestResultMatcher(202)
