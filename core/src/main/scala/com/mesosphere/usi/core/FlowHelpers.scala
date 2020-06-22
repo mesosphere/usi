@@ -11,8 +11,9 @@ private[usi] object FlowHelpers {
   /**
     * Split the output and input for a flow into a corresponding source and sink
     */
-  def asSourceAndSink[A, B](flow: Flow[A, B, NotUsed])(
-      implicit mat: Materializer): (Source[B, NotUsed], Sink[A, Future[Done]]) = {
+  def asSourceAndSink[A, B](
+      flow: Flow[A, B, NotUsed]
+  )(implicit mat: Materializer): (Source[B, NotUsed], Sink[A, Future[Done]]) = {
 
     val ((inputSubscriber, subscriberCompleted), inputSource) =
       Source.asSubscriber[A].watchTermination()(Keep.both).preMaterialize()

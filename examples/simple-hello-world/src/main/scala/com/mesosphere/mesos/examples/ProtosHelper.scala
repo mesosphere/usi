@@ -37,19 +37,23 @@ object ProtosHelper {
   def frameworkInfo(
       user: String,
       name: String,
-      frameworkId: String = UUID.randomUUID().toString): FrameworkInfo.Builder = {
+      frameworkId: String = UUID.randomUUID().toString
+  ): FrameworkInfo.Builder = {
     FrameworkInfo
       .newBuilder()
       .setUser(
         new SystemProperties()
           .get("user.name")
-          .getOrElse(user))
+          .getOrElse(user)
+      )
       .setName(name)
       .setId(FrameworkID.newBuilder.setValue(frameworkId))
       .addRoles("test")
-      .addCapabilities(FrameworkInfo.Capability
-        .newBuilder()
-        .setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
+      .addCapabilities(
+        FrameworkInfo.Capability
+          .newBuilder()
+          .setType(FrameworkInfo.Capability.Type.MULTI_ROLE)
+      )
       .setFailoverTimeout(0d)
   }
 
@@ -68,7 +72,8 @@ object ProtosHelper {
       .setScalar(
         Scalar
           .newBuilder()
-          .setValue(value))
+          .setValue(value)
+      )
   }
 
   /**
@@ -88,12 +93,14 @@ object ProtosHelper {
         Seq(
           scalarResource("cpus", task.spec.cpus).build(),
           scalarResource("mem", task.spec.mem).build()
-        ).asJava)
+        ).asJava
+      )
       .setCommand(
         CommandInfo
           .newBuilder()
           .setShell(true)
-          .setValue(task.spec.cmd))
+          .setValue(task.spec.cmd)
+      )
   }
 
   /**
@@ -110,8 +117,11 @@ object ProtosHelper {
       .addOperations(
         Operation.newBuilder
           .setType(Operation.Type.LAUNCH)
-          .setLaunch(Launch
-            .newBuilder()
-            .addTaskInfos(taskInfo(task, offer.getAgentId))))
+          .setLaunch(
+            Launch
+              .newBuilder()
+              .addTaskInfos(taskInfo(task, offer.getAgentId))
+          )
+      )
   }
 }

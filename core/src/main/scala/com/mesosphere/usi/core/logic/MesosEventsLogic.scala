@@ -24,7 +24,8 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, masterDomainI
 
   private[core] def matchOffer(
       offer: Mesos.Offer,
-      specs: Iterable[RunningPodSpec]): (Set[PodId], SchedulerEventsBuilder) = {
+      specs: Iterable[RunningPodSpec]
+  ): (Set[PodId], SchedulerEventsBuilder) = {
     import com.mesosphere.usi.core.protos.ProtoBuilders._
     import com.mesosphere.usi.core.protos.ProtoConversions._
 
@@ -41,7 +42,8 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, masterDomainI
           offer,
           CurriedPodTaskIdStrategy(spec.id, podTaskIdStrategy),
           executorResources,
-          taskResources)
+          taskResources
+        )
     }
 
     val eventsBuilder = launchCommands.keys.foldLeft(SchedulerEventsBuilder.empty) { (events, podId) =>
@@ -158,7 +160,8 @@ private[core] class MesosEventsLogic(mesosCallFactory: MesosCalls, masterDomainI
             )
           case None =>
             logger.error(
-              s"Critical error! Failed to derive podId from ${taskId}; associated taskStatus has been ignored!")
+              s"Critical error! Failed to derive podId from ${taskId}; associated taskStatus has been ignored!"
+            )
             SchedulerEvents.empty
         }
       case other =>

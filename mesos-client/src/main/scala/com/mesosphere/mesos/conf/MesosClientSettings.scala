@@ -12,14 +12,16 @@ class MesosClientSettings private (
     val maxRedirects: Int,
     val idleTimeout: FiniteDuration,
     val sourceBufferSize: Int,
-    val callTimeout: FiniteDuration) {
+    val callTimeout: FiniteDuration
+) {
 
   private def copy(
       masters: Seq[URL] = this.masters,
       maxRedirects: Int = this.maxRedirects,
       idleTimeout: FiniteDuration = this.idleTimeout,
       sourceBufferSize: Int = this.sourceBufferSize,
-      callTimeout: FiniteDuration = this.callTimeout) =
+      callTimeout: FiniteDuration = this.callTimeout
+  ) =
     new MesosClientSettings(masters, maxRedirects, idleTimeout, sourceBufferSize, callTimeout)
 
   def withMasters(urls: Iterable[URL]): MesosClientSettings = copy(masters = urls.toSeq)

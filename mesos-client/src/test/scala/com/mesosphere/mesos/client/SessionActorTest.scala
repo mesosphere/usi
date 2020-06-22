@@ -20,8 +20,10 @@ class SessionActorTest extends AkkaUnitTest {
           SessionActor(
             Some(BasicAuthenticationProvider("user", "password")),
             "some-strean-id",
-            Uri("http://example.com")),
-          "SessionActor-reply")
+            Uri("http://example.com")
+          ),
+          "SessionActor-reply"
+        )
       val responsePromise = Promise[HttpResponse]()
       val httpResponse = HttpResponse(entity = HttpEntity("hello"))
 
@@ -55,7 +57,8 @@ class SessionActorTest extends AkkaUnitTest {
 
     "refresh the session token when the first call response is an HTTP 401" in withMesosStub(
       StatusCodes.Unauthorized,
-      StatusCodes.OK) { mesos =>
+      StatusCodes.OK
+    ) { mesos =>
       Given("A SessionActor instance")
       val credentialsProvider = new CountingCredentialsProvider()
       val sessionActor =
@@ -81,7 +84,8 @@ class SessionActorTest extends AkkaUnitTest {
       val sessionActor =
         system.spawn(
           SessionActor(None, "some-stream-id", mesos.uri.withPath(Path("/redirected"))),
-          "SessionActor-redirect")
+          "SessionActor-redirect"
+        )
 
       When("we make a call through the session actor")
       val responsePromise = Promise[HttpResponse]()

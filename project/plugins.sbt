@@ -1,7 +1,7 @@
 resolvers += Resolver.jcenterRepo
-addSbtPlugin("com.geirsson" % "sbt-scalafmt" % "1.5.1")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.12")
 addSbtPlugin("com.frugalmechanic" % "fm-sbt-s3-resolver" % "0.19.0")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.0")
 
 // Documentation
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.3")

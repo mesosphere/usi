@@ -19,11 +19,14 @@ private[usi] class RateLimiterFlow[U] private (rate: FiniteDuration, clock: Cloc
 
       var nextPullAllowed = clock.instant()
 
-      setHandler(input, new InHandler {
-        override def onPush(): Unit = {
-          push(output, grab(input))
+      setHandler(
+        input,
+        new InHandler {
+          override def onPush(): Unit = {
+            push(output, grab(input))
+          }
         }
-      })
+      )
 
       setHandler(
         output,

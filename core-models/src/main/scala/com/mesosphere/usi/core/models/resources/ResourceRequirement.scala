@@ -31,8 +31,8 @@ sealed trait ResourceRequirement {
 case class RangeRequirement(
     requestedValues: Seq[RequestedValue],
     resourceType: ResourceType,
-    valueSelectionPolicy: ValueSelectionPolicy = RandomSelection(Random))
-    extends ResourceRequirement {
+    valueSelectionPolicy: ValueSelectionPolicy = RandomSelection(Random)
+) extends ResourceRequirement {
   override def description: String = s"$resourceType:[${requestedValues.mkString(",")}]"
 }
 
@@ -49,11 +49,13 @@ object RangeRequirement {
 
   def ports(
       requestedPorts: Seq[Int],
-      valueSelectionPolicy: ValueSelectionPolicy = RandomSelection(Random)): RangeRequirement = {
+      valueSelectionPolicy: ValueSelectionPolicy = RandomSelection(Random)
+  ): RangeRequirement = {
     new RangeRequirement(
       requestedPorts.map(p => if (p == RandomPort) RandomValue else ExactValue(p)),
       ResourceType.PORTS,
-      valueSelectionPolicy)
+      valueSelectionPolicy
+    )
   }
 }
 

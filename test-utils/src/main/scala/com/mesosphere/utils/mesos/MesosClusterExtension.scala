@@ -131,7 +131,7 @@ object MesosClusterExtension {
         false,
         config,
         agentConfig,
-        mesosLeaderTimeout,
+        mesosLeaderTimeout
       )(system, materializer)
 
       new MesosClusterExtension(mesosCluster)

@@ -94,7 +94,8 @@ object CoreHelloWorldFramework extends StrictLogging {
       .setUser(
         new SystemProperties()
           .get("user.name")
-          .getOrElse(throw new IllegalArgumentException("A local user is needed to launch Mesos tasks")))
+          .getOrElse(throw new IllegalArgumentException("A local user is needed to launch Mesos tasks"))
+      )
       .setName("CoreHelloWorldExample")
       .addRoles("test")
       .addCapabilities(FrameworkInfo.Capability.newBuilder().setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
@@ -122,10 +123,11 @@ object CoreHelloWorldFramework extends StrictLogging {
       clientSettings: MesosClientSettings,
       podRecordRepository: PodRecordRepository,
       frameworkInfo: FrameworkInfo
-  )(
-      implicit ec: ExecutionContext,
+  )(implicit
+      ec: ExecutionContext,
       system: ActorSystem,
-      materializer: Materializer): (MesosClient, StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed]) = {
+      materializer: Materializer
+  ): (MesosClient, StateSnapshot, Flow[SchedulerCommand, StateEvent, NotUsed]) = {
     // #connect
     val client: MesosClient = Await.result(MesosClient(clientSettings, frameworkInfo).runWith(Sink.head), 10.seconds)
     val factory = SchedulerFactory(client, podRecordRepository, SchedulerSettings.load(), DummyMetrics)
@@ -136,7 +138,8 @@ object CoreHelloWorldFramework extends StrictLogging {
   }
 
   def run(
-      settings: MesosClientSettings)(implicit ec: ExecutionContext, system: ActorSystem): CoreHelloWorldFramework = {
+      settings: MesosClientSettings
+  )(implicit ec: ExecutionContext, system: ActorSystem): CoreHelloWorldFramework = {
     implicit val mat: ActorMaterializer = ActorMaterializer()
     val (client, _, schedulerFlow) = init(settings, InMemoryPodRecordRepository(), buildFrameworkInfo)
 

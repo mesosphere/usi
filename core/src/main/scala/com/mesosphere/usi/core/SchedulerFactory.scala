@@ -21,7 +21,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 private[usi] trait SchedulerLogicFactory {
   private[usi] def newSchedulerLogicGraph(
-      snapshot: StateSnapshot): Graph[FanInShape2[SchedulerCommand, MesosEvent, SchedulerEvents], NotUsed]
+      snapshot: StateSnapshot
+  ): Graph[FanInShape2[SchedulerCommand, MesosEvent, SchedulerEvents], NotUsed]
 
   val frameworkInfo: FrameworkInfo
 }
@@ -52,7 +53,8 @@ class SchedulerFactory private (
     client: MesosClient,
     podRecordRepository: PodRecordRepository,
     schedulerSettings: SchedulerSettings,
-    metrics: Metrics)(implicit ec: ExecutionContext)
+    metrics: Metrics
+)(implicit ec: ExecutionContext)
     extends SchedulerLogicFactory
     with PersistenceFlowFactory
     with SuppressReviveFactory
@@ -108,7 +110,8 @@ object SchedulerFactory {
       client: MesosClient,
       podRecordRepository: PodRecordRepository,
       schedulerSettings: SchedulerSettings,
-      metrics: Metrics)(implicit ec: ExecutionContext) =
+      metrics: Metrics
+  )(implicit ec: ExecutionContext) =
     new SchedulerFactory(client, podRecordRepository, schedulerSettings, metrics)
 
   def create(
@@ -116,5 +119,6 @@ object SchedulerFactory {
       podRecordRepository: PodRecordRepository,
       schedulerSettings: SchedulerSettings,
       metrics: Metrics,
-      ec: ExecutionContext) = new SchedulerFactory(client, podRecordRepository, schedulerSettings, metrics)(ec)
+      ec: ExecutionContext
+  ) = new SchedulerFactory(client, podRecordRepository, schedulerSettings, metrics)(ec)
 }

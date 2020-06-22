@@ -113,13 +113,15 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
       "99percentile",
       "999percentile",
       "max",
-      "stddev")
+      "stddev"
+    )
   private def reportSnapshot(
       buffer: StringBuilder,
       name: String,
       snapshot: Snapshot,
       timestamp: Long,
-      scaleMetrics: Boolean): Unit = {
+      scaleMetrics: Boolean
+  ): Unit = {
 
     val values = Seq(
       snapshot.getMin.toDouble,
@@ -177,10 +179,12 @@ class DataDogAPIReporter(settings: DataDogApiReporterSettings, registry: MetricR
       name: String,
       value: String,
       timestamp: Long,
-      metricType: String): Unit = {
+      metricType: String
+  ): Unit = {
     if (buffer.length() > 0) buffer.append(',')
     buffer.append(
-      s"""{"metric":"$name","interval":$transmissionInterval,"points":[[$timestamp,$value]],"type":"$metricType",host:"$host"}""")
+      s"""{"metric":"$name","interval":$transmissionInterval,"points":[[$timestamp,$value]],"type":"$metricType",host:"$host"}"""
+    )
   }
 }
 

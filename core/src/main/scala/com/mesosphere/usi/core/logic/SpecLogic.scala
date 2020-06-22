@@ -21,8 +21,10 @@ private[core] class SpecLogic(mesosCallFactory: MesosCalls) extends ImplicitStri
         logger.debug(s"Received launch for pod ${launchPod.podId}")(
           LoggingArgs("podId" -> launchPod.podId)
         )
-        if (state.podRecords.contains(launchPod.podId) || getRunningPodSpec(state.podSpecs, launchPod.podId)
-            .exists(_.runSpec == launchPod.runSpec)) {
+        if (
+          state.podRecords.contains(launchPod.podId) || getRunningPodSpec(state.podSpecs, launchPod.podId)
+            .exists(_.runSpec == launchPod.runSpec)
+        ) {
           // if we already have a record for the pod, ignore
           logger.debug(s"Pod ${launchPod.podId} already exists.")(
             LoggingArgs("podId" -> launchPod.podId)
@@ -30,9 +32,13 @@ private[core] class SpecLogic(mesosCallFactory: MesosCalls) extends ImplicitStri
           SchedulerEvents.empty
         } else {
           SchedulerEvents(
-            stateEvents = List(PodSpecUpdatedEvent(
-              launchPod.podId,
-              Some(RunningPodSpec(launchPod.podId, launchPod.runSpec, launchPod.domainFilter, launchPod.agentFilter)))))
+            stateEvents = List(
+              PodSpecUpdatedEvent(
+                launchPod.podId,
+                Some(RunningPodSpec(launchPod.podId, launchPod.runSpec, launchPod.domainFilter, launchPod.agentFilter))
+              )
+            )
+          )
         }
       case ExpungePod(podId) =>
         logger.debug(s"Received expunge for pod $podId")(
@@ -67,7 +73,8 @@ private[core] class SpecLogic(mesosCallFactory: MesosCalls) extends ImplicitStri
       case (eventsBuilder, (taskId, status)) =>
         eventsBuilder.withMesosCall(
           mesosCallFactory
-            .newKill(taskId.asProto, if (status.hasAgentId) Some(status.getAgentId) else None, None))
+            .newKill(taskId.asProto, if (status.hasAgentId) Some(status.getAgentId) else None, None)
+        )
     }
   }
 }

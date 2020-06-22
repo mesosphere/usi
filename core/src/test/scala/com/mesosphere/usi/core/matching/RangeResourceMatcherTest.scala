@@ -40,8 +40,9 @@ class RangeResourceMatcherTest extends UnitTestLike {
             ResourceType.CPUS.name,
             Protos.Value.Type.SCALAR,
             basicAllocationInfo,
-            scalar = Protos.Value.Scalar.newBuilder().setValue(1D).build
-          ))
+            scalar = Protos.Value.Scalar.newBuilder().setValue(1d).build
+          )
+        )
       )
 
       result.isDefined should be(false) withClue "Expecting no match on resource that does not contain ports"
@@ -51,7 +52,8 @@ class RangeResourceMatcherTest extends UnitTestLike {
       val requirement = RangeRequirement.ports(Seq(0, 0, 0, 0, 0))
       val result = RangeResourceMatcher.matchAndConsume(
         requirement,
-        Seq(resourceWithPortRange(Range(2000, 2002), Range(3100, 3200))))
+        Seq(resourceWithPortRange(Range(2000, 2002), Range(3100, 3200)))
+      )
 
       val matchedResources = result.get.matchedResources
       matchedResources.size should be(1)
@@ -66,7 +68,9 @@ class RangeResourceMatcherTest extends UnitTestLike {
       matchedResources.size should be(1)
       val firstMatched = matchedResources.head
       firstMatched.getRanges.getRangeCount should be(2)
-      rangesEqual(firstMatched.getRanges, Range(80, 83), Range(100, 100)) should be(true) withClue "Expecting ranges to be matching the ranges of expected ports"
+      rangesEqual(firstMatched.getRanges, Range(80, 83), Range(100, 100)) should be(
+        true
+      ) withClue "Expecting ranges to be matching the ranges of expected ports"
     }
 
     "produce no match when more ports requested than available" in {
@@ -90,7 +94,8 @@ class RangeResourceMatcherTest extends UnitTestLike {
       val match2 = RangeResourceMatcher.matchAndConsume(requirement2, Seq(resourceWithPortRange(Range(2000, 2400))))
 
       match1.get.matchedResources.head.getRanges.getRange(0) should be(
-        match2.get.matchedResources.head.getRanges.getRange(0))
+        match2.get.matchedResources.head.getRanges.getRange(0)
+      )
 
       val differentMatch = (1 to 100).find { seed =>
         val requirement2DifferentSeed = RangeRequirement.ports(Seq(0), RandomSelection(new util.Random(seed)))
@@ -115,24 +120,27 @@ class RangeResourceMatcherTest extends UnitTestLike {
         matchResource.get.matchedResources.head.getRanges.getRange(0).getEnd != 2000
       }
 
-      alwaysSameMatch.isEmpty should be(true) withClue "when no random shuffling is requested, selected port should always be the same"
+      alwaysSameMatch.isEmpty should be(
+        true
+      ) withClue "when no random shuffling is requested, selected port should always be the same"
     }
   }
 
   private def rangesEqual(resultRanges: Value.Ranges, expecting: Range*): Boolean = {
     val resultRangesAsScala = resultRanges.getRangeList.asScala
     expecting.forall(expextedRange =>
-      resultRangesAsScala.exists(r => r.getBegin == expextedRange.start && r.getEnd == expextedRange.end))
+      resultRangesAsScala.exists(r => r.getBegin == expextedRange.start && r.getEnd == expextedRange.end)
+    )
   }
 
   private def resourceWithPortRange(ranges: Range*): Protos.Resource = {
 
-    val protoRanges: Seq[Protos.Value.Range] = ranges.map(
-      r =>
-        Protos.Value.Range.newBuilder
-          .setBegin(r.start)
-          .setEnd(r.end)
-          .build)
+    val protoRanges: Seq[Protos.Value.Range] = ranges.map(r =>
+      Protos.Value.Range.newBuilder
+        .setBegin(r.start)
+        .setEnd(r.end)
+        .build
+    )
 
     val rangesProto = Protos.Value.Ranges.newBuilder
       .addAllRange(protoRanges.asJava)
@@ -142,7 +150,8 @@ class RangeResourceMatcherTest extends UnitTestLike {
       ResourceType.PORTS.name,
       Protos.Value.Type.RANGES,
       basicAllocationInfo,
-      ranges = rangesProto)
+      ranges = rangesProto
+    )
   }
 
 }

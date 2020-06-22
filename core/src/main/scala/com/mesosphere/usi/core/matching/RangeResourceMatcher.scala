@@ -39,7 +39,8 @@ object RangeResourceMatcher {
 
   def matchAndConsume(
       rangeRequirment: RangeRequirement,
-      resources: Iterable[Protos.Resource]): Option[ResourceMatchResult] = {
+      resources: Iterable[Protos.Resource]
+  ): Option[ResourceMatchResult] = {
     matchAndConsumeIter(rangeRequirment, Nil, resources.toList)
   }
 
@@ -54,7 +55,8 @@ object RangeResourceMatcher {
   @tailrec private def matchAndConsumeIter(
       rangeRequirment: RangeRequirement,
       unmatchedResources: List[Protos.Resource],
-      remainingResources: List[Protos.Resource]): Option[ResourceMatchResult] = {
+      remainingResources: List[Protos.Resource]
+  ): Option[ResourceMatchResult] = {
 
     remainingResources match {
       case Nil =>
@@ -67,7 +69,9 @@ object RangeResourceMatcher {
             Some(
               ResourceMatchResult(
                 consumedResources,
-                unmatchedResources ++ rest ++ ResourceUtil.consumeResources(Seq(next), consumedResources)))
+                unmatchedResources ++ rest ++ ResourceUtil.consumeResources(Seq(next), consumedResources)
+              )
+            )
         }
     }
   }
@@ -80,7 +84,8 @@ object RangeResourceMatcher {
     */
   private def tryConsumeValuesFromResource(
       rangeRequirement: RangeRequirement,
-      resource: Protos.Resource): Seq[Protos.Resource] = {
+      resource: Protos.Resource
+  ): Seq[Protos.Resource] = {
     val offeredRanges = parseResourceToRanges(rangeRequirement, resource)
     if (offeredRanges.isEmpty || rangeRequirement.requestedValues.isEmpty) {
       return Seq.empty
@@ -118,7 +123,8 @@ object RangeResourceMatcher {
       createMesosResource(
         resource,
         matchResult.collect { case ValueMatched(v) => v }.toSeq,
-        rangeRequirement.resourceType)
+        rangeRequirement.resourceType
+      )
     }
   }
 
@@ -202,7 +208,8 @@ object RangeResourceMatcher {
   def createMesosResource(
       resourceFromOffer: Protos.Resource,
       requestedValues: Seq[Int],
-      resourceType: ResourceType): Seq[Protos.Resource] = {
+      resourceType: ResourceType
+  ): Seq[Protos.Resource] = {
 
     def overlaps(range: Range, nextVal: Int): Boolean = range.end.toInt == nextVal - 1
     /*
@@ -238,7 +245,8 @@ object RangeResourceMatcher {
       resourceType.name,
       Protos.Value.Type.RANGES,
       resourceFromOffer.getAllocationInfo,
-      ranges = rangesProto)
+      ranges = rangesProto
+    )
 
     Seq(resource)
   }

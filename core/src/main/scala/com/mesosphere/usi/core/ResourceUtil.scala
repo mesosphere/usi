@@ -17,7 +17,8 @@ object ResourceUtil extends ImplicitStrictLogging {
       name: String,
       allocationRole: String,
       reservations: Seq[ReservationInfo],
-      disk: Option[DiskInfo])
+      disk: Option[DiskInfo]
+  )
 
   private[this] object ResourceMatchKey {
     def apply(resource: Mesos.Resource): ResourceMatchKey = {
@@ -58,8 +59,10 @@ object ResourceUtil extends ImplicitStrictLogging {
           .setScalar(
             Mesos.Value.Scalar
               .newBuilder()
-              .setValue(leftOver))
-          .build())
+              .setValue(leftOver)
+          )
+          .build()
+      )
     }
   }
 
@@ -149,7 +152,8 @@ object ResourceUtil extends ImplicitStrictLogging {
     */
   def consumeResources(
       resources: Iterable[Mesos.Resource],
-      usedResources: Seq[Mesos.Resource]): Iterable[Mesos.Resource] = {
+      usedResources: Seq[Mesos.Resource]
+  ): Iterable[Mesos.Resource] = {
     val usedResourceMap: Map[ResourceMatchKey, Seq[Mesos.Resource]] =
       usedResources.groupBy(ResourceMatchKey(_))
 
@@ -163,7 +167,8 @@ object ResourceUtil extends ImplicitStrictLogging {
                   "Different resource types for resource {}: {} and {}",
                   resource.getName,
                   resource.getType,
-                  usedResource.getType)
+                  usedResource.getType
+                )
                 None
               } else
                 try ResourceUtil.consumeResource(resource, usedResource)

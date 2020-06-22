@@ -34,5 +34,6 @@ trait TaskBuilder {
       builder: Mesos.TaskInfo.Builder,
       matchedOffer: Mesos.Offer,
       taskResources: Seq[Mesos.Resource],
-      peerTaskResources: Map[TaskName, Seq[Mesos.Resource]]): Unit
+      peerTaskResources: Map[TaskName, Seq[Mesos.Resource]]
+  ): Unit
 }

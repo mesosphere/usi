@@ -56,7 +56,8 @@ object Scheduler {
   class SourceAndSinkResult(
       snap: StateSnapshot,
       source: javadsl.Source[StateEvent, NotUsed],
-      sink: javadsl.Sink[SchedulerCommand, CompletableFuture[Done]]) {
+      sink: javadsl.Sink[SchedulerCommand, CompletableFuture[Done]]
+  ) {
 
     def getSource: javadsl.Source[StateEvent, NotUsed] = {
       source

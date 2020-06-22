@@ -33,8 +33,9 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
   /**
     * This is a port of [[Flow.ask()]] that supports a tuple to carry a context `C`.
     */
-  private def sessionActorFlow[C](parallelism: Int)(ref: ActorRef[SessionActor.Message])(
-      implicit ec: ExecutionContext): Flow[(Array[Byte], C), (HttpResponse, C), NotUsed] = {
+  private def sessionActorFlow[C](parallelism: Int)(
+      ref: ActorRef[SessionActor.Message]
+  )(implicit ec: ExecutionContext): Flow[(Array[Byte], C), (HttpResponse, C), NotUsed] = {
     Flow[(Array[Byte], C)]
       .watch(ref.toClassic)
       .mapAsync(parallelism) {
@@ -56,7 +57,8 @@ case class Session(baseUri: Uri, streamId: String, authorization: Option[Credent
     val sessionActor =
       system.spawn(
         SessionActor(authorization, streamId, baseUri.withPath(Path("/api/v1/scheduler"))),
-        s"SessionActor-$streamId")
+        s"SessionActor-$streamId"
+      )
 
     FlowWithContext[Array[Byte], C].via(sessionActorFlow(1)(sessionActor))
   }
@@ -145,8 +147,8 @@ class SessionActor(
     streamId: String,
     schedulerEndpoint: Uri,
     context: ActorContext[SessionActor.Message],
-    buffer: StashBuffer[SessionActor.Message])
-    extends StrictLogging {
+    buffer: StashBuffer[SessionActor.Message]
+) extends StrictLogging {
 
   import SessionActor._
 
@@ -247,7 +249,8 @@ class SessionActor(
   private def createPostRequest(
       bytes: Array[Byte],
       endpoint: Uri,
-      maybeCredentials: Option[HttpCredentials]): HttpRequest = {
+      maybeCredentials: Option[HttpCredentials]
+  ): HttpRequest = {
     HttpRequest(
       HttpMethods.POST,
       uri = endpoint,

@@ -28,9 +28,10 @@ import scala.collection.JavaConverters._
   *
   */
 class MesosClientExampleFramework(settings: MesosClientSettings, authorization: Option[CredentialsProvider] = None)(
-    implicit system: ActorSystem,
-    materializer: Materializer)
-    extends StrictLoggingFlow {
+    implicit
+    system: ActorSystem,
+    materializer: Materializer
+) extends StrictLoggingFlow {
   implicit val executionContext = system.dispatcher
 
   val frameworkInfo = FrameworkInfo
@@ -40,9 +41,11 @@ class MesosClientExampleFramework(settings: MesosClientSettings, authorization: 
     .setName("MesosClientExample")
     .setId(FrameworkID.newBuilder.setValue(UUID.randomUUID().toString))
     .addRoles("test")
-    .addCapabilities(FrameworkInfo.Capability
-      .newBuilder()
-      .setType(FrameworkInfo.Capability.Type.MULTI_ROLE))
+    .addCapabilities(
+      FrameworkInfo.Capability
+        .newBuilder()
+        .setType(FrameworkInfo.Capability.Type.MULTI_ROLE)
+    )
     .setFailoverTimeout(0d)
     .build()
 
@@ -96,7 +99,8 @@ object MesosClientExampleFramework {
 
     require(
       (1 <= args.length) && (args.length <= 3),
-      "Please provide arguments: <mesos-url> [<dcos-ca.crt>] [<private-key-file>]")
+      "Please provide arguments: <mesos-url> [<dcos-ca.crt>] [<private-key-file>]"
+    )
 
     val akkaConfig: Config = ConfigFactory.parseString(s"""
       |akka.ssl-config.trustManager.stores = [
@@ -121,7 +125,8 @@ object MesosClientExampleFramework {
     new MesosClientExampleFramework(clientSettings, provider)
   }
 
-  def apply(settings: MesosClientSettings)(
-      implicit system: ActorSystem,
-      materializer: Materializer): MesosClientExampleFramework = new MesosClientExampleFramework(settings)
+  def apply(
+      settings: MesosClientSettings
+  )(implicit system: ActorSystem, materializer: Materializer): MesosClientExampleFramework =
+    new MesosClientExampleFramework(settings)
 }

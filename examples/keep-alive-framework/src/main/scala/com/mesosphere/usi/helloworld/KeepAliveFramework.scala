@@ -27,10 +27,11 @@ import scala.concurrent.duration._
 case class KeepAliveFrameWorkSettings(clientSettings: MesosClientSettings, numberOfTasks: Int, role: String)
 
 class KeepAliveFramework(settings: KeepAliveFrameWorkSettings, authorization: Option[CredentialsProvider] = None)(
-    implicit ec: ExecutionContext,
+    implicit
+    ec: ExecutionContext,
     system: ActorSystem,
-    mat: ActorMaterializer)
-    extends StrictLogging {
+    mat: ActorMaterializer
+) extends StrictLogging {
 
   val client: MesosClient =
     new KeepAliveMesosClientFactory(settings.clientSettings, authorization, settings.role).client
@@ -201,7 +202,8 @@ object KeepAliveFramework {
         val settings = KeepAliveFrameWorkSettings(
           MesosClientSettings.fromConfig(conf).withMasters(Seq(mesosUrl.toURL)),
           conf.getInt("keep-alive-framework.tasks-started"),
-          mesosRole)
+          mesosRole
+        )
         new KeepAliveFramework(settings, provider)
       case _ =>
         sys.exit(1)

@@ -104,9 +104,12 @@ case class Zookeeper(master: String, metrics: Metrics) extends MasterDetector wi
     }
     client.start()
 
-    if (!client.blockUntilConnected(
+    if (
+      !client.blockUntilConnected(
         client.getZookeeperClient.getConnectionTimeoutMs,
-        java.util.concurrent.TimeUnit.MILLISECONDS)) {
+        java.util.concurrent.TimeUnit.MILLISECONDS
+      )
+    ) {
       throw new IllegalStateException("Failed to connect to Zookeeper. Will exit now.")
     }
 

@@ -46,7 +46,8 @@ class SchedulerTest extends AkkaUnitTest with Inside {
     SimpleRunTemplateFactory(
       resourceRequirements = resourceRequirements.result(),
       shellCommand = "sleep 3600",
-      role = "test")
+      role = "test"
+    )
   }
 
   def pullUntil[T](sink: SinkQueue[T])(predicate: T => Boolean): Option[T] = {

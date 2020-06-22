@@ -52,28 +52,30 @@ case class ZookeeperServer(autoStart: Boolean = true, val port: Int = PortAlloca
     * it has been closed (had close() called on it) then an exception will be
     * thrown.
     */
-  def start(): Unit = synchronized {
-    /* With Curator's TestingServer, if you call start() after stop() was called, then, sadly, nothing is done.
-     * However, restart works for both the first start and second start.
-     *
+  def start(): Unit =
+    synchronized {
+      /* With Curator's TestingServer, if you call start() after stop() was called, then, sadly, nothing is done.
+       * However, restart works for both the first start and second start.
+       *
      * We make the start method idempotent by only calling restart if the process isn't already running, matching the
-     * start/stop behavior of a local Zookeeper server.
-     */
-    if (!running) {
-      testingServer.restart()
-      running = true
+       * start/stop behavior of a local Zookeeper server.
+       */
+      if (!running) {
+        testingServer.restart()
+        running = true
+      }
     }
-  }
 
   /**
     * Stop the server without deleting the temp directory
     */
-  def stop(): Unit = synchronized {
-    if (running) {
-      testingServer.stop()
-      running = false
+  def stop(): Unit =
+    synchronized {
+      if (running) {
+        testingServer.stop()
+        running = false
+      }
     }
-  }
 
   /**
     * Close the server and any open clients and delete the temp directory
@@ -98,9 +100,12 @@ trait ZookeeperServerTest extends BeforeAndAfterAll with StrictLogging { this: S
     val client: CuratorFramework = CuratorFrameworkFactory.newClient(zkserver.connectUrl, retryPolicy)
     client.start()
 
-    if (!client.blockUntilConnected(
+    if (
+      !client.blockUntilConnected(
         client.getZookeeperClient.getConnectionTimeoutMs,
-        java.util.concurrent.TimeUnit.MILLISECONDS)) {
+        java.util.concurrent.TimeUnit.MILLISECONDS
+      )
+    ) {
       throw new IllegalStateException("Failed to connect to Zookeeper. Will exit now.")
     }
     val namespaced = namespace.map(client.usingNamespace(_)).getOrElse(client)

@@ -26,7 +26,8 @@ case class MockedFactory(
     frameworkId: FrameworkID = MesosMock.mockFrameworkId,
     frameworkInfo: FrameworkInfo = MesosMock.mockFrameworkInfo(),
     masterDomainInfo: DomainInfo = MesosMock.masterDomainInfo,
-    metrics: Metrics = DummyMetrics)(implicit ec: ExecutionContext)
+    metrics: Metrics = DummyMetrics
+)(implicit ec: ExecutionContext)
     extends SchedulerLogicFactory
     with PersistenceFlowFactory
     with SuppressReviveFactory

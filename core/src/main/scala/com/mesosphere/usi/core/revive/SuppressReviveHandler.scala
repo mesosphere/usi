@@ -33,8 +33,8 @@ private[core] class SuppressReviveHandler(
     frameworkId: Mesos.FrameworkID,
     metrics: Metrics,
     mesosCallFactory: MesosCalls,
-    debounceReviveInterval: FiniteDuration)
-    extends StrictLogging {
+    debounceReviveInterval: FiniteDuration
+) extends StrictLogging {
 
   import SuppressReviveHandler._
 
@@ -133,7 +133,8 @@ private[core] class SuppressReviveHandler(
     Flow[RoleDirective].map {
       case directive @ IssueUpdateFramework(_, newlyRevived, newlySuppressed) =>
         logger.debug(
-          s"Newly suppress roles ${newlySuppressed.mkString(", ")}, newly revived roles ${newlyRevived.mkString(", ")}")
+          s"Newly suppress roles ${newlySuppressed.mkString(", ")}, newly revived roles ${newlyRevived.mkString(", ")}"
+        )
         newlyRevived.foreach { _ =>
           reviveCountMetric.increment()
         }
@@ -200,8 +201,8 @@ private[core] object SuppressReviveHandler {
   private[revive] case class IssueUpdateFramework(
       roleState: Map[String, Set[PodId]],
       newlyRevived: Set[String],
-      newlySuppressed: Set[String])
-      extends RoleDirective
+      newlySuppressed: Set[String]
+  ) extends RoleDirective
 
   private[revive] case class IssueRevive(roles: Set[String]) extends RoleDirective
 }

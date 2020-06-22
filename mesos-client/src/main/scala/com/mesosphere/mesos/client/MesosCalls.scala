@@ -166,7 +166,8 @@ class MesosCalls(frameworkId: FrameworkID) {
           .newBuilder()
           .setExecutorId(executorId)
           .setAgentId(agentId)
-          .build())
+          .build()
+      )
       .build()
   }
 
@@ -191,7 +192,8 @@ class MesosCalls(frameworkId: FrameworkID) {
           .setAgentId(agentId)
           .setTaskId(taskId)
           .setUuid(uuid)
-          .build())
+          .build()
+      )
       .build()
   }
 
@@ -235,7 +237,8 @@ class MesosCalls(frameworkId: FrameworkID) {
           .setAgentId(agentId)
           .setExecutorId(executorId)
           .setData(protobuf.ByteString.copyFrom(message.toArray))
-          .build())
+          .build()
+      )
       .build()
   }
 

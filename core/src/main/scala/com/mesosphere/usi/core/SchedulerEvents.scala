@@ -29,7 +29,8 @@ object SchedulerEvents {
   */
 case class SchedulerEventsBuilder(
     reverseStateEvents: List[StateEvent] = Nil,
-    reverseMesosCalls: List[MesosCall] = Nil) {
+    reverseMesosCalls: List[MesosCall] = Nil
+) {
   lazy val result = SchedulerEvents(reverseStateEvents.reverse, reverseMesosCalls.reverse)
 
   def ++(other: SchedulerEventsBuilder): SchedulerEventsBuilder = {
@@ -40,7 +41,8 @@ case class SchedulerEventsBuilder(
     else
       SchedulerEventsBuilder(
         other.reverseStateEvents ++ reverseStateEvents,
-        other.reverseMesosCalls ++ reverseMesosCalls)
+        other.reverseMesosCalls ++ reverseMesosCalls
+      )
   }
 
   /**

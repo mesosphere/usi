@@ -55,8 +55,9 @@ private[usi] object ProtoConversions {
     def asProtoLabels: Mesos.Labels = {
       Mesos.Labels
         .newBuilder()
-        .addAllLabels(
-          mapLike.map { case (key, value) => Mesos.Label.newBuilder().setKey(key).setValue(value).build }.asJava)
+        .addAllLabels(mapLike.map {
+          case (key, value) => Mesos.Label.newBuilder().setKey(key).setValue(value).build
+        }.asJava)
         .build
     }
   }

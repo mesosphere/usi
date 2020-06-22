@@ -33,7 +33,8 @@ class DropwizardMetricsModule(config: Config) {
 
   def start(actorRefFactory: ActorRefFactory): Done = {
     metricsSettings.statsdReporterSettings.foreach(statsdSettings =>
-      actorRefFactory.actorOf(StatsDReporter.props(statsdSettings, registry), "StatsDReporter"))
+      actorRefFactory.actorOf(StatsDReporter.props(statsdSettings, registry), "StatsDReporter")
+    )
 
     metricsSettings.dataDogReporterSettings.foreach {
       case s: DataDogUdpReporterSettings =>

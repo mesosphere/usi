@@ -19,7 +19,8 @@ class SpecBuilderTest extends UnitTest {
     newAgentId("test-agent"),
     MesosMock.mockFrameworkId,
     hostname = "test-host",
-    allocationInfo = newResourceAllocationInfo("test"))
+    allocationInfo = newResourceAllocationInfo("test")
+  )
 
   "MesosEventsLogic" should {
     "build Mesos proto from RunSpec when fetchUri is defined" in {
@@ -44,7 +45,10 @@ class SpecBuilderTest extends UnitTest {
                 "cpus",
                 Mesos.Value.Type.SCALAR,
                 newResourceAllocationInfo("some-role"),
-                scalar = 4d.asProtoScalar)))
+                scalar = 4d.asProtoScalar
+              )
+            )
+        )
       )
 
       val uri = operation.getTaskInfos(0).getCommand.getUris(0)
@@ -77,7 +81,10 @@ class SpecBuilderTest extends UnitTest {
                 "cpus",
                 Mesos.Value.Type.SCALAR,
                 newResourceAllocationInfo("some-role"),
-                scalar = 4d.asProtoScalar)))
+                scalar = 4d.asProtoScalar
+              )
+            )
+        )
       )
 
       val imageName = operation.getTaskInfos(0).getContainer.getMesos.getImage.getDocker.getName

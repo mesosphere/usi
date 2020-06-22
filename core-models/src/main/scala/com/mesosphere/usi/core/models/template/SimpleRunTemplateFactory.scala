@@ -69,8 +69,8 @@ object SimpleRunTemplateFactory {
       val resourceRequirements: Seq[ResourceRequirement],
       command: Command,
       fetch: Seq[FetchUri],
-      dockerImageName: Option[String])
-      extends TaskBuilder {
+      dockerImageName: Option[String]
+  ) extends TaskBuilder {
 
     if (command.isInstanceOf[DockerEntrypoint]) {
       assert(dockerImageName.isDefined, "The default entrypoint can only be used with a Docker image.")
@@ -80,7 +80,8 @@ object SimpleRunTemplateFactory {
         taskInfoBuilder: Mesos.TaskInfo.Builder,
         matchedOffer: Mesos.Offer,
         taskResources: Seq[Mesos.Resource],
-        peerTaskResources: Map[TaskName, Seq[Mesos.Resource]]): Unit = {
+        peerTaskResources: Map[TaskName, Seq[Mesos.Resource]]
+    ): Unit = {
       val uris = fetch.map { f =>
         val fetchBuilder = Mesos.CommandInfo.URI
           .newBuilder()
@@ -104,11 +105,15 @@ object SimpleRunTemplateFactory {
             .setMesos(
               Mesos.ContainerInfo.MesosInfo
                 .newBuilder()
-                .setImage(Mesos.Image
-                  .newBuilder()
-                  .setType(Mesos.Image.Type.DOCKER)
-                  .setDocker(Mesos.Image.Docker.newBuilder().setName(name))))
-            .build())
+                .setImage(
+                  Mesos.Image
+                    .newBuilder()
+                    .setType(Mesos.Image.Type.DOCKER)
+                    .setDocker(Mesos.Image.Docker.newBuilder().setName(name))
+                )
+            )
+            .build()
+        )
       }
     }
   }
@@ -119,7 +124,8 @@ object SimpleRunTemplateFactory {
         resourceRequirements: Seq[ResourceRequirement],
         command: Command,
         fetch: Seq[FetchUri],
-        dockerImageName: Option[String]): SimpleTaskInfoBuilder = {
+        dockerImageName: Option[String]
+    ): SimpleTaskInfoBuilder = {
       new SimpleTaskInfoBuilder(resourceRequirements, command, fetch, dockerImageName)
     }
 
@@ -127,7 +133,8 @@ object SimpleRunTemplateFactory {
         resourceRequirements: Seq[ResourceRequirement],
         shellCommand: String,
         fetch: Seq[FetchUri] = Seq.empty,
-        dockerImageName: Option[String] = None): SimpleTaskInfoBuilder =
+        dockerImageName: Option[String] = None
+    ): SimpleTaskInfoBuilder =
       apply(resourceRequirements, Shell(shellCommand), fetch, dockerImageName)
 
     /** Factory method for [[com.mesosphere.usi.core.models.template.SimpleRunTemplateFactory.SimpleTaskInfoBuilder]]; Java Api. */
@@ -135,7 +142,8 @@ object SimpleRunTemplateFactory {
         resourceRequirements: java.util.List[ResourceRequirement],
         command: Command,
         fetch: java.util.List[FetchUri],
-        dockerImageName: Optional[String]): SimpleTaskInfoBuilder = {
+        dockerImageName: Optional[String]
+    ): SimpleTaskInfoBuilder = {
       val image = if (dockerImageName.isPresent) Some(dockerImageName.get()) else None
       apply(resourceRequirements.asScala.toSeq, command, fetch.asScala.toSeq, image)
     }
@@ -155,8 +163,10 @@ object SimpleRunTemplateFactory {
       shellCommand: String,
       role: String,
       fetch: Seq[FetchUri] = Seq.empty,
-      dockerImageName: Option[String] = None): RunTemplate =
+      dockerImageName: Option[String] = None
+  ): RunTemplate =
     new LegacyLaunchRunTemplate(
       role,
-      SimpleTaskInfoBuilder(resourceRequirements: Seq[ResourceRequirement], shellCommand, fetch, dockerImageName))
+      SimpleTaskInfoBuilder(resourceRequirements: Seq[ResourceRequirement], shellCommand, fetch, dockerImageName)
+    )
 }

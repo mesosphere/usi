@@ -81,7 +81,8 @@ class ZooKeeperPersistenceStoreTest extends UnitTest with ZookeeperServerTest wi
             store
               .create(nodes :+ nodes.head)
               .runWith(Sink.foreach(p => created.put(p, Done))),
-            patienceConfig.timeout)
+            patienceConfig.timeout
+          )
         }
 
         And("but first 3 nodes were successfully created")
@@ -127,7 +128,8 @@ class ZooKeeperPersistenceStoreTest extends UnitTest with ZookeeperServerTest wi
         res.collect { case Success(node) => node.data.utf8String } should contain theSameElementsAs (Seq(
           "foo",
           "foo",
-          "foo"))
+          "foo"
+        ))
       }
     }
 
@@ -169,7 +171,8 @@ class ZooKeeperPersistenceStoreTest extends UnitTest with ZookeeperServerTest wi
         res.collect { case Success(node) => node.data.utf8String } should contain theSameElementsAs (Seq(
           "bar",
           "bar",
-          "bar"))
+          "bar"
+        ))
       }
     }
 
@@ -269,7 +272,8 @@ class ZooKeeperPersistenceStoreTest extends UnitTest with ZookeeperServerTest wi
         And("a transaction with two create operations is submitted")
         val ops = Seq(
           CreateOp(Node(randomPath(prefix), ByteString("foo"))),
-          CreateOp(Node(randomPath(prefix), ByteString("foo"))))
+          CreateOp(Node(randomPath(prefix), ByteString("foo")))
+        )
 
         Then("a transaction should be successful")
         val res = store.transaction(ops).futureValue

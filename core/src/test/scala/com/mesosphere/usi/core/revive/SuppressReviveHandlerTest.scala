@@ -35,7 +35,8 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside {
       MesosMock.mockFrameworkId,
       DummyMetrics,
       mesosCallFactory,
-      debounceReviveInterval = debounceReviveInterval)
+      debounceReviveInterval = debounceReviveInterval
+    )
   }
 
   class NonDebouncedFixture(defaultRole: String = "web")
@@ -49,7 +50,8 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside {
   "Suppress and revive logic" should {
     "combine 3 revive-worthy events received within the throttle window into a single revive event" in new Fixture(
       debounceReviveInterval = 200.millis,
-      defaultRole = "web") {
+      defaultRole = "web"
+    ) {
       val podSpec1 = RunningPodSpec(newPodId("webapp"), webApp, HomeRegionFilter)
       val podSpec2 = RunningPodSpec(newPodId("webapp"), webApp, HomeRegionFilter)
       val podSpec3 = RunningPodSpec(newPodId("webapp"), webApp, HomeRegionFilter)
@@ -120,10 +122,11 @@ class SuppressReviveHandlerTest extends AkkaUnitTest with Inside {
 
         inside(results) {
           case Seq(
-              initialMessage: IssueUpdateFramework,
-              reviveForPodSpec1: IssueRevive,
-              reviveForPodSpec2: IssueRevive,
-              finalSuppress: IssueUpdateFramework) =>
+                initialMessage: IssueUpdateFramework,
+                reviveForPodSpec1: IssueRevive,
+                reviveForPodSpec2: IssueRevive,
+                finalSuppress: IssueUpdateFramework
+              ) =>
             initialMessage.roleState shouldBe Map("web" -> Set.empty)
 
             reviveForPodSpec1.roles shouldBe Set("web")

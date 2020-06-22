@@ -11,7 +11,8 @@ object ScalarResourceMatcher {
   @tailrec private def matchAndConsumeIter(
       scalarRequirement: ScalarRequirement,
       unmatchedResources: List[Mesos.Resource],
-      remainingResources: List[Mesos.Resource]): Option[ResourceMatchResult] = {
+      remainingResources: List[Mesos.Resource]
+  ): Option[ResourceMatchResult] = {
     remainingResources match {
       case Nil =>
         None
@@ -21,7 +22,8 @@ object ScalarResourceMatcher {
             ResourceMatchResult(
               next.toBuilder.setScalar(scalarRequirement.amount.asProtoScalar).build :: Nil,
               unmatchedResources ++ rest ++ ResourceUtil.consumeScalarResource(next, scalarRequirement.amount)
-            ))
+            )
+          )
         } else {
           matchAndConsumeIter(scalarRequirement, next :: unmatchedResources, rest)
         }
@@ -30,7 +32,8 @@ object ScalarResourceMatcher {
 
   def matchAndConsume(
       scalarRequirement: ScalarRequirement,
-      resources: Iterable[Mesos.Resource]): Option[ResourceMatchResult] = {
+      resources: Iterable[Mesos.Resource]
+  ): Option[ResourceMatchResult] = {
     matchAndConsumeIter(scalarRequirement, Nil, resources.toList)
   }
 }

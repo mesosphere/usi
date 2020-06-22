@@ -19,7 +19,8 @@ case class FetchUri(
     extract: Boolean = true,
     executable: Boolean = false,
     cache: Boolean = false,
-    outputFile: Option[String] = None) {
+    outputFile: Option[String] = None
+) {
   if (extract) require(FetchUri.extractable(uri), s"$uri is not a supported extractable archive type")
 }
 

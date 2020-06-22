@@ -47,7 +47,8 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
       registry.getCounters,
       registry.getHistograms,
       registry.getMeters,
-      registry.getTimers)
+      registry.getTimers
+    )
   }
 
   private def report(
@@ -56,7 +57,8 @@ class StatsDReporter(settings: StatsdReporterSettings, registry: MetricRegistry)
       counters: util.SortedMap[String, Counter],
       histograms: util.SortedMap[String, Histogram],
       meters: util.SortedMap[String, Meter],
-      timers: util.SortedMap[String, Timer]): Unit = {
+      timers: util.SortedMap[String, Timer]
+  ): Unit = {
 
     gauges.asScala.foreach {
       case (name, value) => reportGauge(socket, name, value)
