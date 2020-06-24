@@ -79,7 +79,11 @@ lazy val `usi-root` = (project in file("./"))
 lazy val `commons` = (project in file("./commons"))
   .settings(
     commonSettings,
-    libraryDependencies ++= Seq(Dependencies.scalaLogging, Dependencies.Test.scalaTest % "test")
+    libraryDependencies ++= Seq(
+      Dependencies.akkaActor,
+      Dependencies.scalaLogging,
+      Dependencies.Test.scalaTest % "test"
+    )
   )
 
 lazy val `core-models` = (project in file("./core-models/"))
