@@ -81,6 +81,8 @@ lazy val `commons` = (project in file("./commons"))
     commonSettings,
     libraryDependencies ++= Seq(
       Dependencies.akkaActor,
+      Dependencies.guava,
+      Dependencies.scalaJavaCompat,
       Dependencies.scalaLogging,
       Dependencies.Test.scalaTest % "test"
     )

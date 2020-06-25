@@ -1,7 +1,6 @@
 package com.mesosphere.usi.async
 
 import java.util.concurrent.{ExecutorService, Executors, ThreadFactory}
-// TODO: Should I import Guava?
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import scala.concurrent.ExecutionContext
 

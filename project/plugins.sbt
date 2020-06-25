@@ -1,4 +1,7 @@
-resolvers += Resolver.jcenterRepo
+resolvers ++= Seq(
+  Resolver.jcenterRepo,
+  Resolver.sonatypeRepo("releases")
+)
 addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.12")
 addSbtPlugin("com.frugalmechanic" % "fm-sbt-s3-resolver" % "0.19.0")
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.0")

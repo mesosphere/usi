@@ -8,6 +8,8 @@ object Dependencies {
     val curatorTestVersion = "2.13.0"
     val curatorVersion = "4.0.1"
     val dropwizard = "4.0.5"
+    val guava = "29.0-jre"
+    val scalaJavaCompat = "0.9.1"
     val mesos = "1.9.0"
     val scalaLogging = "3.9.2"
     val scalaTest = "3.0.8"
@@ -33,6 +35,11 @@ object Dependencies {
   val curatorFramework = "org.apache.curator" % "curator-framework" % Versions.curatorVersion
   val curatorAsync = "org.apache.curator" % "curator-x-async" % Versions.curatorVersion
   val curatorTest = ("org.apache.curator" % "curator-test" % Versions.curatorTestVersion).excludeAll(excludeZk35)
+
+  val guava = "com.google.guava" % "guava" % Versions.guava
+
+  // This should be part of Scala 2.13.
+  val scalaJavaCompat = "org.scala-lang.modules" %% "scala-java8-compat" % Versions.scalaJavaCompat
 
   val jwtPlayJson = "com.pauldijou" %% "jwt-play-json" % "4.2.0"
   val akkaHttpPlayJson = "de.heikoseeberger" %% "akka-http-play-json" % "1.31.0"

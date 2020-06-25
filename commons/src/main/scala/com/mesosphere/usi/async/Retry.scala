@@ -2,30 +2,68 @@ package com.mesosphere.usi.async
 
 import java.time.Instant
 import java.time
+import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 
-import scala.concurrent.duration.{FiniteDuration, _}
+import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.concurrent.{ExecutionContext, Future, Promise, blocking => blockingCall}
+import scala.compat.java8.DurationConverters.DurationOps
 import scala.util.{Failure, Random, Success}
 import scala.util.control.NonFatal
 
-case class RetryConfig(
-    maxAttempts: Int = Retry.DefaultMaxAttempts,
-    minDelay: Duration = Retry.DefaultMinDelay,
-    maxDelay: Duration = Retry.DefaultMaxDelay,
-    maxDuration: Duration = Retry.DefaultMaxDuration
-)
+/**
+  * The retry configuration object.
+  *
+  * @param maxAttempts The maximum number of attempts before failing
+  * @param minDelay The minimum delay between invocations
+  * @param maxDelay The maximum delay between invocations
+  * @param maxDuration The maximum amount of time to allow the operation to complete
+  */
+class RetrySettings private (
+    val maxAttempts: Int,
+    val minDelay: FiniteDuration,
+    val maxDelay: FiniteDuration,
+    val maxDuration: Duration
+) {
 
-object RetryConfig {
-  def apply(config: Config): RetryConfig = {
-    RetryConfig(
-      config.int("max-attempts", default = Retry.DefaultMaxAttempts), // TODO: should we import RichConfig?
-      config.duration("min-delay", default = Retry.DefaultMinDelay),
-      config.duration("max-delay", default = Retry.DefaultMaxDelay),
-      config.duration("max-duration", default = Retry.DefaultMaxDuration)
-    )
+  private def copy(
+      maxAttempts: Int = this.maxAttempts,
+      minDelay: FiniteDuration = this.minDelay,
+      maxDelay: FiniteDuration = this.maxDelay,
+      maxDuration: Duration = this.maxDuration
+  ) =
+    new RetrySettings(maxAttempts, minDelay, maxDelay, maxDuration)
+
+  def withMaxAttempts(attempts: Int): RetrySettings = copy(maxAttempts = attempts)
+
+  def withMinDelay(delay: FiniteDuration): RetrySettings = copy(minDelay = delay)
+
+  def withMaxDelay(delay: FiniteDuration): RetrySettings = copy(maxDelay = delay)
+
+  def withMaxDuration(duration: Duration): RetrySettings = copy(maxDuration = duration)
+}
+
+object RetrySettings {
+  def fromConfig(conf: Config): RetrySettings = {
+    val maxAttempts = conf.getInt("max-attempts")
+
+    val minDelay: FiniteDuration = DurationOps(conf.getDuration("min-delay")).toScala
+    val maxDelay: FiniteDuration = DurationOps(conf.getDuration("max-delay")).toScala
+    val maxDuration: Duration = DurationOps(conf.getDuration("max-duration")).toScala
+
+    new RetrySettings(maxAttempts, minDelay, maxDelay, maxDuration)
+  }
+
+  def load(): RetrySettings = {
+    val conf = ConfigFactory.load();
+    RetrySettings.fromConfig(conf.getConfig("usi.retry-defaults"))
+  }
+
+  def load(loader: ClassLoader): RetrySettings = {
+    val conf = ConfigFactory.load(loader);
+    RetrySettings.fromConfig(conf.getConfig("usi.retry-defaults"))
   }
 }
 
@@ -35,21 +73,23 @@ object RetryConfig {
  * See also: https://www.awsarchitectureblog.com/2015/03/backoff.html
   */
 object Retry {
-  val DefaultMaxAttempts: Int = 5
-  val DefaultMinDelay: FiniteDuration = 10.millis
-  val DefaultMaxDelay: FiniteDuration = 1.second
-  val DefaultMaxDuration: FiniteDuration = 24.hours
+
+  import com.mesosphere.usi.async.DurationOps.DurationToHumanReadable
+
+  val defaultSettings: RetrySettings = RetrySettings.load()
 
   type RetryOnFn = Throwable => Boolean
   val defaultRetry: RetryOnFn = NonFatal(_)
 
-  private[util] def randomBetween(min: Long, max: Long): Long = {
+  private[async] def randomBetween(min: Long, max: Long): FiniteDuration = {
     require(min <= max)
-    math.min(math.abs(Random.nextLong() % (max - min + 1)) + min, max)
+    val nanos = math.min(math.abs(Random.nextLong() % (max - min + 1)) + min, max)
+    FiniteDuration(nanos, TimeUnit.NANOSECONDS)
   }
 
   /**
     * Retry a non-blocking call
+    *
     * @param maxAttempts The maximum number of attempts before failing
     * @param minDelay The minimum delay between invocations
     * @param maxDelay The maximum delay between invocations
@@ -65,10 +105,10 @@ object Retry {
     */
   def apply[T](
       name: String,
-      maxAttempts: Int = DefaultMaxAttempts,
-      minDelay: FiniteDuration = DefaultMinDelay,
-      maxDelay: FiniteDuration = DefaultMaxDelay,
-      maxDuration: Duration = DefaultMaxDuration,
+      maxAttempts: Int = defaultSettings.maxAttempts,
+      minDelay: FiniteDuration = defaultSettings.minDelay,
+      maxDelay: FiniteDuration = defaultSettings.maxDelay,
+      maxDuration: Duration = defaultSettings.maxDuration,
       retryOn: RetryOnFn = defaultRetry
   )(f: => Future[T])(implicit system: ActorSystem, ctx: ExecutionContext): Future[T] = {
     val promise = Promise[T]()
@@ -90,18 +130,21 @@ object Retry {
             val nextDelay = randomBetween(
               lastDelay.toNanos,
               if (jitteredLastDelay < 0 || jitteredLastDelay > maxDelay.toNanos) maxDelay.toNanos else jitteredLastDelay
-            ).nano
+            )
 
             require(
               nextDelay <= maxDelay,
               s"nextDelay of ${nextDelay.toNanos}ns is too big, may not exceed ${maxDelay.toNanos}ns"
             )
 
-            scheduler.scheduleOnce(nextDelay)(retry(attempt + 1, nextDelay))
+            system.scheduler.scheduleOnce(nextDelay)(retry(attempt + 1, nextDelay))
           } else {
             if (expired) {
               promise.failure(
-                TimeoutException(s"$name failed to complete in under $maxDuration. Last error: ${e.getMessage}", e)
+                TimeoutException(
+                  s"$name failed to complete in under ${maxDuration.toHumanReadable}. Last error: ${e.getMessage}",
+                  e
+                )
               )
             } else {
               promise.failure(
@@ -135,10 +178,10 @@ object Retry {
     */
   def blocking[T](
       name: String,
-      maxAttempts: Int = 5,
-      minDelay: FiniteDuration = DefaultMinDelay,
-      maxDelay: FiniteDuration = DefaultMaxDelay,
-      maxDuration: Duration = DefaultMaxDuration,
+      maxAttempts: Int = defaultSettings.maxAttempts,
+      minDelay: FiniteDuration = defaultSettings.minDelay,
+      maxDelay: FiniteDuration = defaultSettings.maxDelay,
+      maxDuration: Duration = defaultSettings.maxDuration,
       retryOn: RetryOnFn = defaultRetry
   )(f: => T)(implicit system: ActorSystem, ctx: ExecutionContext): Future[T] = {
     apply(name, maxAttempts, minDelay, maxDelay, maxDuration, retryOn)(Future(blockingCall(f)))
