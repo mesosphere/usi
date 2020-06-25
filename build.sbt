@@ -84,6 +84,7 @@ lazy val `commons` = (project in file("./commons"))
       Dependencies.guava,
       Dependencies.scalaJavaCompat,
       Dependencies.scalaLogging,
+      Dependencies.Test.scalaCheck % "test",
       Dependencies.Test.scalaTest % "test"
     )
   )
