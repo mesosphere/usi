@@ -9,7 +9,8 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.concurrent.{ExecutionContext, Future, Promise, blocking => blockingCall}
-import scala.compat.java8.DurationConverters.DurationOps
+// Rename DurationOps so they are not overridden by async.DurationOps in same scope.
+import scala.compat.java8.DurationConverters.{DurationOps => CompatDurationOps}
 import scala.util.{Failure, Random, Success}
 import scala.util.control.NonFatal
 
@@ -49,9 +50,9 @@ object RetrySettings {
   def fromConfig(conf: Config): RetrySettings = {
     val maxAttempts = conf.getInt("max-attempts")
 
-    val minDelay: FiniteDuration = DurationOps(conf.getDuration("min-delay")).toScala
-    val maxDelay: FiniteDuration = DurationOps(conf.getDuration("max-delay")).toScala
-    val maxDuration: Duration = DurationOps(conf.getDuration("max-duration")).toScala
+    val minDelay: FiniteDuration = conf.getDuration("min-delay").toScala
+    val maxDelay: FiniteDuration = conf.getDuration("max-delay").toScala
+    val maxDuration: Duration = conf.getDuration("max-duration").toScala
 
     new RetrySettings(maxAttempts, minDelay, maxDelay, maxDuration)
   }
