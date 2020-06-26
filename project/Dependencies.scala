@@ -11,7 +11,9 @@ object Dependencies {
     val guava = "29.0-jre"
     val scalaJavaCompat = "0.9.1"
     val mesos = "1.9.0"
+    val mockitoScala = "1.14.8"
     val scalaLogging = "3.9.2"
+    val scalaCheck = "1.14.1"
     val scalaTest = "3.0.8"
   }
 
@@ -53,6 +55,8 @@ object Dependencies {
   val scopt = "com.github.scopt" %% "scopt" % "4.0.0-RC2"
 
   object Test {
+    val mockitoScala = "org.mockito" %% "mockito-scala-scalatest" % Versions.mockitoScala
+    val scalaCheck = "org.scalacheck" %% "scalacheck" % Versions.scalaCheck
     val scalaTest = "org.scalatest" %% "scalatest" % Versions.scalaTest
 
     // testRuntimeOnly "org.scala-lang.modules:scala-xml_$scalaVersion:1.1.1"

@@ -1,8 +1,17 @@
 package com.mesosphere.usi.async
 
-import java.util.concurrent.{ExecutorService, Executors, ThreadFactory}
+import java.util.concurrent.{Executor, ExecutorService, Executors, ThreadFactory}
 import com.google.common.util.concurrent.ThreadFactoryBuilder
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+
+private[async] object CallerThreadExecutionContext {
+  val executor: Executor = (command: Runnable) => command.run()
+
+  lazy val callerThreadExecutionContext: ExecutionContextExecutor =
+    ExecutionContext.fromExecutor(executor)
+
+  def apply(): ExecutionContext = callerThreadExecutionContext
+}
 
 object ThreadPoolContext {
 
@@ -14,10 +23,15 @@ object ThreadPoolContext {
     * if you do blocking IO operations.
     */
   implicit lazy val ioContext =
-    NamedExecutionContext.fixedThreadPoolExecutionContext(numberOfThreads, namePrefix = "io-pool")
+    ExecutionContexts.fixedThreadPoolExecutionContext(numberOfThreads, namePrefix = "io-pool")
 }
 
-object NamedExecutionContext {
+object ExecutionContexts {
+
+  /**
+    * An [[ExecutionContext]] that uses the same thread. Use it wisely.
+    */
+  lazy val callerThread: ExecutionContext = CallerThreadExecutionContext()
 
   /**
     * Returns an execution context backed by a fixed thread pool. All threads in the pool are prefixed with `namePrefix`
