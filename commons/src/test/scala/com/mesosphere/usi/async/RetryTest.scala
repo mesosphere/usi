@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import akka.actor.{ActorSystem, Cancellable, Scheduler}
 import com.mesosphere.usi.async.Retry.RetryOnFn
 import com.mesosphere.utils.UnitTestLike
+import org.mockito.{Mockito => M}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
@@ -19,6 +20,8 @@ class RetryTest extends UnitTestLike with ScalaCheckPropertyChecks with MockitoS
   }
 
   implicit val ec = scala.concurrent.ExecutionContext.global
+
+  implicit val system: ActorSystem = mock[ActorSystem]
 
   def countCalls[T](counter: AtomicInteger)(f: => T): T = {
     counter.incrementAndGet()
@@ -49,11 +52,15 @@ class RetryTest extends UnitTestLike with ScalaCheckPropertyChecks with MockitoS
   "Retry" when {
     "async" should {
       "complete normally" in {
+        val scheduler = trackingScheduler(mutable.Queue.empty[FiniteDuration])
+        M.when(system.scheduler).thenReturn(scheduler)
         val counter = new AtomicInteger()
         Retry("complete")(countCalls(counter)(Future.successful(1))).futureValue should equal(1)
         counter.intValue() should equal(1)
       }
       "fail if the exception is not in the allowed list" in {
+        val scheduler = trackingScheduler(mutable.Queue.empty[FiniteDuration])
+        M.when(system.scheduler).thenReturn(scheduler)
         val ex = new Exception("expected")
         val counter = new AtomicInteger()
         val result = Retry("failure", retryOn = retryFn)(countCalls(counter)(Future.failed(ex))).failed.futureValue
@@ -61,6 +68,8 @@ class RetryTest extends UnitTestLike with ScalaCheckPropertyChecks with MockitoS
         counter.intValue() should equal(1)
       }
       "retry if the exception is allowed" in {
+        val scheduler = trackingScheduler(mutable.Queue.empty[FiniteDuration])
+        M.when(system.scheduler).thenReturn(scheduler)
         val counter = new AtomicInteger()
         val ex = new Exception("")
         val result = Retry("failure", maxAttempts = 5, minDelay = 1.nano, maxDelay = 1.nano) {
@@ -72,7 +81,8 @@ class RetryTest extends UnitTestLike with ScalaCheckPropertyChecks with MockitoS
       }
       "retry in strictly greater increments" in {
         val delays = mutable.Queue.empty[FiniteDuration]
-        implicit val scheduler = trackingScheduler(delays)
+        val scheduler = trackingScheduler(delays)
+        M.when(system.scheduler).thenReturn(scheduler)
         Retry("failure", maxAttempts = 5, minDelay = 1.milli, maxDelay = 5.seconds) {
           Future.failed(new Exception(""))
         }.failed.futureValue
@@ -88,7 +98,8 @@ class RetryTest extends UnitTestLike with ScalaCheckPropertyChecks with MockitoS
       }
       "never exceed maxDelay" in {
         val delays = mutable.Queue.empty[FiniteDuration]
-        implicit val scheduler = trackingScheduler(delays)
+        val scheduler = trackingScheduler(delays)
+        M.when(system.scheduler).thenReturn(scheduler)
         Retry("failure", maxAttempts = 100, minDelay = 1.milli, maxDelay = 5.seconds) {
           Future.failed(new Exception(""))
         }.failed.futureValue
@@ -134,7 +145,8 @@ class RetryTest extends UnitTestLike with ScalaCheckPropertyChecks with MockitoS
       }
       "retry in strictly greater increments" in {
         val delays = mutable.Queue.empty[FiniteDuration]
-        implicit val scheduler = trackingScheduler(delays)
+        val scheduler = trackingScheduler(delays)
+        M.when(system.scheduler).thenReturn(scheduler)
         Retry
           .blocking("failure", maxAttempts = 5, minDelay = 1.milli, maxDelay = 5.seconds) {
             throw new Exception("expected")
@@ -157,7 +169,8 @@ class RetryTest extends UnitTestLike with ScalaCheckPropertyChecks with MockitoS
       }
       "never exceed maxDelay" in {
         val delays = mutable.Queue.empty[FiniteDuration]
-        implicit val scheduler = trackingScheduler(delays)
+        val scheduler = trackingScheduler(delays)
+        M.when(system.scheduler).thenReturn(scheduler)
         Retry
           .blocking("failure", maxAttempts = 100, minDelay = 1.milli, maxDelay = 5.seconds) {
             throw new Exception("")
