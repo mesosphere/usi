@@ -16,7 +16,7 @@ class MesosClientImplTest extends AkkaUnitTest {
 
   "Mesos client" should {
     "fail if the provided Mesos version is incompatible" in {
-      val masterInfo = MasterInfo.newBuilder().setVersion("1.8.0").setId("unique").setIp(42).setPort(0).build()
+      val masterInfo = MasterInfo.newBuilder().setVersion("1.4.2").setId("unique").setIp(42).setPort(0).build()
       val frameworkId = FrameworkID.newBuilder().setValue("framework").build()
       val subscribedEvent = Event.Subscribed.newBuilder().setMasterInfo(masterInfo).setFrameworkId(frameworkId).build()
       val sharedKillSwitch = KillSwitches.shared("mesos-client-killswitch")
