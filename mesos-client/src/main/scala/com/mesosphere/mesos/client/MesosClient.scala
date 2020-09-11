@@ -419,7 +419,7 @@ class MesosClientImpl(
 
   val masterInfo = subscribed.getMasterInfo
 
-  val minimalVersion = SemanticVersion(1, 9, 0)
+  val minimalVersion = SemanticVersion(1, 5, 0)
   val version = SemanticVersion(masterInfo.getVersion).get
   require(
     version >= minimalVersion,
