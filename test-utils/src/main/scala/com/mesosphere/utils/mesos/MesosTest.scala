@@ -379,7 +379,16 @@ case class MesosCluster(
       file.getAbsolutePath
     }
 
-    val credentialsPath = write(mesosWorkDir, fileName = "credentials", content = "principal1 secret1")
+    val credentialsPath = write(
+      mesosWorkDir,
+      fileName = "credentials",
+      content = """
+        |{
+        |  "credentials" : [{ "principal": "principal1", "secret": "secret1" }]
+        |}
+      """.stripMargin
+    )
+
     val aclsPath = write(
       mesosWorkDir,
       fileName = "acls.json",
