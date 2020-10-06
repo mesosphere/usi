@@ -34,7 +34,7 @@ pipeline {
 
       steps {
         sh 'mkdir -p /root/.sbt/launchers/1.3.13/'
-        sh 'curl -O /root/.sbt/launchers/1.3.13/sbt-launch.jar https://repo.scala-sbt.org/scalasbt/maven-releases/org/scala-sbt/sbt-launch/1.3.13/sbt-launch.jar'
+        sh 'curl -L -o /root/.sbt/launchers/1.3.13/sbt-launch.jar https://repo.scala-sbt.org/scalasbt/maven-releases/org/scala-sbt/sbt-launch/1.3.13/sbt-launch.jar'
         sh 'sbt +publish'
       }
     }
